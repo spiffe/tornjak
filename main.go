@@ -12,6 +12,7 @@ import (
     "encoding/json"
     "os/exec"
     "github.com/pkg/errors"
+    "github.com/lumjjb/tornjak/api"
 )
 /*
 func main() {
@@ -72,12 +73,17 @@ func main() {
         case "api":
             // default to spire-server binary
             RunSpireApi(config)
+        case "rest":
+            apiServer := &api.Server{
+                SpireServerAddr: "unix://" + config.Server.RegistrationUDSPath,
+            }
+            apiServer.HandleRequests()
         default:
             log.Fatalf("Unrecognized command")
     }
     return
-}
 
+}
 
 func GetServerInfo (config *run.Config) {
 
@@ -107,7 +113,6 @@ func RunSpireApi (config *run.Config) {
     var args []string
 
     apiArgs := os.Args[3:]
-
 
     for _, check := range checkList {
         if err := check(apiArgs); err != nil {
@@ -141,7 +146,6 @@ func denyTokenGenerate (args []string) error {
     return nil
 }
 
-
 func noAdmin(args []string) error {
     for _, a := range args {
         if a == "-admin" {
@@ -152,8 +156,7 @@ func noAdmin(args []string) error {
     return nil
 }
 
-
 var checkList []checkFn = []checkFn{
     denyTokenGenerate,
     noAdmin,
-}   
+}
