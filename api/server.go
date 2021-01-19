@@ -14,11 +14,13 @@ type Server struct {
 }
 
 func (_ *Server) homePage(w http.ResponseWriter, r *http.Request){
+    w.Header().Set("Access-Control-Allow-Origin", "*")
     fmt.Fprintf(w, "Welcome to the HomePage!")
     fmt.Println("Endpoint Hit: homePage")
 }
 
 func (s *Server) agentList (w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Access-Control-Allow-Origin", "*")
     fmt.Println("Endpoint Hit: Agent List")
 
     var input ListAgentsRequest
@@ -63,6 +65,7 @@ func (s *Server) agentList (w http.ResponseWriter, r *http.Request) {
 
 
 func (s *Server) agentBan (w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Access-Control-Allow-Origin", "*")
     fmt.Println("Endpoint Hit: Agent Ban")
 
     var input BanAgentRequest
@@ -100,6 +103,7 @@ func (s *Server) agentBan (w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) agentDelete (w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Access-Control-Allow-Origin", "*")
     fmt.Println("Endpoint Hit: Agent Delete")
 
     var input DeleteAgentRequest
@@ -137,6 +141,7 @@ func (s *Server) agentDelete (w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) agentCreateJoinToken (w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Access-Control-Allow-Origin", "*")
     fmt.Println("Endpoint Hit: Agent Create Join Token")
 
     var input CreateJoinTokenRequest
@@ -178,7 +183,9 @@ func (s *Server) agentCreateJoinToken (w http.ResponseWriter, r *http.Request) {
 
 }
 
-
+func Cors(w http.ResponseWriter, r *http.Request) {
+  w.Header().Set("Access-Control-Allow-Origin", "*")
+}
 
 
 func (s *Server) HandleRequests() {
