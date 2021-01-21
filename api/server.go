@@ -14,13 +14,13 @@ type Server struct {
 }
 
 func (_ *Server) homePage(w http.ResponseWriter, r *http.Request){
-    w.Header().Set("Access-Control-Allow-Origin", "*")
     fmt.Fprintf(w, "Welcome to the HomePage!")
     fmt.Println("Endpoint Hit: homePage")
+    cors(w,r)
 }
 
 func (s *Server) agentList (w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Access-Control-Allow-Origin", "*")
+    cors(w,r)
     fmt.Println("Endpoint Hit: Agent List")
 
     var input ListAgentsRequest
@@ -65,7 +65,7 @@ func (s *Server) agentList (w http.ResponseWriter, r *http.Request) {
 
 
 func (s *Server) agentBan (w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Access-Control-Allow-Origin", "*")
+    cors(w,r)
     fmt.Println("Endpoint Hit: Agent Ban")
 
     var input BanAgentRequest
@@ -103,7 +103,7 @@ func (s *Server) agentBan (w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) agentDelete (w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Access-Control-Allow-Origin", "*")
+    cors(w,r)
     fmt.Println("Endpoint Hit: Agent Delete")
 
     var input DeleteAgentRequest
@@ -138,10 +138,11 @@ func (s *Server) agentDelete (w http.ResponseWriter, r *http.Request) {
     }
 
     w.Write([]byte("SUCCESS"))
+    cors(w,r)
 }
 
 func (s *Server) agentCreateJoinToken (w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Access-Control-Allow-Origin", "*")
+    cors(w,r)
     fmt.Println("Endpoint Hit: Agent Create Join Token")
 
     var input CreateJoinTokenRequest
@@ -180,11 +181,13 @@ func (s *Server) agentCreateJoinToken (w http.ResponseWriter, r *http.Request) {
         http.Error(w, emsg, http.StatusBadRequest)
         return
     }
-
 }
 
-func Cors(w http.ResponseWriter, r *http.Request) {
+func cors(w http.ResponseWriter, _ *http.Request) {
+  w.Header().Set("Content-Type", "text/html; charset=ascii")
   w.Header().Set("Access-Control-Allow-Origin", "*")
+  w.Header().Set("Access-Control-Allow-Headers","Content-Type,access-control-allow-origin, access-control-allow-headers")
+  w.WriteHeader(http.StatusOK)
 }
 
 
