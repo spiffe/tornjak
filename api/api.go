@@ -7,6 +7,7 @@ import (
 
 	types "github.com/spiffe/spire/proto/spire/types"
     agent "github.com/spiffe/spire/proto/spire/api/server/agent/v1"
+    entry "github.com/spiffe/spire/proto/spire/api/server/entry/v1"
 )
 
 type ListAgentsRequest agent.ListAgentsRequest
@@ -90,6 +91,76 @@ func (s *Server) CreateJoinToken(inp CreateJoinTokenRequest) (*CreateJoinTokenRe
 
     return (*CreateJoinTokenResponse)(joinToken), nil
 }
+
+
+// Entries
+
+type ListEntriesRequest entry.ListEntriesRequest
+type ListEntriesResponse entry.ListEntriesResponse
+
+func (s *Server) ListEntries(inp ListEntriesRequest) (*ListEntriesResponse, error) {
+    inpReq := entry.ListEntriesRequest(inp)
+    var conn *grpc.ClientConn
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithInsecure())
+	if err != nil {
+        return nil, err
+	}
+	defer conn.Close()
+    client:= entry.NewEntryClient(conn)
+
+    resp, err := client.ListEntries(context.Background(), &inpReq)
+    if err != nil {
+        return nil, err
+    }
+
+    return (*ListEntriesResponse)(resp), nil
+}
+
+
+type BatchCreateEntryRequest entry.BatchCreateEntryRequest
+type BatchCreateEntryResponse entry.BatchCreateEntryResponse
+
+func (s *Server) BatchCreateEntry(inp BatchCreateEntryRequest) (*BatchCreateEntryResponse, error) {
+    inpReq := entry.BatchCreateEntryRequest(inp)
+    var conn *grpc.ClientConn
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithInsecure())
+	if err != nil {
+        return nil, err
+	}
+	defer conn.Close()
+    client:= entry.NewEntryClient(conn)
+
+    resp, err := client.BatchCreateEntry(context.Background(), &inpReq)
+    if err != nil {
+        return nil, err
+    }
+
+    return (*BatchCreateEntryResponse)(resp), nil
+}
+
+type BatchDeleteEntryRequest entry.BatchDeleteEntryRequest
+type BatchDeleteEntryResponse entry.BatchDeleteEntryResponse
+
+func (s *Server) BatchDeleteEntry(inp BatchDeleteEntryRequest) (*BatchDeleteEntryResponse, error) {
+    inpReq := entry.BatchDeleteEntryRequest(inp)
+    var conn *grpc.ClientConn
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithInsecure())
+	if err != nil {
+        return nil, err
+	}
+	defer conn.Close()
+    client:= entry.NewEntryClient(conn)
+
+    resp, err := client.BatchDeleteEntry(context.Background(), &inpReq)
+    if err != nil {
+        return nil, err
+    }
+
+    return (*BatchDeleteEntryResponse)(resp), nil
+}
+
+
+
 
 /*
 
