@@ -3,4 +3,5 @@
 
 [[ -f tornjak ]] && \
 docker build -t lumjjb/tornjak . && docker push lumjjb/tornjak \
-&& docker build -f Dockerfile.spireadd -t lumjjb/tornjak-spire-server . && docker push lumjjb/tornjak-spire-server
+&& docker build -f Dockerfile.spireadd -t lumjjb/tornjak-spire-server . && docker push lumjjb/tornjak-spire-server \
+&& docker build --no-cache -f Dockerfile.add-frontend -t lumjjb/tornjak-spire-server-front . && docker push lumjjb/tornjak-spire-server-front

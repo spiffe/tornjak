@@ -1,0 +1,12 @@
+FROM gcr.io/spiffe-io/spire-server:0.11.0
+RUN apk add curl
+COPY tornjak tornjak
+
+# Add frontend
+RUN apk add npm git
+RUN git clone https://github.com/lumjjb/tornjak-frontend.git
+RUN npm install --prefix ./tornjak-frontend
+
+# Add init
+COPY run_server.sh run_server.sh
+ENTRYPOINT ["/opt/spire/run_server.sh"]
