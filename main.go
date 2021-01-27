@@ -57,7 +57,7 @@ func main() {
 
 func main() {
     if len(os.Args) <  3 {
-        log.Fatalf("Usage %v <config file> [serverinfo|api]", os.Args[0])
+        log.Fatalf("Usage %v <config file> [serverinfo|api|http]", os.Args[0])
     }
 
     config, err := run.ParseFile(os.Args[1], false)
@@ -73,7 +73,7 @@ func main() {
         case "api":
             // default to spire-server binary
             RunSpireApi(config)
-        case "rest":
+        case "http":
             apiServer := &api.Server{
                 SpireServerAddr: "unix://" + config.Server.RegistrationUDSPath,
             }

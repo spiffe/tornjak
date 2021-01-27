@@ -1,6 +1,8 @@
 .PHONY: ui vendor build
 
-build: bin/tornjak ui container
+CONTAINER_TAG ?= lumjjb/tornjak-spire-server:latest
+
+all: bin/tornjak ui container
 
 bin/tornjak: vendor
 	# Build hack because of flake of imported go module
@@ -17,7 +19,7 @@ vendor:
 	go mod vendor
 
 container: bin/tornjak ui
-	docker build --no-cache -f Dockerfile.add-frontend -t lumjjb/tornjak-spire-server . && docker push lumjjb/tornjak-spire-server
+	docker build --no-cache -f Dockerfile.add-frontend -t ${CONTAINER_TAG} . && docker push ${CONTAINER_TAG}
 
 clean:
 	rm -rf bin/
