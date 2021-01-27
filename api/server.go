@@ -326,17 +326,22 @@ func cors(w http.ResponseWriter, _ *http.Request) {
 
 
 func (s *Server) HandleRequests() {
-    http.HandleFunc("/", s.homePage)
 
     // Agents
-    http.HandleFunc("/agent/list", s.agentList)
-    http.HandleFunc("/agent/ban", s.agentBan)
-    http.HandleFunc("/agent/delete", s.agentDelete)
-    http.HandleFunc("/agent/createjointoken", s.agentCreateJoinToken)
+    http.HandleFunc("/api/agent/list", s.agentList)
+    http.HandleFunc("/api/agent/ban", s.agentBan)
+    http.HandleFunc("/api/agent/delete", s.agentDelete)
+    http.HandleFunc("/api/agent/createjointoken", s.agentCreateJoinToken)
     
     // Entries
-    http.HandleFunc("/entry/list", s.entryList)
-    http.HandleFunc("/entry/create", s.entryCreate)
-    http.HandleFunc("/entry/delete", s.entryDelete)
+    http.HandleFunc("/api/entry/list", s.entryList)
+    http.HandleFunc("/api/entry/create", s.entryCreate)
+    http.HandleFunc("/api/entry/delete", s.entryDelete)
+
+    // UI
+    //http.HandleFunc("/", s.homePage)
+    http.Handle("/", http.FileServer(http.Dir("./ui")))
+
+    fmt.Println("Starting to listen...")
     log.Fatal(http.ListenAndServe(":10000", nil))
 }

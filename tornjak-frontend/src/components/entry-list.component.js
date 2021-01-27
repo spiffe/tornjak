@@ -31,7 +31,7 @@ export default class EntryList extends Component {
   }
 
   componentDidMount() {
-    axios.get(GetApiServerUri('/entry/list'), { crossdomain: true })
+    axios.get(GetApiServerUri('/api/entry/list'), { crossdomain: true })
       .then(response => {
           console.log(response.data);
         this.setState({ entries:response.data["entries"]} );
@@ -42,7 +42,7 @@ export default class EntryList extends Component {
   }
 
   deleteEntry(id) {
-    axios.post('http://localhost:10000/entry/delete', {
+    axios.post(GetApiServerUri('/api/entry/delete'), {
         "ids": [id]
     })
       .then(res => { console.log(res.data)

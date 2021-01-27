@@ -223,7 +223,7 @@ console.log(a.substr(sp))*/
         }]
     }
 
-    axios.post(GetApiServerUri('/entry/create'), cjtData)
+    axios.post(GetApiServerUri('/api/entry/create'), cjtData)
       .then(res => this.setState({ message: "Requst:" + JSON.stringify(cjtData,null, ' ')+ "\n\nSuccess:" + JSON.stringify(res.data, null, ' ')}))
       .catch(err => this.setState({ message: "ERROR:" + err }))
     //window.location = '/';

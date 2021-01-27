@@ -167,7 +167,7 @@ console.log(a.substr(sp))*/
     if (this.state.token !== "") {
         cjtData["token"] = this.state.token;
     }
-    axios.post(GetApiServerUri('/agent/createjointoken'), cjtData)
+    axios.post(GetApiServerUri('/api/agent/createjointoken'), cjtData)
       .then(res => this.setState({ message: "Requst:" + JSON.stringify(cjtData,null, ' ')+ "\n\nSuccess:" + JSON.stringify(res.data, null, ' ')}))
       .catch(err => this.setState({ message: "ERROR:" + err }))
     //window.location = '/';

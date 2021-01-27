@@ -31,7 +31,7 @@ export default class AgentList extends Component {
   }
 
   componentDidMount() {
-    axios.get(GetApiServerUri('/agent/list'), { crossdomain: true })
+    axios.get(GetApiServerUri('/api/agent/list'), { crossdomain: true })
       .then(response => {
         this.setState({ agents:response.data["agents"]} );
       })
@@ -41,20 +41,20 @@ export default class AgentList extends Component {
   }
 
   banAgent(id) {
-    axios.post('http://localhost:10000/agent/ban', {
+    axios.post(GetApiServerUri('/api/agent/ban'), {
         "id": {
               "trust_domain": id.trust_domain,
               "path": id.path,
         }
     })
-      .then(res => console.log(res.data), alert("Ban SUCCESS"), window.location.reload(false));
+      .then(res => console.log(res.data), alert("Ban SUCCESS"), this.componentDidMount());
     this.setState({
       agents: this.state.agents.filter(el => el._id !== id)
     })
   }
 
   deleteAgent(id) {
-    axios.post('http://localhost:10000/agent/delete', {
+    axios.post(GetApiServerUri('/api/agent/delete'), {
         "id": {
               "trust_domain": id.trust_domain,
               "path": id.path,
