@@ -1,5 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# golang vendor
+vendor/
+
 # dependencies
 tornjak-frontend/node_modules
 tornjak-frontend/.pnp

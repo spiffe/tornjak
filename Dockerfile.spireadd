@@ -1,5 +1,0 @@
-FROM gcr.io/spiffe-io/spire-server:0.11.0
-RUN apk add curl
-COPY tornjak tornjak
-COPY run_server.sh run_server.sh
-ENTRYPOINT ["/opt/spire/run_server.sh"]
