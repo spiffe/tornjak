@@ -1,5 +1,7 @@
 # Tornjak manager 
 
+![tornjak-manager](rsrc/manager.png)
+
 The tornjak manager provides a way to manage identities, providing capabilities such as:
 - Global visibility of identity registrations
 - Management of SPIRE identity configurations (Q)

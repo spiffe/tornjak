@@ -1,5 +1,7 @@
 # Tornjak Agent
 
+![tornjak-agent](rsrc/agent.png)
+
 The components of tornjak on the SPIRE server should ideally be minimal. It should leverage the APIs of the SPIRE server as well as all the controls based around the SPIRE server, this leads to enforcement point being as close to the action as well as not having to have additional management throughout the stack. However, in order to fulfill some of the capabilities that are needed today and current state of features being developed, the component will take up a bigger role. 
 
 As certain new features are built out in SPIRE, these responsibility can then be transfered to use SPIRE native mechanisms. In addition, if certain additional APIs will have a corresponding API in the future, then the capabilities will move to using the SPIRE APIs. 
