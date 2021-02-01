@@ -3,8 +3,9 @@
 Due to there being several components that need to be built as well as dependencies on continuing effort, the work can be broken down into milestones.
 
 
+## Milestones
 
-Milestone 1:
+### Milestone 1:
 
 Very simple global visibility and management of SPIRE APIs with simple authentication.
 
@@ -24,7 +25,7 @@ Very simple global visibility and management of SPIRE APIs with simple authentic
 Feature dependencies: None
 
 
-Milestone 2:
+### Milestone 2:
 
 Add ability to obtain server info and some custom tornjak APIs with simple authentication
 
@@ -37,7 +38,7 @@ In addition to above:
 
 Feature dependencies: None
 
-Milestone 3:
+### Milestone 3:
 
 Provide authorization capabilities and policy management. Showcase the ability to use
 the workload registrar usecase with a stricter threat model enforced by policy.
@@ -59,7 +60,7 @@ In addition to above:
 Feature dependencies: Authorization and policy management
 
 
-Milestone 4:
+### Milestone 4:
 
 Provide better UX around policy management and provide the ability to create
 more sophisticated identity policy.
@@ -73,7 +74,7 @@ In addition to above:
 Feature dependencies: Authorization and policy management
 
 
-Milestone 5+:
+### Milestone 5+:
 
 Other missing features:
 - Agent
