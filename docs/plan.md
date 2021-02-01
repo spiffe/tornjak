@@ -12,8 +12,13 @@ The nature of the design specification of milestones is based on two main ideas:
 Here are a set of milestones. It is defined in an order but does not have to strictly follow it apart from Milestones A and B to lay the foundations of other milestones.
 
 List of milestones
-- Milestone A: Global Visibility
-- Milestone B: 
+- [Milestone A: Global Visibility](#milestone-a-global-visibility)
+- [Milestone B: Global Visibility + Authentication](#milestone-b-global-visibility--authentication)
+- [Milestone C: Policy management](#milestone-c-policy-management)
+- [Milestone D: Improve Policy definitions and UX](#milestone-d-improve-policy-definitions-and-ux)
+- [Milestone E: Auditability](#milestone-e-auditability)
+- [Milestone F: Advanced Authentication](#milestone-f-advanced-authentication)
+- [Milestone G: Enhancing SPIRE API](#milestone-g-enhancing-spire-api)
 
 ### Milestone A: Global Visibility
 

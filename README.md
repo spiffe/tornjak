@@ -1,16 +1,19 @@
-# tornjak
+# Tornjak
 
-This repo container add-ons to a SPIRE server. It is a single binary which runs alongside the spire server. It is configured by pointing to a SPIRE server config file. Right now the features are:
+The project aims to provide a management plane and capabilities for SPIFFE identities managed by SPIRE.
+The goals are to provide global visibility, auditability, and configuration and policy management for identities.
+This can be thought about as a central management plane for identities across SPIRE servers, with the aim for use by an administrator or CISO to govern an organization's workload identities.
 
-- UI for SPIRE server API
+The architecture consists of 2 main components, the agent and the manager.
+- The manager provides a management control plane for SPIRE servers, and a central point of data collection. It interacts with the agents, SPIRE servers, and corresponding components to achieve this.
+- The agent provides a way for the management plane to communicate with the SPIRE servers and provide introspection and configuration of identities.
 
-Usage:
-```
-tornjak <server.conf> [api/rest/]
-```
+For more details of the components and execution plan, please refer to these documents
+- [Manager design and details](docs/tornjak-manager.md)
+- [Agent design and details](docs/tornjak-agent.md)
+- [Execution plan](docs/plan.md)
 
-
-# Building and pushing
+## Building and pushing
 
 The binary and container can be built with the following command, replacing the container tag with the desired container tag of choice.
 
@@ -19,3 +22,14 @@ CONTAINER_TAG=lumjjb/tornjak-spire-server:latest make container
 ```
 
 The container is run with the same arguments as the SPIRE server image, and usage is transparent. It runs a server hosted on port 10000 accessed via http.
+
+### Additional technical detail
+
+This repo container add-ons to a SPIRE server. It is a single binary which runs alongside the spire server. It is configured by pointing to a SPIRE server config file. Right now the features are:
+
+- UI for SPIRE server API
+
+Usage:
+```
+tornjak <server.conf> [api/http]
+```
