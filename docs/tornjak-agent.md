@@ -22,9 +22,9 @@ As certain new features are built out in SPIRE, these responsibility can then be
   - /api/getlogs
 
 ### Authentication:
-- Ideally, authentication should be handled through SPIRE server, today, this is done via the socket or via the "Admin" flag for a SPIFFE ID within the trust domain. There are conversations about this (Issue #TBD) to enable SPIFFE IDs outside the trust domain of the SPIRE server or through other authentication mechanisms to administer the SPIRE server. This is to address the bootstrapping problem of administration of a SPIRE server. 
+- Ideally, authentication should be handled through SPIRE server, today, this is done via the socket or via the "Admin" flag for a SPIFFE ID within the trust domain. There are conversations about this (#2099)[https://github.com/spiffe/spire/issues/2099] to enable SPIFFE IDs outside the trust domain of the SPIRE server or through other authentication mechanisms to administer the SPIRE server. This is to address the bootstrapping problem of administration of a SPIRE server. 
 - In the meantime, the Tornjak agent will use the socket to authenticate with the SPIRE server. This means that additional authentication needs to be done to authenticate the caller (management plane) to the agent. For this, we will implement standard client authentication mechanisms configured on the agent. This will mirror the configuration of our ideal state with a workaround for authentication to be done.
 
 ### Authorization
-- Ideally, authentication should be handled through SPIRE server mechanisms, with the feature from #1975
+- Ideally, authentication should be handled through SPIRE server mechanisms, with the feature from [#1975](https://github.com/spiffe/spire/issues/1975)
 - For now, we will have a flat access model, which is equivalent to "Admin" flag of the SPIRE server.
