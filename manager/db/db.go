@@ -6,4 +6,5 @@ import (
 
 type ManagerDB interface {
 	CreateServerEntry(sinfo types.ServerInfo) error
+	GetServers() (types.ServerInfoList, error)
 }

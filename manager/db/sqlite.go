@@ -46,3 +46,26 @@ func (db *LocalSqliteDb) CreateServerEntry(sinfo types.ServerInfo) error {
 
 	return err
 }
+
+
+func (db *LocalSqliteDb) GetServers () (types.ServerInfoList, error) {
+    rows, err := db.database.Query("SELECT servername, address FROM servers")
+	if err != nil {
+		return types.ServerInfoList{}, errors.New("Unable to execute SQL query")
+	}
+
+    sinfos := []types.ServerInfo{}
+    var name string
+    var address string
+    for rows.Next() {
+        rows.Scan(&name, &address)
+        sinfos = append(sinfos, types.ServerInfo{
+            Name: name,
+            Address: address,
+        })
+    }
+
+	return types.ServerInfoList{
+        Servers: sinfos,
+    }, nil
+}
