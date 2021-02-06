@@ -23,6 +23,19 @@ func (_ *Server) homePage(w http.ResponseWriter, r *http.Request){
     cors(w,r)
 }
 
+
+// Handle preflight checks
+func corsHandler(f func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
+  return func(w http.ResponseWriter, r *http.Request) {
+    if (r.Method == "OPTIONS") {
+        cors(w,r)
+        return
+    } else {
+      f(w,r)
+    }
+  }
+}
+
 func cors(w http.ResponseWriter, _ *http.Request) {
   w.Header().Set("Content-Type", "text/html; charset=ascii")
   w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -75,9 +88,9 @@ func (s *Server) HandleRequests() {
     // TO implement
     rtr := mux.NewRouter()
 
-    rtr.HandleFunc("/manager-api/server/list", s.serverList)
-    rtr.HandleFunc("/manager-api/server/register", s.serverRegister)
-    rtr.HandleFunc("/manager-api/entry/list/{server:.*}", s.entryList)
+    rtr.HandleFunc("/manager-api/server/list", corsHandler(s.serverList))
+    rtr.HandleFunc("/manager-api/server/register", corsHandler(s.serverRegister))
+    rtr.HandleFunc("/manager-api/entry/list/{server:.*}", corsHandler(s.entryList))
 
     //http.HandleFunc("/manager-api/get-server-info", s.agentList)
     //http.HandleFunc("/manager-api/agent/list/:id", s.agentList)

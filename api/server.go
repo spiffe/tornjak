@@ -301,19 +301,30 @@ func cors(w http.ResponseWriter, _ *http.Request) {
   w.WriteHeader(http.StatusOK)
 }
 
+// Handle preflight checks
+func corsHandler(f func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
+  return func(w http.ResponseWriter, r *http.Request) {
+    if (r.Method == "OPTIONS") {
+        cors(w,r)
+        return
+    } else {
+      f(w,r)
+    }
+  }
+}
 
 func (s *Server) HandleRequests() {
 
     // Agents
-    http.HandleFunc("/api/agent/list", s.agentList)
-    http.HandleFunc("/api/agent/ban", s.agentBan)
-    http.HandleFunc("/api/agent/delete", s.agentDelete)
-    http.HandleFunc("/api/agent/createjointoken", s.agentCreateJoinToken)
+    http.HandleFunc("/api/agent/list", corsHandler(s.agentList))
+    http.HandleFunc("/api/agent/ban", corsHandler(s.agentBan))
+    http.HandleFunc("/api/agent/delete", corsHandler(s.agentDelete))
+    http.HandleFunc("/api/agent/createjointoken", corsHandler(s.agentCreateJoinToken))
     
     // Entries
-    http.HandleFunc("/api/entry/list", s.entryList)
-    http.HandleFunc("/api/entry/create", s.entryCreate)
-    http.HandleFunc("/api/entry/delete", s.entryDelete)
+    http.HandleFunc("/api/entry/list", corsHandler(s.entryList))
+    http.HandleFunc("/api/entry/create", corsHandler(s.entryCreate))
+    http.HandleFunc("/api/entry/delete", corsHandler(s.entryDelete))
 
     // UI
     //http.HandleFunc("/", s.homePage)
