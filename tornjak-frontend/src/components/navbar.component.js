@@ -1,9 +1,16 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import IsManager from './is_manager';
 
 export default class Navbar extends Component {
 
   render() {
+    let managerNavs;
+    managerNavs =
+          <li className="navbar-item">
+          <Link to="/entry/create" className="nav-link">Manage Servers</Link>
+          </li>
+
     return (
       <nav className="navbar navbar-dark bg-dark navbar-expand-lg">
         <Link to="/" className="navbar-brand">Tornjak</Link>
@@ -23,7 +30,7 @@ export default class Navbar extends Component {
           <li className="navbar-item">
           <Link to="/entry/create" className="nav-link">Create Entry</Link>
           </li>
-
+          {IsManager && managerNavs}
         </ul>
         </div>
       </nav>
