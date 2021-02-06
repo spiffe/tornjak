@@ -58,7 +58,10 @@ func (db *LocalSqliteDb) GetServers () (types.ServerInfoList, error) {
     var name string
     var address string
     for rows.Next() {
-        rows.Scan(&name, &address)
+        if err = rows.Scan(&name, &address); err != nil {
+            return  types.ServerInfoList{}, err
+        }
+
         sinfos = append(sinfos, types.ServerInfo{
             Name: name,
             Address: address,
@@ -68,4 +71,16 @@ func (db *LocalSqliteDb) GetServers () (types.ServerInfoList, error) {
 	return types.ServerInfoList{
         Servers: sinfos,
     }, nil
+}
+
+func (db *LocalSqliteDb) GetServer (name string) (types.ServerInfo, error) {
+    row := db.database.QueryRow("SELECT servername, address FROM servers WHERE servername=?", name)
+	
+    sinfo := types.ServerInfo{}
+    err := row.Scan(&sinfo.Name, &sinfo.Address)
+    if err != nil {
+		return types.ServerInfo{}, err
+	}
+
+	return sinfo, nil
 }

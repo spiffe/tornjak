@@ -184,7 +184,6 @@ func (s *Server) agentCreateJoinToken (w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) entryList (w http.ResponseWriter, r *http.Request) {
-    cors(w,r)
     fmt.Println("Endpoint Hit: Entry List")
 
     var input ListEntriesRequest
@@ -224,6 +223,7 @@ func (s *Server) entryList (w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    cors(w,r)
 }
 
 func (s *Server) entryCreate (w http.ResponseWriter, r *http.Request) {

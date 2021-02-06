@@ -31,12 +31,45 @@ func cors(w http.ResponseWriter, _ *http.Request) {
 }
 
 
-func pageHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) entryList(w http.ResponseWriter, r *http.Request) {
+  cors(w,r)
   vars := mux.Vars(r)
-  varId := vars["server"]
-  fmt.Println(varId)
+  serverName := vars["server"]
+
+  fmt.Println(serverName)
+
+  // Get server info
+  sinfo, err := s.db.GetServer(serverName)
+  if err != nil {
+      emsg := fmt.Sprintf("Error getting server info: %v", err.Error())
+      http.Error(w, emsg, http.StatusBadRequest)
+      return
+  }
+  fmt.Printf("%+v\n", sinfo)
+
+  client := sinfo.HttpClient()
+
+  // Tornjak path to entry list api
+  resp, err := client.Get(strings.TrimSuffix(sinfo.Address, "/") + "/api/entry/list")
+  if err != nil {
+      emsg := fmt.Sprintf("Error making api call to server: %v", err.Error())
+      http.Error(w, emsg, http.StatusBadRequest)
+      return
+  }
+  defer resp.Body.Close()
+  copyHeader(w.Header(), resp.Header)
+  w.WriteHeader(resp.StatusCode)
+  io.Copy(w, resp.Body)
   //fileName := varId + ".html"
   //http.ServeFile(w,r,fileName)
+}
+
+func copyHeader(dst, src http.Header) {
+    for k, vv := range src {
+        for _, v := range vv {
+            dst.Add(k, v)
+        }
+    }
 }
 
 func (s *Server) HandleRequests() {
@@ -45,7 +78,7 @@ func (s *Server) HandleRequests() {
 
     rtr.HandleFunc("/manager-api/server/list", s.serverList)
     rtr.HandleFunc("/manager-api/server/register", s.serverRegister)
-    rtr.HandleFunc("/manager-api/agent/list/{server:.*}", pageHandler)
+    rtr.HandleFunc("/manager-api/entry/list/{server:.*}", s.entryList)
 
     //http.HandleFunc("/manager-api/get-server-info", s.agentList)
     //http.HandleFunc("/manager-api/agent/list/:id", s.agentList)
@@ -80,7 +113,6 @@ func NewManagerServer(listenAddr, dbString string) (*Server, error) {
 
 
 func (s *Server) serverList (w http.ResponseWriter, r *http.Request) {
-    cors(w,r)
     fmt.Println("Endpoint Hit: Server List")
 
     buf := new(strings.Builder)
@@ -119,11 +151,10 @@ func (s *Server) serverList (w http.ResponseWriter, r *http.Request) {
         http.Error(w, emsg, http.StatusBadRequest)
         return
     }
-
+    cors(w,r)
 }
 
 func (s *Server) serverRegister (w http.ResponseWriter, r *http.Request) {
-    cors(w,r)
     fmt.Println("Endpoint Hit: Server Create")
 
     buf := new(strings.Builder)
