@@ -8,7 +8,7 @@ export default class Navbar extends Component {
     let managerNavs;
     managerNavs =
           <li className="navbar-item">
-          <Link to="/entry/create" className="nav-link">Manage Servers</Link>
+          <Link to="/server/manage" className="nav-link">Manage Servers</Link>
           </li>
 
     return (

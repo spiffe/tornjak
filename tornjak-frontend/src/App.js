@@ -6,6 +6,7 @@ import AgentList from "./components/agent-list.component";
 import CreateJoinToken from "./components/agent-create-join-token.component";
 import EntryList from "./components/entry-list.component";
 import EntryCreate from "./components/entry-create.component";
+import ServerManagement from "./components/server-management.component";
 
 
 
@@ -20,6 +21,7 @@ function App() {
                 <Route path="/entries" exact component={EntryList} />
                 <Route path="/entry/create" exact component={EntryCreate} />
                 <Route path="/agent/createjointoken" exact component={CreateJoinToken} />
+                <Route path="/server/manage" exact component={ServerManagement} />
             </div>
         </Router>
     );
