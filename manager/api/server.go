@@ -32,7 +32,6 @@ func cors(w http.ResponseWriter, _ *http.Request) {
 
 
 func (s *Server) entryList(w http.ResponseWriter, r *http.Request) {
-  cors(w,r)
   vars := mux.Vars(r)
   serverName := vars["server"]
 
@@ -143,15 +142,10 @@ func (s *Server) serverList (w http.ResponseWriter, r *http.Request) {
         http.Error(w, emsg, http.StatusBadRequest)
         return
     }
+    cors(w,r)
 
     je := json.NewEncoder(w)
-    err = je.Encode(ret)
-    if err != nil {
-        emsg := fmt.Sprintf("Error encoding output: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
-        return
-    }
-    cors(w,r)
+    je.Encode(ret)
 }
 
 func (s *Server) serverRegister (w http.ResponseWriter, r *http.Request) {
@@ -186,7 +180,7 @@ func (s *Server) serverRegister (w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    w.Write([]byte("SUCCESS"))
     cors(w,r)
+    w.Write([]byte("SUCCESS"))
 }
 

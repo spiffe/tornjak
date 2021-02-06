@@ -20,7 +20,6 @@ func (_ *Server) homePage(w http.ResponseWriter, r *http.Request){
 }
 
 func (s *Server) agentList (w http.ResponseWriter, r *http.Request) {
-    cors(w,r)
     fmt.Println("Endpoint Hit: Agent List")
 
     var input ListAgentsRequest
@@ -52,20 +51,15 @@ func (s *Server) agentList (w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    cors(w,r)
     je := json.NewEncoder(w)
-    err = je.Encode(ret)
-    if err != nil {
-        emsg := fmt.Sprintf("Error encoding output: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
-        return
-    }
-
+    // Shouldn't error here
+    je.Encode(ret)
 }
 
 
 
 func (s *Server) agentBan (w http.ResponseWriter, r *http.Request) {
-    cors(w,r)
     fmt.Println("Endpoint Hit: Agent Ban")
 
     var input BanAgentRequest
@@ -99,11 +93,11 @@ func (s *Server) agentBan (w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    cors(w,r)
     w.Write([]byte("SUCCESS"))
 }
 
 func (s *Server) agentDelete (w http.ResponseWriter, r *http.Request) {
-    cors(w,r)
     fmt.Println("Endpoint Hit: Agent Delete")
 
     var input DeleteAgentRequest
@@ -137,12 +131,11 @@ func (s *Server) agentDelete (w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    w.Write([]byte("SUCCESS"))
     cors(w,r)
+    w.Write([]byte("SUCCESS"))
 }
 
 func (s *Server) agentCreateJoinToken (w http.ResponseWriter, r *http.Request) {
-    cors(w,r)
     fmt.Println("Endpoint Hit: Agent Create Join Token")
 
     var input CreateJoinTokenRequest
@@ -174,13 +167,10 @@ func (s *Server) agentCreateJoinToken (w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    cors(w,r)
     je := json.NewEncoder(w)
-    err = je.Encode(ret)
-    if err != nil {
-        emsg := fmt.Sprintf("Error encoding output: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
-        return
-    }
+    // Shouldn't error here
+    je.Encode(ret)
 }
 
 func (s *Server) entryList (w http.ResponseWriter, r *http.Request) {
@@ -215,19 +205,13 @@ func (s *Server) entryList (w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    je := json.NewEncoder(w)
-    err = je.Encode(ret)
-    if err != nil {
-        emsg := fmt.Sprintf("Error encoding output: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
-        return
-    }
-
     cors(w,r)
+    je := json.NewEncoder(w)
+    // Shouldn't error here
+    je.Encode(ret)
 }
 
 func (s *Server) entryCreate (w http.ResponseWriter, r *http.Request) {
-    cors(w,r)
     fmt.Println("Endpoint Hit: Entry BatchCreate")
 
     var input BatchCreateEntryRequest
@@ -259,20 +243,16 @@ func (s *Server) entryCreate (w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    je := json.NewEncoder(w)
-    err = je.Encode(ret)
-    if err != nil {
-        emsg := fmt.Sprintf("Error encoding output: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
-        return
-    }
 
+    cors(w,r)
+    je := json.NewEncoder(w)
+    // Shouldn't error here
+    je.Encode(ret)
 }
 
 
 
 func (s *Server) entryDelete (w http.ResponseWriter, r *http.Request) {
-    cors(w,r)
     fmt.Println("Endpoint Hit: Entry BatchDelete")
 
     var input BatchDeleteEntryRequest
@@ -304,14 +284,11 @@ func (s *Server) entryDelete (w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    je := json.NewEncoder(w)
-    err = je.Encode(ret)
-    if err != nil {
-        emsg := fmt.Sprintf("Error encoding output: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
-        return
-    }
 
+    cors(w,r)
+    je := json.NewEncoder(w)
+    // Shouldn't error here
+    je.Encode(ret)
 }
 
 
