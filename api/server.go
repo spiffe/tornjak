@@ -28,7 +28,7 @@ func (s *Server) agentList (w http.ResponseWriter, r *http.Request) {
     n, err := io.Copy(buf, r.Body)
     if err != nil {
         emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
     data := buf.String()
@@ -39,7 +39,7 @@ func (s *Server) agentList (w http.ResponseWriter, r *http.Request) {
         err := json.Unmarshal([]byte(data), &input)
         if err != nil {
             emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-            http.Error(w, emsg, http.StatusBadRequest)
+            retError(w, emsg, http.StatusBadRequest)
             return
         }
     }
@@ -47,7 +47,7 @@ func (s *Server) agentList (w http.ResponseWriter, r *http.Request) {
     ret, err := s.ListAgents(input)
     if err != nil {
         emsg := fmt.Sprintf("Error: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
 
@@ -68,20 +68,20 @@ func (s *Server) agentBan (w http.ResponseWriter, r *http.Request) {
     n, err := io.Copy(buf, r.Body)
     if err != nil {
         emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
     data := buf.String()
 
     if n == 0 {
         emsg := fmt.Sprintf("Error: no data provided")
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     } else {
         err := json.Unmarshal([]byte(data), &input)
         if err != nil {
             emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-            http.Error(w, emsg, http.StatusBadRequest)
+            retError(w, emsg, http.StatusBadRequest)
             return
         }
     }
@@ -89,7 +89,7 @@ func (s *Server) agentBan (w http.ResponseWriter, r *http.Request) {
     err = s.BanAgent(input)
     if err != nil {
         emsg := fmt.Sprintf("Error listing agents: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
 
@@ -106,20 +106,20 @@ func (s *Server) agentDelete (w http.ResponseWriter, r *http.Request) {
     n, err := io.Copy(buf, r.Body)
     if err != nil {
         emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
     data := buf.String()
 
     if n == 0 {
         emsg := fmt.Sprintf("Error: no data provided")
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     } else {
         err := json.Unmarshal([]byte(data), &input)
         if err != nil {
             emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-            http.Error(w, emsg, http.StatusBadRequest)
+            retError(w, emsg, http.StatusBadRequest)
             return
         }
     }
@@ -127,7 +127,7 @@ func (s *Server) agentDelete (w http.ResponseWriter, r *http.Request) {
     err = s.DeleteAgent(input)
     if err != nil {
         emsg := fmt.Sprintf("Error listing agents: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
 
@@ -144,7 +144,7 @@ func (s *Server) agentCreateJoinToken (w http.ResponseWriter, r *http.Request) {
     n, err := io.Copy(buf, r.Body)
     if err != nil {
         emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
     data := buf.String()
@@ -155,7 +155,7 @@ func (s *Server) agentCreateJoinToken (w http.ResponseWriter, r *http.Request) {
         err := json.Unmarshal([]byte(data), &input)
         if err != nil {
             emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-            http.Error(w, emsg, http.StatusBadRequest)
+            retError(w, emsg, http.StatusBadRequest)
             return
         }
     }
@@ -163,7 +163,7 @@ func (s *Server) agentCreateJoinToken (w http.ResponseWriter, r *http.Request) {
     ret, err := s.CreateJoinToken(input)
     if err != nil {
         emsg := fmt.Sprintf("Error: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
 
@@ -182,7 +182,7 @@ func (s *Server) entryList (w http.ResponseWriter, r *http.Request) {
     n, err := io.Copy(buf, r.Body)
     if err != nil {
         emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
     data := buf.String()
@@ -193,7 +193,7 @@ func (s *Server) entryList (w http.ResponseWriter, r *http.Request) {
         err := json.Unmarshal([]byte(data), &input)
         if err != nil {
             emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-            http.Error(w, emsg, http.StatusBadRequest)
+            retError(w, emsg, http.StatusBadRequest)
             return
         }
     }
@@ -201,7 +201,7 @@ func (s *Server) entryList (w http.ResponseWriter, r *http.Request) {
     ret, err := s.ListEntries(input)
     if err != nil {
         emsg := fmt.Sprintf("Error: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
 
@@ -220,7 +220,7 @@ func (s *Server) entryCreate (w http.ResponseWriter, r *http.Request) {
     n, err := io.Copy(buf, r.Body)
     if err != nil {
         emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
     data := buf.String()
@@ -231,7 +231,7 @@ func (s *Server) entryCreate (w http.ResponseWriter, r *http.Request) {
         err := json.Unmarshal([]byte(data), &input)
         if err != nil {
             emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-            http.Error(w, emsg, http.StatusBadRequest)
+            retError(w, emsg, http.StatusBadRequest)
             return
         }
     }
@@ -239,7 +239,7 @@ func (s *Server) entryCreate (w http.ResponseWriter, r *http.Request) {
     ret, err := s.BatchCreateEntry(input)
     if err != nil {
         emsg := fmt.Sprintf("Error: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
 
@@ -261,7 +261,7 @@ func (s *Server) entryDelete (w http.ResponseWriter, r *http.Request) {
     n, err := io.Copy(buf, r.Body)
     if err != nil {
         emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
     data := buf.String()
@@ -272,7 +272,7 @@ func (s *Server) entryDelete (w http.ResponseWriter, r *http.Request) {
         err := json.Unmarshal([]byte(data), &input)
         if err != nil {
             emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-            http.Error(w, emsg, http.StatusBadRequest)
+            retError(w, emsg, http.StatusBadRequest)
             return
         }
     }
@@ -280,7 +280,7 @@ func (s *Server) entryDelete (w http.ResponseWriter, r *http.Request) {
     ret, err := s.BatchDeleteEntry(input)
     if err != nil {
         emsg := fmt.Sprintf("Error: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
 
@@ -300,6 +300,15 @@ func cors(w http.ResponseWriter, _ *http.Request) {
   w.Header().Set("Access-Control-Allow-Headers","Content-Type,access-control-allow-origin, access-control-allow-headers")
   w.WriteHeader(http.StatusOK)
 }
+
+func retError(w http.ResponseWriter, emsg string, status int) {
+  w.Header().Set("Content-Type", "text/html; charset=ascii")
+  w.Header().Set("Access-Control-Allow-Origin", "*")
+  w.Header().Set("Access-Control-Allow-Headers","Content-Type,access-control-allow-origin, access-control-allow-headers")
+  http.Error(w, emsg, status)
+}
+
+
 
 // Handle preflight checks
 func corsHandler(f func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {

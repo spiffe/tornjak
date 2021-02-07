@@ -43,6 +43,15 @@ func cors(w http.ResponseWriter, _ *http.Request) {
   w.WriteHeader(http.StatusOK)
 }
 
+func retError(w http.ResponseWriter, emsg string, status int) {
+  w.Header().Set("Content-Type", "text/html; charset=ascii")
+  w.Header().Set("Access-Control-Allow-Origin", "*")
+  w.Header().Set("Access-Control-Allow-Headers","Content-Type,access-control-allow-origin, access-control-allow-headers")
+  http.Error(w, emsg, status)
+}
+
+
+
 
 func (s *Server) entryList(w http.ResponseWriter, r *http.Request) {
   vars := mux.Vars(r)
@@ -54,7 +63,7 @@ func (s *Server) entryList(w http.ResponseWriter, r *http.Request) {
   sinfo, err := s.db.GetServer(serverName)
   if err != nil {
       emsg := fmt.Sprintf("Error getting server info: %v", err.Error())
-      http.Error(w, emsg, http.StatusBadRequest)
+      retError(w, emsg, http.StatusBadRequest)
       return
   }
   fmt.Printf("%+v\n", sinfo)
@@ -65,7 +74,7 @@ func (s *Server) entryList(w http.ResponseWriter, r *http.Request) {
   resp, err := client.Get(strings.TrimSuffix(sinfo.Address, "/") + "/api/entry/list")
   if err != nil {
       emsg := fmt.Sprintf("Error making api call to server: %v", err.Error())
-      http.Error(w, emsg, http.StatusBadRequest)
+      retError(w, emsg, http.StatusBadRequest)
       return
   }
   defer resp.Body.Close()
@@ -132,7 +141,7 @@ func (s *Server) serverList (w http.ResponseWriter, r *http.Request) {
     n, err := io.Copy(buf, r.Body)
     if err != nil {
         emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
     data := buf.String()
@@ -144,7 +153,7 @@ func (s *Server) serverList (w http.ResponseWriter, r *http.Request) {
         err := json.Unmarshal([]byte(data), &input)
         if err != nil {
             emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-            http.Error(w, emsg, http.StatusBadRequest)
+            retError(w, emsg, http.StatusBadRequest)
             return
         }
     }
@@ -152,7 +161,7 @@ func (s *Server) serverList (w http.ResponseWriter, r *http.Request) {
     ret, err := s.ListServers(input)
     if err != nil {
         emsg := fmt.Sprintf("Error: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
     cors(w,r)
@@ -169,7 +178,7 @@ func (s *Server) serverRegister (w http.ResponseWriter, r *http.Request) {
     n, err := io.Copy(buf, r.Body)
     if err != nil {
         emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
     data := buf.String()
@@ -181,7 +190,7 @@ func (s *Server) serverRegister (w http.ResponseWriter, r *http.Request) {
         err := json.Unmarshal([]byte(data), &input)
         if err != nil {
             emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-            http.Error(w, emsg, http.StatusBadRequest)
+            retError(w, emsg, http.StatusBadRequest)
             return
         }
     }
@@ -189,7 +198,7 @@ func (s *Server) serverRegister (w http.ResponseWriter, r *http.Request) {
     err = s.RegisterServer(input)
     if err != nil {
         emsg := fmt.Sprintf("Error: %v", err.Error())
-        http.Error(w, emsg, http.StatusBadRequest)
+        retError(w, emsg, http.StatusBadRequest)
         return
     }
 
