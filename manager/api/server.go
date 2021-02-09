@@ -104,7 +104,8 @@ func (s *Server) HandleRequests() {
     //http.HandleFunc("/manager-api/get-server-info", s.agentList)
     //http.HandleFunc("/manager-api/agent/list/:id", s.agentList)
     
-    http.Handle("/", rtr)
+    http.Handle("/manager-api/", rtr)
+    http.Handle("/", http.FileServer(http.Dir("./ui-manager")))
     fmt.Println("Starting to listen...")
     log.Fatal(http.ListenAndServe(s.listenAddr, nil))
 }

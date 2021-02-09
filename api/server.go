@@ -337,7 +337,7 @@ func (s *Server) HandleRequests() {
 
     // UI
     //http.HandleFunc("/", s.homePage)
-    http.Handle("/", http.FileServer(http.Dir("./ui")))
+    http.Handle("/", http.FileServer(http.Dir("./ui-agent")))
 
     fmt.Println("Starting to listen...")
     log.Fatal(http.ListenAndServe(":10000", nil))

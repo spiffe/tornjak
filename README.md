@@ -15,10 +15,13 @@ For more details of the components and execution plan, please refer to these doc
 
 ## Building and pushing
 
-The binary and container can be built with the following command, replacing the container tag with the desired container tag of choice.
+The binary and container can be built with the following command, replacing the container tag with the desired container tag of choice. 
+
+
+This makes the tornjak agent + spire server container:
 
 ```
-CONTAINER_TAG=lumjjb/tornjak-spire-server:latest make container
+CONTAINER_TAG=lumjjb/tornjak-spire-server:latest make container-agent
 ```
 
 The container is run with the same arguments as the SPIRE server image, and usage is transparent. It runs a server hosted on port 10000 accessed via http.
