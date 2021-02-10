@@ -27,3 +27,10 @@ yarn-debug.log*
 yarn-error.log*
 
 localdb
+
+# build artifacts
+bin/
+ui/
+ui-manager/
+ui-agent/
+tornjak
