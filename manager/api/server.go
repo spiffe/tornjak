@@ -12,6 +12,10 @@ import (
     managerdb "github.com/lumjjb/tornjak/manager/db"
 )
 
+var (
+    jsonContentType string = "application/json"
+)
+
 type Server struct {
     listenAddr string
     db managerdb.ManagerDB
@@ -50,41 +54,6 @@ func retError(w http.ResponseWriter, emsg string, status int) {
   http.Error(w, emsg, status)
 }
 
-
-
-
-func (s *Server) entryList(w http.ResponseWriter, r *http.Request) {
-  vars := mux.Vars(r)
-  serverName := vars["server"]
-
-  fmt.Println(serverName)
-
-  // Get server info
-  sinfo, err := s.db.GetServer(serverName)
-  if err != nil {
-      emsg := fmt.Sprintf("Error getting server info: %v", err.Error())
-      retError(w, emsg, http.StatusBadRequest)
-      return
-  }
-  fmt.Printf("%+v\n", sinfo)
-
-  client := sinfo.HttpClient()
-
-  // Tornjak path to entry list api
-  resp, err := client.Get(strings.TrimSuffix(sinfo.Address, "/") + "/api/entry/list")
-  if err != nil {
-      emsg := fmt.Sprintf("Error making api call to server: %v", err.Error())
-      retError(w, emsg, http.StatusBadRequest)
-      return
-  }
-  defer resp.Body.Close()
-  copyHeader(w.Header(), resp.Header)
-  w.WriteHeader(resp.StatusCode)
-  io.Copy(w, resp.Body)
-  //fileName := varId + ".html"
-  //http.ServeFile(w,r,fileName)
-}
-
 func copyHeader(dst, src http.Header) {
     for k, vv := range src {
         for _, v := range vv {
@@ -93,13 +62,52 @@ func copyHeader(dst, src http.Header) {
     }
 }
 
+// Returns a post proxy function for tornjak api, where path is the path from the base URL, i.e. "/api/entry/delete"
+func (s *Server) apiServerProxyFunc (apiPath string) func (w http.ResponseWriter, r *http.Request) {
+    return func (w http.ResponseWriter, r *http.Request) {
+      vars := mux.Vars(r)
+      serverName := vars["server"]
+
+      fmt.Println(serverName)
+
+      // Get server info
+      sinfo, err := s.db.GetServer(serverName)
+      if err != nil {
+          emsg := fmt.Sprintf("Error getting server info: %v", err.Error())
+          retError(w, emsg, http.StatusBadRequest)
+          return
+      }
+      fmt.Printf("%+v\n", sinfo)
+
+      client := sinfo.HttpClient()
+
+      resp, err := client.Post(strings.TrimSuffix(sinfo.Address, "/") + apiPath, jsonContentType, r.Body)
+      if err != nil {
+          emsg := fmt.Sprintf("Error making api call to server: %v", err.Error())
+          retError(w, emsg, http.StatusBadRequest)
+          return
+      }
+      defer resp.Body.Close()
+      copyHeader(w.Header(), resp.Header)
+      w.WriteHeader(resp.StatusCode)
+      io.Copy(w, resp.Body)
+    }
+}
+
+
 func (s *Server) HandleRequests() {
     // TO implement
     rtr := mux.NewRouter()
 
     rtr.HandleFunc("/manager-api/server/list", corsHandler(s.serverList))
     rtr.HandleFunc("/manager-api/server/register", corsHandler(s.serverRegister))
-    rtr.HandleFunc("/manager-api/entry/list/{server:.*}", corsHandler(s.entryList))
+    rtr.HandleFunc("/manager-api/entry/list/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/entry/list")))
+    rtr.HandleFunc("/manager-api/entry/delete/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/entry/delete")))
+    rtr.HandleFunc("/manager-api/entry/create/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/entry/create")))
+    rtr.HandleFunc("/manager-api/agent/list/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/agent/list")))
+    rtr.HandleFunc("/manager-api/agent/delete/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/agent/delete")))
+    rtr.HandleFunc("/manager-api/agent/ban/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/agent/ban")))
+    rtr.HandleFunc("/manager-api/agent/createjointoken/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/agent/createjointoken")))
 
     //http.HandleFunc("/manager-api/get-server-info", s.agentList)
     //http.HandleFunc("/manager-api/agent/list/:id", s.agentList)
