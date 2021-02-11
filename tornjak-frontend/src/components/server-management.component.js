@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios'
+import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 
 const Server = props => (
@@ -29,7 +30,7 @@ export default class ServerManagement extends Component {
 
 
   refreshServerState () {
-    axios.get("http://localhost:50000" + "/manager-api/server/list", { crossdomain: true })
+    axios.get(GetApiServerUri("/manager-api/server/list"), { crossdomain: true })
       .then(response => {
           console.log(response.data);
         this.setState({ servers:response.data["servers"]} );
@@ -71,7 +72,7 @@ export default class ServerManagement extends Component {
         "address": this.state.formServerAddress,
     };
 
-    axios.post('http://localhost:50000/manager-api/server/register', cjtData)
+    axios.post(GetApiServerUri('/manager-api/server/register'), cjtData)
       .then(res => this.setState({ message: "Requst:" + JSON.stringify(cjtData,null,  ' ')+ "\n\nSuccess:" + JSON.stringify(res.data, null, ' ')}))
       .catch(err => this.setState({ message: "ERROR:" + err }))
 

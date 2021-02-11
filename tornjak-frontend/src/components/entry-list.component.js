@@ -50,7 +50,7 @@ export default class EntryList extends Component {
   }
 
   populateServers () {
-    axios.get("http://localhost:50000" + "/manager-api/server/list", { crossdomain: true })
+    axios.get(GetApiServerUri("/manager-api/server/list"), { crossdomain: true })
       .then(response => {
         this.setState({ servers:response.data["servers"]} );
       })
@@ -60,7 +60,7 @@ export default class EntryList extends Component {
   }
 
   populateEntries(serverName) {
-      axios.get('http://localhost:50000/manager-api/entry/list/' + serverName, {     crossdomain: true })
+      axios.get(GetApiServerUri('/manager-api/entry/list/') + serverName, {     crossdomain: true })
       .then(response =>{
         console.log(response);
         this.setState({ entries:response.data["entries"]});
