@@ -37,6 +37,7 @@ export default class AgentList extends Component {
     this.state = { 
         agents: [],
         servers: [],
+        selectedServer: "",
         message: "",
     };
   }
@@ -84,7 +85,14 @@ export default class AgentList extends Component {
   }
 
   banAgent(id) {
-    axios.post(GetApiServerUri('/api/agent/ban'), {
+    var endpoint = ""
+    if (IsManager) {
+        endpoint = GetApiServerUri('/manager-api/agent/ban') + "/" + this.state.   selectedServer
+    } else {
+        endpoint = GetApiServerUri('/api/agent/ban')
+    }
+
+    axios.post(endpoint, {
         "id": {
               "trust_domain": id.trust_domain,
               "path": id.path,
@@ -97,7 +105,14 @@ export default class AgentList extends Component {
   }
 
   deleteAgent(id) {
-    axios.post(GetApiServerUri('/api/agent/delete'), {
+    var endpoint = ""
+    if (IsManager) {
+        endpoint = GetApiServerUri('/manager-api/agent/delete') + "/" + this.state.   selectedServer
+    } else {
+        endpoint = GetApiServerUri('/api/agent/delete')
+    }
+
+    axios.post(endpoint, {
         "id": {
               "trust_domain": id.trust_domain,
               "path": id.path,
@@ -139,6 +154,7 @@ export default class AgentList extends Component {
 
   onServerSelect(e) {
       const serverName = e.target.value;
+      this.setState({selectedServer: serverName})
       if (serverName !== "") {
           this.populateAgents(serverName)
       }

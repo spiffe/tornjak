@@ -36,6 +36,7 @@ export default class EntryList extends Component {
     this.onServerSelect = this.onServerSelect.bind(this);
     this.state = { 
         servers: [],
+        selectedServer: "",
         entries: [],
         message: "",
     };
@@ -86,7 +87,13 @@ export default class EntryList extends Component {
 
 
   deleteEntry(id) {
-    axios.post(GetApiServerUri('/api/entry/delete'), {
+    var endpoint = ""
+    if (IsManager) {
+        endpoint = GetApiServerUri('/manager-api/entry/delete') + "/" + this.state.selectedServer
+    } else {
+        endpoint = GetApiServerUri('/api/entry/delete')
+    }
+    axios.post(endpoint, {
         "ids": [id]
     })
       .then(res => { console.log(res.data)
@@ -124,6 +131,7 @@ export default class EntryList extends Component {
 
   onServerSelect(e) {
       const serverName = e.target.value;
+      this.setState({selectedServer: serverName});
       if (serverName !== "") {
           this.populateEntries(serverName)
       }
