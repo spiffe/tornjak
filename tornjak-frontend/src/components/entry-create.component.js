@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import GetApiServerUri from './helpers';
+import IsManager from './is_manager';
 
+const ServerDropdown = props => (
+  <option value={props.value}>{props.name}</option>
+)
 
 export default class CreateEntry extends Component {
   constructor(props) {
@@ -11,6 +15,7 @@ export default class CreateEntry extends Component {
     this.onChangeSelectors = this.onChangeSelectors.bind(this);
     this.onChangeSpiffeId = this.onChangeSpiffeId.bind(this);
     this.onChangeParentId = this.onChangeParentId.bind(this);
+    this.onServerSelect = this.onServerSelect.bind(this);
     //this.onChangeTtl = this.onChangeTtl.bind(this);
       
     this.onSubmit = this.onSubmit.bind(this);
@@ -23,6 +28,7 @@ export default class CreateEntry extends Component {
       spiffeId: "",
       spiffeIdTrustDomain: "",
       spiffeIdPath: "",
+
       // parent_id
       parentId: "",
       parentIdTrustDomain: "",
@@ -36,12 +42,47 @@ export default class CreateEntry extends Component {
 
 
       message: "",
+      servers: [],
+      selectedServer: "",
     }
   }
 
   componentDidMount() {
-    this.setState({
-    })
+      if (IsManager) {
+        this.populateServers()
+      } else {
+        // agent doesnt need to do anything
+        this.setState({})
+      }
+  }
+
+  // Server dropdown populate
+  populateServers () {
+    axios.get(GetApiServerUri("/manager-api/server/list"), { crossdomain: true })
+      .then(response => {
+        this.setState({ servers:response.data["servers"]} );
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+  }
+
+  serverDropdownList() {
+      //return this.state.entries.toString()
+    if (typeof this.state.servers !== 'undefined') {
+        return this.state.servers.map(server => {
+          return <ServerDropdown key={server.name}
+                    value={server.name}
+                    name={server.name} />
+        })
+    } else {
+        return ""
+    }
+  }
+
+  onServerSelect(e) {
+      const serverName = e.target.value;
+      this.setState({selectedServer: serverName});
   }
 
   onChangeName(e) {
@@ -178,6 +219,17 @@ console.log(a.substr(sp))*/
     this.setState({ tags: newTags });
   }
 
+  getApiEntryCreateEndpoint() {
+      if (!IsManager) {
+          return GetApiServerUri('/api/entry/create')
+      } else if (IsManager && this.state.selectedServer !== "") {
+          return GetApiServerUri('/manager-api/entry/create') + "/" + this.state.selectedServer
+      } else {
+          this.setState({message:"Error: No server selected"})
+          return ""
+      }
+  }
+
   onSubmit(e) {
     e.preventDefault();
 
@@ -223,13 +275,30 @@ console.log(a.substr(sp))*/
         }]
     }
 
-    axios.post(GetApiServerUri('/api/entry/create'), cjtData)
+    let endpoint = this.getApiEntryCreateEndpoint();
+    if (endpoint === "") {
+        return
+    }
+    axios.post(endpoint, cjtData)
       .then(res => this.setState({ message: "Requst:" + JSON.stringify(cjtData,null, ' ')+ "\n\nSuccess:" + JSON.stringify(res.data, null, ' ')}))
       .catch(err => this.setState({ message: "ERROR:" + err }))
     //window.location = '/';
   }
 
   render() {
+    let managerServerSelector =  (
+        <div id="server-dropdown-div">
+        <label id="server-dropdown">Choose a server:</label>
+        <br/>
+        <select name="servers" id="servers" onChange={this.onServerSelect}>
+          <optgroup label="Servers">
+            <option value=""/>
+                {this.serverDropdownList()}
+          </optgroup>
+        </select>
+        </div>
+    )
+
     return (
       <div>
         <h3>Create New Entry</h3>
@@ -239,6 +308,8 @@ console.log(a.substr(sp))*/
             {this.state.message}
           </pre>
           </div>
+          {IsManager && managerServerSelector}
+          <br/><br/>
 
           <div className="form-group">
             <label>SPIFFE ID: i.e. spiffe://example.org/sample/spiffe/id</label>
