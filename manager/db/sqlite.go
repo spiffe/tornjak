@@ -47,38 +47,37 @@ func (db *LocalSqliteDb) CreateServerEntry(sinfo types.ServerInfo) error {
 	return err
 }
 
-
-func (db *LocalSqliteDb) GetServers () (types.ServerInfoList, error) {
-    rows, err := db.database.Query("SELECT servername, address FROM servers")
+func (db *LocalSqliteDb) GetServers() (types.ServerInfoList, error) {
+	rows, err := db.database.Query("SELECT servername, address FROM servers")
 	if err != nil {
 		return types.ServerInfoList{}, errors.New("Unable to execute SQL query")
 	}
 
-    sinfos := []types.ServerInfo{}
-    var name string
-    var address string
-    for rows.Next() {
-        if err = rows.Scan(&name, &address); err != nil {
-            return  types.ServerInfoList{}, err
-        }
+	sinfos := []types.ServerInfo{}
+	var name string
+	var address string
+	for rows.Next() {
+		if err = rows.Scan(&name, &address); err != nil {
+			return types.ServerInfoList{}, err
+		}
 
-        sinfos = append(sinfos, types.ServerInfo{
-            Name: name,
-            Address: address,
-        })
-    }
+		sinfos = append(sinfos, types.ServerInfo{
+			Name:    name,
+			Address: address,
+		})
+	}
 
 	return types.ServerInfoList{
-        Servers: sinfos,
-    }, nil
+		Servers: sinfos,
+	}, nil
 }
 
-func (db *LocalSqliteDb) GetServer (name string) (types.ServerInfo, error) {
-    row := db.database.QueryRow("SELECT servername, address FROM servers WHERE servername=?", name)
-	
-    sinfo := types.ServerInfo{}
-    err := row.Scan(&sinfo.Name, &sinfo.Address)
-    if err != nil {
+func (db *LocalSqliteDb) GetServer(name string) (types.ServerInfo, error) {
+	row := db.database.QueryRow("SELECT servername, address FROM servers WHERE servername=?", name)
+
+	sinfo := types.ServerInfo{}
+	err := row.Scan(&sinfo.Name, &sinfo.Address)
+	if err != nil {
 		return types.ServerInfo{}, err
 	}
 
