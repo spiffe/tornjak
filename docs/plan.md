@@ -58,7 +58,7 @@ In addition to above:
 Provide authorization capabilities and policy management. Showcase the ability to use
 the workload registrar usecase with a stricter threat model enforced by policy.
 
-Feature dependencies: Authorization and policy management
+Feature dependencies: [Authorization and policy management (Issue #1975)](https://github.com/spiffe/spire/issues/1975)
 
 In addition to above:
 - Agent
@@ -78,7 +78,7 @@ In addition to above:
 Provide better UX around policy management and provide the ability to create
 more sophisticated identity policy.
 
-Feature dependencies: Authorization and policy management
+Feature dependencies: [Authorization and policy management (Issue #1975)](https://github.com/spiffe/spire/issues/1975)
 
 In addition to above:
 - Manager
@@ -87,10 +87,14 @@ In addition to above:
 
 ### Milestone E: Auditability
 
+Feature Dependencies: Advanced Logging entries and infrastructure for SPIRE (Issue TBD)
+
 - Manager
-  - Auditability of Identities and use for operations/forensics (Dependencies: Advanced Logging entries and infrastructure for SPIRE)
+  - Auditability of Identities and use for operations/forensics 
 
 ### Milestone F: Advanced Authentication
+
+Feature dependencies: [More Admin Authentication mechanisms for SPIRE server (Issue #2099)](https://github.com/spiffe/spire/issues/2099)
 
 Other missing features:
 - Agent
@@ -98,6 +102,8 @@ Other missing features:
 
 
 ### Milestone G: Enhancing SPIRE API
+
+Feature dependencies: Augment SPIRE API (Issue TBD)
 
 Other missing features:
 - Manager
