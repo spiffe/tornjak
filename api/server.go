@@ -7,10 +7,17 @@ import (
     "encoding/json"
     "strings"
     "io"
+    "io/ioutil"
+    "crypto/x509"
+    "crypto/tls"
 )
 
 type Server struct {
     SpireServerAddr string
+    CertPath string
+    KeyPath string
+    TlsEnabled bool
+    MTlsEnabled bool
 }
 
 func (_ *Server) homePage(w http.ResponseWriter, r *http.Request){
@@ -339,6 +346,39 @@ func (s *Server) HandleRequests() {
     //http.HandleFunc("/", s.homePage)
     http.Handle("/", http.FileServer(http.Dir("./ui-agent")))
 
-    fmt.Println("Starting to listen...")
-    log.Fatal(http.ListenAndServe(":10000", nil))
+
+    // TLS Stack handling
+    if s.TlsEnabled || s.MTlsEnabled {
+
+        // Create a CA certificate pool and add cert.pem to it
+        caCert, err := ioutil.ReadFile(s.CertPath)
+        if err != nil {
+            log.Fatal(err)
+        }
+        caCertPool := x509.NewCertPool()
+        caCertPool.AppendCertsFromPEM(caCert)
+
+        // Create the TLS Config with the CA pool and enable Client certificate validation
+
+        tlsConfig := &tls.Config{
+            ClientCAs: caCertPool,
+        }
+        if s.MTlsEnabled {
+            tlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
+        }
+        tlsConfig.BuildNameToCertificate()
+
+        // Create a Server instance to listen on port 8443 with the TLS config
+        server := &http.Server{
+            Addr:      ":10000",
+            TLSConfig: tlsConfig,
+        }
+
+        fmt.Println("Starting to listen on TLS...")
+        log.Fatal(server.ListenAndServeTLS(s.CertPath, s.KeyPath))
+        return
+    } else {
+        fmt.Println("Starting to listen ...")
+        log.Fatal(http.ListenAndServe(":10000", nil))
+    }
 }

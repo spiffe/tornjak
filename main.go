@@ -76,6 +76,11 @@ func main() {
         case "http":
             apiServer := &api.Server{
                 SpireServerAddr: "unix://" + config.Server.RegistrationUDSPath,
+                // TODO: Add flag parse for args
+                CertPath: "cert.pem",
+                KeyPath: "key.pem",
+                TlsEnabled: false,
+                MTlsEnabled: false,
             }
             apiServer.HandleRequests()
         default:
