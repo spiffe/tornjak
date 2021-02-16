@@ -13,6 +13,7 @@ import (
 )
 
 type Server struct {
+	ListenAddr      string
 	SpireServerAddr string
 	CertPath        string
 	KeyPath         string
@@ -358,15 +359,15 @@ func (s *Server) HandleRequests() {
 
 		// Create a Server instance to listen on port 8443 with the TLS config
 		server := &http.Server{
-			Addr:      ":10000",
+			Addr:      s.ListenAddr,
 			TLSConfig: tlsConfig,
 		}
 
-		fmt.Println("Starting to listen on TLS...")
+		fmt.Printf("Starting to listen with TLS on %s...\n", s.ListenAddr)
 		log.Fatal(server.ListenAndServeTLS(s.CertPath, s.KeyPath))
 		return
 	} else {
-		fmt.Println("Starting to listen ...")
-		log.Fatal(http.ListenAndServe(":10000", nil))
+		fmt.Printf("Starting to listen on %s...\n", s.ListenAddr)
+		log.Fatal(http.ListenAndServe(s.ListenAddr, nil))
 	}
 }

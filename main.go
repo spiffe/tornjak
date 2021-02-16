@@ -78,6 +78,7 @@ func main() {
 		apiServer := &api.Server{
 			SpireServerAddr: "unix://" + config.Server.RegistrationUDSPath,
 			// TODO: Add flag parse for args
+			ListenAddr:  ":10000",
 			CertPath:    "cert.pem",
 			KeyPath:     "key.pem",
 			TlsEnabled:  false,
