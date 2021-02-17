@@ -8,6 +8,7 @@ const Server = props => (
   <tr>
     <td>{props.server.name}</td>
     <td>{props.server.address}</td>
+    <td>{props.server.tls && "TLS" || props.server.mtls && "mTLS" || "None"}</td>
   </tr>
 )
 
@@ -31,7 +32,6 @@ export default class ServerManagement extends Component {
   componentDidMount() {
       this.refreshServerState()
   }
-
 
   refreshServerState () {
     axios.get(GetApiServerUri("/manager-api/server/list"), { crossdomain: true })
@@ -174,6 +174,7 @@ export default class ServerManagement extends Component {
             <tr>
               <th>Server Name</th>
               <th>Address</th>
+              <th>TLS?</th>
             </tr>
           </thead>
           <tbody>
