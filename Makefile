@@ -5,9 +5,9 @@ CONTAINER_MANAGER_TAG ?= lumjjb/tornjak-manager:latest
 
 all: bin/tornjak ui container
 
-bin/tornjak:
+bin/tornjak-agent:
 	# Build hack because of flake of imported go module
-	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:1.15 /bin/sh -c "go build main.go; go build -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o bin/tornjak main.go"
+	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:1.15 /bin/sh -c "go build agent.go; go build -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o bin/tornjak-agent agent.go"
 
 
 bin/tornjak-manager:
@@ -34,7 +34,7 @@ vendor:
 	go mod tidy
 	go mod vendor
 
-container-agent: bin/tornjak ui-agent
+container-agent: bin/tornjak-agent ui-agent
 	docker build --no-cache -f Dockerfile.add-frontend -t ${CONTAINER_TAG} . && docker push ${CONTAINER_TAG}
 
 container-manager: bin/tornjak-manager ui-manager
