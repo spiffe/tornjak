@@ -18,9 +18,13 @@ export default class ServerManagement extends Component {
         servers: [],
         formServerName: "",
         formServerAddress: "",
+        formTLS: false,
+        formMTLS: false,
+        formCertData: null,
+        formKeyData: null,
     };
-    this.onChangeFormServerName = this.onChangeFormServerName.bind(this);
-    this.onChangeFormServerAddress = this.onChangeFormServerAddress.bind(this);
+    this.onCertFileChange = this.onCertFileChange.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
 
@@ -41,7 +45,7 @@ export default class ServerManagement extends Component {
   }
 
   serverList() {
-      //return this.state.servers.toString()
+    //return this.state.servers.toString()
     if (typeof this.state.servers !== 'undefined') {
         return this.state.servers.map(s => {
           return <Server key={s.name} 
@@ -52,32 +56,48 @@ export default class ServerManagement extends Component {
     }
   }
 
-  onChangeFormServerName(e) {
+  handleInputChange(e) {
+    const target = e.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+
     this.setState({
-      formServerName: e.target.value
+      [name]: value
     });
   }
 
-  onChangeFormServerAddress(e) {
-    this.setState({
-      formServerAddress: e.target.value
-    });
-  }
+
+  onCertFileChange = event => {
+    // Update the state
+    const reader = new FileReader();
+    reader.onload = e => {
+      this.setState({ 
+          formCertData: (new Buffer(e.target.result)).toString("base64"),
+      });
+    }
+    reader.readAsText(event.target.files[0])
+  };
 
   onSubmit(e) {
     e.preventDefault();
 
+    console.log("onSubmit");
+    console.log(this.state.certData);
     var cjtData = {
         "name": this.state.formServerName,
         "address": this.state.formServerAddress,
+        "tls": this.state.formTLS,
+        "mtls": this.state.formMTLS,
+        "cert": this.state.formCertData,
+        "key": this.state.formKeyData,
     };
+    console.log(cjtData);
 
     axios.post(GetApiServerUri('/manager-api/server/register'), cjtData)
       .then(res => this.setState({ message: "Requst:" + JSON.stringify(cjtData,null,  ' ')+ "\n\nSuccess:" + JSON.stringify(res.data, null, ' ')}))
       .catch(err => this.setState({ message: "ERROR:" + err }))
 
     this.refreshServerState()
-    //window.location = '/';
   }
 
 
@@ -93,10 +113,11 @@ export default class ServerManagement extends Component {
           <div className="form-group">
             <label>Server Name (Unique)</label>
             <input type="text"
+              name="formServerName"
               required
               className="form-control"
               value={this.state.formServerName}
-              onChange={this.onChangeFormServerName}
+              onChange={this.handleInputChange}
             />
           </div>
 
@@ -104,16 +125,39 @@ export default class ServerManagement extends Component {
           <div className="form-group">
             <label>Address (i.e. http://localhost:5000/) </label>
             <input type="text"
+              name="formServerAddress"
               required
               className="form-control"
-              value={this.state.token}
-              onChange={this.onChangeFormServerAddress}
+              value={this.state.formServerAddress}
+              onChange={this.handleInputChange}
             />
           </div>
 
+          <div name="tls-checkbox-input">
+          <input
+            name="formTLS"
+            type="checkbox"
+            checked={this.state.formTLS}
+            onChange={this.handleInputChange}
+            />
+            TLS Enabled
+          </div>
+
+          <div name="mtls-checkbox-input">
+          <input
+            name="formMTLS"
+            type="checkbox"
+            checked={this.state.formMTLS}
+            onChange={this.handleInputChange}
+            />
+            mTLS Enabled
+          </div>
+
+          <input type="certFile" onChange={this.onCertFileChange} />
+
 
           <div className="form-group">
-            <input type="submit" value="Register Server" className="btn btn-primary" />
+          <input type="submit" value="Register Server" className="btn btn-primary" />
           </div>
         </form>
 
@@ -136,6 +180,7 @@ export default class ServerManagement extends Component {
             {this.serverList()}
           </tbody>
         </table>
+
       </div>
     )
   }
