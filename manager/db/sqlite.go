@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	initServersTable = "CREATE TABLE IF NOT EXISTS servers (servername TEXT PRIMARY KEY, address TEXT)"
+	initServersTable = "CREATE TABLE IF NOT EXISTS servers (servername TEXT PRIMARY KEY, address TEXT, tls bool, mtls bool, cert varBinary, key varBinary)"
 )
 
 type LocalSqliteDb struct {
@@ -38,32 +38,42 @@ func NewLocalSqliteDB(dbpath string) (ManagerDB, error) {
 }
 
 func (db *LocalSqliteDb) CreateServerEntry(sinfo types.ServerInfo) error {
-	statement, err := db.database.Prepare("INSERT INTO servers (servername, address) VALUES (?, ?)")
+	statement, err := db.database.Prepare("INSERT INTO servers (servername, address, tls, mtls, cert, key) VALUES (?,?,?,?,?,?)")
 	if err != nil {
-		return errors.New("Unable to execute SQL query")
+        return errors.Errorf("Unable to execute SQL query: %v", err)
 	}
-	_, err = statement.Exec(sinfo.Name, sinfo.Address)
+	_, err = statement.Exec(sinfo.Name, sinfo.Address, sinfo.TLS, sinfo.MTLS, sinfo.Cert, sinfo.Key)
 
 	return err
 }
 
 func (db *LocalSqliteDb) GetServers() (types.ServerInfoList, error) {
-	rows, err := db.database.Query("SELECT servername, address FROM servers")
+	rows, err := db.database.Query("SELECT servername, address, tls, mtls, cert, key FROM servers")
 	if err != nil {
 		return types.ServerInfoList{}, errors.New("Unable to execute SQL query")
 	}
 
 	sinfos := []types.ServerInfo{}
-	var name string
-	var address string
+	var (
+        name string
+	    address string
+        tls bool
+        mtls bool
+        cert []byte
+        key []byte
+    )
 	for rows.Next() {
-		if err = rows.Scan(&name, &address); err != nil {
+		if err = rows.Scan(&name, &address, &tls, &mtls, &cert, &key); err != nil {
 			return types.ServerInfoList{}, err
 		}
 
 		sinfos = append(sinfos, types.ServerInfo{
 			Name:    name,
 			Address: address,
+			TLS: tls,
+			MTLS: mtls,
+			Cert: cert,
+			Key: key,
 		})
 	}
 
