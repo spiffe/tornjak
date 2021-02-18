@@ -21,13 +21,16 @@ export default class ServerManagement extends Component {
         formServerAddress: "",
         formTLS: false,
         formMTLS: false,
+        formCAData: null,
         formCertData: null,
         formKeyData: null,
 
+        CAFileText: "",
         certFileText: "",
         keyFileText: "",
     };
     this.onCertFileChange = this.onCertFileChange.bind(this);
+    this.onCAFileChange = this.onCAFileChange.bind(this);
     this.onKeyFileChange = this.onKeyFileChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -71,6 +74,19 @@ export default class ServerManagement extends Component {
   }
 
 
+  onCAFileChange = event => {
+    // Update the state
+    const reader = new FileReader();
+    reader.onload = e => {
+      this.setState({ 
+          formCAData: (new Buffer(e.target.result)).toString("base64"),
+          CAFileText: "CA file load success",
+      });
+    }
+    reader.readAsText(event.target.files[0])
+  };
+  
+
   onCertFileChange = event => {
     // Update the state
     const reader = new FileReader();
@@ -105,6 +121,7 @@ export default class ServerManagement extends Component {
         "address": this.state.formServerAddress,
         "tls": this.state.formTLS,
         "mtls": this.state.formMTLS,
+        "ca": this.state.formCAData,
         "cert": this.state.formCertData,
         "key": this.state.formKeyData,
     };
@@ -125,6 +142,28 @@ export default class ServerManagement extends Component {
     if (!IsManager) {
         return <h1>Only manager deplayments have use of this page</h1>
     }
+
+    const tlsFormOptions = (
+          <div> CA File (for (m)TLS):
+          <input name="CAfile" type="file" onChange={this.onCAFileChange} />
+            {this.state.CAFileText}
+          </div>
+    )
+
+    const mtlsFormOptions = (
+        <div>
+          <div> 
+           Cert File (for mTLS):
+          <input name="certfile" type="file" onChange={this.onCertFileChange} />
+            {this.state.certFileText}
+          </div>
+          <div> Key File (for mTLS):
+          <input name="keyfile" type="file" onChange={this.onKeyFileChange} />
+            {this.state.keyFileText}
+          </div>
+        </div>
+    )
+
     return (
       <div>
         <h3> Register New Server </h3>
@@ -162,6 +201,7 @@ export default class ServerManagement extends Component {
             />
             TLS Enabled
           </div>
+          {this.state.formTLS && tlsFormOptions}
 
           <div name="mtls-checkbox-input">
           <input
@@ -172,16 +212,7 @@ export default class ServerManagement extends Component {
             />
             mTLS Enabled
           </div>
-          <div> Cert File (for (m)TLS):
-          <input name="certfile" type="file" onChange={this.onCertFileChange} />
-            {this.state.certFileText}
-          </div>
-
-          <div> Key File (for mTLS):
-          <input name="keyfile" type="file" onChange={this.onKeyFileChange} />
-            {this.state.keyFileText}
-          </div>
-
+          {this.state.formMTLS && mtlsFormOptions}
 
           <div className="form-group">
           <input type="submit" value="Register Server" className="btn btn-primary" />
