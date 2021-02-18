@@ -34,13 +34,12 @@ func NewLocalSqliteDB(dbpath string) (ManagerDB, error) {
 	return &LocalSqliteDb{
 		database: database,
 	}, nil
-
 }
 
 func (db *LocalSqliteDb) CreateServerEntry(sinfo types.ServerInfo) error {
 	statement, err := db.database.Prepare("INSERT INTO servers (servername, address, tls, mtls, cert, key) VALUES (?,?,?,?,?,?)")
 	if err != nil {
-        return errors.Errorf("Unable to execute SQL query: %v", err)
+		return errors.Errorf("Unable to execute SQL query: %v", err)
 	}
 	_, err = statement.Exec(sinfo.Name, sinfo.Address, sinfo.TLS, sinfo.MTLS, sinfo.Cert, sinfo.Key)
 
@@ -55,13 +54,13 @@ func (db *LocalSqliteDb) GetServers() (types.ServerInfoList, error) {
 
 	sinfos := []types.ServerInfo{}
 	var (
-        name string
-	    address string
-        tls bool
-        mtls bool
-        cert []byte
-        key []byte
-    )
+		name    string
+		address string
+		tls     bool
+		mtls    bool
+		cert    []byte
+		key     []byte
+	)
 	for rows.Next() {
 		if err = rows.Scan(&name, &address, &tls, &mtls, &cert, &key); err != nil {
 			return types.ServerInfoList{}, err
@@ -70,10 +69,10 @@ func (db *LocalSqliteDb) GetServers() (types.ServerInfoList, error) {
 		sinfos = append(sinfos, types.ServerInfo{
 			Name:    name,
 			Address: address,
-			TLS: tls,
-			MTLS: mtls,
-			Cert: cert,
-			Key: key,
+			TLS:     tls,
+			MTLS:    mtls,
+			Cert:    cert,
+			Key:     key,
 		})
 	}
 

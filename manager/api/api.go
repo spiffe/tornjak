@@ -19,6 +19,10 @@ func (s *Server) ListServers(inp ListServersRequest) (*ListServersResponse, erro
 	if err != nil {
 		return nil, err
 	}
+	for i, _ := range resp.Servers {
+		resp.Servers[i].Key = []byte{}
+		resp.Servers[i].Cert = []byte{}
+	}
 
 	return (*ListServersResponse)(&resp), nil
 }
