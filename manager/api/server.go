@@ -78,7 +78,12 @@ func (s *Server) apiServerProxyFunc(apiPath string) func(w http.ResponseWriter, 
 		}
 		fmt.Printf("%+v\n", sinfo)
 
-		client := sinfo.HttpClient()
+		client, err := sinfo.HttpClient()
+		if err != nil {
+			emsg := fmt.Sprintf("Error initializing server client: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		}
 
 		resp, err := client.Post(strings.TrimSuffix(sinfo.Address, "/")+apiPath, jsonContentType, r.Body)
 		if err != nil {
