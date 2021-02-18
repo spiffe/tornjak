@@ -8,7 +8,7 @@ const Server = props => (
   <tr>
     <td>{props.server.name}</td>
     <td>{props.server.address}</td>
-    <td>{props.server.tls && "TLS" || props.server.mtls && "mTLS" || "None"}</td>
+    <td>{props.server.mtls && "mTLS" || props.server.tls && "TLS" || "None"}</td>
   </tr>
 )
 
@@ -23,8 +23,12 @@ export default class ServerManagement extends Component {
         formMTLS: false,
         formCertData: null,
         formKeyData: null,
+
+        certFileText: "",
+        keyFileText: "",
     };
     this.onCertFileChange = this.onCertFileChange.bind(this);
+    this.onKeyFileChange = this.onKeyFileChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
@@ -73,16 +77,29 @@ export default class ServerManagement extends Component {
     reader.onload = e => {
       this.setState({ 
           formCertData: (new Buffer(e.target.result)).toString("base64"),
+          certFileText: "cert file load success",
       });
     }
     reader.readAsText(event.target.files[0])
   };
 
+  onKeyFileChange = event => {
+    // Update the state
+    const reader = new FileReader();
+    reader.onload = e => {
+      this.setState({ 
+          formKeyData: (new Buffer(e.target.result)).toString("base64"),
+          keyFileText: "key file load success",
+      });
+    }
+    reader.readAsText(event.target.files[0])
+  };
+
+
   onSubmit(e) {
     e.preventDefault();
 
     console.log("onSubmit");
-    console.log(this.state.certData);
     var cjtData = {
         "name": this.state.formServerName,
         "address": this.state.formServerAddress,
@@ -94,10 +111,13 @@ export default class ServerManagement extends Component {
     console.log(cjtData);
 
     axios.post(GetApiServerUri('/manager-api/server/register'), cjtData)
-      .then(res => this.setState({ message: "Requst:" + JSON.stringify(cjtData,null,  ' ')+ "\n\nSuccess:" + JSON.stringify(res.data, null, ' ')}))
+      .then(res => {
+          this.setState({ message: "Requst:" + JSON.stringify(cjtData,null,  ' ')+ "\n\nSuccess:" + JSON.stringify(res.data, null, ' ')});
+          this.refreshServerState();
+      }
+      )
       .catch(err => this.setState({ message: "ERROR:" + err }))
 
-    this.refreshServerState()
   }
 
 
@@ -152,8 +172,15 @@ export default class ServerManagement extends Component {
             />
             mTLS Enabled
           </div>
+          <div> Cert File (for (m)TLS):
+          <input name="certfile" type="file" onChange={this.onCertFileChange} />
+            {this.state.certFileText}
+          </div>
 
-          <input type="certFile" onChange={this.onCertFileChange} />
+          <div> Key File (for mTLS):
+          <input name="keyfile" type="file" onChange={this.onKeyFileChange} />
+            {this.state.keyFileText}
+          </div>
 
 
           <div className="form-group">
