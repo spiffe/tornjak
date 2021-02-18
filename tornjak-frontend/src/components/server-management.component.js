@@ -133,7 +133,7 @@ export default class ServerManagement extends Component {
           this.refreshServerState();
       }
       )
-      .catch(err => this.setState({ message: "ERROR:" + err }))
+      .catch(err => this.setState({ message: "ERROR:" + err + (typeof (err.response) !== "undefined" ? err.response.data : "")}))
 
   }
 

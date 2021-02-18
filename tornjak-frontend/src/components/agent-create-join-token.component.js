@@ -227,7 +227,7 @@ console.log(a.substr(sp))*/
     }
     axios.post(endpoint, cjtData)
       .then(res => this.setState({ message: "Requst:" + JSON.stringify(cjtData,null, ' ')+ "\n\nSuccess:" + JSON.stringify(res.data, null, ' ')}))
-      .catch(err => this.setState({ message: "ERROR:" + err }))
+      .catch(err => this.setState({ message: "ERROR:" + err + (typeof (err.response) !== "undefined" ? err.response.data : "")}))
     //window.location = '/';
   }
 
