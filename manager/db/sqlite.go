@@ -84,10 +84,10 @@ func (db *LocalSqliteDb) GetServers() (types.ServerInfoList, error) {
 }
 
 func (db *LocalSqliteDb) GetServer(name string) (types.ServerInfo, error) {
-	row := db.database.QueryRow("SELECT servername, address FROM servers WHERE servername=?", name)
+	row := db.database.QueryRow("SELECT servername, address, tls, mtls, ca, cert, key FROM servers WHERE servername=?", name)
 
 	sinfo := types.ServerInfo{}
-	err := row.Scan(&sinfo.Name, &sinfo.Address)
+	err := row.Scan(&sinfo.Name, &sinfo.Address, &sinfo.TLS, &sinfo.MTLS, &sinfo.CA, &sinfo.Cert, &sinfo.Key)
 	if err != nil {
 		return types.ServerInfo{}, err
 	}

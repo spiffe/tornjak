@@ -2,6 +2,7 @@ FROM gcr.io/spiffe-io/spire-server:0.11.0
 RUN apk add curl
 COPY bin/tornjak-agent tornjak-agent
 COPY ui-agent ui-agent
+COPY sample-keys sample-keys
 
 
 # Add init
