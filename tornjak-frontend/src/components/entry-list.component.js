@@ -65,9 +65,9 @@ export default class EntryList extends Component {
       .then(response =>{
         console.log(response);
         this.setState({ entries:response.data["entries"]});
-      }).catch(error => {
+      }).catch(err => {
           this.setState({ 
-              message: "Error retrieving " + serverName + " : "+ error.message,
+              message: "Error retrieving " + serverName + " : "+ err + (typeof (err.response) !== "undefined" ? ":" + err.response.data : ""),
               entries: [],
           });
       });
