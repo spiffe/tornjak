@@ -124,11 +124,20 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 
 	switch cmd {
 	case "serverinfo":
-		GetServerInfo(config)
+		serverInfo, err := GetServerInfo(config)
+		if err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+		fmt.Println(serverInfo)
 	case "api":
 		// default to spire-server binary
 		RunSpireApi(config, opt.apiOptions.args)
 	case "http":
+		serverInfo, err := GetServerInfo(config)
+		if err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+
 		apiServer := &api.Server{
 			SpireServerAddr: "unix://" + config.Server.RegistrationUDSPath,
 			ListenAddr:      opt.httpOptions.listenAddr,
@@ -136,6 +145,7 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 			KeyPath:         opt.httpOptions.keyPath,
 			TlsEnabled:      opt.httpOptions.tls,
 			MTlsEnabled:     opt.httpOptions.mtls,
+			SpireServerInfo: serverInfo,
 		}
 		apiServer.HandleRequests()
 	default:
@@ -145,25 +155,29 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 
 }
 
-func GetServerInfo(config *run.Config) {
+func GetServerInfo(config *run.Config) (string, error) {
 	if config.Plugins == nil {
-		log.Fatalf("config plugins map should not be nil")
+		return "", errors.New("config plugins map should not be nil")
 	}
+
 	pluginConfigs, err := catalog.PluginConfigsFromHCL(*config.Plugins)
 	if err != nil {
-		log.Fatalf("Unable to parse plugin HCL: %v", err)
+		return "", errors.Errorf("Unable to parse plugin HCL: %v", err)
 	}
 
-	fmt.Println("Plugin Info")
+	serverInfo := ""
+	serverInfo += "Plugin Info\n"
 	for _, pc := range pluginConfigs {
-		fmt.Printf("%v Plugin: %v\n", pc.Type, pc.Name)
-		fmt.Printf("Data: %v\n\n", pc.Data)
+		serverInfo += fmt.Sprintf("%v Plugin: %v\n", pc.Type, pc.Name)
+		serverInfo += fmt.Sprintf("Data: %v\n\n", pc.Data)
 	}
 
-	fmt.Println("\n\n")
-	fmt.Println("Server Info")
+	serverInfo += "\n\n"
+	serverInfo += "Server Info"
 	s, _ := json.MarshalIndent(config.Server, "", "\t")
-	fmt.Println(string(s))
+	serverInfo += string(s)
+
+	return serverInfo, nil
 }
 
 // Call API to show example of policy enforcement, will be deprecated, used only for

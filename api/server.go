@@ -19,6 +19,9 @@ type Server struct {
 	KeyPath         string
 	TlsEnabled      bool
 	MTlsEnabled     bool
+
+	// SpireServerInfo provides config info for the spire server
+	SpireServerInfo string
 }
 
 func (_ *Server) homePage(w http.ResponseWriter, r *http.Request) {
