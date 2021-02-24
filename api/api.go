@@ -156,6 +156,17 @@ func (s *Server) BatchDeleteEntry(inp BatchDeleteEntryRequest) (*BatchDeleteEntr
 	return (*BatchDeleteEntryResponse)(resp), nil
 }
 
+type GetTornjakServerInfoRequest struct{}
+type GetTornjakServerInfoResponse struct {
+	ServerInfo string `json:"serverinfo"`
+}
+
+func (s *Server) GetTornjakServerInfo(inp GetTornjakServerInfoRequest) (*GetTornjakServerInfoResponse, error) {
+	return &GetTornjakServerInfoResponse{
+		ServerInfo: s.SpireServerInfo,
+	}, nil
+}
+
 /*
 
 Agent

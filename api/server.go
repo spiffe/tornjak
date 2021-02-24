@@ -322,6 +322,44 @@ func corsHandler(f func(w http.ResponseWriter, r *http.Request)) http.HandlerFun
 	}
 }
 
+func (s *Server) getTornjakServerInfo(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Endpoint Hit: Server Info")
+
+	var input GetTornjakServerInfoRequest
+	buf := new(strings.Builder)
+
+	n, err := io.Copy(buf, r.Body)
+	if err != nil {
+		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	data := buf.String()
+
+	if n == 0 {
+		input = GetTornjakServerInfoRequest{}
+	} else {
+		err := json.Unmarshal([]byte(data), &input)
+		if err != nil {
+			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		}
+	}
+
+	ret, err := s.GetTornjakServerInfo(input)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+
+	cors(w, r)
+	je := json.NewEncoder(w)
+	// Shouldn't error here
+	je.Encode(ret)
+}
+
 func (s *Server) HandleRequests() {
 
 	// Agents
@@ -334,6 +372,9 @@ func (s *Server) HandleRequests() {
 	http.HandleFunc("/api/entry/list", corsHandler(s.entryList))
 	http.HandleFunc("/api/entry/create", corsHandler(s.entryCreate))
 	http.HandleFunc("/api/entry/delete", corsHandler(s.entryDelete))
+
+	// Tornjak specific
+	http.HandleFunc("/api/tornjak/serverinfo", corsHandler(s.getTornjakServerInfo))
 
 	// UI
 	//http.HandleFunc("/", s.homePage)
