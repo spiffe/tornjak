@@ -7,8 +7,7 @@ import CreateJoinToken from "./components/agent-create-join-token.component";
 import EntryList from "./components/entry-list.component";
 import EntryCreate from "./components/entry-create.component";
 import ServerManagement from "./components/server-management.component";
-
-
+import TornjakServerInfo from "./components/tornjak-server-info.component";
 
 function App() {
     return (
@@ -21,6 +20,7 @@ function App() {
                 <Route path="/entries" exact component={EntryList} />
                 <Route path="/entry/create" exact component={EntryCreate} />
                 <Route path="/agent/createjointoken" exact component={CreateJoinToken} />
+                <Route path="/tornjak/serverinfo" exact component={TornjakServerInfo} />
                 <Route path="/server/manage" exact component={ServerManagement} />
             </div>
         </Router>

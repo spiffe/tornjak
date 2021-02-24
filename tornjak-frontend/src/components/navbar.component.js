@@ -30,6 +30,11 @@ export default class Navbar extends Component {
           <li className="navbar-item">
           <Link to="/entry/create" className="nav-link">Create Entry</Link>
           </li>
+
+          <li className="navbar-item">
+          <Link to="/tornjak/serverinfo" className="nav-link">Tornjak ServerInfo</Link>
+          </li>
+
           {IsManager && managerNavs}
         </ul>
         </div>
