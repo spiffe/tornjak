@@ -111,6 +111,7 @@ func (s *Server) HandleRequests() {
 	rtr.HandleFunc("/manager-api/agent/delete/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/agent/delete")))
 	rtr.HandleFunc("/manager-api/agent/ban/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/agent/ban")))
 	rtr.HandleFunc("/manager-api/agent/createjointoken/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/agent/createjointoken")))
+	rtr.HandleFunc("/manager-api/tornjak/serverinfo/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/tornjak/serverinfo")))
 
 	//http.HandleFunc("/manager-api/get-server-info", s.agentList)
 	//http.HandleFunc("/manager-api/agent/list/:id", s.agentList)
