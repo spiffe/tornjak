@@ -1,4 +1,4 @@
-.PHONY: ui vendor build
+.PHONY: ui vendor build ui-agent ui-manager
 
 CONTAINER_TAG ?= tsidentity/tornjak-spire-server:latest
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:latest
@@ -12,7 +12,7 @@ bin/tornjak-agent:
 
 bin/tornjak-manager:
 	# Build hack because of flake of imported go module
-	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:1.15 /bin/sh -c "go build manager.go; go build -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o bin/tornjak-manager manager.go"
+	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:1.15 /bin/sh -c "go build -o tornjak-manager manager.go; go build -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o bin/tornjak-manager manager.go"
 
 
 ui-agent:
