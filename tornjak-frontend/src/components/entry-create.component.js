@@ -16,6 +16,7 @@ export default class CreateEntry extends Component {
     this.onChangeSpiffeId = this.onChangeSpiffeId.bind(this);
     this.onChangeParentId = this.onChangeParentId.bind(this);
     this.onServerSelect = this.onServerSelect.bind(this);
+    this.onChangeAdminFlag= this.onChangeAdminFlag.bind(this);
     //this.onChangeTtl = this.onChangeTtl.bind(this);
       
     this.onSubmit = this.onSubmit.bind(this);
@@ -36,6 +37,7 @@ export default class CreateEntry extends Component {
 
       // ',' delimetered selectors
       selectors: "",
+      adminFlag: false,
 
       //ttl: 500,
       //token: "",
@@ -102,6 +104,13 @@ export default class CreateEntry extends Component {
       selectors: e.target.value
     });
   }
+
+  onChangeAdminFlag(e) {
+    this.setState({
+      adminFlag: e.target.checked,
+    });
+  }
+
 
 /*
  * const str1 = 'spiffe://example.org/abc/def/gew:';
@@ -271,7 +280,8 @@ console.log(a.substr(sp))*/
                 "trust_domain": this.state.parentIdTrustDomain,
                 "path": this.state.parentIdPath,
             },
-            "selectors": selectorEntries
+            "selectors": selectorEntries,
+            "admin": this.state.adminFlag,
         }]
     }
 
@@ -339,6 +349,17 @@ console.log(a.substr(sp))*/
               value={this.state.token}
               onChange={this.onChangeSelectors}
             /></div>
+
+          <div className="form-group">
+            <input
+                type="checkbox"
+                checked={this.state.adminFlag}
+                onChange={this.onChangeAdminFlag}
+            />
+            Admin Flag
+          </div>
+
+
 
 
           <div className="form-group">
