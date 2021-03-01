@@ -1,7 +1,7 @@
 .PHONY: ui vendor build
 
-CONTAINER_TAG ?= lumjjb/tornjak-spire-server:latest
-CONTAINER_MANAGER_TAG ?= lumjjb/tornjak-manager:latest
+CONTAINER_TAG ?= tsidentity/tornjak-spire-server:latest
+CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:latest
 
 all: bin/tornjak ui container
 
