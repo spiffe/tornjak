@@ -1,0 +1,25 @@
+# Create a CA
+
+Run `./create-ca.sh` to create a CA. It will put the necessary cert and key files in the `CA/` directory.
+
+# Signing a cert
+
+To create and sign a certificate run `./create-cert.sh <domain name> <name>`, for example `./create-cert.sh *.mydomain.com roks1`. This will create the files `roks1.key` and `roks1.crt` which will represent the key/cert pair to configure the server.
+
+# The configuration of the server will be
+
+## For TLS
+
+Client: 
+TLS: CA/rootCA.crt
+
+Server: roks1.key, roks1.crt
+
+## For mTLS
+
+Client: 
+TLS: CA/rootCA.crt, mTLS: client.key, client.crt
+
+Server: 
+TLS: roks1.key, roks1.crt
+mTLS: CA/rootCA.crt
