@@ -64,7 +64,7 @@ export default class TornjakServerInfo extends Component {
   populateLocalTornjakServerInfo() {
     axios.get(GetApiServerUri('/api/tornjak/serverinfo'), { crossdomain: true })
       .then(response => {
-        this.setState({ agents:response.data["serverinfo"]});
+        this.setState({ tornjakServerInfo:response.data["serverinfo"]});
       })
       .catch((error) => {
         console.log(error);
