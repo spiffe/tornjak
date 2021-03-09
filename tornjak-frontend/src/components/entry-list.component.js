@@ -75,7 +75,7 @@ export default class EntryList extends Component {
   }
 
   populateLocalEntries() {
-      axios.get('/api/entry/list', {crossdomain: true })
+      axios.get(GetApiServerUri('/api/entry/list'), { crossdomain: true })
       .then(response => {
           console.log(response.data);
         this.setState({ entries:response.data["entries"]} );
