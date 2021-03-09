@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import IsManager from './is_manager';
+import 'carbon-components/css/carbon-components.min.css';
+import { Dropdown } from 'carbon-components-react';
+import './style.css';
+  
 
 export default class Navbar extends Component {
 
@@ -15,28 +19,26 @@ export default class Navbar extends Component {
       <nav className="navbar navbar-dark bg-dark navbar-expand-lg">
         <Link to="/" className="navbar-brand">Tornjak</Link>
         <div className="collpase navbar-collapse">
-        <ul className="navbar-nav mr-auto">
-          <li className="navbar-item">
-          <Link to="/agents" className="nav-link">Agents</Link>
-          </li>
-          <li className="navbar-item">
-          <Link to="/agent/createjointoken" className="nav-link">Join Token</Link>
-          </li>
-
-          <li className="navbar-item">
-          <Link to="/entries" className="nav-link">Entries</Link>
-          </li>
- 
-          <li className="navbar-item">
-          <Link to="/entry/create" className="nav-link">Create Entry</Link>
-          </li>
-
-          <li className="navbar-item">
-          <Link to="/tornjak/serverinfo" className="nav-link">Tornjak ServerInfo</Link>
-          </li>
-
-          {IsManager && managerNavs}
-        </ul>
+          <div class="dropdown">
+            <ul class="dropbtn">Agents</ul>
+            <div class="dropdown-content">
+              <Link to="/agents" className="nav-link">Agents List</Link>
+              <Link to="/agent/createjointoken" className="nav-link">Create Token</Link>
+            </div>
+          </div>
+          <div class="dropdown">
+            <ul class="dropbtn">Entries</ul>
+            <div class="dropdown-content">
+              <Link to="/entries" className="nav-link">Entries List</Link>
+              <Link to="/entry/create" className="nav-link">Create Entries</Link>
+            </div>
+          </div>
+            <ul className="navbar-nav mr-auto">
+              <li className="navbar-item">
+                <Link to="/tornjak/serverinfo" className="nav-link">Tornjak ServerInfo</Link>
+              </li>
+              {IsManager && managerNavs}
+          </ul>
         </div>
       </nav>
     );
