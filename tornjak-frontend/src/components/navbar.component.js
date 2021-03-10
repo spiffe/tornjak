@@ -20,14 +20,14 @@ export default class Navbar extends Component {
         <Link to="/" className="navbar-brand">Tornjak</Link>
         <div className="collpase navbar-collapse">
           <div class="dropdown">
-            <ul class="dropbtn">Agents</ul>
+          <Link to="/agents" class="dropbtn">Agents</Link>
             <div class="dropdown-content">
               <Link to="/agents" className="nav-link">Agents List</Link>
               <Link to="/agent/createjointoken" className="nav-link">Create Token</Link>
             </div>
           </div>
           <div class="dropdown">
-            <ul class="dropbtn">Entries</ul>
+            <Link to="/entries" class="dropbtn">Entries</Link>
             <div class="dropdown-content">
               <Link to="/entries" className="nav-link">Entries List</Link>
               <Link to="/entry/create" className="nav-link">Create Entries</Link>
