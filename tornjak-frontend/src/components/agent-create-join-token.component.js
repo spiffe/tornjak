@@ -249,7 +249,7 @@ console.log(a.substr(sp))*/
       <div>
         <h3>Create New Agent Join Token</h3>
         <form onSubmit={this.onSubmit}>
-          <div className="alert alert-primary" role="alert">
+          <div className="alert-primary" role="alert">
           <pre>
             {this.state.message}
           </pre>
