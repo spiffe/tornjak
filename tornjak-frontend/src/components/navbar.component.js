@@ -17,25 +17,25 @@ export default class Navbar extends Component {
 
     return (
       <nav className="navbar navbar-dark bg-dark navbar-expand-lg">
-        <Link to="/" className="navbar-brand">Tornjak</Link>
+        <a href="/" className="navbar-brand">Tornjak</a>
         <div className="collpase navbar-collapse">
           <div class="dropdown">
-          <Link to="/agents" class="dropbtn">Agents</Link>
+          <a href="/agents" class="dropbtn">Agents</a>
             <div class="dropdown-content">
-              <Link to="/agents" className="nav-link">Agents List</Link>
-              <Link to="/agent/createjointoken" className="nav-link">Create Token</Link>
+              <a href="/agents" className="nav-link">Agents List</a>
+              <a href="/agent/createjointoken" className="nav-link">Create Token</a>
             </div>
           </div>
           <div class="dropdown">
-            <Link to="/entries" class="dropbtn">Entries</Link>
+            <a href="/entries" class="dropbtn">Entries</a>
             <div class="dropdown-content">
-              <Link to="/entries" className="nav-link">Entries List</Link>
-              <Link to="/entry/create" className="nav-link">Create Entries</Link>
+              <a href="/entries" className="nav-link">Entries List</a>
+              <a href="/entry/create" className="nav-link">Create Entries</a>
             </div>
           </div>
             <ul className="navbar-nav mr-auto">
               <li className="navbar-item">
-                <Link to="/tornjak/serverinfo" className="nav-link">Tornjak ServerInfo</Link>
+                <a href="/tornjak/serverinfo" className="nav-link">Tornjak ServerInfo</a>
               </li>
               {IsManager && managerNavs}
           </ul>
