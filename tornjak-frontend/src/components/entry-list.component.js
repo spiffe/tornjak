@@ -167,7 +167,7 @@ export default class EntryList extends Component {
     return (
       <div>
         <h3>Entry List</h3>
-        <div className="alert alert-primary" role="alert">
+        <div className="alert-primary" role="alert">
         <pre>
            {this.state.message}
         </pre>
