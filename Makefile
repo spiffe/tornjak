@@ -2,15 +2,16 @@
 
 CONTAINER_TAG ?= tsidentity/tornjak-spire-server:latest
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:latest
+GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
 
 all: bin/tornjak ui container
 
-bin/tornjak-agent:
+bin/tornjak-agent: $(GO_FILES)
 	# Build hack because of flake of imported go module
 	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:1.15 /bin/sh -c "go build agent.go; go build -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o bin/tornjak-agent agent.go"
 
 
-bin/tornjak-manager:
+bin/tornjak-manager: $(GO_FILES)
 	# Build hack because of flake of imported go module
 	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:1.15 /bin/sh -c "go build -o tornjak-manager manager.go; go build -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o bin/tornjak-manager manager.go"
 
