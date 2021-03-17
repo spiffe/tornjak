@@ -215,11 +215,12 @@ export default class ServerManagement extends Component {
           {this.state.formMTLS && mtlsFormOptions}
 
           <div className="form-group">
+            <br></br>
           <input type="submit" value="Register Server" className="btn btn-primary" />
           </div>
         </form>
 
-        <div className="alert alert-primary" role="alert">
+        <div className="alert-primary" role="alert">
         <pre>
            {this.state.message}
         </pre>
