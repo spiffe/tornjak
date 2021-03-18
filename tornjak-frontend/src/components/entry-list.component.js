@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import axios from 'axios'
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
+import {
+  serverSelected
+} from '../actions';
 
 const Entry = props => (
   <tr>
@@ -24,16 +28,10 @@ const Entry = props => (
   </tr>
 )
 
-const ServerDropdown = props => (
-    <option value={props.value}>{props.name}</option>
-)
-
-export default class EntryList extends Component {
+class EntryList extends Component {
   constructor(props) {
     super(props);
     this.deleteEntry = this.deleteEntry.bind(this);
-    this.serverDropdownList = this.serverDropdownList.bind(this);
-    this.onServerSelect = this.onServerSelect.bind(this);
     this.state = { 
         servers: [],
         selectedServer: "",
@@ -43,21 +41,17 @@ export default class EntryList extends Component {
   }
 
   componentDidMount() {
-    if (IsManager) {
-        this.populateServers()
+    if (IsManager && this.props.globalServerSelected !== "") {
+      this.populateEntries(this.props.globalServerSelected)
     } else {
         this.populateLocalEntries()
     }
   }
 
-  populateServers () {
-    axios.get(GetApiServerUri("/manager-api/server/list"), { crossdomain: true })
-      .then(response => {
-        this.setState({ servers:response.data["servers"]} );
-      })
-      .catch((error) => {
-        console.log(error);
-      })
+  componentDidUpdate(prevProps) {
+    if(prevProps.globalServerSelected !== this.props.globalServerSelected){
+      this.populateEntries(this.props.globalServerSelected)
+    }
   }
 
   populateEntries(serverName) {
@@ -116,53 +110,7 @@ export default class EntryList extends Component {
     }
   }
 
-  serverDropdownList() {
-      //return this.state.entries.toString()
-    if (typeof this.state.servers !== 'undefined') {
-        return this.state.servers.map(server => {
-          return <ServerDropdown key={server.name} 
-                    value={server.name} 
-                    name={server.name} />
-        })
-    } else {
-        return ""
-    }
-  }
-
-  onServerSelect(e) {
-      const serverName = e.target.value;
-      this.setState({selectedServer: serverName});
-      if (serverName !== "") {
-          this.populateEntries(serverName)
-      }
-  }
-
-  getServer(serverName) {
-      var i;
-      const servers = this.state.servers
-      for (i = 0; i < servers.length; i++) {
-        if (servers[i].name === serverName) {
-            return servers[i]
-        }
-      }
-      return null
-  }
-
-
   render() {
-
-    let managerServerSelector =  (
-        <div id="server-dropdown-div">
-        <label id="server-dropdown">Choose a server:</label>
-        <br/>
-        <select name="servers" id="servers" onChange={this.onServerSelect}>
-          <optgroup label="Servers">
-            <option value=""/>
-                {this.serverDropdownList()}
-          </optgroup>
-        </select>
-        </div>
-    )
 
     return (
       <div>
@@ -172,7 +120,7 @@ export default class EntryList extends Component {
            {this.state.message}
         </pre>
         </div>
-        {IsManager && managerServerSelector}
+        {IsManager}
         <br/><br/>
 
         <table className="table" style={{width : "100%"}}>
@@ -194,3 +142,13 @@ export default class EntryList extends Component {
     )
   }
 }
+
+
+const mapStateToProps = (state) => ({
+  globalServerSelected: state.filteredData.globalServerSelected,
+})
+
+export default connect(
+  mapStateToProps,
+  { serverSelected }
+)(EntryList)
