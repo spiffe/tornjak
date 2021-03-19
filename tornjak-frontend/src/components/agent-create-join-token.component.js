@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import axios from 'axios';
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
+import {
+  serverSelected
+} from '../actions';
 
-const ServerDropdown = props => (
-  <option value={props.value}>{props.name}</option>
-)
-
-export default class CreateJoinToken extends Component {
+class CreateJoinToken extends Component {
   constructor(props) {
     super(props);
 
@@ -15,10 +15,7 @@ export default class CreateJoinToken extends Component {
     this.onChangeTtl = this.onChangeTtl.bind(this);
     this.onChangeToken = this.onChangeToken.bind(this);
     this.onChangeSpiffeId = this.onChangeSpiffeId.bind(this);
-    this.onServerSelect = this.onServerSelect.bind(this);
-
     this.onSubmit = this.onSubmit.bind(this);
-
 
     this.state = {
       name: "",
@@ -36,40 +33,19 @@ export default class CreateJoinToken extends Component {
   
   componentDidMount() {
       if (IsManager) {
-        this.populateServers()
+        if(this.props.globalServerSelected !== ""){
+          this.setState({selectedServer: this.props.globalServerSelected});
+        }
       } else {
         // agent doesnt need to do anything
         this.setState({})
       }
   }
 
-  // Server dropdown populate
-  populateServers () {
-    axios.get(GetApiServerUri("/manager-api/server/list"), { crossdomain: true })
-      .then(response => {
-        this.setState({ servers:response.data["servers"]} );
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-  }
-
-  serverDropdownList() {
-      //return this.state.entries.toString()
-    if (typeof this.state.servers !== 'undefined') {
-        return this.state.servers.map(server => {
-          return <ServerDropdown key={server.name}
-                    value={server.name}
-                    name={server.name} />
-        })
-    } else {
-        return ""
+  componentDidUpdate(prevProps) {
+    if(prevProps.globalServerSelected !== this.props.globalServerSelected){
+      this.setState({selectedServer: this.props.globalServerSelected});
     }
-  }
-
-  onServerSelect(e) {
-      const serverName = e.target.value;
-      this.setState({selectedServer: serverName});
   }
 
 
@@ -232,19 +208,6 @@ console.log(a.substr(sp))*/
   }
 
   render() {
-    let managerServerSelector =  (
-        <div id="server-dropdown-div">
-        <label id="server-dropdown">Choose a server:</label>
-        <br/>
-        <select name="servers" id="servers" onChange={this.onServerSelect}>
-          <optgroup label="Servers">
-            <option value=""/>
-                {this.serverDropdownList()}
-          </optgroup>
-        </select>
-        </div>
-    )
-
     return (
       <div>
         <h3>Create New Agent Join Token</h3>
@@ -254,7 +217,7 @@ console.log(a.substr(sp))*/
             {this.state.message}
           </pre>
           </div>
-          {IsManager && managerServerSelector}
+          {IsManager}
           <br/><br/>
 
           <div className="form-group">
@@ -296,3 +259,12 @@ console.log(a.substr(sp))*/
     )
   }
 }
+
+const mapStateToProps = (state) => ({
+  globalServerSelected: state.filteredData.globalServerSelected,
+})
+
+export default connect(
+  mapStateToProps,
+  { serverSelected }
+)(CreateJoinToken)

@@ -41,8 +41,10 @@ class AgentList extends Component {
   }
 
   componentDidMount() {
-    if (IsManager && this.props.globalServerSelected !== "") {
-      this.populateAgents(this.props.globalServerSelected)
+    if (IsManager) {
+      if(this.props.globalServerSelected !== ""){
+        this.populateAgents(this.props.globalServerSelected)
+      }
     } else {
         this.populateLocalAgents()
       }

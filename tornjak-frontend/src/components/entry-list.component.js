@@ -41,8 +41,10 @@ class EntryList extends Component {
   }
 
   componentDidMount() {
-    if (IsManager && this.props.globalServerSelected !== "") {
-      this.populateEntries(this.props.globalServerSelected)
+    if (IsManager) {
+      if(this.props.globalServerSelected !== ""){
+        this.populateEntries(this.props.globalServerSelected)
+      }
     } else {
         this.populateLocalEntries()
     }
