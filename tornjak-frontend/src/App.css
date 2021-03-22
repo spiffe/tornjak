@@ -1,3 +1,9 @@
+.nav-comp {
+  min-width: 700px;
+}
+.rest-body {
+  margin-left: 20px;
+}
 .App {
   text-align: center;
 }

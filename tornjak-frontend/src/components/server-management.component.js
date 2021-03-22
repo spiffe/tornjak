@@ -199,7 +199,7 @@ export default class ServerManagement extends Component {
             checked={this.state.formTLS}
             onChange={this.handleInputChange}
             />
-            TLS Enabled
+              TLS Enabled
           </div>
           {this.state.formTLS && tlsFormOptions}
 

@@ -5,6 +5,7 @@
   "dependencies": {
     "@carbon/charts": "^0.41.41",
     "@carbon/charts-react": "^0.41.41",
+    "@inertiajs/inertia-react": "^0.5.4",
     "@reduxjs/toolkit": "^1.5.0",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.3",

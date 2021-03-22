@@ -1,3 +1,6 @@
+.navigation-bar {
+  min-width: 900px;
+}
 .dropbtn {
     background-color: #373a37;
     color: rgb(177, 176, 176);
