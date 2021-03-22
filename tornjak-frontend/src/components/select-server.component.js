@@ -74,11 +74,11 @@ class SelectServer extends Component {
 
         let managerServerSelector = (
             <div id="server-dropdown-div">
-                <label id="server-dropdown">Choose a server:</label>
-                <br />
+                <label id="server-dropdown">Choose a Server:</label>
                 <select name="servers" id="servers" onChange={this.onServerSelect}>
                     <optgroup label="Servers">
-                        <option value="" />
+                    <option value="none" selected disabled>Select an Option </option>
+                    <option value="none" selected disabled>{this.props.globalServerSelected} </option>
                         {this.serverDropdownList()}
                     </optgroup>
                 </select>
