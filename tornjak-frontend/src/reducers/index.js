@@ -2,7 +2,7 @@ import selectReducer from './selectReducer';
 import {combineReducers} from 'redux';
 
 const allReducers = combineReducers({
-    filteredData : selectReducer
+    serverInfo : selectReducer
 });
 
 export default allReducers;

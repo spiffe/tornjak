@@ -147,7 +147,7 @@ class EntryList extends Component {
 
 
 const mapStateToProps = (state) => ({
-  globalServerSelected: state.filteredData.globalServerSelected,
+  globalServerSelected: state.serverInfo.globalServerSelected,
 })
 
 export default connect(
