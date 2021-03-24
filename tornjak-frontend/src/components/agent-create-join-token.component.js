@@ -5,7 +5,7 @@ import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import {
   serverSelected
-} from '../actions';
+} from 'actions';
 
 class CreateJoinToken extends Component {
   constructor(props) {

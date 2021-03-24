@@ -6,7 +6,7 @@ import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import {
     serverSelected
-} from '../actions';
+} from 'actions';
 
 const ServerDropdown = props => (
     <option value={props.value}>{props.name}</option>
