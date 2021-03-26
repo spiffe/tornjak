@@ -126,7 +126,7 @@ class EntryList extends Component {
         {IsManager}
         <br/><br/>
 
-        <table className="table" style={{width : "100%"}}>
+        {/* <table className="table" style={{width : "100%"}}>
           <thead className="thead-light">
             <tr>
               <th>ID</th>
@@ -140,7 +140,7 @@ class EntryList extends Component {
           <tbody>
             {this.entryList()}
           </tbody>
-        </table>
+        </table> */}
         <div className="indviduallisttable">
           <Table data={this.entryList()} id="table-1" />
         </div>

@@ -38,18 +38,16 @@ class DataTableRender extends React.Component {
 
     prepareTableData() {
         const { data } = this.props;
-        console.log("data", data)
         let listData = [...data];
         let listtabledata = [];
         let i = 0;
         for (i = 0; i < listData.length; i++) {
             listtabledata[i] = {}
+            listtabledata[i]["id"] = i+1
             listtabledata[i]["trustdomain"] = listData[i].props.agent.id.trust_domain
-            listtabledata[i]["id"] = "spiffe://" + listData[i].props.agent.id.trust_domain + listData[i].props.agent.id.path
+            listtabledata[i]["spiffeid"] = "spiffe://" + listData[i].props.agent.id.trust_domain + listData[i].props.agent.id.path
             listtabledata[i]["info"] = <div style={{overflowX: 'auto', width: "400px"}}><pre>{JSON.stringify(listData[i].props.agent, null, ' ')}</pre></div>
-            //listtabledata[i]["actions"] = {}
-            //listtabledata[i]["actions"]["banAgent"] = listData[i].props.banAgent
-            //listtabledata[i]["actions"]["deleteAgent"] = listData[i].props.deleteAgent
+            listtabledata[i]["actions"] = <div><a href="#" onClick={() => { listData[i].props.banAgent(listData[i].props.agent.id) }}>Ban</a> <br /> <a href="#" onClick={() => { listData[i].props.deleteAgent(listData[i].props.agent.id) }}>Delete</a></div>
         }
         this.setState({
             listTableData: listtabledata
@@ -57,23 +55,28 @@ class DataTableRender extends React.Component {
     }
     render() {
         const { listTableData } = this.state;
+        console.log("listTableData", listTableData)
         const headerData = [
+            {
+                header: 'ID',
+                key: 'id',
+            },
             {
                 header: 'Trust Domain',
                 key: 'trustdomain',
             },
             {
                 header: 'SPIFFE ID',
-                key: 'id',
+                key: 'spiffeid',
             },
             {
                 header: 'Info',
                 key: 'info',
             },
-            // {
-            //     header: 'Actions',
-            //     key: 'id',
-            // },
+            {
+                header: 'Actions',
+                key: 'actions',
+            },
         ];
         return (
             <DataTable

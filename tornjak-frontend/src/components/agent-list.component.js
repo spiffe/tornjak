@@ -9,13 +9,6 @@ import {
   serverSelected
 } from 'actions';
 
-const UniqueData = props => (
-  { 'trustdomain': props.agent.id.trust_domain, 
-    'id': "spiffe://" + props.agent.id.trust_domain + props.agent.id.path, 
-    'info': JSON.stringify(props.agent, null, ' '),
-    'actions': props.agent.id.trust_domain
-  }
-)
 const Agent = props => (
   <tr>
     <td>{props.agent.id.trust_domain}</td>
@@ -144,23 +137,7 @@ class AgentList extends Component {
     }
   }
 
-  agentList2() {
-    //return this.state.agents.toString()
-    if (typeof this.state.agents !== 'undefined') {
-      return this.state.agents.map(currentAgent => {
-        return <UniqueData 
-                  trustdomain={currentAgent.id.trust_domain}
-                  key={currentAgent.id.path}
-                  id={currentAgent.id.path}
-                  agent={currentAgent} />;
-      })
-    } else {
-      return ""
-    }
-  }
-
   render() {
-    console.log("ghf", this.agentList())
     return (
       <div>
         <h3>Agent List</h3>
