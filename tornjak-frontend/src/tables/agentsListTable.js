@@ -1,5 +1,6 @@
 import React from "react";
 import { DataTable } from "carbon-components-react";
+import ResetIcon from "@carbon/icons-react/es/reset--alt/20";
 const {
     TableContainer,
     Table,
@@ -13,6 +14,8 @@ const {
     TableToolbar,
     TableToolbarSearch,
     TableToolbarContent,
+    TableBatchActions,
+    TableBatchAction,
 } = DataTable;
 
 class DataTableRender extends React.Component {
@@ -38,28 +41,22 @@ class DataTableRender extends React.Component {
         console.log("data", data)
         let listData = [...data];
         let listtabledata = [];
-        let firstDeal = "", firstGroup = "", i = 0, j = 0, index = 0;
+        let i = 0;
         for (i = 0; i < listData.length; i++) {
             listtabledata[i] = {}
             listtabledata[i]["trustdomain"] = listData[i].props.agent.id.trust_domain
             listtabledata[i]["id"] = "spiffe://" + listData[i].props.agent.id.trust_domain + listData[i].props.agent.id.path
-            listtabledata[i]["info"] = JSON.stringify(listData[i].props.agent)
+            listtabledata[i]["info"] = <div style={{overflowX: 'auto', width: "400px"}}><pre>{JSON.stringify(listData[i].props.agent, null, ' ')}</pre></div>
             //listtabledata[i]["actions"] = {}
             //listtabledata[i]["actions"]["banAgent"] = listData[i].props.banAgent
             //listtabledata[i]["actions"]["deleteAgent"] = listData[i].props.deleteAgent
         }
         this.setState({
             listTableData: listtabledata
-          })
-        //console.log("listtabledata", listtabledata)
+        })
     }
     render() {
         const { listTableData } = this.state;
-        const { data } = this.props;
-        console.log("listTableData", listTableData)
-        /* var headerData = [], i = 0, keys = Object.keys(listTableData[0]);
-        for(i=0; i < keys.length; i++)
-          headerData.push({"key": keys[i], "header": keys[i].toUpperCase()}) */
         const headerData = [
             {
                 header: 'Trust Domain',
@@ -100,6 +97,28 @@ class DataTableRender extends React.Component {
                             <TableToolbarContent>
                                 <TableToolbarSearch onChange={(e) => onInputChange(e)} />
                             </TableToolbarContent>
+                            <TableBatchActions
+                                {...getBatchActionProps()}
+                            >
+                                <TableBatchAction
+                                    renderIcon={ResetIcon}
+                                    iconDescription="Delete"
+                                    onClick={() => {
+                                        this.reCalculateAverage(selectedRows);
+                                    }}
+                                >
+                                    Delete
+                                </TableBatchAction>
+                                <TableBatchAction
+                                    renderIcon={ResetIcon}
+                                    iconDescription="Ban"
+                                    onClick={() => {
+                                        this.performAction(selectedRows);
+                                    }}
+                                >
+                                    Ban
+                                </TableBatchAction>
+                            </TableBatchActions>
                         </TableToolbar>
                         <Table size="short" useZebraStyles>
                             <TableHead>
