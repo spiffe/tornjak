@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios'
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
+import Table from "tables/entriesListTable";
 import {
   serverSelected
 } from 'actions';
@@ -140,6 +141,9 @@ class EntryList extends Component {
             {this.entryList()}
           </tbody>
         </table>
+        <div className="indviduallisttable">
+          <Table data={this.entryList()} id="table-1" />
+        </div>
       </div>
     )
   }

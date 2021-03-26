@@ -4,25 +4,33 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
+import Table from "tables/agentsListTable";
 import {
   serverSelected
 } from 'actions';
 
+const UniqueData = props => (
+  { 'trustdomain': props.agent.id.trust_domain, 
+    'id': "spiffe://" + props.agent.id.trust_domain + props.agent.id.path, 
+    'info': JSON.stringify(props.agent, null, ' '),
+    'actions': props.agent.id.trust_domain
+  }
+)
 const Agent = props => (
   <tr>
     <td>{props.agent.id.trust_domain}</td>
-    <td>{ "spiffe://" + props.agent.id.trust_domain + props.agent.id.path}</td>
-    <td><div style={{overflowX: 'auto', width: "400px"}}>
-    <pre>{JSON.stringify(props.agent, null, ' ')}</pre>
+    <td>{"spiffe://" + props.agent.id.trust_domain + props.agent.id.path}</td>
+    <td><div style={{ overflowX: 'auto', width: "400px" }}>
+      <pre>{JSON.stringify(props.agent, null, ' ')}</pre>
     </div></td>
 
     <td>
       {/*
         // <Link to={"/agentView/"+props.agent._id}>view</Link> |
       */}
-      <a href="#" onClick={() => { props.banAgent (props.agent.id) }}>ban</a>
-      <br/>
-      <a href="#" onClick={() => { props.deleteAgent (props.agent.id) }}>delete</a>
+      <a href="#" onClick={() => { props.banAgent(props.agent.id) }}>ban</a>
+      <br />
+      <a href="#" onClick={() => { props.deleteAgent(props.agent.id) }}>delete</a>
     </td>
   </tr>
 )
@@ -32,40 +40,40 @@ class AgentList extends Component {
     super(props);
     this.deleteAgent = this.deleteAgent.bind(this);
     this.banAgent = this.banAgent.bind(this);
-    this.state = { 
-        agents: [],
-        servers: [],
-        selectedServer: "",
-        message: "",
+    this.state = {
+      agents: [],
+      servers: [],
+      selectedServer: "",
+      message: "",
     };
   }
 
   componentDidMount() {
     if (IsManager) {
-      if(this.props.globalServerSelected !== ""){
+      if (this.props.globalServerSelected !== "") {
         this.populateAgents(this.props.globalServerSelected)
       }
     } else {
-        this.populateLocalAgents()
-      }
+      this.populateLocalAgents()
+    }
   }
 
   componentDidUpdate(prevProps) {
-    if(prevProps.globalServerSelected !== this.props.globalServerSelected){
+    if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
       this.populateAgents(this.props.globalServerSelected)
     }
   }
 
   populateAgents(serverName) {
-      axios.get(GetApiServerUri('/manager-api/agent/list/') + serverName, {     crossdomain: true })
-      .then(response =>{
+    axios.get(GetApiServerUri('/manager-api/agent/list/') + serverName, { crossdomain: true })
+      .then(response => {
         console.log(response);
-        this.setState({ agents:response.data["agents"]});
+        this.setState({ agents: response.data["agents"] });
       }).catch(error => {
-          this.setState({
-              message: "Error retrieving " + serverName + " : "+ error.message,
-              agents: [],
-          });
+        this.setState({
+          message: "Error retrieving " + serverName + " : " + error.message,
+          agents: [],
+        });
       });
 
   }
@@ -73,7 +81,7 @@ class AgentList extends Component {
   populateLocalAgents() {
     axios.get(GetApiServerUri('/api/agent/list'), { crossdomain: true })
       .then(response => {
-        this.setState({ agents:response.data["agents"]});
+        this.setState({ agents: response.data["agents"] });
       })
       .catch((error) => {
         console.log(error);
@@ -83,16 +91,16 @@ class AgentList extends Component {
   banAgent(id) {
     var endpoint = ""
     if (IsManager) {
-        endpoint = GetApiServerUri('/manager-api/agent/ban') + "/" + this.state.   selectedServer
+      endpoint = GetApiServerUri('/manager-api/agent/ban') + "/" + this.state.selectedServer
     } else {
-        endpoint = GetApiServerUri('/api/agent/ban')
+      endpoint = GetApiServerUri('/api/agent/ban')
     }
 
     axios.post(endpoint, {
-        "id": {
-              "trust_domain": id.trust_domain,
-              "path": id.path,
-        }
+      "id": {
+        "trust_domain": id.trust_domain,
+        "path": id.path,
+      }
     })
       .then(res => console.log(res.data), alert("Ban SUCCESS"), this.componentDidMount());
     this.setState({
@@ -103,53 +111,68 @@ class AgentList extends Component {
   deleteAgent(id) {
     var endpoint = ""
     if (IsManager) {
-        endpoint = GetApiServerUri('/manager-api/agent/delete') + "/" + this.state.   selectedServer
+      endpoint = GetApiServerUri('/manager-api/agent/delete') + "/" + this.state.selectedServer
     } else {
-        endpoint = GetApiServerUri('/api/agent/delete')
+      endpoint = GetApiServerUri('/api/agent/delete')
     }
 
     axios.post(endpoint, {
-        "id": {
-              "trust_domain": id.trust_domain,
-              "path": id.path,
-        }
+      "id": {
+        "trust_domain": id.trust_domain,
+        "path": id.path,
+      }
     })
       .then(res => console.log(res.data))
     this.setState({
-      agents: this.state.agents.filter(el => 
-          el.id.trust_domain !== id.trust_domain ||
-          el.id.path !== id.path)
+      agents: this.state.agents.filter(el =>
+        el.id.trust_domain !== id.trust_domain ||
+        el.id.path !== id.path)
     })
   }
 
   agentList() {
-      //return this.state.agents.toString()
+    //return this.state.agents.toString()
     if (typeof this.state.agents !== 'undefined') {
-        return this.state.agents.map(currentAgent => {
-          return <Agent key={currentAgent.id.path} 
-                    agent={currentAgent} 
-                    banAgent={this.banAgent} 
-                    deleteAgent={this.deleteAgent}/>;
-        })
+      return this.state.agents.map(currentAgent => {
+        return <Agent key={currentAgent.id.path}
+          agent={currentAgent}
+          banAgent={this.banAgent}
+          deleteAgent={this.deleteAgent} />;
+      })
     } else {
-        return ""
+      return ""
+    }
+  }
+
+  agentList2() {
+    //return this.state.agents.toString()
+    if (typeof this.state.agents !== 'undefined') {
+      return this.state.agents.map(currentAgent => {
+        return <UniqueData 
+                  trustdomain={currentAgent.id.trust_domain}
+                  key={currentAgent.id.path}
+                  id={currentAgent.id.path}
+                  agent={currentAgent} />;
+      })
+    } else {
+      return ""
     }
   }
 
   render() {
-
+    console.log("ghf", this.agentList())
     return (
       <div>
         <h3>Agent List</h3>
         <div className="alert-primary" role="alert">
-        <pre>
-           {this.state.message}
-        </pre>
+          <pre>
+            {this.state.message}
+          </pre>
         </div>
         {IsManager}
-        <br/><br/>
+        <br /><br />
 
-        <table className="table" style={{width : "100%"}}>
+        {/* <table className="table" style={{ width: "100%" }}>
           <thead className="thead-light">
             <tr>
               <th>Trust Domain</th>
@@ -161,7 +184,10 @@ class AgentList extends Component {
           <tbody>
             {this.agentList()}
           </tbody>
-        </table>
+        </table> */}
+        <div className="indviduallisttable">
+          <Table data={this.agentList()} id="table-1" />
+        </div>
       </div>
     )
   }
