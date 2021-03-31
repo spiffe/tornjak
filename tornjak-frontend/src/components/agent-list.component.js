@@ -33,8 +33,6 @@ class AgentList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      servers: [],
-      selectedServer: "",
       message: "",
     };
   }
@@ -42,20 +40,20 @@ class AgentList extends Component {
   componentDidMount() {
     if (IsManager) {
       if (this.props.globalServerSelected !== "") {
-        this.populateAgents(this.props.globalServerSelected)
+        this.populateAgentsUpdate(this.props.globalServerSelected)
       }
     } else {
-      this.populateLocalAgents()
+      this.populateLocalAgentsUpdate()
     }
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
-      this.populateAgents(this.props.globalServerSelected)
+      this.populateAgentsUpdate(this.props.globalServerSelected)
     }
   }
 
-  populateAgents(serverName) {
+  populateAgentsUpdate(serverName) {
     axios.get(GetApiServerUri('/manager-api/agent/list/') + serverName, { crossdomain: true })
       .then(response => {
         console.log(response);
@@ -69,7 +67,7 @@ class AgentList extends Component {
 
   }
 
-  populateLocalAgents() {
+  populateLocalAgentsUpdate() {
     axios.get(GetApiServerUri('/api/agent/list'), { crossdomain: true })
       .then(response => {
         this.props.agentsList(response.data["agents"]);
@@ -80,7 +78,6 @@ class AgentList extends Component {
   }
 
   agentList() {
-    //return this.state.agents.toString()
     if (typeof this.props.globalagentsList !== 'undefined') {
       return this.props.globalagentsList.map(currentAgent => {
         return <Agent key={currentAgent.id.path}
@@ -103,7 +100,7 @@ class AgentList extends Component {
         </div>
         {IsManager}
         <br /><br />
-        <div className="indviduallisttable">
+        <div className="indvidual-list-table">
           <Table data={this.agentList()} id="table-1" />
         </div>
       </div>

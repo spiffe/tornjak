@@ -53,13 +53,13 @@ class DataTableRender extends React.Component {
         let listtabledata = [];
         let i = 0;
         for (i = 0; i < listData.length; i++) {
-            listtabledata[i] = {}
-            listtabledata[i]["id"] = listData[i].props.entry.id
-            listtabledata[i]["spiffeid"] = "spiffe://" + listData[i].props.entry.spiffe_id.trust_domain + listData[i].props.entry.spiffe_id.path
-            listtabledata[i]["parentid"] = "spiffe://" + listData[i].props.entry.parent_id.trust_domain + listData[i].props.entry.parent_id.path
-            listtabledata[i]["selectors"] = listData[i].props.entry.selectors.map(s => s.type + ":" + s.value).join(', ')
-            listtabledata[i]["info"] = <div style={{overflowX: 'auto', width: "400px"}}><pre>{JSON.stringify(listData[i].props.entry, null, ' ')}</pre></div>
-            // listtabledata[i]["actions"] = <div><a href="#" onClick={() => { listData[i].props.deleteEntry(listData[i].props.entry.id) }}>Delete</a></div>
+            listtabledata[i] = {};
+            listtabledata[i]["id"] = listData[i].props.entry.id;
+            listtabledata[i]["spiffeid"] = "spiffe://" + listData[i].props.entry.spiffe_id.trust_domain + listData[i].props.entry.spiffe_id.path;
+            listtabledata[i]["parentid"] = "spiffe://" + listData[i].props.entry.parent_id.trust_domain + listData[i].props.entry.parent_id.path;
+            listtabledata[i]["selectors"] = listData[i].props.entry.selectors.map(s => s.type + ":" + s.value).join(', ');
+            listtabledata[i]["info"] = <div style={{overflowX: 'auto', width: "400px"}}><pre>{JSON.stringify(listData[i].props.entry, null, ' ')}</pre></div>;
+            // listtabledata[i]["actions"] = <div><a href="#" onClick={() => { listData[i].props.deleteEntry(listData[i].props.entry.id) }}>Delete</a></div>;
         }
         this.setState({
             listTableData: listtabledata
@@ -67,8 +67,7 @@ class DataTableRender extends React.Component {
     }
 
     deleteEntry(selectedRows) {
-        var id = [];
-        var i = 0;
+        var id = [], i = 0, endpoint = "";
         if(selectedRows.length !== 0)
         {
             for(i=0; i < selectedRows.length; i++)
@@ -76,19 +75,23 @@ class DataTableRender extends React.Component {
                 id[i] = selectedRows[i].id;
             }
         }
-        var endpoint = ""
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/entry/delete') + "/" + this.props.globalServerSelected
         } else {
             endpoint = GetApiServerUri('/api/entry/delete')
         }
-        console.log("id", id)
-        axios.post(endpoint, {
-            "ids": [id[0]]
-        })
-          .then(res => { console.log(res.data)
-            this.props.entriesList(this.props.globalentriesList.filter(el => el.id !== id[0]));
-          })
+        if(id[0] !== undefined)
+        {
+            axios.post(endpoint, {
+                "ids": [id[0]]
+            })
+            .then(res => { console.log(res.data)
+                this.props.entriesList(this.props.globalentriesList.filter(el => el.id !== id[0]))
+                .catch((error) => {
+                    console.log(error);
+                  })
+            })
+        }
     }
 
     render() {

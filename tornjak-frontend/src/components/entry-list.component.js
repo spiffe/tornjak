@@ -43,20 +43,20 @@ class EntryList extends Component {
   componentDidMount() {
     if (IsManager) {
       if(this.props.globalServerSelected !== ""){
-        this.populateEntries(this.props.globalServerSelected)
+        this.populateEntriesUpdate(this.props.globalServerSelected)
       }
     } else {
-        this.populateLocalEntries()
+        this.populateLocalEntriesUpdate()
     }
   }
 
   componentDidUpdate(prevProps) {
     if(prevProps.globalServerSelected !== this.props.globalServerSelected){
-      this.populateEntries(this.props.globalServerSelected)
+      this.populateEntriesUpdate(this.props.globalServerSelected)
     }
   }
 
-  populateEntries(serverName) {
+  populateEntriesUpdate(serverName) {
       axios.get(GetApiServerUri('/manager-api/entry/list/') + serverName, {     crossdomain: true })
       .then(response =>{
         console.log(response);
@@ -70,7 +70,7 @@ class EntryList extends Component {
 
   }
 
-  populateLocalEntries() {
+  populateLocalEntriesUpdate() {
       axios.get(GetApiServerUri('/api/entry/list'), { crossdomain: true })
       .then(response => {
           console.log(response.data);
@@ -82,7 +82,6 @@ class EntryList extends Component {
   }
 
   entryList() {
-    //return this.state.entries.toString()
   if (typeof this.props.globalentriesList !== 'undefined') {
       return this.props.globalentriesList.map(currentEntry => {
         return <Entry key={currentEntry.id} 
@@ -106,7 +105,7 @@ class EntryList extends Component {
         </div>
         {IsManager}
         <br/><br/>
-        <div className="indviduallisttable">
+        <div className="indvidual-list-table">
           <Table data={this.entryList()} id="table-1" />
         </div>
       </div>
