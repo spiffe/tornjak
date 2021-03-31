@@ -6,7 +6,8 @@ import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import Table from "tables/agentsListTable";
 import {
-  serverSelected
+  serverSelected,
+  agentsList
 } from 'actions';
 
 const Agent = props => (
@@ -31,10 +32,7 @@ const Agent = props => (
 class AgentList extends Component {
   constructor(props) {
     super(props);
-    this.deleteAgent = this.deleteAgent.bind(this);
-    this.banAgent = this.banAgent.bind(this);
     this.state = {
-      agents: [],
       servers: [],
       selectedServer: "",
       message: "",
@@ -61,12 +59,12 @@ class AgentList extends Component {
     axios.get(GetApiServerUri('/manager-api/agent/list/') + serverName, { crossdomain: true })
       .then(response => {
         console.log(response);
-        this.setState({ agents: response.data["agents"] });
+        this.props.agentsList(response.data["agents"]);
       }).catch(error => {
         this.setState({
-          message: "Error retrieving " + serverName + " : " + error.message,
-          agents: [],
+          message: "Error retrieving " + serverName + " : " + error.message
         });
+        this.props.agentsList([]);
       });
 
   }
@@ -74,59 +72,17 @@ class AgentList extends Component {
   populateLocalAgents() {
     axios.get(GetApiServerUri('/api/agent/list'), { crossdomain: true })
       .then(response => {
-        this.setState({ agents: response.data["agents"] });
+        this.props.agentsList(response.data["agents"]);
       })
       .catch((error) => {
         console.log(error);
       })
   }
 
-  banAgent(id) {
-    var endpoint = ""
-    if (IsManager) {
-      endpoint = GetApiServerUri('/manager-api/agent/ban') + "/" + this.state.selectedServer
-    } else {
-      endpoint = GetApiServerUri('/api/agent/ban')
-    }
-
-    axios.post(endpoint, {
-      "id": {
-        "trust_domain": id.trust_domain,
-        "path": id.path,
-      }
-    })
-      .then(res => console.log(res.data), alert("Ban SUCCESS"), this.componentDidMount());
-    this.setState({
-      agents: this.state.agents.filter(el => el._id !== id)
-    })
-  }
-
-  deleteAgent(id) {
-    var endpoint = ""
-    if (IsManager) {
-      endpoint = GetApiServerUri('/manager-api/agent/delete') + "/" + this.state.selectedServer
-    } else {
-      endpoint = GetApiServerUri('/api/agent/delete')
-    }
-
-    axios.post(endpoint, {
-      "id": {
-        "trust_domain": id.trust_domain,
-        "path": id.path,
-      }
-    })
-      .then(res => console.log(res.data))
-    this.setState({
-      agents: this.state.agents.filter(el =>
-        el.id.trust_domain !== id.trust_domain ||
-        el.id.path !== id.path)
-    })
-  }
-
   agentList() {
     //return this.state.agents.toString()
-    if (typeof this.state.agents !== 'undefined') {
-      return this.state.agents.map(currentAgent => {
+    if (typeof this.props.globalagentsList !== 'undefined') {
+      return this.props.globalagentsList.map(currentAgent => {
         return <Agent key={currentAgent.id.path}
           agent={currentAgent}
           banAgent={this.banAgent}
@@ -136,7 +92,6 @@ class AgentList extends Component {
       return ""
     }
   }
-
   render() {
     return (
       <div>
@@ -148,20 +103,6 @@ class AgentList extends Component {
         </div>
         {IsManager}
         <br /><br />
-
-        {/* <table className="table" style={{ width: "100%" }}>
-          <thead className="thead-light">
-            <tr>
-              <th>Trust Domain</th>
-              <th>SPIFFE ID</th>
-              <th>Info</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.agentList()}
-          </tbody>
-        </table> */}
         <div className="indviduallisttable">
           <Table data={this.agentList()} id="table-1" />
         </div>
@@ -173,9 +114,10 @@ class AgentList extends Component {
 
 const mapStateToProps = (state) => ({
   globalServerSelected: state.serverInfo.globalServerSelected,
+  globalagentsList: state.serverInfo.globalagentsList,
 })
 
 export default connect(
   mapStateToProps,
-  { serverSelected }
+  { serverSelected, agentsList }
 )(AgentList)

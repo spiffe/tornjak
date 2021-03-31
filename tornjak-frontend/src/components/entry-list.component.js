@@ -6,7 +6,8 @@ import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import Table from "tables/entriesListTable";
 import {
-  serverSelected
+  serverSelected,
+  entriesList
 } from 'actions';
 
 const Entry = props => (
@@ -32,11 +33,9 @@ const Entry = props => (
 class EntryList extends Component {
   constructor(props) {
     super(props);
-    this.deleteEntry = this.deleteEntry.bind(this);
     this.state = { 
         servers: [],
         selectedServer: "",
-        entries: [],
         message: "",
     };
   }
@@ -61,12 +60,12 @@ class EntryList extends Component {
       axios.get(GetApiServerUri('/manager-api/entry/list/') + serverName, {     crossdomain: true })
       .then(response =>{
         console.log(response);
-        this.setState({ entries:response.data["entries"]});
+        this.props.entriesList(response.data["entries"]);
       }).catch(err => {
           this.setState({ 
-              message: "Error retrieving " + serverName + " : "+ err + (typeof (err.response) !== "undefined" ? ":" + err.response.data : ""),
-              entries: [],
+              message: "Error retrieving " + serverName + " : "+ err + (typeof (err.response) !== "undefined" ? ":" + err.response.data : "")
           });
+          this.props.entriesList([]);
       });
 
   }
@@ -75,43 +74,25 @@ class EntryList extends Component {
       axios.get(GetApiServerUri('/api/entry/list'), { crossdomain: true })
       .then(response => {
           console.log(response.data);
-        this.setState({ entries:response.data["entries"]} );
+        this.props.entriesList(response.data["entries"]);
       })
       .catch((error) => {
         console.log(error);
       })
   }
 
-
-  deleteEntry(id) {
-    var endpoint = ""
-    if (IsManager) {
-        endpoint = GetApiServerUri('/manager-api/entry/delete') + "/" + this.state.selectedServer
-    } else {
-        endpoint = GetApiServerUri('/api/entry/delete')
-    }
-    axios.post(endpoint, {
-        "ids": [id]
-    })
-      .then(res => { console.log(res.data)
-        this.setState({
-          entries: this.state.entries.filter(el => el.id !== id)
-        })
-      })
-  }
-
   entryList() {
-      //return this.state.entries.toString()
-    if (typeof this.state.entries !== 'undefined') {
-        return this.state.entries.map(currentEntry => {
-          return <Entry key={currentEntry.id} 
-                    entry={currentEntry} 
-                    deleteEntry={this.deleteEntry}/>;
-        })
-    } else {
-        return ""
-    }
+    //return this.state.entries.toString()
+  if (typeof this.props.globalentriesList !== 'undefined') {
+      return this.props.globalentriesList.map(currentEntry => {
+        return <Entry key={currentEntry.id} 
+                  entry={currentEntry} 
+                  deleteEntry={this.deleteEntry}/>;
+      })
+  } else {
+      return ""
   }
+}
 
   render() {
 
@@ -125,22 +106,6 @@ class EntryList extends Component {
         </div>
         {IsManager}
         <br/><br/>
-
-        {/* <table className="table" style={{width : "100%"}}>
-          <thead className="thead-light">
-            <tr>
-              <th>ID</th>
-              <th>SPIFFE ID</th>
-              <th>Parent ID</th>
-              <th>Selectors</th>
-              <th>Actions</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.entryList()}
-          </tbody>
-        </table> */}
         <div className="indviduallisttable">
           <Table data={this.entryList()} id="table-1" />
         </div>
@@ -152,9 +117,10 @@ class EntryList extends Component {
 
 const mapStateToProps = (state) => ({
   globalServerSelected: state.serverInfo.globalServerSelected,
+  globalentriesList: state.serverInfo.globalentriesList
 })
 
 export default connect(
   mapStateToProps,
-  { serverSelected }
+  { serverSelected, entriesList }
 )(EntryList)

@@ -1,6 +1,13 @@
 import React from "react";
+import { connect } from 'react-redux';
 import { DataTable } from "carbon-components-react";
 import ResetIcon from "@carbon/icons-react/es/reset--alt/20";
+import GetApiServerUri from 'components/helpers';
+import IsManager from 'components/is_manager';
+import axios from 'axios'
+import {
+    entriesList
+  } from 'actions';
 const {
     TableContainer,
     Table,
@@ -32,8 +39,12 @@ class DataTableRender extends React.Component {
         //this.prepareTableData();
     }
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps !== this.props)
+        if (prevProps !== this.props){
+            this.setState({
+                listData: this.props.globalentriesList
+            })
             this.prepareTableData();
+        }
     }
 
     prepareTableData() {
@@ -48,15 +59,40 @@ class DataTableRender extends React.Component {
             listtabledata[i]["parentid"] = "spiffe://" + listData[i].props.entry.parent_id.trust_domain + listData[i].props.entry.parent_id.path
             listtabledata[i]["selectors"] = listData[i].props.entry.selectors.map(s => s.type + ":" + s.value).join(', ')
             listtabledata[i]["info"] = <div style={{overflowX: 'auto', width: "400px"}}><pre>{JSON.stringify(listData[i].props.entry, null, ' ')}</pre></div>
-            listtabledata[i]["actions"] = <div><a href="#" onClick={() => { listData[i].props.deleteEntry(listData[i].props.entry.id) }}>Delete</a></div>
+            // listtabledata[i]["actions"] = <div><a href="#" onClick={() => { listData[i].props.deleteEntry(listData[i].props.entry.id) }}>Delete</a></div>
         }
         this.setState({
             listTableData: listtabledata
           })
     }
+
+    deleteEntry(selectedRows) {
+        var id = [];
+        var i = 0;
+        if(selectedRows.length !== 0)
+        {
+            for(i=0; i < selectedRows.length; i++)
+            {
+                id[i] = selectedRows[i].id;
+            }
+        }
+        var endpoint = ""
+        if (IsManager) {
+            endpoint = GetApiServerUri('/manager-api/entry/delete') + "/" + this.props.globalServerSelected
+        } else {
+            endpoint = GetApiServerUri('/api/entry/delete')
+        }
+        console.log("id", id)
+        axios.post(endpoint, {
+            "ids": [id[0]]
+        })
+          .then(res => { console.log(res.data)
+            this.props.entriesList(this.props.globalentriesList.filter(el => el.id !== id[0]));
+          })
+    }
+
     render() {
         const { listTableData } = this.state;
-        console.log("listTableData", listTableData)
         const headerData = [
             {
                 header: 'ID',
@@ -78,10 +114,10 @@ class DataTableRender extends React.Component {
                 header: 'Info',
                 key: 'info',
             },
-            {
-                header: 'Actions',
-                key: 'actions',
-            },
+            // {
+            //     header: 'Actions',
+            //     key: 'actions',
+            // },
         ];
         return (
             <DataTable
@@ -97,6 +133,7 @@ class DataTableRender extends React.Component {
                     getPaginationProps,
                     getBatchActionProps,
                     getTableContainerProps,
+                    selectedRows,
                 }) => (
                     <TableContainer
                         {...getTableContainerProps()}
@@ -112,7 +149,7 @@ class DataTableRender extends React.Component {
                                     renderIcon={ResetIcon}
                                     iconDescription="Delete"
                                     onClick={() => {
-                                        this.reCalculateAverage(selectedRows);
+                                        this.deleteEntry(selectedRows);
                                     }}
                                 >
                                     Delete
@@ -148,4 +185,12 @@ class DataTableRender extends React.Component {
     }
 }
 
-export default DataTableRender;
+const mapStateToProps = (state) => ({
+    globalServerSelected: state.serverInfo.globalServerSelected,
+    globalentriesList: state.serverInfo.globalentriesList
+  })
+  
+  export default connect(
+    mapStateToProps,
+    { entriesList }
+  )(DataTableRender)

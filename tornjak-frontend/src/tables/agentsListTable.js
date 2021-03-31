@@ -1,6 +1,13 @@
 import React from "react";
 import { DataTable } from "carbon-components-react";
+import { connect } from 'react-redux';
 import ResetIcon from "@carbon/icons-react/es/reset--alt/20";
+import GetApiServerUri from 'components/helpers';
+import IsManager from 'components/is_manager';
+import axios from 'axios'
+import {
+    agentsList
+  } from 'actions';
 const {
     TableContainer,
     Table,
@@ -32,8 +39,12 @@ class DataTableRender extends React.Component {
         //this.prepareTableData();
     }
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps !== this.props)
+        if (prevProps !== this.props){
+            this.setState({
+                listData: this.props.globalagentsList
+            })
             this.prepareTableData();
+        } 
     }
 
     prepareTableData() {
@@ -47,15 +58,74 @@ class DataTableRender extends React.Component {
             listtabledata[i]["trustdomain"] = listData[i].props.agent.id.trust_domain
             listtabledata[i]["spiffeid"] = "spiffe://" + listData[i].props.agent.id.trust_domain + listData[i].props.agent.id.path
             listtabledata[i]["info"] = <div style={{overflowX: 'auto', width: "400px"}}><pre>{JSON.stringify(listData[i].props.agent, null, ' ')}</pre></div>
-            listtabledata[i]["actions"] = <div><a href="#" onClick={() => { listData[i].props.banAgent(listData[i].props.agent.id) }}>Ban</a> <br /> <a href="#" onClick={() => { listData[i].props.deleteAgent(listData[i].props.agent.id) }}>Delete</a></div>
+            // listtabledata[i]["actions"] = <div><a href="#" onClick={() => { listData[i].props.banAgent(listData[i].props.agent.id) }}>Ban</a> <br /> <a href="#" onClick={() => { listData[i].props.deleteAgent(listData[i].props.agent.id) }}>Delete</a></div>
         }
         this.setState({
             listTableData: listtabledata
         })
     }
+
+    deleteAgent(selectedRows) {
+        var id = [];
+        var i = 0;
+        if(selectedRows.length !== 0)
+        {
+            for(i=0; i < selectedRows.length; i++)
+            {
+                id[i] = {}
+                id[i]["trust_domain"] = selectedRows[i].cells[1].value;
+                id[i]["path"] = selectedRows[i].cells[2].value.substr(20);
+            }
+        }
+        var endpoint = ""
+        if (IsManager) {
+          endpoint = GetApiServerUri('/manager-api/agent/delete') + "/" + this.props.globalServerSelected
+        } else {
+          endpoint = GetApiServerUri('/api/agent/delete')
+        }
+    
+        axios.post(endpoint, {
+          "id": {
+            "trust_domain": id[0].trust_domain,
+            "path": id[0].path,
+          }
+        })
+          .then(res => console.log(res.data))
+        this.props.agentsList(this.props.globalagentsList.filter(el =>
+            el.id.trust_domain !== id[0].trust_domain ||
+            el.id.path !== id[0].path));
+      }
+
+      banAgent(selectedRows) {
+        var id = [];
+        var i = 0;
+        if(selectedRows.length !== 0)
+        {
+            for(i=0; i < selectedRows.length; i++)
+            {
+                id[i] = {}
+                id[i]["trust_domain"] = selectedRows[i].cells[1].value;
+                id[i]["path"] = selectedRows[i].cells[2].value.substr(20);
+            }
+        }
+        var endpoint = ""
+        if (IsManager) {
+          endpoint = GetApiServerUri('/manager-api/agent/ban') + "/" + this.props.globalServerSelected
+        } else {
+          endpoint = GetApiServerUri('/api/agent/ban')
+        }
+    
+        axios.post(endpoint, {
+          "id": {
+            "trust_domain": id[0].trust_domain,
+            "path": id[0].path,
+          }
+        })
+          .then(res => console.log(res.data), alert("Ban SUCCESS"), this.componentDidMount());
+        this.props.agentsList(this.props.globalagentsList.filter(el => el._id !== id[0]));
+      }
     render() {
         const { listTableData } = this.state;
-        console.log("listTableData", listTableData)
         const headerData = [
             {
                 header: 'ID',
@@ -73,10 +143,10 @@ class DataTableRender extends React.Component {
                 header: 'Info',
                 key: 'info',
             },
-            {
-                header: 'Actions',
-                key: 'actions',
-            },
+            // {
+            //     header: 'Actions',
+            //     key: 'actions',
+            // },
         ];
         return (
             <DataTable
@@ -92,6 +162,7 @@ class DataTableRender extends React.Component {
                     getPaginationProps,
                     getBatchActionProps,
                     getTableContainerProps,
+                    selectedRows,
                 }) => (
                     <TableContainer
                         {...getTableContainerProps()}
@@ -107,7 +178,7 @@ class DataTableRender extends React.Component {
                                     renderIcon={ResetIcon}
                                     iconDescription="Delete"
                                     onClick={() => {
-                                        this.reCalculateAverage(selectedRows);
+                                        this.deleteAgent(selectedRows);
                                     }}
                                 >
                                     Delete
@@ -116,7 +187,7 @@ class DataTableRender extends React.Component {
                                     renderIcon={ResetIcon}
                                     iconDescription="Ban"
                                     onClick={() => {
-                                        this.performAction(selectedRows);
+                                        this.banAgent(selectedRows);
                                     }}
                                 >
                                     Ban
@@ -152,4 +223,12 @@ class DataTableRender extends React.Component {
     }
 }
 
-export default DataTableRender;
+const mapStateToProps = (state) => ({
+    globalServerSelected: state.serverInfo.globalServerSelected,
+    globalagentsList: state.serverInfo.globalagentsList
+  })
+  
+  export default connect(
+    mapStateToProps,
+    { agentsList }
+  )(DataTableRender)
