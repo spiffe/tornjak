@@ -7,7 +7,7 @@ import IsManager from './is_manager';
 import Table from "tables/agentsListTable";
 import {
   serverSelected,
-  agentsList
+  agentsListUpdate
 } from 'actions';
 
 const Agent = props => (
@@ -57,12 +57,12 @@ class AgentList extends Component {
     axios.get(GetApiServerUri('/manager-api/agent/list/') + serverName, { crossdomain: true })
       .then(response => {
         console.log(response);
-        this.props.agentsList(response.data["agents"]);
+        this.props.agentsListUpdate(response.data["agents"]);
       }).catch(error => {
         this.setState({
           message: "Error retrieving " + serverName + " : " + error.message
         });
-        this.props.agentsList([]);
+        this.props.agentsListUpdate([]);
       });
 
   }
@@ -70,7 +70,7 @@ class AgentList extends Component {
   populateLocalAgentsUpdate() {
     axios.get(GetApiServerUri('/api/agent/list'), { crossdomain: true })
       .then(response => {
-        this.props.agentsList(response.data["agents"]);
+        this.props.agentsListUpdate(response.data["agents"]);
       })
       .catch((error) => {
         console.log(error);
@@ -116,5 +116,5 @@ const mapStateToProps = (state) => ({
 
 export default connect(
   mapStateToProps,
-  { serverSelected, agentsList }
+  { serverSelected, agentsListUpdate }
 )(AgentList)

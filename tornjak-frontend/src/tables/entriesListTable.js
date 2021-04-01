@@ -6,7 +6,7 @@ import GetApiServerUri from 'components/helpers';
 import IsManager from 'components/is_manager';
 import axios from 'axios'
 import {
-    entriesList
+    entriesListUpdate
   } from 'actions';
 const {
     TableContainer,
@@ -86,7 +86,7 @@ class DataTableRender extends React.Component {
                 "ids": [id[0]]
             })
             .then(res => { console.log(res.data)
-                this.props.entriesList(this.props.globalentriesList.filter(el => el.id !== id[0]))
+                this.props.entriesListUpdate(this.props.globalentriesList.filter(el => el.id !== id[0]))
                 .catch((error) => {
                     console.log(error);
                   })
@@ -195,5 +195,5 @@ const mapStateToProps = (state) => ({
   
   export default connect(
     mapStateToProps,
-    { entriesList }
+    { entriesListUpdate }
   )(DataTableRender)

@@ -7,7 +7,7 @@ import IsManager from './is_manager';
 import Table from "tables/entriesListTable";
 import {
   serverSelected,
-  entriesList
+  entriesListUpdate
 } from 'actions';
 
 const Entry = props => (
@@ -60,12 +60,12 @@ class EntryList extends Component {
       axios.get(GetApiServerUri('/manager-api/entry/list/') + serverName, {     crossdomain: true })
       .then(response =>{
         console.log(response);
-        this.props.entriesList(response.data["entries"]);
+        this.props.entriesListUpdate(response.data["entries"]);
       }).catch(err => {
           this.setState({ 
               message: "Error retrieving " + serverName + " : "+ err + (typeof (err.response) !== "undefined" ? ":" + err.response.data : "")
           });
-          this.props.entriesList([]);
+          this.props.entriesListUpdate([]);
       });
 
   }
@@ -74,7 +74,7 @@ class EntryList extends Component {
       axios.get(GetApiServerUri('/api/entry/list'), { crossdomain: true })
       .then(response => {
           console.log(response.data);
-        this.props.entriesList(response.data["entries"]);
+        this.props.entriesListUpdate(response.data["entries"]);
       })
       .catch((error) => {
         console.log(error);
@@ -121,5 +121,5 @@ const mapStateToProps = (state) => ({
 
 export default connect(
   mapStateToProps,
-  { serverSelected, entriesList }
+  { serverSelected, entriesListUpdate }
 )(EntryList)

@@ -10,7 +10,7 @@ export function serverSelected(globalServerSelected) {
     }   
 }
 
-export function entriesList(globalentriesList) {
+export function entriesListUpdate(globalentriesList) {
     return dispatch => {
         dispatch({
             type: GLOBAL_ENTRIES_LIST,
@@ -19,7 +19,7 @@ export function entriesList(globalentriesList) {
     }   
 }
 
-export function agentsList(globalagentsList) {
+export function agentsListUpdate(globalagentsList) {
     return dispatch => {
         dispatch({
             type: GLOBAL_AGENTS_LIST,
