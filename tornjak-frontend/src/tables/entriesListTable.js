@@ -7,7 +7,7 @@ import IsManager from 'components/is_manager';
 import axios from 'axios'
 import {
     entriesListUpdate
-  } from 'actions';
+} from 'actions';
 const {
     TableContainer,
     Table,
@@ -39,7 +39,7 @@ class DataTableRender extends React.Component {
         //this.prepareTableData();
     }
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps !== this.props){
+        if (prevProps !== this.props) {
             this.setState({
                 listData: this.props.globalentriesList
             })
@@ -58,39 +58,37 @@ class DataTableRender extends React.Component {
             listtabledata[i]["spiffeid"] = "spiffe://" + listData[i].props.entry.spiffe_id.trust_domain + listData[i].props.entry.spiffe_id.path;
             listtabledata[i]["parentid"] = "spiffe://" + listData[i].props.entry.parent_id.trust_domain + listData[i].props.entry.parent_id.path;
             listtabledata[i]["selectors"] = listData[i].props.entry.selectors.map(s => s.type + ":" + s.value).join(', ');
-            listtabledata[i]["info"] = <div style={{overflowX: 'auto', width: "400px"}}><pre>{JSON.stringify(listData[i].props.entry, null, ' ')}</pre></div>;
+            listtabledata[i]["info"] = <div style={{ overflowX: 'auto', width: "400px" }}><pre>{JSON.stringify(listData[i].props.entry, null, ' ')}</pre></div>;
             // listtabledata[i]["actions"] = <div><a href="#" onClick={() => { listData[i].props.deleteEntry(listData[i].props.entry.id) }}>Delete</a></div>;
         }
         this.setState({
             listTableData: listtabledata
-          })
+        })
     }
 
     deleteEntry(selectedRows) {
         var id = [], i = 0, endpoint = "";
-        if(selectedRows.length !== 0)
-        {
-            for(i=0; i < selectedRows.length; i++)
-            {
-                id[i] = selectedRows[i].id;
-            }
-        }
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/entry/delete') + "/" + this.props.globalServerSelected
         } else {
             endpoint = GetApiServerUri('/api/entry/delete')
         }
-        if(id[0] !== undefined)
+        if (selectedRows.length !== 0) 
         {
-            axios.post(endpoint, {
-                "ids": [id[0]]
-            })
-            .then(res => { console.log(res.data)
-                this.props.entriesListUpdate(this.props.globalentriesList.filter(el => el.id !== id[0]))
-                .catch((error) => {
-                    console.log(error);
-                  })
-            })
+            for (i = 0; i < selectedRows.length; i++) 
+            {
+                id = selectedRows[i].id;
+                axios.post(endpoint, {
+                    "ids": [id]
+                })
+                    .then(res => {
+                        console.log(res.data)
+                        this.props.entriesListUpdate(this.props.globalentriesList.filter(el => el.id !== id))
+                            .catch((error) => {
+                                console.log(error);
+                            })
+                    })
+            }
         }
     }
 
@@ -191,9 +189,9 @@ class DataTableRender extends React.Component {
 const mapStateToProps = (state) => ({
     globalServerSelected: state.serverInfo.globalServerSelected,
     globalentriesList: state.serverInfo.globalentriesList
-  })
-  
-  export default connect(
+})
+
+export default connect(
     mapStateToProps,
     { entriesListUpdate }
-  )(DataTableRender)
+)(DataTableRender)

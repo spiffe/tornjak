@@ -7,7 +7,7 @@ import IsManager from 'components/is_manager';
 import axios from 'axios'
 import {
     agentsListUpdate
-  } from 'actions';
+} from 'actions';
 const {
     TableContainer,
     Table,
@@ -39,12 +39,12 @@ class DataTableRender extends React.Component {
         //this.prepareTableData();
     }
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps !== this.props){
+        if (prevProps !== this.props) {
             this.setState({
                 listData: this.props.globalagentsList
             })
             this.prepareTableData();
-        } 
+        }
     }
 
     prepareTableData() {
@@ -54,10 +54,10 @@ class DataTableRender extends React.Component {
         let i = 0;
         for (i = 0; i < listData.length; i++) {
             listtabledata[i] = {};
-            listtabledata[i]["id"] = i+1;
+            listtabledata[i]["id"] = i + 1;
             listtabledata[i]["trustdomain"] = listData[i].props.agent.id.trust_domain;
             listtabledata[i]["spiffeid"] = "spiffe://" + listData[i].props.agent.id.trust_domain + listData[i].props.agent.id.path;
-            listtabledata[i]["info"] = <div style={{overflowX: 'auto', width: "400px"}}><pre>{JSON.stringify(listData[i].props.agent, null, ' ')}</pre></div>;
+            listtabledata[i]["info"] = <div style={{ overflowX: 'auto', width: "400px" }}><pre>{JSON.stringify(listData[i].props.agent, null, ' ')}</pre></div>;
             // listtabledata[i]["actions"] = <div><a href="#" onClick={() => { listData[i].props.banAgent(listData[i].props.agent.id) }}>Ban</a> <br /> <a href="#" onClick={() => { listData[i].props.deleteAgent(listData[i].props.agent.id) }}>Delete</a></div>;
         }
         this.setState({
@@ -67,68 +67,61 @@ class DataTableRender extends React.Component {
 
     deleteAgent(selectedRows) {
         var id = [], i = 0, endpoint = "";
-        if(selectedRows.length !== 0)
-        {
-            for(i=0; i < selectedRows.length; i++)
-            {
-                id[i] = {}
-                id[i]["trust_domain"] = selectedRows[i].cells[1].value;
-                id[i]["path"] = selectedRows[i].cells[2].value.substr(20);
-            }
-        }
+        var prefix = "spiffe://"
         if (IsManager) {
-          endpoint = GetApiServerUri('/manager-api/agent/delete') + "/" + this.props.globalServerSelected;
+            endpoint = GetApiServerUri('/manager-api/agent/delete') + "/" + this.props.globalServerSelected;
         } else {
-          endpoint = GetApiServerUri('/api/agent/delete');
+            endpoint = GetApiServerUri('/api/agent/delete');
         }
-        if(id[0] !== undefined)
-        {
-            axios.post(endpoint, {
-            "id": {
-                "trust_domain": id[0].trust_domain,
-                "path": id[0].path,
+        if (selectedRows.length !== 0) {
+            for (i = 0; i < selectedRows.length; i++) {
+                id = {}
+                id["trust_domain"] = selectedRows[i].cells[1].value;
+                id["path"] = selectedRows[i].cells[2].value.substr(selectedRows[i].cells[1].value.concat(prefix).length);
+                axios.post(endpoint, {
+                    "id": {
+                        "trust_domain": id.trust_domain,
+                        "path": id.path,
+                    }
+                })
+                    .then(res => {
+                        console.log(res.data);
+                        this.props.agentsListUpdate(this.props.globalagentsList.filter(el =>
+                            el.id.trust_domain !== id.trust_domain ||
+                            el.id.path !== id.path));
+                      })
+                    .catch((error) => {
+                        console.log(error);
+                    })
             }
-            })
-            .then(res => console.log(res.data))
-            .catch((error) => {
-                console.log(error);
-              })
-            this.props.agentsListUpdate(this.props.globalagentsList.filter(el =>
-                el.id.trust_domain !== id[0].trust_domain ||
-                el.id.path !== id[0].path));
         }
-      }
+    }
 
-      banAgent(selectedRows) {
+    banAgent(selectedRows) {
         var id = [], i = 0, endpoint = "";
-        if(selectedRows.length !== 0)
-        {
-            for(i=0; i < selectedRows.length; i++)
-            {
-                id[i] = {}
-                id[i]["trust_domain"] = selectedRows[i].cells[1].value;
-                id[i]["path"] = selectedRows[i].cells[2].value.substr(20);
-            }
-        }
         if (IsManager) {
-          endpoint = GetApiServerUri('/manager-api/agent/ban') + "/" + this.props.globalServerSelected
+            endpoint = GetApiServerUri('/manager-api/agent/ban') + "/" + this.props.globalServerSelected
         } else {
-          endpoint = GetApiServerUri('/api/agent/ban')
+            endpoint = GetApiServerUri('/api/agent/ban')
         }
-        if(id[0] !== undefined)
-        {
-            axios.post(endpoint, {
-            "id": {
-                "trust_domain": id[0].trust_domain,
-                "path": id[0].path,
+        if (selectedRows.length !== 0) {
+            for (i = 0; i < selectedRows.length; i++) {
+                id = {}
+                id["trust_domain"] = selectedRows[i].cells[1].value;
+                id["path"] = selectedRows[i].cells[2].value.substr(20);
+                axios.post(endpoint, {
+                    "id": {
+                        "trust_domain": id.trust_domain,
+                        "path": id.path,
+                    }
+                })
+                    .then(res => console.log(res.data), alert("Ban SUCCESS"), this.componentDidMount())
+                    .catch((error) => {
+                        console.log(error);
+                    })
             }
-            })
-            .then(res => console.log(res.data), alert("Ban SUCCESS"), this.componentDidMount())
-            .catch((error) => {
-                console.log(error);
-              })
         }
-      }
+    }
     render() {
         const { listTableData } = this.state;
         const headerData = [
@@ -231,9 +224,9 @@ class DataTableRender extends React.Component {
 const mapStateToProps = (state) => ({
     globalServerSelected: state.serverInfo.globalServerSelected,
     globalagentsList: state.serverInfo.globalagentsList
-  })
-  
-  export default connect(
+})
+
+export default connect(
     mapStateToProps,
     { agentsListUpdate }
-  )(DataTableRender)
+)(DataTableRender)
