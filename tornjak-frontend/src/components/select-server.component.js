@@ -92,7 +92,7 @@ class SelectServer extends Component {
 }
 
 const mapStateToProps = (state) => ({
-    globalServerSelected: state.serverInfo.globalServerSelected,
+    globalServerSelected: state.server.globalServerSelected,
 })
 
 export default connect(

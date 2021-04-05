@@ -227,8 +227,8 @@ class DataTableRender extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-    globalServerSelected: state.serverInfo.globalServerSelected,
-    globalagentsList: state.serverInfo.globalagentsList
+    globalServerSelected: state.server.globalServerSelected,
+    globalagentsList: state.agents.globalagentsList
 })
 
 export default connect(
