@@ -1,4 +1,4 @@
-FROM gcr.io/spiffe-io/spire-server:0.11.0
+FROM gcr.io/spiffe-io/spire-server:0.12.0
 RUN apk add curl
 COPY bin/tornjak-agent tornjak-agent
 COPY ui-agent ui-agent
