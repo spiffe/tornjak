@@ -66,8 +66,7 @@ class DataTableRender extends React.Component {
     }
 
     deleteAgent(selectedRows) {
-        var id = [], i = 0, endpoint = "";
-        var prefix = "spiffe://"
+        var id = [], i = 0, endpoint = "", prefix = "spiffe://";
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/agent/delete') + "/" + this.props.globalServerSelected;
         } else {
@@ -89,12 +88,15 @@ class DataTableRender extends React.Component {
                         this.props.agentsListUpdate(this.props.globalagentsList.filter(el =>
                             el.id.trust_domain !== id.trust_domain ||
                             el.id.path !== id.path));
-                      })
+                    })
                     .catch((error) => {
                         console.log(error);
                     })
             }
+        } else {
+            return ""
         }
+        window.location.reload();
     }
 
     banAgent(selectedRows) {
@@ -120,7 +122,10 @@ class DataTableRender extends React.Component {
                         console.log(error);
                     })
             }
+        } else {
+            return ""
         }
+        window.location.reload();
     }
     render() {
         const { listTableData } = this.state;

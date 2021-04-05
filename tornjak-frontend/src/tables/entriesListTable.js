@@ -89,7 +89,10 @@ class DataTableRender extends React.Component {
                             })
                     })
             }
+        } else {
+            return ""
         }
+        window.location.reload();
     }
 
     render() {
