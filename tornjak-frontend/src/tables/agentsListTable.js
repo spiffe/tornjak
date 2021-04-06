@@ -103,7 +103,7 @@ class DataTableRender extends React.Component {
     }
 
     banAgent(selectedRows) {
-        var id = [], i = 0, endpoint = "";
+        var id = [], i = 0, endpoint = "", prefix = "spiffe://";
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/agent/ban') + "/" + this.props.globalServerSelected
         } else {
