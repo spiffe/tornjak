@@ -85,10 +85,12 @@ class DataTableRender extends React.Component {
             return ""
         }
         Promise.all(promises)
-            .then(responses => responses.forEach(response => {
-                console.log("Status: ", response.statusText)
-                this.props.entriesListUpdate(this.props.globalentriesList.filter(el => el.id !== response.data.results[0].id))
-            }))
+            .then(responses => {
+                for (i = 0; i < responses.length; i++) {
+                    console.log("Status: ", responses[i].statusText)
+                    this.props.entriesListUpdate(this.props.globalentriesList.filter(el => el.id !== responses[i].data.results[0].id))
+                }
+            })
             .catch((error) => {
                 console.log(error);
             })
