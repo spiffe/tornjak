@@ -91,12 +91,13 @@ class DataTableRender extends React.Component {
         Promise.all(promises)
             .then(responses => {
                 for (i = 0; i < responses.length; i++) {
-                console.log("Status: ", responses[i].data)
-                this.props.agentsListUpdate(this.props.globalagentsList.filter(el =>
-                    el.id.trust_domain !== id[i].trust_domain ||
-                    el.id.path !== id[i].path));
-                i++;
-            }})
+                    console.log("Status: ", responses[i].data)
+                    this.props.agentsListUpdate(this.props.globalagentsList.filter(el =>
+                        el.id.trust_domain !== id[i].trust_domain ||
+                        el.id.path !== id[i].path));
+                    i++;
+                }
+            })
             .catch((error) => {
                 console.log(error);
             })
