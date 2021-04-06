@@ -58,8 +58,10 @@ class CreateEntry extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
-      this.setState({ selectedServer: this.props.globalServerSelected });
+    if (IsManager) {
+      if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
+        this.setState({ selectedServer: this.props.globalServerSelected });
+      }
     }
   }
 
@@ -338,7 +340,7 @@ class CreateEntry extends Component {
 
 
 const mapStateToProps = (state) => ({
-  globalServerSelected: state.serverInfo.globalServerSelected,
+  globalServerSelected: state.server.globalServerSelected,
 })
 
 export default connect(

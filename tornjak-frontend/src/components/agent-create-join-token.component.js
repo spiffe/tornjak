@@ -43,8 +43,10 @@ class CreateJoinToken extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if(prevProps.globalServerSelected !== this.props.globalServerSelected){
-      this.setState({selectedServer: this.props.globalServerSelected});
+    if (IsManager) {
+      if(prevProps.globalServerSelected !== this.props.globalServerSelected){
+        this.setState({selectedServer: this.props.globalServerSelected});
+      }
     }
   }
 
@@ -261,7 +263,7 @@ console.log(a.substr(sp))*/
 }
 
 const mapStateToProps = (state) => ({
-  globalServerSelected: state.serverInfo.globalServerSelected,
+  globalServerSelected: state.server.globalServerSelected,
 })
 
 export default connect(
