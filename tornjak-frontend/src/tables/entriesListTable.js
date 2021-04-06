@@ -68,31 +68,30 @@ class DataTableRender extends React.Component {
 
     deleteEntry(selectedRows) {
         var id = [], i = 0, endpoint = "";
+        let promises = [];
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/entry/delete') + "/" + this.props.globalServerSelected
         } else {
             endpoint = GetApiServerUri('/api/entry/delete')
         }
-        if (selectedRows.length !== 0) 
-        {
-            for (i = 0; i < selectedRows.length; i++) 
-            {
-                id = selectedRows[i].id;
-                axios.post(endpoint, {
-                    "ids": [id]
-                })
-                    .then(res => {
-                        console.log(res.data)
-                        this.props.entriesListUpdate(this.props.globalentriesList.filter(el => el.id !== id))
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    })
+        if (selectedRows.length !== 0) {
+            for (i = 0; i < selectedRows.length; i++) {
+                id[i] = selectedRows[i].id;
+                promises.push(axios.post(endpoint, {
+                    "ids": [id[i]]
+                }))
             }
         } else {
             return ""
         }
-        window.location.reload();
+        Promise.all(promises)
+            .then(responses => responses.forEach(response => {
+                console.log("Status: ", response.statusText)
+                this.props.entriesListUpdate(this.props.globalentriesList.filter(el => el.id !== response.data.results[0].id))
+            }))
+            .catch((error) => {
+                console.log(error);
+            })
     }
 
     render() {

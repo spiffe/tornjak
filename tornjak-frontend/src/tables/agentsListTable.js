@@ -67,6 +67,7 @@ class DataTableRender extends React.Component {
 
     deleteAgent(selectedRows) {
         var id = [], i = 0, endpoint = "", prefix = "spiffe://";
+        let promises = [];
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/agent/delete') + "/" + this.props.globalServerSelected;
         } else {
@@ -74,29 +75,32 @@ class DataTableRender extends React.Component {
         }
         if (selectedRows.length !== 0) {
             for (i = 0; i < selectedRows.length; i++) {
-                id = {}
-                id["trust_domain"] = selectedRows[i].cells[1].value;
-                id["path"] = selectedRows[i].cells[2].value.substr(selectedRows[i].cells[1].value.concat(prefix).length);
-                axios.post(endpoint, {
+                id[i] = {}
+                id[i]["trust_domain"] = selectedRows[i].cells[1].value;
+                id[i]["path"] = selectedRows[i].cells[2].value.substr(selectedRows[i].cells[1].value.concat(prefix).length);
+                promises.push(axios.post(endpoint, {
                     "id": {
-                        "trust_domain": id.trust_domain,
-                        "path": id.path,
+                        "trust_domain": id[i].trust_domain,
+                        "path": id[i].path,
                     }
-                })
-                    .then(res => {
-                        console.log(res.data);
-                        this.props.agentsListUpdate(this.props.globalagentsList.filter(el =>
-                            el.id.trust_domain !== id.trust_domain ||
-                            el.id.path !== id.path));
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    })
+                }))
             }
         } else {
             return ""
         }
-        window.location.reload();
+        i = 0;
+        Promise.all(promises)
+            .then(responses => responses.forEach(response => {
+                console.log("Status: ", response.data)
+                console.log(response)
+                this.props.agentsListUpdate(this.props.globalagentsList.filter(el =>
+                    el.id.trust_domain !== id[i].trust_domain ||
+                    el.id.path !== id[i].path));
+                i++;
+            }))
+            .catch((error) => {
+                console.log(error);
+            })
     }
 
     banAgent(selectedRows) {
@@ -108,13 +112,13 @@ class DataTableRender extends React.Component {
         }
         if (selectedRows.length !== 0) {
             for (i = 0; i < selectedRows.length; i++) {
-                id = {}
-                id["trust_domain"] = selectedRows[i].cells[1].value;
-                id["path"] = selectedRows[i].cells[2].value.substr(20);
+                id[i] = {}
+                id[i]["trust_domain"] = selectedRows[i].cells[1].value;
+                id[i]["path"] = selectedRows[i].cells[2].value.substr(selectedRows[i].cells[1].value.concat(prefix).length);
                 axios.post(endpoint, {
                     "id": {
-                        "trust_domain": id.trust_domain,
-                        "path": id.path,
+                        "trust_domain": id[i].trust_domain,
+                        "path": id[i].path,
                     }
                 })
                     .then(res => console.log(res.data), alert("Ban SUCCESS"), this.componentDidMount())
@@ -125,7 +129,6 @@ class DataTableRender extends React.Component {
         } else {
             return ""
         }
-        window.location.reload();
     }
     render() {
         const { listTableData } = this.state;
