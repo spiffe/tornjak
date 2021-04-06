@@ -84,9 +84,9 @@ class DataTableRender extends React.Component {
                     .then(res => {
                         console.log(res.data)
                         this.props.entriesListUpdate(this.props.globalentriesList.filter(el => el.id !== id))
-                            .catch((error) => {
-                                console.log(error);
-                            })
+                    })
+                    .catch((error) => {
+                        console.log(error);
                     })
             }
         } else {
