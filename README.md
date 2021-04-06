@@ -13,7 +13,12 @@ For more details of the components and execution plan, please refer to these doc
 - [Agent design and details](docs/tornjak-agent.md)
 - [Execution plan](docs/plan.md)
 
-## Building and pushing
+## Get Started
+
+The following are guides on how to try out Tornjak:
+- [Tornjak simple deployment with SPIRE k8s quickstart](docs/spire-quickstart.md)
+
+## Development: Building and pushing
 
 The binary and container can be built with the following command, replacing the container tag with the desired container tag of choice. 
 
@@ -25,14 +30,3 @@ CONTAINER_TAG=lumjjb/tornjak-spire-server:latest make container-agent
 ```
 
 The container is run with the same arguments as the SPIRE server image, and usage is transparent. It runs a server hosted on port 10000 accessed via http.
-
-### Additional technical detail
-
-This repo container add-ons to a SPIRE server. It is a single binary which runs alongside the spire server. It is configured by pointing to a SPIRE server config file. Right now the features are:
-
-- UI for SPIRE server API
-
-Usage:
-```
-tornjak <server.conf> [api/http]
-```
