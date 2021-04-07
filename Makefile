@@ -1,6 +1,7 @@
 .PHONY: ui vendor build ui-agent ui-manager
 
 CONTAINER_TAG ?= tsidentity/tornjak-spire-server:latest
+CONTAINER_VERSION_IMAGEPATH ?= tsidentity/tornjak-spire-server
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:latest
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
 
@@ -40,6 +41,11 @@ container-agent: bin/tornjak-agent ui-agent
 
 container-manager: bin/tornjak-manager ui-manager
 	docker build --no-cache -f Dockerfile.tornjak-manager -t ${CONTAINER_MANAGER_TAG} . && docker push ${CONTAINER_MANAGER_TAG}
+
+container-agent-multiversions: bin/tornjak-agent ui-agent
+	for i in $(shell cat SPIRE_BUILD_VERSIONS); do \
+		./build-and-push-versioned-container.sh $$i ${CONTAINER_VERSION_IMAGEPATH}; \
+	done
 
 clean:
 	rm -rf bin/
