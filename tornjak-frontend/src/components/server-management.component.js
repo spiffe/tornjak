@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import axios from 'axios'
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
+import {
+  serversListUpdateFunc
+} from 'actions';
 
 const Server = props => (
   <tr>
@@ -12,11 +16,10 @@ const Server = props => (
   </tr>
 )
 
-export default class ServerManagement extends Component {
+class ServerManagement extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        servers: [],
         formServerName: "",
         formServerAddress: "",
         formTLS: false,
@@ -24,7 +27,6 @@ export default class ServerManagement extends Component {
         formCAData: null,
         formCertData: null,
         formKeyData: null,
-
         CAFileText: "",
         certFileText: "",
         keyFileText: "",
@@ -44,7 +46,7 @@ export default class ServerManagement extends Component {
     axios.get(GetApiServerUri("/manager-api/server/list"), { crossdomain: true })
       .then(response => {
           console.log(response.data);
-        this.setState({ servers:response.data["servers"]} );
+          this.props.serversListUpdateFunc(response.data["servers"]);
       })
       .catch((error) => {
         console.log(error);
@@ -52,9 +54,8 @@ export default class ServerManagement extends Component {
   }
 
   serverList() {
-    //return this.state.servers.toString()
-    if (typeof this.state.servers !== 'undefined') {
-        return this.state.servers.map(s => {
+    if (typeof this.props.globalServersList !== 'undefined') {
+        return this.props.globalServersList.map(s => {
           return <Server key={s.name} 
                     server={s} />;
         })
@@ -67,7 +68,6 @@ export default class ServerManagement extends Component {
     const target = e.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
-
     this.setState({
       [name]: value
     });
@@ -125,8 +125,6 @@ export default class ServerManagement extends Component {
         "cert": this.state.formCertData,
         "key": this.state.formKeyData,
     };
-    console.log(cjtData);
-
     axios.post(GetApiServerUri('/manager-api/server/register'), cjtData)
       .then(res => {
           this.setState({ message: "Requst:" + JSON.stringify(cjtData,null,  ' ')+ "\n\nSuccess:" + JSON.stringify(res.data, null, ' ')});
@@ -140,7 +138,7 @@ export default class ServerManagement extends Component {
 
   render() {
     if (!IsManager) {
-        return <h1>Only manager deplayments have use of this page</h1>
+        return <h1>Only manager deployments have use of this page</h1>
     }
 
     const tlsFormOptions = (
@@ -245,3 +243,12 @@ export default class ServerManagement extends Component {
     )
   }
 }
+
+const mapStateToProps = (state) => ({
+  globalServersList: state.servers.globalServersList
+})
+
+export default connect(
+  mapStateToProps,
+  { serversListUpdateFunc }
+)(ServerManagement)

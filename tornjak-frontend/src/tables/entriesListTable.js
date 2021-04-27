@@ -6,7 +6,7 @@ import GetApiServerUri from 'components/helpers';
 import IsManager from 'components/is_manager';
 import axios from 'axios'
 import {
-    entriesListUpdate
+    entriesListUpdateFunc
 } from 'actions';
 const {
     TableContainer,
@@ -58,8 +58,7 @@ class DataTableRender extends React.Component {
             listtabledata[i]["spiffeid"] = "spiffe://" + listData[i].props.entry.spiffe_id.trust_domain + listData[i].props.entry.spiffe_id.path;
             listtabledata[i]["parentid"] = "spiffe://" + listData[i].props.entry.parent_id.trust_domain + listData[i].props.entry.parent_id.path;
             listtabledata[i]["selectors"] = listData[i].props.entry.selectors.map(s => s.type + ":" + s.value).join(', ');
-            listtabledata[i]["info"] = <div style={{ overflowX: 'auto', width: "400px" }}><pre>{JSON.stringify(listData[i].props.entry, null, ' ')}</pre></div>;
-            // listtabledata[i]["actions"] = <div><a href="#" onClick={() => { listData[i].props.deleteEntry(listData[i].props.entry.id) }}>Delete</a></div>;
+            listtabledata[i]["info"] = JSON.stringify(listData[i].props.entry, null, ' ');
         }
         this.setState({
             listTableData: listtabledata
@@ -88,7 +87,7 @@ class DataTableRender extends React.Component {
             .then(responses => {
                 for (i = 0; i < responses.length; i++) {
                     console.log("Status: ", responses[i].statusText)
-                    this.props.entriesListUpdate(this.props.globalentriesList.filter(el => el.id !== responses[i].data.results[0].id))
+                    this.props.entriesListUpdateFunc(this.props.globalentriesList.filter(el => el.id !== responses[i].data.results[0].id))
                 }
             })
             .catch((error) => {
@@ -119,10 +118,6 @@ class DataTableRender extends React.Component {
                 header: 'Info',
                 key: 'info',
             },
-            // {
-            //     header: 'Actions',
-            //     key: 'actions',
-            // },
         ];
         return (
             <DataTable
@@ -177,7 +172,14 @@ class DataTableRender extends React.Component {
                                     <TableRow key={row.id}>
                                         <TableSelectRow {...getSelectionProps({ row })} />
                                         {row.cells.map((cell) => (
-                                            <TableCell key={cell.id}>{cell.value}</TableCell>
+                                            <TableCell key={cell.id}>
+                                                {cell.info.header === "info" ? (
+                                                    <div style={{ overflowX: 'auto', width: "400px" }}>
+                                                        <pre>{cell.value}</pre>
+                                                    </div>
+                                                ) : (
+                                                    cell.value)}
+                                            </TableCell>
                                         ))}
                                     </TableRow>
                                 ))}
@@ -191,11 +193,11 @@ class DataTableRender extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-    globalServerSelected: state.server.globalServerSelected,
+    globalServerSelected: state.servers.globalServerSelected,
     globalentriesList: state.entries.globalentriesList
 })
 
 export default connect(
     mapStateToProps,
-    { entriesListUpdate }
+    { entriesListUpdateFunc }
 )(DataTableRender)

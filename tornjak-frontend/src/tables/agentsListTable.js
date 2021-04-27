@@ -6,7 +6,7 @@ import GetApiServerUri from 'components/helpers';
 import IsManager from 'components/is_manager';
 import axios from 'axios'
 import {
-    agentsListUpdate
+    agentsListUpdateFunc
 } from 'actions';
 const {
     TableContainer,
@@ -57,8 +57,7 @@ class DataTableRender extends React.Component {
             listtabledata[i]["id"] = i + 1;
             listtabledata[i]["trustdomain"] = listData[i].props.agent.id.trust_domain;
             listtabledata[i]["spiffeid"] = "spiffe://" + listData[i].props.agent.id.trust_domain + listData[i].props.agent.id.path;
-            listtabledata[i]["info"] = <div style={{ overflowX: 'auto', width: "400px" }}><pre>{JSON.stringify(listData[i].props.agent, null, ' ')}</pre></div>;
-            // listtabledata[i]["actions"] = <div><a href="#" onClick={() => { listData[i].props.banAgent(listData[i].props.agent.id) }}>Ban</a> <br /> <a href="#" onClick={() => { listData[i].props.deleteAgent(listData[i].props.agent.id) }}>Delete</a></div>;
+            listtabledata[i]["info"] = JSON.stringify(listData[i].props.agent, null, ' ');
         }
         this.setState({
             listTableData: listtabledata
@@ -91,8 +90,7 @@ class DataTableRender extends React.Component {
         Promise.all(promises)
             .then(responses => {
                 for (i = 0; i < responses.length; i++) {
-                    console.log("Status: ", responses[i].data)
-                    this.props.agentsListUpdate(this.props.globalagentsList.filter(el =>
+                    this.props.agentsListUpdateFunc(this.props.globalagentsList.filter(el =>
                         el.id.trust_domain !== id[i].trust_domain ||
                         el.id.path !== id[i].path));
                 }
@@ -148,10 +146,6 @@ class DataTableRender extends React.Component {
                 header: 'Info',
                 key: 'info',
             },
-            // {
-            //     header: 'Actions',
-            //     key: 'actions',
-            // },
         ];
         return (
             <DataTable
@@ -215,7 +209,14 @@ class DataTableRender extends React.Component {
                                     <TableRow key={row.id}>
                                         <TableSelectRow {...getSelectionProps({ row })} />
                                         {row.cells.map((cell) => (
-                                            <TableCell key={cell.id}>{cell.value}</TableCell>
+                                            <TableCell key={cell.id}>
+                                                {cell.info.header === "info" ? (
+                                                <div style={{ overflowX: 'auto', width: "400px" }}>
+                                                    <pre>{cell.value}</pre>
+                                                </div>
+                                                ) : (
+                                                cell.value)}
+                                            </TableCell>
                                         ))}
                                     </TableRow>
                                 ))}
@@ -229,11 +230,11 @@ class DataTableRender extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-    globalServerSelected: state.server.globalServerSelected,
+    globalServerSelected: state.servers.globalServerSelected,
     globalagentsList: state.agents.globalagentsList
 })
 
 export default connect(
     mapStateToProps,
-    { agentsListUpdate }
+    { agentsListUpdateFunc }
 )(DataTableRender)

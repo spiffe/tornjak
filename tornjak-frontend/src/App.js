@@ -1,6 +1,6 @@
 import React from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
-import { BrowserRouter as Router, Route} from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import NavigationBar from "./components/navbar.component";
 import NavHeader from "./components/navHeader.component";
 import SelectServer from "./components/select-server.component";
@@ -10,7 +10,7 @@ import EntryList from "./components/entry-list.component";
 import EntryCreate from "./components/entry-create.component";
 import ServerManagement from "./components/server-management.component";
 import TornjakServerInfo from "./components/tornjak-server-info.component";
-import { Provider} from 'react-redux'; //enables all components to have acces to everything inside our react app
+import { Provider } from 'react-redux'; //enables all components to have acces to everything inside our react app
 import store from './store';
 import './App.css';
 
@@ -35,7 +35,11 @@ function App() {
                         <Route path="/agent/createjointoken" exact component={CreateJoinToken} />
                         <Route path="/tornjak/serverinfo" exact component={TornjakServerInfo} />
                         <Route path="/server/manage" exact component={ServerManagement} />
-                    </div>    
+                        <br /><br /><br />
+                        <svg className="endbanneroutput">
+                            <rect className="endbanneroutput"></rect>
+                        </svg>
+                    </div>
                 </div>
             </Router>
         </Provider>

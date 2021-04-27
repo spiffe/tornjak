@@ -38,3 +38,64 @@
     width: 98%;
     margin-bottom: 20px;
   }
+
+  .entry-form {
+    width: 60%;
+    border-width:1px;
+    border-style:solid;
+    border-color: rgb(180, 178, 178);
+    padding: 30px 30px 30px 30px;
+  }
+  .parentId-drop-down {
+    margin-bottom: 20px;
+  }
+  
+  .parentId-manual-input-field {
+    margin-bottom: 20px;
+    margin-left: 40px;
+  }
+  .spiffeId-input-field {
+    margin-bottom: 20px;
+  }
+
+  .parentId-helper {
+    font-size: 12px;
+    color:rgb(82, 79, 79);
+    margin-top: 2px;
+  }
+
+  .selectors-multiselect {
+    margin-bottom: 20px;
+  }
+
+  .selectors-textArea {
+    margin-bottom: 20px;
+  }
+  .admin-flag-checkbox {
+  }
+
+  .ttl-input {
+    display: inline-block;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    width: 160px
+  }
+
+  .expiresAt-input {
+    display: inline-block;
+    margin-bottom: 20px;
+    width: 160px;
+  }
+  
+  .federates-with-input-field {
+    margin-bottom: 20px;
+    width: 55%;
+  }
+  .dnsnames-input-field {
+    margin-bottom: 20px;
+    width: 55%;
+  }
+
+  .servers-drp-dwn {
+    margin-top: 5px;
+  }

@@ -1,12 +1,14 @@
-import serverReducer from './serverReducer';
+import serversReducer from './serversReducer';
 import agentsReducer from './agentsReducer';
 import entriesReducer from './entriesReducer';
+import tornjakReducer from './tornjakReducer';
 import {combineReducers} from 'redux';
 
 const allReducers = combineReducers({
-    server : serverReducer,
+    servers : serversReducer,
     agents : agentsReducer,
     entries : entriesReducer,
+    tornjak: tornjakReducer,
 });
 
 export default allReducers;

@@ -4,8 +4,15 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
+import TornjakApi from './tornjak-api-helpers';
+
 import {
-    serverSelected
+    serverSelectedFunc,
+    serversListUpdateFunc,
+    tornjakServerInfoUpdateFunc,
+    serverInfoUpdateFunc,
+    agentsListUpdateFunc,
+    tornjakMessegeFunc
 } from 'actions';
 
 const ServerDropdown = props => (
@@ -15,10 +22,11 @@ const ServerDropdown = props => (
 class SelectServer extends Component {
     constructor(props) {
         super(props);
+        this.TornjakApi = new TornjakApi();
         this.serverDropdownList = this.serverDropdownList.bind(this);
         this.onServerSelect = this.onServerSelect.bind(this);
+
         this.state = {
-            servers: [],
         };
     }
 
@@ -28,10 +36,22 @@ class SelectServer extends Component {
         }
     }
 
+    componentDidUpdate() {
+        if (IsManager) {
+            if ((this.props.globalServerSelected !== "") && (this.props.globalErrorMessege === "OK" || this.props.globalErrorMessege === "")) {
+                this.TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessegeFunc);
+            }
+            if ((this.props.globalTornjakServerInfo !== "") && (this.props.globalErrorMessege === "OK" || this.props.globalErrorMessege === "")) {
+                this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
+                this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessegeFunc)
+            }
+        }
+    }
+
     populateServers() {
         axios.get(GetApiServerUri("/manager-api/server/list"), { crossdomain: true })
             .then(response => {
-                this.setState({ servers: response.data["servers"] });
+                this.props.serversListUpdateFunc(response.data["servers"]);
             })
             .catch((error) => {
                 console.log(error);
@@ -39,8 +59,8 @@ class SelectServer extends Component {
     }
 
     serverDropdownList() {
-        if (typeof this.state.servers !== 'undefined') {
-            return this.state.servers.map(server => {
+        if (typeof this.props.globalServersList !== 'undefined') {
+            return this.props.globalServersList.map(server => {
                 return <ServerDropdown key={server.name}
                     value={server.name}
                     name={server.name} />
@@ -53,13 +73,13 @@ class SelectServer extends Component {
     onServerSelect(e) {
         const serverName = e.target.value;
         if (serverName !== "") {
-            this.props.serverSelected(serverName);
+            this.props.serverSelectedFunc(serverName);
         }
     }
 
     getServer(serverName) {
         var i;
-        const servers = this.state.servers
+        const servers = this.props.globalServersList
         for (i = 0; i < servers.length; i++) {
             if (servers[i].name === serverName) {
                 return servers[i]
@@ -69,20 +89,20 @@ class SelectServer extends Component {
     }
 
     render() {
-
         let managerServerSelector = (
             <div id="server-dropdown-div">
-                <label id="server-dropdown">Choose a Server:</label>
-                <select name="servers" id="servers" onChange={this.onServerSelect}>
-                    <optgroup label="Servers">
-                    <option value="none" selected disabled>Select an Option </option>
-                    <option value="none" selected disabled>{this.props.globalServerSelected} </option>
-                        {this.serverDropdownList()}
-                    </optgroup>
-                </select>
+                <label id="server-dropdown">Choose a Server</label>
+                <div className="servers-drp-dwn">
+                    <select name="servers" id="servers" onChange={this.onServerSelect}>
+                        <optgroup label="Servers">
+                            <option value="none" selected disabled>Select an Option </option>
+                            <option value="none" selected disabled>{this.props.globalServerSelected} </option>
+                            {this.serverDropdownList()}
+                        </optgroup>
+                    </select>
+                </div>
             </div>
         )
-
         return (
             <div>
                 {IsManager && managerServerSelector}
@@ -92,10 +112,13 @@ class SelectServer extends Component {
 }
 
 const mapStateToProps = (state) => ({
-    globalServerSelected: state.server.globalServerSelected,
+    globalServerSelected: state.servers.globalServerSelected,
+    globalServersList: state.servers.globalServersList,
+    globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
+    globalErrorMessege: state.tornjak.globalErrorMessege,
 })
 
 export default connect(
     mapStateToProps,
-    { serverSelected }
+    { serverSelectedFunc, serversListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, agentsListUpdateFunc, tornjakMessegeFunc }
 )(SelectServer)

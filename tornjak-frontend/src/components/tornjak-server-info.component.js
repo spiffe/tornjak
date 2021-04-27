@@ -1,92 +1,68 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
+import TornjakApi from './tornjak-api-helpers';
 import {
-  serverSelected
+  serverSelectedFunc,
+  serverInfoUpdateFunc,
+  tornjakServerInfoUpdateFunc,
+  tornjakMessegeFunc,
 } from 'actions';
 
 const TornjakServerInfoDisplay = props => (
-    <p>
+  <p>
     <pre>
-        {props.tornjakServerInfo}
+      {props.tornjakServerInfo}
     </pre>
-    </p>
+  </p>
 )
 
 class TornjakServerInfo extends Component {
   constructor(props) {
     super(props);
-    this.state = { 
-        tornjakServerInfo: "",
-        servers: [],
-        selectedServer: "",
-        message: "",
-    };
+    this.TornjakApi = new TornjakApi();
+    this.state = {};
   }
 
   componentDidMount() {
-      if (IsManager) {
-        if(this.props.globalServerSelected !== ""){
-          this.populateTornjakServerInfo(this.props.globalServerSelected)
-        }
-      } else {
-        this.populateLocalTornjakServerInfo()
+    if (IsManager) {
+      if (this.props.globalServerSelected !== "") {
+        this.TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessegeFunc);
       }
-  }
-
-  componentDidUpdate(prevProps) {
-    if(prevProps.globalServerSelected !== this.props.globalServerSelected){
-      this.populateTornjakServerInfo(this.props.globalServerSelected)
+    } else {
+      this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessegeFunc);
     }
   }
 
-  populateTornjakServerInfo(serverName) {
-      axios.get(GetApiServerUri('/manager-api/tornjak/serverinfo/') + serverName, {     crossdomain: true })
-      .then(response =>{
-        console.log(response);
-        this.setState({ tornjakServerInfo: response.data["serverinfo"]});
-      }).catch(error => {
-          this.setState({
-              message: "Error retrieving " + serverName + " : "+ error.message,
-              agents: [],
-          });
-      });
-
-  }
-
-  populateLocalTornjakServerInfo() {
-    axios.get(GetApiServerUri('/api/tornjak/serverinfo'), { crossdomain: true })
-      .then(response => {
-        this.setState({ tornjakServerInfo:response.data["serverinfo"]});
-      })
-      .catch((error) => {
-        console.log(error);
-      })
+  componentDidUpdate(prevProps) {
+    if (IsManager) {
+      if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
+        this.TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessegeFunc)
+      }
+    } 
   }
 
   tornjakServerInfo() {
-    if (this.state.tornjakServerInfo === "") {
-        return ""
+    if (this.props.globalTornjakServerInfo === "") {
+      return ""
     } else {
-        return <TornjakServerInfoDisplay tornjakServerInfo={this.state.tornjakServerInfo} />
+      return <TornjakServerInfoDisplay tornjakServerInfo={this.props.globalTornjakServerInfo} />
     }
   }
 
   render() {
-
     return (
       <div>
         <h3>Server Info</h3>
-        <div className="alert-primary" role="alert">
-        <pre>
-           {this.state.message}
-        </pre>
-        </div>
+        {this.props.globalErrorMessege !== "OK" &&
+          <div className="alert-primary" role="alert">
+            <pre>
+              {this.props.globalErrorMessege}
+            </pre>
+          </div>
+        }
         {IsManager}
-        <br/><br/>
+        <br /><br />
         {this.tornjakServerInfo()}
       </div>
     )
@@ -94,10 +70,13 @@ class TornjakServerInfo extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  globalServerSelected: state.server.globalServerSelected,
+  globalServerSelected: state.servers.globalServerSelected,
+  globalServerInfo: state.servers.globalServerInfo,
+  globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
+  globalErrorMessege: state.tornjak.globalErrorMessege,
 })
 
 export default connect(
   mapStateToProps,
-  { serverSelected }
+  { serverSelectedFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, tornjakMessegeFunc }
 )(TornjakServerInfo)

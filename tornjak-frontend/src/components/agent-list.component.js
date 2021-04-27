@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import Table from "tables/agentsListTable";
+import { selectors } from './selector-info';
+import TornjakApi from './tornjak-api-helpers';
 import {
-  serverSelected,
-  agentsListUpdate
+  serverSelectedFunc,
+  agentsListUpdateFunc,
+  tornjakServerInfoUpdateFunc,
+  serverInfoUpdateFunc,
+  selectorInfoFunc,
+  tornjakMessegeFunc
 } from 'actions';
 
 const Agent = props => (
@@ -32,49 +35,38 @@ const Agent = props => (
 class AgentList extends Component {
   constructor(props) {
     super(props);
+    this.TornjakApi = new TornjakApi();
     this.state = {
       message: "",
     };
   }
 
   componentDidMount() {
+    this.props.selectorInfoFunc(selectors); //set selector info
     if (IsManager) {
       if (this.props.globalServerSelected !== "") {
-        this.populateAgentsUpdate(this.props.globalServerSelected)
+        this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessegeFunc)
       }
     } else {
-      this.populateLocalAgentsUpdate()
+      populateLocalAgentsUpdate(this.props.agentsListUpdateFunc, this.props.tornjakMessegeFunc);
+      populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessegeFunc);
+      if(this.props.globalTornjakServerInfo !== "") {
+        this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
+      }
     }
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
-      this.populateAgentsUpdate(this.props.globalServerSelected)
+    if (IsManager) {
+      if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
+        this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessegeFunc)
+      }
+    } else {
+        if(prevProps.globalTornjakServerInfo !== this.props.globalTornjakServerInfo)
+        {
+          this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
+        }
     }
-  }
-
-  populateAgentsUpdate(serverName) {
-    axios.get(GetApiServerUri('/manager-api/agent/list/') + serverName, { crossdomain: true })
-      .then(response => {
-        console.log(response);
-        this.props.agentsListUpdate(response.data["agents"]);
-      }).catch(error => {
-        this.setState({
-          message: "Error retrieving " + serverName + " : " + error.message
-        });
-        this.props.agentsListUpdate([]);
-      });
-
-  }
-
-  populateLocalAgentsUpdate() {
-    axios.get(GetApiServerUri('/api/agent/list'), { crossdomain: true })
-      .then(response => {
-        this.props.agentsListUpdate(response.data["agents"]);
-      })
-      .catch((error) => {
-        console.log(error);
-      })
   }
 
   agentList() {
@@ -89,15 +81,18 @@ class AgentList extends Component {
       return ""
     }
   }
+
   render() {
     return (
       <div>
         <h3>Agent List</h3>
-        <div className="alert-primary" role="alert">
-          <pre>
-            {this.state.message}
-          </pre>
-        </div>
+        {this.props.globalErrorMessege !== "OK" &&
+          <div className="alert-primary" role="alert">
+            <pre>
+              {this.props.globalErrorMessege}
+            </pre>
+          </div>
+        }
         {IsManager}
         <br /><br />
         <div className="indvidual-list-table">
@@ -108,13 +103,14 @@ class AgentList extends Component {
   }
 }
 
-
 const mapStateToProps = (state) => ({
-  globalServerSelected: state.server.globalServerSelected,
+  globalServerSelected: state.servers.globalServerSelected,
   globalagentsList: state.agents.globalagentsList,
+  globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
+  globalErrorMessege: state.tornjak.globalErrorMessege,
 })
 
 export default connect(
   mapStateToProps,
-  { serverSelected, agentsListUpdate }
+  { serverSelectedFunc, agentsListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessegeFunc }
 )(AgentList)

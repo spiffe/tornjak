@@ -6,8 +6,9 @@ import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import Table from "tables/entriesListTable";
 import {
-  serverSelected,
-  entriesListUpdate
+  serverSelectedFunc,
+  entriesListUpdateFunc,
+  tornjakMessegeFunc,
 } from 'actions';
 
 const Entry = props => (
@@ -36,7 +37,6 @@ class EntryList extends Component {
     this.state = { 
         servers: [],
         selectedServer: "",
-        message: "",
     };
   }
 
@@ -51,21 +51,21 @@ class EntryList extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if(prevProps.globalServerSelected !== this.props.globalServerSelected){
-      this.populateEntriesUpdate(this.props.globalServerSelected)
+    if (IsManager) {
+      if(prevProps.globalServerSelected !== this.props.globalServerSelected){
+        this.populateEntriesUpdate(this.props.globalServerSelected)
+      }
     }
   }
 
   populateEntriesUpdate(serverName) {
       axios.get(GetApiServerUri('/manager-api/entry/list/') + serverName, {     crossdomain: true })
       .then(response =>{
-        console.log(response);
-        this.props.entriesListUpdate(response.data["entries"]);
+        this.props.entriesListUpdateFunc(response.data["entries"]);
+        this.props.tornjakMessegeFunc(response.statusText);
       }).catch(err => {
-          this.setState({ 
-              message: "Error retrieving " + serverName + " : "+ err + (typeof (err.response) !== "undefined" ? ":" + err.response.data : "")
-          });
-          this.props.entriesListUpdate([]);
+          this.props.entriesListUpdateFunc([]);
+          this.props.tornjakMessegeFunc("Error retrieving " + serverName + " : "+ err + (typeof (err.response) !== "undefined" ? ":" + err.response.data : ""));
       });
 
   }
@@ -73,11 +73,12 @@ class EntryList extends Component {
   populateLocalEntriesUpdate() {
       axios.get(GetApiServerUri('/api/entry/list'), { crossdomain: true })
       .then(response => {
-          console.log(response.data);
-        this.props.entriesListUpdate(response.data["entries"]);
+        this.props.entriesListUpdateFunc(response.data["entries"]);
+        this.props.tornjakMessegeFunc(response.statusText);
       })
       .catch((error) => {
         console.log(error);
+        this.props.tornjakMessegeFunc(error.message);
       })
   }
 
@@ -98,11 +99,13 @@ class EntryList extends Component {
     return (
       <div>
         <h3>Entry List</h3>
-        <div className="alert-primary" role="alert">
-        <pre>
-           {this.state.message}
-        </pre>
-        </div>
+        {this.props.globalErrorMessege !== "OK" &&
+          <div className="alert-primary" role="alert">
+            <pre>
+              {this.props.globalErrorMessege}
+            </pre>
+          </div>
+        }
         {IsManager}
         <br/><br/>
         <div className="indvidual-list-table">
@@ -115,11 +118,12 @@ class EntryList extends Component {
 
 
 const mapStateToProps = (state) => ({
-  globalServerSelected: state.server.globalServerSelected,
-  globalentriesList: state.entries.globalentriesList
+  globalServerSelected: state.servers.globalServerSelected,
+  globalentriesList: state.entries.globalentriesList,
+  globalErrorMessege: state.tornjak.globalErrorMessege,
 })
 
 export default connect(
   mapStateToProps,
-  { serverSelected, entriesListUpdate }
+  { serverSelectedFunc, entriesListUpdateFunc, tornjakMessegeFunc }
 )(EntryList)

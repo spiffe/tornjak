@@ -42,3 +42,12 @@
     transform: rotate(360deg);
   }
 }
+
+.endbanneroutput {
+  margin-left: -30px;
+  margin-top: 1%;
+  width: 110%;
+  height: 30px;
+  position: fixed;
+  bottom: 0;
+}
