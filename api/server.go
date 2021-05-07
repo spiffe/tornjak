@@ -24,7 +24,7 @@ type Server struct {
 	MTlsEnabled     bool
 
 	// SpireServerInfo provides config info for the spire server
-	SpireServerInfo string
+	SpireServerInfo TornjakServerInfo
 }
 
 func (_ *Server) homePage(w http.ResponseWriter, r *http.Request) {

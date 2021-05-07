@@ -17,7 +17,7 @@ class TornjakApi extends Component {
   populateTornjakServerInfo = (serverName, tornjakServerInfoUpdateFunc, tornjakMessegeFunc) => {
     axios.get(GetApiServerUri('/manager-api/tornjak/serverinfo/') + serverName, { crossdomain: true })
       .then(response => {
-        tornjakServerInfoUpdateFunc(response.data["serverinfo"]);
+        tornjakServerInfoUpdateFunc(response.data);
         tornjakMessegeFunc(response.statusText);
       }).catch(error => {
         tornjakServerInfoUpdateFunc([]);
@@ -29,7 +29,7 @@ class TornjakApi extends Component {
   populateLocalTornjakServerInfo = (tornjakServerInfoUpdateFunc, tornjakMessegeFunc) => {
     axios.get(GetApiServerUri('/api/tornjak/serverinfo'), { crossdomain: true })
       .then(response => {
-        tornjakServerInfoUpdateFunc(response.data["serverinfo"]);
+        tornjakServerInfoUpdateFunc(response.data);
         tornjakMessegeFunc(response.statusText);
       })
       .catch((error) => {
@@ -43,14 +43,11 @@ class TornjakApi extends Component {
     const nodeAttKeyWord = "NodeAttestor Plugin: ";
     if (serverInfo === "" || serverInfo == undefined)
       return
-    var nodeAttStrtInd = serverInfo.search(nodeAttKeyWord) + nodeAttKeyWord.length;
-    var nodeAttEndInd = serverInfo.indexOf('\n', nodeAttStrtInd)
-    var nodeAtt = serverInfo.substr(nodeAttStrtInd, nodeAttEndInd - nodeAttStrtInd)
-    //server trust domain
-    const trustDomainKeyWord = "\"TrustDomain\": \"";
-    var trustDomainStrtInd = serverInfo.search(trustDomainKeyWord) + trustDomainKeyWord.length;
-    var trustDomainEndInd = serverInfo.indexOf("\"", trustDomainStrtInd)
-    var trustDomain = serverInfo.substr(trustDomainStrtInd, trustDomainEndInd - trustDomainStrtInd)
+    if (serverInfo.plugins["NodeAttestor"].length == 0) {
+        return
+    }
+    let nodeAtt = serverInfo.plugins["NodeAttestor"][0];
+    let trustDomain = serverInfo.trustDomain;
     var reqInfo =
     {
       "data":

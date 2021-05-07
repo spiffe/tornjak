@@ -155,21 +155,23 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 
 }
 
-func GetServerInfo(config *run.Config) (string, error) {
+func GetServerInfo(config *run.Config) (api.TornjakServerInfo, error) {
 	if config.Plugins == nil {
-		return "", errors.New("config plugins map should not be nil")
+		return api.TornjakServerInfo{}, errors.New("config plugins map should not be nil")
 	}
 
 	pluginConfigs, err := catalog.PluginConfigsFromHCL(*config.Plugins)
 	if err != nil {
-		return "", errors.Errorf("Unable to parse plugin HCL: %v", err)
+		return api.TornjakServerInfo{}, errors.Errorf("Unable to parse plugin HCL: %v", err)
 	}
 
 	serverInfo := ""
 	serverInfo += "Plugin Info\n"
+	pluginMap := map[string][]string{}
 	for _, pc := range pluginConfigs {
 		serverInfo += fmt.Sprintf("%v Plugin: %v\n", pc.Type, pc.Name)
 		serverInfo += fmt.Sprintf("Data: %v\n\n", pc.Data)
+		pluginMap[pc.Type] = append(pluginMap[pc.Type], pc.Name)
 	}
 
 	serverInfo += "\n\n"
@@ -177,7 +179,11 @@ func GetServerInfo(config *run.Config) (string, error) {
 	s, _ := json.MarshalIndent(config.Server, "", "\t")
 	serverInfo += string(s)
 
-	return serverInfo, nil
+	return api.TornjakServerInfo{
+		Plugins:       pluginMap,
+		TrustDomain:   config.Server.TrustDomain,
+		VerboseConfig: serverInfo,
+	}, nil
 }
 
 // Call API to show example of policy enforcement, will be deprecated, used only for

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Accordion, AccordionItem, Tag } from "carbon-components-react";
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
 import {
@@ -9,12 +10,39 @@ import {
   tornjakMessegeFunc,
 } from 'actions';
 
+const pluginTagColorMapper = {
+    "NodeAttestor": "red",
+    "WorkloadAttestor": "green",
+    "KeyManager": "cyan",
+    "NodeResolver": "blue",
+    "Notifier": "teal",
+    "DataStore": "purple",
+}
+
+const PluginTags = props => (
+    <p>{ props.names.map(v=><Tag type={pluginTagColorMapper[props.type]} >{props.type + ": " + v}</Tag>)}</p>
+)
 const TornjakServerInfoDisplay = props => (
-  <p>
+  <Accordion>
+  <AccordionItem title="Trust Domain" open="true">
+    <p>
+    {props.tornjakServerInfo.trustDomain}
+    </p>
+  </AccordionItem>
+  <AccordionItem title="Plugins" open="true">
+    <table>
+      {
+          Object.entries(props.tornjakServerInfo.plugins).map(([key,value]) =>
+              <tr><PluginTags type={key} names={value}/></tr>)
+      }
+    </table>
+  </AccordionItem>
+  <AccordionItem title="Verbose Config (click to expand)">
     <pre>
-      {props.tornjakServerInfo}
+      { props.tornjakServerInfo.verboseConfig }
     </pre>
-  </p>
+  </AccordionItem>
+  </Accordion>
 )
 
 class TornjakServerInfo extends Component {

@@ -157,14 +157,10 @@ func (s *Server) BatchDeleteEntry(inp BatchDeleteEntryRequest) (*BatchDeleteEntr
 }
 
 type GetTornjakServerInfoRequest struct{}
-type GetTornjakServerInfoResponse struct {
-	ServerInfo string `json:"serverinfo"`
-}
+type GetTornjakServerInfoResponse TornjakServerInfo
 
 func (s *Server) GetTornjakServerInfo(inp GetTornjakServerInfoRequest) (*GetTornjakServerInfoResponse, error) {
-	return &GetTornjakServerInfoResponse{
-		ServerInfo: s.SpireServerInfo,
-	}, nil
+	return (*GetTornjakServerInfoResponse)(&s.SpireServerInfo), nil
 }
 
 /*
