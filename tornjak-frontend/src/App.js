@@ -2,7 +2,6 @@ import React from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import NavigationBar from "./components/navbar.component";
-import NavHeader from "./components/navHeader.component";
 import SelectServer from "./components/select-server.component";
 import AgentList from "./components/agent-list.component";
 import CreateJoinToken from "./components/agent-create-join-token.component";
@@ -21,7 +20,6 @@ function App() {
                 {/* <div className="container"> */}
                 <div>
                     <div className="nav-comp">
-                        {/* <NavHeader /> */}
                         <NavigationBar />
                     </div>
                     <br />

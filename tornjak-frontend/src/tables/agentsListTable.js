@@ -65,7 +65,7 @@ class DataTableRender extends React.Component {
     }
 
     deleteAgent(selectedRows) {
-        var id = [], i = 0, endpoint = "", prefix = "spiffe://";
+        var id = [], endpoint = "", prefix = "spiffe://";
         let promises = [];
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/agent/delete') + "/" + this.props.globalServerSelected;
@@ -73,7 +73,7 @@ class DataTableRender extends React.Component {
             endpoint = GetApiServerUri('/api/agent/delete');
         }
         if (selectedRows.length !== 0) {
-            for (i = 0; i < selectedRows.length; i++) {
+            for (let i = 0; i < selectedRows.length; i++) {
                 id[i] = {}
                 id[i]["trust_domain"] = selectedRows[i].cells[1].value;
                 id[i]["path"] = selectedRows[i].cells[2].value.substr(selectedRows[i].cells[1].value.concat(prefix).length);
@@ -89,7 +89,7 @@ class DataTableRender extends React.Component {
         }
         Promise.all(promises)
             .then(responses => {
-                for (i = 0; i < responses.length; i++) {
+                for (let i = 0; i < responses.length; i++) {
                     this.props.agentsListUpdateFunc(this.props.globalagentsList.filter(el =>
                         el.id.trust_domain !== id[i].trust_domain ||
                         el.id.path !== id[i].path));

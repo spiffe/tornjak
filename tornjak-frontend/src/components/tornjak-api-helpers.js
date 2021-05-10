@@ -1,5 +1,4 @@
 import { Component } from 'react';
-import { connect } from 'react-redux';
 import axios from 'axios';
 import GetApiServerUri from './helpers';
 
@@ -33,17 +32,17 @@ class TornjakApi extends Component {
         tornjakMessegeFunc(response.statusText);
       })
       .catch((error) => {
-        tornjakMessegeFunc("Error retrieving " + " : " + error.message);
+        tornjakMessegeFunc("Error retrieving: " + error.message);
       })
   }
 
   //Function - Sets the server trust domain and nodeAttestorPlugin
   populateServerInfo = (serverInfo, serverInfoUpdateFunc) => {
     //node attestor plugin
-    const nodeAttKeyWord = "NodeAttestor Plugin: ";
-    if (serverInfo === "" || serverInfo == undefined)
+    if (serverInfo === "" || serverInfo === undefined) {
       return
-    if (serverInfo.plugins["NodeAttestor"].length == 0) {
+    }
+    if (serverInfo.plugins["NodeAttestor"].length === 0) {
         return
     }
     let nodeAtt = serverInfo.plugins["NodeAttestor"][0];
@@ -80,7 +79,7 @@ class TornjakApi extends Component {
         tornjakMessegeFunc(response.statusText);
       })
       .catch((error) => {
-        tornjakMessegeFunc("Error retrieving " + " : " + error.message);
+        tornjakMessegeFunc("Error retrieving: " + error.message);
       })
   }
 }

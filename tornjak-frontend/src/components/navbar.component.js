@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
-import { Link, useHistory, withRouter } from 'react-router-dom';
-import { browserHistory } from 'react-router';
 import IsManager from './is_manager';
 import 'carbon-components/css/carbon-components.min.css';
-import { Dropdown } from 'carbon-components-react';
 import './style.css';
 
 export default class NavigationBar extends Component {

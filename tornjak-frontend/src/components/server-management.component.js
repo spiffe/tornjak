@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import axios from 'axios'
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
@@ -12,7 +11,7 @@ const Server = props => (
   <tr>
     <td>{props.server.name}</td>
     <td>{props.server.address}</td>
-    <td>{props.server.mtls && "mTLS" || props.server.tls && "TLS" || "None"}</td>
+    <td>{(props.server.mtls && "mTLS") || (props.server.tls && "TLS") || "None"}</td>
   </tr>
 )
 

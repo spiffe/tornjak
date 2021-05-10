@@ -25,9 +25,9 @@ const Agent = props => (
       {/*
         // <Link to={"/agentView/"+props.agent._id}>view</Link> |
       */}
-      <a href="#" onClick={() => { props.banAgent(props.agent.id) }}>ban</a>
+      <a href="/#" onClick={() => { props.banAgent(props.agent.id) }}>ban</a>
       <br />
-      <a href="#" onClick={() => { props.deleteAgent(props.agent.id) }}>delete</a>
+      <a href="/#" onClick={() => { props.deleteAgent(props.agent.id) }}>delete</a>
     </td>
   </tr>
 )

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import axios from 'axios'
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
@@ -19,9 +18,8 @@ const Entry = props => (
     <td>{ props.entry.selectors.map(s => s.type + ":" + s.value).join(', ')}</td>
     
     <td>
-      {/* <Link to={"/entryView/"+props.entry._id}>view</Link>*/}
       <br/>
-      <a href="#" onClick={() => { props.deleteEntry (props.entry.id) }}>delete</a>
+      <a href="/#" onClick={() => { props.deleteEntry (props.entry.id) }}>delete</a>
     </td>
 
     <td><div style={{overflowX: 'auto', width: "400px"}}>

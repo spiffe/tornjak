@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"github.com/lumjjb/tornjak/manager/types"
 	"os"
 	"testing"
@@ -43,7 +42,7 @@ func TestServerCreate(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(sList.Servers) != 1 || sList.Servers[0] != sinfo {
+	if len(sList.Servers) != 1 || sList.Servers[0].Name != sinfo.Name {
 		t.Fatal("Server list should initially be empty")
 	}
 }

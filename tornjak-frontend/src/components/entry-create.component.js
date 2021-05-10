@@ -163,8 +163,8 @@ class CreateEntry extends Component {
   onChangeSelectorsRecommended = selected => {
     var i = 0, sid = selected.selectedItems, selectors = "", selectorsDisplay = "";
     for (i = 0; i < sid.length; i++) {
-      if (i != sid.length - 1) {
-        selectors = selectors + sid[i].label + ":" + '\n';
+      if (i !== sid.length - 1) {
+        selectors = selectors + sid[i].label + ":\n";
         selectorsDisplay = selectorsDisplay + sid[i].label + ",";
       }
       else {
@@ -172,7 +172,7 @@ class CreateEntry extends Component {
         selectorsDisplay = selectorsDisplay + sid[i].label
       }
     }
-    if (selectorsDisplay.length == 0)
+    if (selectorsDisplay.length === 0)
       selectorsDisplay = "Select Selectors"
     this.setState({
       selectorsRecommendationList: selectors,
@@ -444,7 +444,7 @@ class CreateEntry extends Component {
               />
               <p className="parentId-helper">i.e. spiffe://example.org/agent/myagent1 - For node entries, select spiffe server as parent i.e. spiffe://example.org/spire/server</p>
             </div>
-            {this.state.parentIDManualEntry == true &&
+            {this.state.parentIDManualEntry === true &&
               <div className="parentId-manual-input-field">
                 <TextInput
                   helperText="i.e. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent i.e. spiffe://example.org/spire/server"
