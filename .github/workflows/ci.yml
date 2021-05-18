@@ -1,5 +1,5 @@
 name: Tornjak CI
-on: [push]
+on: [push, pull_request]
 jobs:
   tornjak-build:
     runs-on: ubuntu-latest
