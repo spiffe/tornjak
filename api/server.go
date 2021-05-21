@@ -5,7 +5,6 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
 	"io"
 	"io/ioutil"
 	"log"
@@ -13,6 +12,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/gorilla/mux"
+
+	agentdb "github.com/lumjjb/tornjak/pkg/agent/db"
 )
 
 type Server struct {
@@ -25,6 +28,9 @@ type Server struct {
 
 	// SpireServerInfo provides config info for the spire server
 	SpireServerInfo TornjakServerInfo
+
+	// AgentDB for storing Workload Attestor Plugin Info of agents
+	Db agentdb.AgentDB
 }
 
 func (_ *Server) homePage(w http.ResponseWriter, r *http.Request) {
@@ -421,6 +427,9 @@ func (s *Server) HandleRequests() {
 
 	// Tornjak specific
 	rtr.HandleFunc("/api/tornjak/serverinfo", corsHandler(s.getTornjakServerInfo))
+	//Agents Selectors
+	rtr.HandleFunc("/api/tornjak/selectors/register", corsHandler(s.pluginDefine))
+	rtr.HandleFunc("/api/tornjak/selectors/list", corsHandler(s.agentsList))
 
 	// UI
 	spa := spaHandler{staticPath: "ui-agent", indexPath: "index.html"}
@@ -461,4 +470,75 @@ func (s *Server) HandleRequests() {
 		fmt.Printf("Starting to listen on %s...\n", s.ListenAddr)
 		log.Fatal(http.ListenAndServe(s.ListenAddr, rtr))
 	}
+}
+
+// NewAgentsDB returns a new agents DB, given a DB connection string
+func NewAgentsDB(dbString string) (agentdb.AgentDB, error) {
+	db, err := agentdb.NewLocalSqliteDB(dbString)
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
+}
+
+func (s *Server) agentsList(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Endpoint Hit: Selector List")
+	buf := new(strings.Builder)
+	n, err := io.Copy(buf, r.Body)
+	if err != nil {
+		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	data := buf.String()
+	var input ListSelectorsRequest
+	if n == 0 {
+		input = ListSelectorsRequest{}
+	} else {
+		err := json.Unmarshal([]byte(data), &input)
+		if err != nil {
+			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		}
+	}
+	ret, err := s.ListSelectors(input)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	cors(w, r)
+	je := json.NewEncoder(w)
+	je.Encode(ret)
+}
+
+func (s *Server) pluginDefine(w http.ResponseWriter, r *http.Request) {
+	buf := new(strings.Builder)
+	n, err := io.Copy(buf, r.Body)
+	if err != nil {
+		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	data := buf.String()
+	var input RegisterSelectorRequest
+	if n == 0 {
+		input = RegisterSelectorRequest{}
+	} else {
+		err := json.Unmarshal([]byte(data), &input)
+		if err != nil {
+			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		}
+	}
+	err = s.DefineSelectors(input)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	cors(w, r)
+	w.Write([]byte("SUCCESS"))
 }

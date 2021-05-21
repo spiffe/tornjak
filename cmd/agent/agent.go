@@ -3,14 +3,16 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/lumjjb/tornjak/api"
+	"log"
+	"os"
+	"os/exec"
+
 	"github.com/pkg/errors"
 	"github.com/spiffe/spire/cmd/spire-server/cli/run"
 	"github.com/spiffe/spire/pkg/common/catalog"
 	"github.com/urfave/cli/v2"
-	"log"
-	"os"
-	"os/exec"
+
+	"github.com/lumjjb/tornjak/api"
 )
 
 type cliOptions struct {
@@ -28,11 +30,13 @@ type cliOptions struct {
 	apiOptions        struct {
 		args []string
 	}
+	dbOptions struct {
+		dbString string
+	}
 }
 
 func main() {
 	var opt cliOptions
-
 	app := &cli.App{
 		Flags: []cli.Flag{
 			&cli.StringFlag{
@@ -42,6 +46,12 @@ func main() {
 				Usage:       "Config file path for spire server",
 				Destination: &opt.genericOptions.configFile,
 				Required:    true,
+			},
+			&cli.StringFlag{
+				Name:        "agents-db-string",
+				Value:       "./agentlocaldb",
+				Usage:       "Db string for agents",
+				Destination: &opt.dbOptions.dbString,
 			},
 		},
 		Commands: []*cli.Command{
@@ -115,6 +125,10 @@ func main() {
 }
 
 func runTornjakCmd(cmd string, opt cliOptions) error {
+	agentdb, err := api.NewAgentsDB(opt.dbOptions.dbString)
+	if err != nil {
+		log.Fatalf("err: %v", err)
+	}
 	config, err := run.ParseFile(opt.genericOptions.configFile, false)
 	if err != nil {
 		// Hide internal error since it is specific to arguments of originating library
@@ -146,6 +160,7 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 			TlsEnabled:      opt.httpOptions.tls,
 			MTlsEnabled:     opt.httpOptions.mtls,
 			SpireServerInfo: serverInfo,
+			Db:              agentdb,
 		}
 		apiServer.HandleRequests()
 	default:

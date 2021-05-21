@@ -81,8 +81,8 @@ class EntryList extends Component {
   }
 
   entryList() {
-  if (typeof this.props.globalentriesList !== 'undefined') {
-      return this.props.globalentriesList.map(currentEntry => {
+  if (typeof this.props.globalEntriesList !== 'undefined') {
+      return this.props.globalEntriesList.map(currentEntry => {
         return <Entry key={currentEntry.id} 
                   entry={currentEntry} 
                   deleteEntry={this.deleteEntry}/>;
@@ -117,7 +117,7 @@ class EntryList extends Component {
 
 const mapStateToProps = (state) => ({
   globalServerSelected: state.servers.globalServerSelected,
-  globalentriesList: state.entries.globalentriesList,
+  globalEntriesList: state.entries.globalEntriesList,
   globalErrorMessege: state.tornjak.globalErrorMessege,
 })
 

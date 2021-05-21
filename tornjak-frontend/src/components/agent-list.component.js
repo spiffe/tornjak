@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import IsManager from './is_manager';
 import Table from "tables/agentsListTable";
-import { selectors } from './selector-info';
+import { selectors, workloadSelectors} from './selector-info';
 import TornjakApi from './tornjak-api-helpers';
 import {
   serverSelectedFunc,
@@ -10,7 +10,9 @@ import {
   tornjakServerInfoUpdateFunc,
   serverInfoUpdateFunc,
   selectorInfoFunc,
-  tornjakMessegeFunc
+  tornjakMessegeFunc,
+  workloadSelectorInfoFunc,
+  agentworkloadSelectorInfoFunc,
 } from 'actions';
 
 const Agent = props => (
@@ -43,11 +45,14 @@ class AgentList extends Component {
 
   componentDidMount() {
     this.props.selectorInfoFunc(selectors); //set selector info
+    this.props.workloadSelectorInfoFunc(workloadSelectors); //set workload selector info
     if (IsManager) {
+      this.TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
       if (this.props.globalServerSelected !== "") {
         this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessegeFunc)
       }
     } else {
+      this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
       this.TornjakApi.populateLocalAgentsUpdate(this.props.agentsListUpdateFunc, this.props.tornjakMessegeFunc);
       this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessegeFunc);
       if(this.props.globalTornjakServerInfo !== "") {
@@ -70,8 +75,8 @@ class AgentList extends Component {
   }
 
   agentList() {
-    if (typeof this.props.globalagentsList !== 'undefined') {
-      return this.props.globalagentsList.map(currentAgent => {
+    if (typeof this.props.globalAgentsList !== 'undefined') {
+      return this.props.globalAgentsList.map(currentAgent => {
         return <Agent key={currentAgent.id.path}
           agent={currentAgent}
           banAgent={this.banAgent}
@@ -105,12 +110,12 @@ class AgentList extends Component {
 
 const mapStateToProps = (state) => ({
   globalServerSelected: state.servers.globalServerSelected,
-  globalagentsList: state.agents.globalagentsList,
+  globalAgentsList: state.agents.globalAgentsList,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
   globalErrorMessege: state.tornjak.globalErrorMessege,
 })
 
 export default connect(
   mapStateToProps,
-  { serverSelectedFunc, agentsListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessegeFunc }
+  { serverSelectedFunc, agentsListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessegeFunc, workloadSelectorInfoFunc, agentworkloadSelectorInfoFunc }
 )(AgentList)

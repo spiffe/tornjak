@@ -3,7 +3,7 @@ import {
 } from '../actions/types';
 
 const initialState = {
-    globalentriesList: [],
+    globalEntriesList: [],
 };
 
 export default function entriesReducer(state = initialState, action) {
@@ -11,7 +11,7 @@ export default function entriesReducer(state = initialState, action) {
         case GLOBAL_ENTRIES_LIST:
             return {
                 ...state,
-                globalentriesList: action.payload
+                globalEntriesList: action.payload
             };
         default:
             return state;

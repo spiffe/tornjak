@@ -41,7 +41,7 @@ class DataTableRender extends React.Component {
     componentDidUpdate(prevProps, prevState) {
         if (prevProps !== this.props) {
             this.setState({
-                listData: this.props.globalentriesList
+                listData: this.props.globalEntriesList
             })
             this.prepareTableData();
         }
@@ -87,7 +87,7 @@ class DataTableRender extends React.Component {
             .then(responses => {
                 for (let i = 0; i < responses.length; i++) {
                     console.log("Status: ", responses[i].statusText)
-                    this.props.entriesListUpdateFunc(this.props.globalentriesList.filter(el => el.id !== responses[i].data.results[0].id))
+                    this.props.entriesListUpdateFunc(this.props.globalEntriesList.filter(el => el.id !== responses[i].data.results[0].id))
                 }
             })
             .catch((error) => {
@@ -194,7 +194,7 @@ class DataTableRender extends React.Component {
 
 const mapStateToProps = (state) => ({
     globalServerSelected: state.servers.globalServerSelected,
-    globalentriesList: state.entries.globalentriesList
+    globalEntriesList: state.entries.globalEntriesList
 })
 
 export default connect(

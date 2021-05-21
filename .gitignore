@@ -26,7 +26,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-localdb
+serverlocaldb
+agentlocaldb
 
 # build artifacts
 bin/

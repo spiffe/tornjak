@@ -4,6 +4,7 @@ import {
     GLOBAL_TORNJAK_SERVER_INFO,
     GLOBAL_SERVERS_LIST,
     GLOBAL_SELECTOR_INFO,
+    GLOBAL_WORKLOAD_SELECTOR_INFO,
 } from '../actions/types';
 
 const initialState = {
@@ -12,6 +13,7 @@ const initialState = {
     globalServerInfo: [],
     globalServersList: [],
     globalSelectorInfo:[],
+    globalWorkloadSelectorInfo:[],
 };
 
 export default function serversReducer(state = initialState, action) {
@@ -40,6 +42,11 @@ export default function serversReducer(state = initialState, action) {
             return {
                 ...state,
                 globalSelectorInfo: action.payload
+            };
+        case GLOBAL_WORKLOAD_SELECTOR_INFO:
+            return {
+                ...state,
+                globalWorkloadSelectorInfo: action.payload
             };
         default:
             return state;

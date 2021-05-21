@@ -1,14 +1,13 @@
 package managerapi
 
 import (
-	managertypes "github.com/lumjjb/tornjak/manager/types"
+	managertypes "github.com/lumjjb/tornjak/pkg/manager/types"
+
 	"github.com/pkg/errors"
 	//types "github.com/spiffe/spire/proto/spire/types"
 	//agent "github.com/spiffe/spire/proto/spire/api/server/agent/v1"
 	//entry "github.com/spiffe/spire/proto/spire/api/server/entry/v1"
 )
-
-var tmpString = "DUMMY"
 
 type ListServersRequest struct{}
 type ListServersResponse managertypes.ServerInfoList

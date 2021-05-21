@@ -11,37 +11,37 @@ import {
 } from 'actions';
 
 const pluginTagColorMapper = {
-    "NodeAttestor": "red",
-    "WorkloadAttestor": "green",
-    "KeyManager": "cyan",
-    "NodeResolver": "blue",
-    "Notifier": "teal",
-    "DataStore": "purple",
+  "NodeAttestor": "red",
+  "WorkloadAttestor": "green",
+  "KeyManager": "cyan",
+  "NodeResolver": "blue",
+  "Notifier": "teal",
+  "DataStore": "purple",
 }
 
 const PluginTags = props => (
-    <p>{ props.names.map(v=><Tag type={pluginTagColorMapper[props.type]} >{props.type + ": " + v}</Tag>)}</p>
+  <p>{props.names.map(v => <Tag type={pluginTagColorMapper[props.type]} >{props.type + ": " + v}</Tag>)}</p>
 )
 const TornjakServerInfoDisplay = props => (
   <Accordion>
-  <AccordionItem title="Trust Domain" open="true">
-    <p>
-    {props.tornjakServerInfo.trustDomain}
-    </p>
-  </AccordionItem>
-  <AccordionItem title="Plugins" open="true">
-    <table>
-      {
-          Object.entries(props.tornjakServerInfo.plugins).map(([key,value]) =>
-              <tr><PluginTags type={key} names={value}/></tr>)
-      }
-    </table>
-  </AccordionItem>
-  <AccordionItem title="Verbose Config (click to expand)">
-    <pre>
-      { props.tornjakServerInfo.verboseConfig }
-    </pre>
-  </AccordionItem>
+    <AccordionItem title="Trust Domain" open="true">
+      <p>
+        {props.tornjakServerInfo.trustDomain}
+      </p>
+    </AccordionItem>
+    <AccordionItem title="Plugins" open="true">
+      <table>
+        {
+          Object.entries(props.tornjakServerInfo.plugins).map(([key, value]) =>
+            <tr key={key + ":" + value}><PluginTags type={key} names={value} /></tr>)
+        }
+      </table>
+    </AccordionItem>
+    <AccordionItem title="Verbose Config (click to expand)">
+      <pre>
+        {props.tornjakServerInfo.verboseConfig}
+      </pre>
+    </AccordionItem>
   </Accordion>
 )
 
@@ -67,7 +67,7 @@ class TornjakServerInfo extends Component {
       if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
         this.TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessegeFunc)
       }
-    } 
+    }
   }
 
   tornjakServerInfo() {

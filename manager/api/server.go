@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	managerdb "github.com/lumjjb/tornjak/manager/db"
+	managerdb "github.com/lumjjb/tornjak/pkg/manager/db"
 )
 
 var (
@@ -156,6 +156,9 @@ func (s *Server) HandleRequests() {
 	rtr.HandleFunc("/manager-api/agent/ban/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/agent/ban")))
 	rtr.HandleFunc("/manager-api/agent/createjointoken/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/agent/createjointoken")))
 	rtr.HandleFunc("/manager-api/tornjak/serverinfo/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/tornjak/serverinfo")))
+	//Agents Selectors
+	rtr.HandleFunc("/manager-api/tornjak/selectors/register/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/tornjak/selectors/register")))
+	rtr.HandleFunc("/manager-api/tornjak/selectors/list/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/tornjak/selectors/list")))
 
 	//http.HandleFunc("/manager-api/get-server-info", s.agentList)
 	//http.HandleFunc("/manager-api/agent/list/:id", s.agentList)

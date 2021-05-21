@@ -1,13 +1,14 @@
 package main
 
 import (
-	managerapi "github.com/lumjjb/tornjak/manager/api"
 	"log"
+
+	managerapi "github.com/lumjjb/tornjak/manager/api"
 )
 
 func main() {
 	var (
-		dbString   = "./localdb"
+		dbString   = "./serverlocaldb"
 		listenAddr = ":50000"
 	)
 	s, err := managerapi.NewManagerServer(listenAddr, dbString)

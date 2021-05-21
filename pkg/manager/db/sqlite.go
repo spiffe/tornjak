@@ -2,12 +2,14 @@ package db
 
 import (
 	"database/sql"
+
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 
-	"github.com/lumjjb/tornjak/manager/types"
+	"github.com/lumjjb/tornjak/pkg/manager/types"
 )
 
+// TO DO: Add DELETE servers option from the data base
 const (
 	initServersTable = "CREATE TABLE IF NOT EXISTS servers (servername TEXT PRIMARY KEY, address TEXT, tls bool, mtls bool, ca varBinary, cert varBinary, key varBinary)"
 )
@@ -21,7 +23,7 @@ func NewLocalSqliteDB(dbpath string) (ManagerDB, error) {
 	if err != nil {
 		return nil, errors.New("Unable to open connection to DB")
 	}
-
+	// Table for servers
 	statement, err := database.Prepare(initServersTable)
 	if err != nil {
 		return nil, errors.Errorf("Unable to execute SQL query :%v", initServersTable)
