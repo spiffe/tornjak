@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import IsManager from './is_manager';
 import 'carbon-components/css/carbon-components.min.css';
 import './style.css';
+import tornjak_logo from "res/tornjak_logo.png";
 
 export default class NavigationBar extends Component {
   constructor(props) {
     super(props);
     this.state = {};
-}
+  }
   render() {
     let managerNavs;
     managerNavs =
@@ -18,7 +19,10 @@ export default class NavigationBar extends Component {
     return (
       <div className="navigation-bar">
         <nav className="navbar navbar-dark bg-dark navbar-expand-lg">
-          <a href="/" className="navbar-brand">Tornjak</a>
+          <span class="logo">
+            <a href="/">
+              <img src={tornjak_logo} height="50" width="160" alt="Tornjak" /></a>
+          </span>
           <div className="collpase navbar-collapse">
             <div className="dropdown">
               <a href="/agents" className="dropbtn">Agents </a>
