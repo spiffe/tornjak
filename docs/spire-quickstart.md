@@ -1,6 +1,6 @@
 # Tornjak simple deployment with SPIRE k8s quickstart
 
-In this tutorial, we will show how one can try out tornjak with a SPIRE deployment using the SPIRE k8s quickstart tutorial. As we will see, this is as simple as setting up SPIRE, and replacing the image with the tornjak compatible image for the SPIRE server. A walkthrough of this guide is also available through [video](https://www.youtube.com/watch?v=_bhucDtsMf8).
+In this tutorial, we will show how one can try out tornjak with a SPIRE deployment using the SPIRE k8s quickstart tutorial. As we will see, this is as simple as setting up SPIRE, and replacing the image with the Tornjak compatible image for the SPIRE server. A walkthrough of this guide is also available through [video](https://www.youtube.com/watch?v=QBNqImUeKcE).
 
 ## Step 1: Setup SPIRE k8s quickstart tutorial (optional)
 
