@@ -18,6 +18,6 @@ cleanup
 
 
 sed "s/{version}/${VERSION}/g" Dockerfile.add-frontend-versions > Dockerfile.add-frontend-versions-${VERSION}
-docker build -t ${IMAGE_PATH} -f Dockerfile.add-frontend-versions-${VERSION} .
-docker push ${IMAGE_PATH}
+docker build -t ${IMAGE_PATH}:${VERSION} -f Dockerfile.add-frontend-versions-${VERSION} .
+docker push ${IMAGE_PATH}:${VERSION}
 cleanup
