@@ -1,5 +1,8 @@
 # Tornjak
 
+_**WARNING: This project is still in early development and should not be used in production**_
+
+
 The project aims to provide a management plane and capabilities for SPIFFE identities managed by SPIRE.
 The goals are to provide global visibility, auditability, and configuration and policy management for identities.
 This can be thought about as a central management plane for identities across SPIRE servers, with the aim for use by an administrator or CISO to govern an organization's workload identities.
