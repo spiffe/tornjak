@@ -1,16 +1,16 @@
 import React from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter as Router, Route } from "react-router-dom";
-import NavigationBar from "./components/navbar.component";
-import SelectServer from "./components/select-server.component";
-import AgentList from "./components/agent-list.component";
-import CreateJoinToken from "./components/agent-create-join-token.component";
-import EntryList from "./components/entry-list.component";
-import EntryCreate from "./components/entry-create.component";
-import ServerManagement from "./components/server-management.component";
-import TornjakServerInfo from "./components/tornjak-server-info.component";
+import NavigationBar from "./components/navbar";
+import SelectServer from "./components/select-server";
+import AgentList from "./components/agent-list";
+import CreateJoinToken from "./components/agent-create-join-token";
+import EntryList from "./components/entry-list";
+import EntryCreate from "./components/entry-create";
+import ServerManagement from "./components/server-management";
+import TornjakServerInfo from "./components/tornjak-server-info";
 import { Provider } from 'react-redux'; //enables all components to have acces to everything inside our react app
-import store from './store';
+import store from 'redux/store';
 import './App.css';
 
 function App() {

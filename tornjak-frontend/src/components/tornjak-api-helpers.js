@@ -96,26 +96,26 @@ class TornjakApi extends Component {
       })
   }
   // populateTornjakServerInfo returns the torjak server info of the selected server in manager mode
-  populateTornjakServerInfo = (serverName, tornjakServerInfoUpdateFunc, tornjakMessegeFunc) => {
+  populateTornjakServerInfo = (serverName, tornjakServerInfoUpdateFunc, tornjakMessageFunc) => {
     axios.get(GetApiServerUri('/manager-api/tornjak/serverinfo/') + serverName, { crossdomain: true })
       .then(response => {
         tornjakServerInfoUpdateFunc(response.data);
-        tornjakMessegeFunc(response.statusText);
+        tornjakMessageFunc(response.statusText);
       }).catch(error => {
         tornjakServerInfoUpdateFunc([]);
-        tornjakMessegeFunc("Error retrieving " + serverName + " : " + error.message);
+        tornjakMessageFunc("Error retrieving " + serverName + " : " + error.message);
       });
   }
 
   // populateLocalTornjakServerInfo returns the torjak server info of the server in local mode
-  populateLocalTornjakServerInfo = (tornjakServerInfoUpdateFunc, tornjakMessegeFunc) => {
+  populateLocalTornjakServerInfo = (tornjakServerInfoUpdateFunc, tornjakMessageFunc) => {
     axios.get(GetApiServerUri('/api/tornjak/serverinfo'), { crossdomain: true })
       .then(response => {
         tornjakServerInfoUpdateFunc(response.data);
-        tornjakMessegeFunc(response.statusText);
+        tornjakMessageFunc(response.statusText);
       })
       .catch((error) => {
-        tornjakMessegeFunc("Error retrieving: " + error.message);
+        tornjakMessageFunc("Error retrieving: " + error.message);
       })
   }
 
@@ -142,27 +142,27 @@ class TornjakApi extends Component {
   }
 
   // populateAgentsUpdate returns the list of agents with their info in manager mode for the selected server
-  populateAgentsUpdate = (serverName, agentsListUpdateFunc, tornjakMessegeFunc) => {
+  populateAgentsUpdate = (serverName, agentsListUpdateFunc, tornjakMessageFunc) => {
     axios.get(GetApiServerUri('/manager-api/agent/list/') + serverName, { crossdomain: true })
       .then(response => {
         agentsListUpdateFunc(response.data["agents"]);
-        tornjakMessegeFunc(response.statusText);
+        tornjakMessageFunc(response.statusText);
       }).catch(error => {
         agentsListUpdateFunc([]);
-        tornjakMessegeFunc("Error retrieving " + serverName + " : " + error.message);
+        tornjakMessageFunc("Error retrieving " + serverName + " : " + error.message);
       });
 
   }
 
   // populateLocalAgentsUpdate - returns the list of agents with their info in Local mode for the server
-  populateLocalAgentsUpdate = (agentsListUpdateFunc, tornjakMessegeFunc) => {
+  populateLocalAgentsUpdate = (agentsListUpdateFunc, tornjakMessageFunc) => {
     axios.get(GetApiServerUri('/api/agent/list'), { crossdomain: true })
       .then(response => {
         agentsListUpdateFunc(response.data["agents"]);
-        tornjakMessegeFunc(response.statusText);
+        tornjakMessageFunc(response.statusText);
       })
       .catch((error) => {
-        tornjakMessegeFunc("Error retrieving: " + error.message);
+        tornjakMessageFunc("Error retrieving: " + error.message);
       })
   }
 }

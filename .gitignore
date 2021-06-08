@@ -32,6 +32,5 @@ agentlocaldb
 # build artifacts
 bin/
 ui/
-ui-manager/
 ui-agent/
-tornjak
+/agent

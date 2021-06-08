@@ -9,12 +9,12 @@ all: bin/tornjak-agent bin/tornjak-manager ui-agent ui-manager container-agent c
 
 bin/tornjak-agent: $(GO_FILES) vendor
 	# Build hack because of flake of imported go module
-	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:1.15 /bin/sh -c "go build cmd/agent/agent.go; go build -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o bin/tornjak-agent cmd/agent/agent.go"
+	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:1.15 /bin/sh -c "go build tornjak-backend/cmd/agent/agent.go; go build -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o bin/tornjak-agent tornjak-backend/cmd/agent/agent.go"
 
 
 bin/tornjak-manager: $(GO_FILES) vendor
 	# Build hack because of flake of imported go module
-	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:1.15 /bin/sh -c "go build -o tornjak-manager cmd/manager/manager.go; go build -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o bin/tornjak-manager cmd/manager/manager.go"
+	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:1.15 /bin/sh -c "go build -o tornjak-manager tornjak-backend/cmd/manager/manager.go; go build -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o bin/tornjak-manager tornjak-backend/cmd/manager/manager.go"
 
 
 ui-agent:
