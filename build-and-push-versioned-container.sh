@@ -12,12 +12,16 @@ helptext() {
     exit 1
 }
 
+errExit() {
+    cleanup
+    exit 2
+}
+
 cleanup
 [[ -z $VERSION ]] && helptext
 [[ -z $IMAGE_PATH ]] && helptext
 
-
 sed "s/{version}/${VERSION}/g" Dockerfile.add-frontend-versions > Dockerfile.add-frontend-versions-${VERSION}
-docker build -t ${IMAGE_PATH}:${VERSION} -f Dockerfile.add-frontend-versions-${VERSION} .
-docker push ${IMAGE_PATH}:${VERSION}
+docker build -t ${IMAGE_PATH}:${VERSION} -f Dockerfile.add-frontend-versions-${VERSION} . || errExit
+docker push ${IMAGE_PATH}:${VERSION} || errExit
 cleanup
