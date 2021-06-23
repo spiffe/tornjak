@@ -33,12 +33,6 @@ type Server struct {
 	Db agentdb.AgentDB
 }
 
-func (_ *Server) homePage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Welcome to the HomePage!")
-	fmt.Println("Endpoint Hit: homePage")
-	cors(w, r)
-}
-
 func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Endpoint Hit: Agent List")
 
@@ -64,7 +58,7 @@ func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	ret, err := s.ListAgents(input)
+	ret, err := s.ListAgents(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
 		retError(w, emsg, http.StatusBadRequest)
@@ -73,8 +67,12 @@ func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
 
 	cors(w, r)
 	je := json.NewEncoder(w)
-	// Shouldn't error here
-	je.Encode(ret)
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
 }
 
 func (s *Server) agentBan(w http.ResponseWriter, r *http.Request) {
@@ -92,7 +90,7 @@ func (s *Server) agentBan(w http.ResponseWriter, r *http.Request) {
 	data := buf.String()
 
 	if n == 0 {
-		emsg := fmt.Sprintf("Error: no data provided")
+		emsg := "Error: no data provided"
 		retError(w, emsg, http.StatusBadRequest)
 		return
 	} else {
@@ -104,7 +102,7 @@ func (s *Server) agentBan(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = s.BanAgent(input)
+	err = s.BanAgent(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error listing agents: %v", err.Error())
 		retError(w, emsg, http.StatusBadRequest)
@@ -112,7 +110,13 @@ func (s *Server) agentBan(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cors(w, r)
-	w.Write([]byte("SUCCESS"))
+	_, err = w.Write([]byte("SUCCESS"))
+
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
 }
 
 func (s *Server) agentDelete(w http.ResponseWriter, r *http.Request) {
@@ -130,7 +134,7 @@ func (s *Server) agentDelete(w http.ResponseWriter, r *http.Request) {
 	data := buf.String()
 
 	if n == 0 {
-		emsg := fmt.Sprintf("Error: no data provided")
+		emsg := "Error: no data provided"
 		retError(w, emsg, http.StatusBadRequest)
 		return
 	} else {
@@ -142,7 +146,7 @@ func (s *Server) agentDelete(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = s.DeleteAgent(input)
+	err = s.DeleteAgent(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error listing agents: %v", err.Error())
 		retError(w, emsg, http.StatusBadRequest)
@@ -150,7 +154,13 @@ func (s *Server) agentDelete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cors(w, r)
-	w.Write([]byte("SUCCESS"))
+	_, err = w.Write([]byte("SUCCESS"))
+
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
 }
 
 func (s *Server) agentCreateJoinToken(w http.ResponseWriter, r *http.Request) {
@@ -178,7 +188,7 @@ func (s *Server) agentCreateJoinToken(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	ret, err := s.CreateJoinToken(input)
+	ret, err := s.CreateJoinToken(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
 		retError(w, emsg, http.StatusBadRequest)
@@ -187,8 +197,12 @@ func (s *Server) agentCreateJoinToken(w http.ResponseWriter, r *http.Request) {
 
 	cors(w, r)
 	je := json.NewEncoder(w)
-	// Shouldn't error here
-	je.Encode(ret)
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
 }
 
 func (s *Server) entryList(w http.ResponseWriter, r *http.Request) {
@@ -216,7 +230,7 @@ func (s *Server) entryList(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	ret, err := s.ListEntries(input)
+	ret, err := s.ListEntries(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
 		retError(w, emsg, http.StatusBadRequest)
@@ -225,8 +239,12 @@ func (s *Server) entryList(w http.ResponseWriter, r *http.Request) {
 
 	cors(w, r)
 	je := json.NewEncoder(w)
-	// Shouldn't error here
-	je.Encode(ret)
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
 }
 
 func (s *Server) entryCreate(w http.ResponseWriter, r *http.Request) {
@@ -254,7 +272,7 @@ func (s *Server) entryCreate(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	ret, err := s.BatchCreateEntry(input)
+	ret, err := s.BatchCreateEntry(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
 		retError(w, emsg, http.StatusBadRequest)
@@ -263,8 +281,12 @@ func (s *Server) entryCreate(w http.ResponseWriter, r *http.Request) {
 
 	cors(w, r)
 	je := json.NewEncoder(w)
-	// Shouldn't error here
-	je.Encode(ret)
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
 }
 
 func (s *Server) entryDelete(w http.ResponseWriter, r *http.Request) {
@@ -292,7 +314,7 @@ func (s *Server) entryDelete(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	ret, err := s.BatchDeleteEntry(input)
+	ret, err := s.BatchDeleteEntry(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
 		retError(w, emsg, http.StatusBadRequest)
@@ -301,8 +323,12 @@ func (s *Server) entryDelete(w http.ResponseWriter, r *http.Request) {
 
 	cors(w, r)
 	je := json.NewEncoder(w)
-	// Shouldn't error here
-	je.Encode(ret)
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
 }
 
 func cors(w http.ResponseWriter, _ *http.Request) {
@@ -365,8 +391,12 @@ func (s *Server) getTornjakServerInfo(w http.ResponseWriter, r *http.Request) {
 
 	cors(w, r)
 	je := json.NewEncoder(w)
-	// Shouldn't error here
-	je.Encode(ret)
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
 }
 
 // spaHandler implements the http.Handler interface, so we can use it
@@ -510,7 +540,12 @@ func (s *Server) agentsList(w http.ResponseWriter, r *http.Request) {
 	}
 	cors(w, r)
 	je := json.NewEncoder(w)
-	je.Encode(ret)
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
 }
 
 func (s *Server) pluginDefine(w http.ResponseWriter, r *http.Request) {
@@ -540,5 +575,10 @@ func (s *Server) pluginDefine(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	cors(w, r)
-	w.Write([]byte("SUCCESS"))
+	_, err = w.Write([]byte("SUCCESS"))
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
 }
