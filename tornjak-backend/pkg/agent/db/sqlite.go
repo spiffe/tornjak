@@ -1,58 +1,92 @@
 package db
 
 import (
+	"context"
 	"database/sql"
+	"fmt"
+	"strings"
 
+	"github.com/cenkalti/backoff/v4"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 
 	"github.com/lumjjb/tornjak/tornjak-backend/pkg/agent/types"
 )
 
-// TO DO: DELETE deleted agents from the db
 const (
-	initAgentsTable = "CREATE TABLE IF NOT EXISTS agents (spiffeid TEXT PRIMARY KEY, plugin TEXT)" //creates agentdb with fields spiffeid and plugin
+	// agent table with fields spiffeid and plugin
+	initAgentsTable = `CREATE TABLE IF NOT EXISTS agents 
+                            (id INTEGER PRIMARY KEY AUTOINCREMENT, spiffeid TEXT, plugin TEXT)`
+	// cluster table with fields name, domainName, platformtype, managedby
+	initClustersTable = `CREATE TABLE IF NOT EXISTS clusters 
+                            (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, created_at TEXT, 
+                            domain_name TEXT, platform_type TEXT, managed_by TEXT, UNIQUE (name))`
+	// cluster - agent relation table specifying by clusterid and spiffeid
+	//                                enforces uniqueness of spiffeid
+	initClusterMemberTable = `CREATE TABLE IF NOT EXISTS cluster_memberships 
+                            (id INTEGER PRIMARY KEY AUTOINCREMENT, spiffeid TEXT, cluster_id int,
+                            FOREIGN KEY (cluster_id) REFERENCES clusters(id), UNIQUE (spiffeid))`
 )
 
 type LocalSqliteDb struct {
-	database *sql.DB
+	database   *sql.DB
+	expBackoff *backoff.BackOff
 }
 
-func NewLocalSqliteDB(dbpath string) (AgentDB, error) {
+func createDBTable(database *sql.DB, cmd string) error {
+	statement, err := database.Prepare(cmd)
+	if err != nil {
+		return SQLError{cmd, err}
+	}
+	_, err = statement.Exec()
+	if err != nil {
+		return SQLError{cmd, err}
+	}
+	return nil
+}
+
+func NewLocalSqliteDB(dbpath string, backOffParams backoff.BackOff) (AgentDB, error) {
 	database, err := sql.Open("sqlite3", dbpath)
 	if err != nil {
 		return nil, errors.New("Unable to open connection to DB")
 	}
 
-	// Table for workload selectors
-	statement, err := database.Prepare(initAgentsTable)
-	if err != nil {
-		return nil, errors.Errorf("Unable to execute SQL query :%v", initAgentsTable)
-	}
-	_, err = statement.Exec()
-	if err != nil {
-		return nil, errors.Errorf("Unable to execute SQL query :%v", initAgentsTable)
+	initTableList := []string{initAgentsTable, initClustersTable, initClusterMemberTable}
+
+	for i := 0; i < len(initTableList); i++ {
+		err = createDBTable(database, initTableList[i])
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &LocalSqliteDb{
-		database: database,
+		database:   database,
+		expBackoff: &backOffParams,
 	}, nil
 }
 
+// AGENT - SELECTOR/PLUGIN HANDLERS
+
 func (db *LocalSqliteDb) CreateAgentEntry(sinfo types.AgentInfo) error {
-	statement, err := db.database.Prepare("INSERT OR REPLACE INTO agents (spiffeid, plugin) VALUES (?,?)")
+	// TODO can there be multiple? plugins per agent?  handle replace
+	cmd := `INSERT OR REPLACE INTO agents (spiffeid, plugin) VALUES (?,?)`
+	statement, err := db.database.Prepare(cmd)
 	if err != nil {
-		return errors.Errorf("Unable to execute SQL query: %v", err)
+		return SQLError{cmd, err}
 	}
 	_, err = statement.Exec(sinfo.Spiffeid, sinfo.Plugin)
-
-	return err
+	if err != nil {
+		return SQLError{cmd, err}
+	}
+	return nil
 }
 
 func (db *LocalSqliteDb) GetAgents() (types.AgentInfoList, error) {
-	rows, err := db.database.Query("SELECT spiffeid, plugin FROM agents")
+	cmd := `SELECT spiffeid, plugin FROM agents`
+	rows, err := db.database.Query(cmd)
 	if err != nil {
-		return types.AgentInfoList{}, errors.New("Unable to execute SQL query")
+		return types.AgentInfoList{}, SQLError{cmd, err}
 	}
 
 	sinfos := []types.AgentInfo{}
@@ -62,7 +96,7 @@ func (db *LocalSqliteDb) GetAgents() (types.AgentInfoList, error) {
 	)
 	for rows.Next() {
 		if err = rows.Scan(&spiffeid, &plugin); err != nil {
-			return types.AgentInfoList{}, err
+			return types.AgentInfoList{}, SQLError{cmd, err}
 		}
 
 		sinfos = append(sinfos, types.AgentInfo{
@@ -76,13 +110,228 @@ func (db *LocalSqliteDb) GetAgents() (types.AgentInfoList, error) {
 	}, nil
 }
 
-func (db *LocalSqliteDb) GetAgentPluginInfo(name string) (types.AgentInfo, error) {
-	row := db.database.QueryRow("SELECT spiffeid, plugin FROM agents WHERE spiffeid=?", name)
+func (db *LocalSqliteDb) GetAgentPluginInfo(spiffeid string) (types.AgentInfo, error) {
+	cmd := `SELECT spiffeid, plugin FROM agents WHERE spiffeid=?`
+	row := db.database.QueryRow(cmd, spiffeid)
 
 	sinfo := types.AgentInfo{}
 	err := row.Scan(&sinfo.Spiffeid, &sinfo.Plugin)
-	if err != nil {
-		return types.AgentInfo{}, err
+	if err == sql.ErrNoRows {
+		return types.AgentInfo{}, GetError{fmt.Sprintf("Agent %v has no assigned plugin", spiffeid)}
+	} else if err != nil {
+		return types.AgentInfo{}, SQLError{cmd, err}
 	}
 	return sinfo, nil
+}
+
+// CLUSTER HANDLERS
+
+// GetClusterAgents takes in string cluster name and outputs array of spiffeids of agents assigned to the cluster
+func (db *LocalSqliteDb) GetClusterAgents(name string) ([]string, error) {
+	// search in clusterMemberships table
+	cmdGetMemberships := `SELECT GROUP_CONCAT(cluster_memberships.spiffeid) 
+                        FROM clusters LEFT JOIN cluster_memberships 
+                        ON clusters.id=cluster_memberships.cluster_id
+                        WHERE clusters.name=? 
+                        GROUP BY clusters.name`
+	row := db.database.QueryRow(cmdGetMemberships, name)
+
+	var spiffeidList []string
+	var spiffeids sql.NullString
+
+	err := row.Scan(&spiffeids)
+	if err == sql.ErrNoRows {
+		return nil, GetError{fmt.Sprintf("Cluster %v not registered", name)}
+	} else if err != nil {
+		return nil, SQLError{cmdGetMemberships, err}
+	}
+	if spiffeids.Valid {
+		spiffeidList = strings.Split(spiffeids.String, ",")
+	} else {
+		spiffeidList = []string{}
+	}
+
+	return spiffeidList, nil
+
+}
+
+// GetAgentClusterName takes in string of spiffeid of agent and outputs the name of the cluster
+func (db *LocalSqliteDb) GetAgentClusterName(spiffeid string) (string, error) {
+	var clusterName sql.NullString
+	cmdGetName := `SELECT clusters.name 
+                 FROM cluster_memberships LEFT JOIN clusters 
+                 ON clusters.id=cluster_memberships.cluster_id
+                 WHERE cluster_memberships.spiffeid=?`
+	row := db.database.QueryRow(cmdGetName, spiffeid)
+	err := row.Scan(&clusterName)
+	if err == sql.ErrNoRows {
+		return "", GetError{fmt.Sprintf("Agent %v unassigned to any cluster", spiffeid)}
+	} else if err != nil {
+		return "", SQLError{cmdGetName, err}
+	}
+	if clusterName.Valid {
+		return clusterName.String, nil
+	} else {
+		return "", GetError{fmt.Sprintf("Agent %v assinged to unregistered cluster", spiffeid)}
+	}
+}
+
+// GetClusters outputs a list of ClusterInfo structs with information on currently registered clusters
+func (db *LocalSqliteDb) GetClusters() (types.ClusterInfoList, error) {
+	// BEGIN transaction
+	cmd := `SELECT clusters.name, clusters.created_at, clusters.domain_name, clusters.managed_by, 
+          clusters.platform_type, GROUP_CONCAT(cluster_memberships.spiffeid) 
+          FROM clusters LEFT JOIN cluster_memberships 
+          ON clusters.id=cluster_memberships.cluster_id
+          GROUP BY clusters.name`
+
+	rows, err := db.database.Query(cmd)
+	if err != nil {
+		return types.ClusterInfoList{}, SQLError{cmd, err}
+	}
+
+	sinfos := []types.ClusterInfo{}
+	var (
+		name                string
+		createdAt           string
+		domainName          string
+		managedBy           string
+		platformType        string
+		agentsListConcatted sql.NullString
+		agentsList          []string
+	)
+	for rows.Next() {
+		if err = rows.Scan(&name, &createdAt, &domainName, &managedBy, &platformType, &agentsListConcatted); err != nil {
+			return types.ClusterInfoList{}, SQLError{cmd, err}
+		}
+
+		if agentsListConcatted.Valid { // handle clusters with no assigned agents
+			agentsList = strings.Split(agentsListConcatted.String, ",")
+		} else {
+			agentsList = []string{}
+		}
+		sinfos = append(sinfos, types.ClusterInfo{
+			Name:         name,
+			CreationTime: createdAt,
+			DomainName:   domainName,
+			ManagedBy:    managedBy,
+			PlatformType: platformType,
+			AgentsList:   agentsList,
+		})
+	}
+
+	return types.ClusterInfoList{
+		Clusters: sinfos,
+	}, nil
+}
+
+// CreateClusterEntry takes in struct cinfo of type ClusterInfo.  If a cluster with cinfo.Name already registered, returns error.
+func (db *LocalSqliteDb) createClusterEntryOp(cinfo types.ClusterInfo) error {
+	// BEGIN transaction
+	ctx := context.Background()
+	tx, err := db.database.BeginTx(ctx, nil)
+	if err != nil {
+		return errors.Errorf("Error initializing context: %v", err)
+	}
+	txHelper := getTornjakTxHelper(ctx, tx)
+
+	// INSERT cluster metadata
+	err = txHelper.insertClusterMetadata(cinfo)
+	if err != nil {
+		return backoff.Permanent(txHelper.rollbackHandler(err))
+	}
+
+	// ADD agents to cluster
+	err = txHelper.addAgentBatchToCluster(cinfo.Name, cinfo.AgentsList)
+	if err != nil {
+		return backoff.Permanent(txHelper.rollbackHandler(err))
+	}
+	return tx.Commit()
+}
+
+// EditClusterEntry takes in struct cinfo of type ClusterInfo.  If cluster with cinfo.Name does not exist, throws error.
+func (db *LocalSqliteDb) editClusterEntryOp(cinfo types.ClusterInfo) error {
+	// BEGIN transaction
+	ctx := context.Background()
+	tx, err := db.database.BeginTx(ctx, nil)
+	if err != nil {
+		return errors.Errorf("Error initializing context: %v", err)
+	}
+	txHelper := getTornjakTxHelper(ctx, tx)
+
+	// UPDATE cluster metadata
+	err = txHelper.updateClusterMetadata(cinfo)
+	if err != nil {
+		return backoff.Permanent(txHelper.rollbackHandler(err))
+	}
+
+	// REMOVE all currently assigned cluster agents
+	err = txHelper.deleteClusterAgents(cinfo.EditedName)
+	if err != nil {
+		return backoff.Permanent(txHelper.rollbackHandler(err))
+	}
+
+	// ADD agents to cluster
+	err = txHelper.addAgentBatchToCluster(cinfo.EditedName, cinfo.AgentsList)
+	if err != nil {
+		return backoff.Permanent(txHelper.rollbackHandler(err))
+	}
+
+	return tx.Commit()
+}
+
+// DeleteClusterEntry takes in string name of cluster and removes cluster information and agent membership of cluster from the database.  If not all agents can be removed from the cluster, cluster information remains in the database.
+func (db *LocalSqliteDb) deleteClusterEntryOp(clusterName string) error {
+	// BEGIN transaction
+	ctx := context.Background()
+	tx, err := db.database.BeginTx(ctx, nil)
+	if err != nil {
+		return errors.Errorf("Error initializing context: %v", err)
+	}
+	txHelper := getTornjakTxHelper(ctx, tx)
+
+	// REMOVE all currently assigned cluster agents (requires metadata still entered)
+	err = txHelper.deleteClusterAgents(clusterName)
+	if err != nil {
+		return backoff.Permanent(txHelper.rollbackHandler(err))
+	}
+
+	// REMOVE cluster metadata
+	err = txHelper.deleteClusterMetadata(clusterName)
+	if err != nil {
+		return backoff.Permanent(txHelper.rollbackHandler(err))
+	}
+
+	return tx.Commit()
+}
+
+func (db *LocalSqliteDb) retryOp(operation func() error) error {
+	err := backoff.Retry(operation, *db.expBackoff)
+	if err != nil {
+		if serr, ok := err.(*backoff.PermanentError); ok {
+			return serr.Unwrap()
+		}
+	}
+	return err
+}
+
+func (db *LocalSqliteDb) CreateClusterEntry(cinfo types.ClusterInfo) error {
+	operation := func() error {
+		return db.createClusterEntryOp(cinfo)
+	}
+	return db.retryOp(operation)
+}
+
+func (db *LocalSqliteDb) EditClusterEntry(cinfo types.ClusterInfo) error {
+	operation := func() error {
+		return db.editClusterEntryOp(cinfo)
+	}
+	return db.retryOp(operation)
+}
+
+func (db *LocalSqliteDb) DeleteClusterEntry(clustername string) error {
+	operation := func() error {
+		return db.deleteClusterEntryOp(clustername)
+	}
+	return db.retryOp(operation)
 }
