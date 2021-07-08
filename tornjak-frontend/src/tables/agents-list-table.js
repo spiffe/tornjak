@@ -8,7 +8,7 @@ import ResetIcon from "@carbon/icons-react/es/reset--alt/20";
 import GetApiServerUri from 'components/helpers';
 import IsManager from 'components/is_manager';
 import WorkLoadAttestor from 'components/work-load-attestor-modal';
-import axios from 'axios'
+import axios from 'axios';
 import {
     agentsListUpdateFunc
 } from 'redux/actions';
@@ -34,7 +34,7 @@ class DataTableRender extends React.Component {
         super(props);
         this.state = {
             listData: props.data,
-            listTableData: [{}]
+            listTableData: [{"id":"0"}],
         };
         this.prepareTableData = this.prepareTableData.bind(this);
     }
@@ -57,7 +57,7 @@ class DataTableRender extends React.Component {
         let listtabledata = [];
         for (let i = 0; i < listData.length; i++) {
             listtabledata[i] = {};
-            listtabledata[i]["id"] = i + 1;
+            listtabledata[i]["id"] = (i + 1).toString();
             listtabledata[i]["trustdomain"] = listData[i].props.agent.id.trust_domain;
             listtabledata[i]["spiffeid"] = "spiffe://" + listData[i].props.agent.id.trust_domain + listData[i].props.agent.id.path;
             listtabledata[i]["info"] = JSON.stringify(listData[i].props.agent, null, ' ');
@@ -145,7 +145,7 @@ class DataTableRender extends React.Component {
         const { listTableData } = this.state;
         const headerData = [
             {
-                header: 'ID',
+                header: '#No',
                 key: 'id',
             },
             {
@@ -226,8 +226,8 @@ class DataTableRender extends React.Component {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {rows.map((row) => (
-                                    <TableRow key={row.id}>
+                                {rows.map((row, key) => (
+                                    <TableRow key={key}>
                                         <TableSelectRow
                                             {...getSelectionProps({ row })} />
                                         {row.cells.map((cell) => (

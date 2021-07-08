@@ -15,6 +15,8 @@ class TornjakApi extends Component {
     this.populateServerInfo = this.populateServerInfo.bind(this);
     this.populateAgentsUpdate = this.populateAgentsUpdate.bind(this);
     this.populateLocalAgentsUpdate = this.populateLocalAgentsUpdate.bind(this);
+    this.populateClustersUpdate = this.populateClustersUpdate.bind(this);
+    this.populateLocalClustersUpdate = this.populateLocalClustersUpdate.bind(this);
   }
 
   registerSelectors = (serverName, wLoadAttdata, refreshSelectorsState, agentworkloadSelectorInfoFunc) => {
@@ -126,7 +128,7 @@ class TornjakApi extends Component {
       return
     }
     if (serverInfo.plugins["NodeAttestor"].length === 0) {
-        return
+      return
     }
     let nodeAtt = serverInfo.plugins["NodeAttestor"][0];
     let trustDomain = serverInfo.trustDomain;
@@ -162,9 +164,36 @@ class TornjakApi extends Component {
         tornjakMessageFunc(response.statusText);
       })
       .catch((error) => {
+        agentsListUpdateFunc([]);
         tornjakMessageFunc("Error retrieving: " + error.message);
       })
   }
+
+  // populatelustersUpdate returns the list of clusters with their info in manager mode for the selected server
+  populateClustersUpdate = (serverName, clustersListUpdateFunc, tornjakMessageFunc) => {
+    axios.get(GetApiServerUri('/manager-api/tornjak/clusters/list/') + serverName, { crossdomain: true })
+      .then(response => {
+        clustersListUpdateFunc(response.data["clusters"]);
+        tornjakMessageFunc(response.statusText);
+      }).catch(error => {
+        clustersListUpdateFunc([]);
+        tornjakMessageFunc("Error retrieving " + serverName + " : " + error.message);
+      });
+  }
+
+  // populateLocalClustersUpdate - returns the list of clusters with their info in Local mode for the server
+  populateLocalClustersUpdate = (clustersListUpdateFunc, tornjakMessageFunc) => {
+    axios.get(GetApiServerUri('/api/tornjak/clusters/list'), { crossdomain: true })
+      .then(response => {
+        clustersListUpdateFunc(response.data["clusters"]);
+        tornjakMessageFunc(response.statusText);
+      })
+      .catch((error) => {
+        clustersListUpdateFunc([]);
+        tornjakMessageFunc("Error retrieving: " + error.message);
+      })
+  }
+
 }
 
 export default TornjakApi;

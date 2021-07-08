@@ -1,3 +1,9 @@
+const clusterType = 
+[
+  "Kubernetes",
+  "VMs",
+];
+
 const selectors =
 {
   "aws_iid": [
@@ -166,4 +172,4 @@ const workloadSelectors =
     },
   ],
 };
-export { selectors, workloadSelectors };
+export { clusterType, selectors, workloadSelectors };

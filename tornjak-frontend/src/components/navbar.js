@@ -25,6 +25,13 @@ export default class NavigationBar extends Component {
           </span>
           <div className="collpase navbar-collapse">
             <div className="dropdown">
+              <a href="/clusters" className="dropbtn">Clusters </a>
+              <div className="dropdown-content">
+                <a href="/clusters" className="nav-link">Clusters List</a>
+                <a href="/cluster/clustermanagement" className="nav-link">Cluster Management</a>
+              </div>
+            </div>
+            <div className="dropdown">
               <a href="/agents" className="dropbtn">Agents </a>
               <div className="dropdown-content">
                 <a href="/agents" className="nav-link">Agents List</a>

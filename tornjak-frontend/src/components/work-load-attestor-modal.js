@@ -35,6 +35,9 @@ class WorkLoadAttestor extends React.Component {
         }
     }
     componentDidUpdate(prevProps, prevState) {
+        if(prevProps !== this.props) {
+            this.prepareAgentData();
+        }
     }
 
     prepareAgentData() {
@@ -93,39 +96,41 @@ class WorkLoadAttestor extends React.Component {
                 },
             ];
         return (
-            <ModalWrapper
-                triggerButtonKind="ghost"
-                buttonTriggerText="Add WorkLoad Attestor Info"
-                primaryButtonText="Save & Add"
-                handleSubmit={this.handleSubmit}
-                shouldCloseAfterSubmit={true}
-            >
-                <p> Define WorkLoad Attestor Information: </p>
-                <br />
-                <div className="parentId-drop-down">
-                    <Dropdown
-                        ariaLabel="workload-attestor-kind-drop-down"
-                        id="workload-attestor-kind-drop-down"
-                        items={PluginList}
-                        label="Select WorkLoad Attestor Plugin"
-                        titleText="WorkLoad Attestor Plugin"
-                        onChange={this.onChangeWorkloadPlugin}
-                    />
-                </div>
-                <div className="selectors-textArea">
-                    <TextArea
-                        cols={50}
-                        helperText="i.e. docker:label:,..."
-                        id="selectors-textArea"
-                        invalidText="A valid value is required"
-                        labelText="Workload Selectors"
-                        placeholder="Select Workload Attestor Plugin from above and selectors will be populated here - Refer to Workload Attestor Plugin"
-                        defaultValue={this.state.selectorsList}
-                        rows={8}
-                        disabled
-                    />
-                </div>
-            </ModalWrapper>
+            <div>
+                <ModalWrapper
+                    triggerButtonKind="ghost"
+                    buttonTriggerText="Add WorkLoad Attestor Info"
+                    primaryButtonText="Save & Add"
+                    handleSubmit={this.handleSubmit}
+                    shouldCloseAfterSubmit={true}
+                >
+                    <p> Define WorkLoad Attestor Information: </p>
+                    <br />
+                    <div className="parentId-drop-down">
+                        <Dropdown
+                            ariaLabel="workload-attestor-kind-drop-down"
+                            id="workload-attestor-kind-drop-down"
+                            items={PluginList}
+                            label="Select WorkLoad Attestor Plugin"
+                            titleText="WorkLoad Attestor Plugin"
+                            onChange={this.onChangeWorkloadPlugin}
+                        />
+                    </div>
+                    <div className="selectors-textArea">
+                        <TextArea
+                            cols={50}
+                            helperText="i.e. docker:label:,..."
+                            id="selectors-textArea"
+                            invalidText="A valid value is required"
+                            labelText="Workload Selectors"
+                            placeholder="Select Workload Attestor Plugin from above and selectors will be populated here - Refer to Workload Attestor Plugin"
+                            defaultValue={this.state.selectorsList}
+                            rows={8}
+                            disabled
+                        />
+                    </div>
+                </ModalWrapper>
+            </div>
         );
     }
 }

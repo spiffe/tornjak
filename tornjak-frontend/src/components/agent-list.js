@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import IsManager from './is_manager';
 import Table from "tables/agents-list-table";
-import { selectors, workloadSelectors} from './selector-info';
+import { selectors, workloadSelectors} from '../data/data';
 import TornjakApi from './tornjak-api-helpers';
 import {
   serverSelectedFunc,
@@ -71,7 +71,7 @@ class AgentList extends Component {
         if(prevProps.globalTornjakServerInfo !== this.props.globalTornjakServerInfo)
         {
           this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
-          this.TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
+          this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
         }
     }
   }
@@ -92,7 +92,7 @@ class AgentList extends Component {
   render() {
     return (
       <div>
-        <h3>Agent List</h3>
+        <h3>Agents List</h3>
         {this.props.globalErrorMessage !== "OK" &&
           <div className="alert-primary" role="alert">
             <pre>
@@ -100,7 +100,6 @@ class AgentList extends Component {
             </pre>
           </div>
         }
-        {IsManager}
         <br /><br />
         <div className="indvidual-list-table">
           <Table data={this.agentList()} id="table-1" />

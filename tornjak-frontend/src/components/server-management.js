@@ -165,7 +165,6 @@ class ServerManagement extends Component {
       <div>
         <h3> Register New Server </h3>
         <form onSubmit={this.onSubmit}>
-          
           <div className="form-group">
             <label>Server Name (Unique)</label>
             <input type="text"

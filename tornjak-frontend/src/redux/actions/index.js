@@ -9,7 +9,35 @@ import {
     GLOBAL_MESSAGE,
     GLOBAL_WORKLOAD_SELECTOR_INFO,
     GLOBAL_AGENTS_WORKLOADATTESTOR_INFO,
+    GLOBAL_CLUSTERS_LIST,
+    GLOBAL_CLUSTER_TYPE_INFO,
 } from './types';
+
+// Expected input - List of clusters with their info
+// clustersListUpdateFunc returns the list of clusters with their info
+export function clustersListUpdateFunc(globalClustersList) {
+    return dispatch => {
+        dispatch({
+            type: GLOBAL_CLUSTERS_LIST,
+            payload: globalClustersList
+        });
+    }
+}
+
+// Expected input - 
+// {
+//  "label": "clustertype1",
+//  "label": "clustertype2"
+// }
+// clusterTypeInfoFunc returns the list of available cluster types
+export function clusterTypeInfoFunc(globalClusterTypeInfo) {
+    return dispatch => {
+        dispatch({
+            type: GLOBAL_CLUSTER_TYPE_INFO,
+            payload: globalClusterTypeInfo
+        });
+    }
+}
 
 // Expected input - "Error Message/ Success Message"
 // tornjakMessageFunc returns the Error Message/ Success Message of an executed function

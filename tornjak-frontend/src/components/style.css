@@ -57,11 +57,33 @@
     margin-bottom: 20px;
   }
   
+  .clustertype-drop-down {
+    margin-bottom: 20px;
+  }
+
   .parentId-manual-input-field {
     margin-bottom: 20px;
     margin-left: 40px;
   }
+
+  .clustertype-manual-input-field {
+    margin-bottom: 20px;
+    margin-left: 40px;
+  }
+
   .spiffeId-input-field {
+    margin-bottom: 20px;
+  }
+
+  .cluster-domain-name-input-field {
+    margin-bottom: 20px;
+  }
+
+  .cluster-managed-by-input-field {
+    margin-bottom: 20px;
+  }
+
+  .clustername-input-field {
     margin-bottom: 20px;
   }
 
@@ -71,14 +93,20 @@
     margin-top: 2px;
   }
 
+  .cluster-helper {
+    font-size: 12px;
+    color:rgb(82, 79, 79);
+    margin-top: 2px;  
+  }
   .selectors-multiselect {
     margin-bottom: 20px;
   }
 
-  .selectors-textArea {
+  .agents-multiselect {
     margin-bottom: 20px;
   }
-  .admin-flag-checkbox {
+  .selectors-textArea {
+    margin-bottom: 20px;
   }
 
   .ttl-input {
@@ -105,4 +133,14 @@
 
   .servers-drp-dwn {
     margin-top: 5px;
+  }
+
+  .success-message {
+    font-weight: bold;
+    color: green;
+  }
+
+  .failed-message {
+    font-weight: bold;
+    color:red;
   }

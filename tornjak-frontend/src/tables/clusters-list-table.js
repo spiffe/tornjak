@@ -1,12 +1,14 @@
 import React from "react";
-import { connect } from 'react-redux';
 import { DataTable } from "carbon-components-react";
-import ResetIcon from "@carbon/icons-react/es/reset--alt/20";
-import GetApiServerUri from 'components/helpers';
-import IsManager from 'components/is_manager';
-import axios from 'axios'
+import { connect } from 'react-redux';
 import {
-    entriesListUpdateFunc
+    Delete16 as Delete,
+} from '@carbon/icons-react';
+import IsManager from 'components/is_manager';
+import GetApiServerUri from 'components/helpers';
+import axios from 'axios';
+import {
+    clustersListUpdateFunc
 } from 'redux/actions';
 const {
     TableContainer,
@@ -41,7 +43,7 @@ class DataTableRender extends React.Component {
     componentDidUpdate(prevProps, prevState) {
         if (prevProps !== this.props) {
             this.setState({
-                listData: this.props.globalEntriesList
+                listData: this.props.globalClustersList
             })
             this.prepareTableData();
         }
@@ -51,34 +53,38 @@ class DataTableRender extends React.Component {
         const { data } = this.props;
         let listData = [...data];
         let listtabledata = [];
-        let i = 0;
-        for (i = 0; i < listData.length; i++) {
+        for (let i = 0; i < listData.length; i++) {
             listtabledata[i] = {};
-            listtabledata[i]["idx"] = (i + 1).toString();
-            listtabledata[i]["id"] = listData[i].props.entry.id;
-            listtabledata[i]["spiffeid"] = "spiffe://" + listData[i].props.entry.spiffe_id.trust_domain + listData[i].props.entry.spiffe_id.path;
-            listtabledata[i]["parentid"] = "spiffe://" + listData[i].props.entry.parent_id.trust_domain + listData[i].props.entry.parent_id.path;
-            listtabledata[i]["selectors"] = listData[i].props.entry.selectors.map(s => s.type + ":" + s.value).join(', ');
-            listtabledata[i]["info"] = JSON.stringify(listData[i].props.entry, null, ' ');
+            listtabledata[i]["id"] = (i + 1).toString();
+            listtabledata[i]["clusterName"] = listData[i].props.cluster.name;
+            listtabledata[i]["clusterType"] = listData[i].props.cluster.platformType;
+            listtabledata[i]["clusterManagedBy"] = listData[i].props.cluster.managedBy;
+            listtabledata[i]["clusterDomainName"] = listData[i].props.cluster.domainName;
+            listtabledata[i]["clusterAssignedAgents"] = <pre>{JSON.stringify(listData[i].props.cluster.agentsList, null, ' ')}</pre>
         }
         this.setState({
             listTableData: listtabledata
         })
     }
 
-    deleteEntry(selectedRows) {
-        var id = [], endpoint = "";
+    deleteCluster(selectedRows) {
+        var cluster = [], endpoint = "";
         let promises = [];
         if (IsManager) {
-            endpoint = GetApiServerUri('/manager-api/entry/delete') + "/" + this.props.globalServerSelected
+            endpoint = GetApiServerUri('/manager-api/tornjak/clusters/delete') + "/" + this.props.globalServerSelected;
         } else {
-            endpoint = GetApiServerUri('/api/entry/delete')
+            endpoint = GetApiServerUri('/api/tornjak/clusters/delete');
         }
+        console.log("selectedRows", selectedRows)
         if (selectedRows.length !== 0) {
             for (let i = 0; i < selectedRows.length; i++) {
-                id[i] = selectedRows[i].id;
+                cluster[i] = {}
+                cluster[i]["name"] = selectedRows[i].cells[1].value;
+                console.log("cluster", cluster)
                 promises.push(axios.post(endpoint, {
-                    "ids": [id[i]]
+                    "cluster": {
+                        "name": cluster[i].name
+                    }
                 }))
             }
         } else {
@@ -87,8 +93,8 @@ class DataTableRender extends React.Component {
         Promise.all(promises)
             .then(responses => {
                 for (let i = 0; i < responses.length; i++) {
-                    console.log("Status: ", responses[i].statusText)
-                    this.props.entriesListUpdateFunc(this.props.globalEntriesList.filter(el => el.id !== responses[i].data.results[0].id))
+                    this.props.clustersListUpdateFunc(this.props.globalClustersList.filter(el =>
+                        el.name !== cluster[i].name));
                 }
             })
             .catch((error) => {
@@ -101,27 +107,27 @@ class DataTableRender extends React.Component {
         const headerData = [
             {
                 header: '#No',
-                key: 'idx',
-            },
-            {
-                header: 'Id',
                 key: 'id',
             },
             {
-                header: 'SPIFFE ID',
-                key: 'spiffeid',
+                header: 'Cluster Name',
+                key: 'clusterName',
             },
             {
-                header: 'Parent ID',
-                key: 'parentid',
+                header: 'Cluster Type',
+                key: 'clusterType',
             },
             {
-                header: 'Selectors',
-                key: 'selectors',
+                header: 'Cluster Managed By',
+                key: 'clusterManagedBy',
             },
             {
-                header: 'Info',
-                key: 'info',
+                header: 'Cluster Domain Name',
+                key: 'clusterDomainName',
+            },
+            {
+                header: 'Assigned Agents',
+                key: 'clusterAssignedAgents',
             },
         ];
         return (
@@ -151,10 +157,11 @@ class DataTableRender extends React.Component {
                                 {...getBatchActionProps()}
                             >
                                 <TableBatchAction
-                                    renderIcon={ResetIcon}
+                                    renderIcon={Delete}
                                     iconDescription="Delete"
                                     onClick={() => {
-                                        this.deleteEntry(selectedRows);
+                                        this.deleteCluster(selectedRows);
+                                        getBatchActionProps().onCancel();
                                     }}
                                 >
                                     Delete
@@ -164,9 +171,10 @@ class DataTableRender extends React.Component {
                         <Table size="short" useZebraStyles>
                             <TableHead>
                                 <TableRow>
-                                    <TableSelectAll {...getSelectionProps()} />
+                                    <TableSelectAll
+                                        {...getSelectionProps()} />
                                     {headers.map((header) => (
-                                        <TableHeader {...getHeaderProps({ header })}>
+                                        <TableHeader key={header.header} {...getHeaderProps({ header })}>
                                             {header.header}
                                         </TableHeader>
                                     ))}
@@ -175,7 +183,8 @@ class DataTableRender extends React.Component {
                             <TableBody>
                                 {rows.map((row, key) => (
                                     <TableRow key={key}>
-                                        <TableSelectRow {...getSelectionProps({ row })} />
+                                        <TableSelectRow
+                                            {...getSelectionProps({ row })} />
                                         {row.cells.map((cell) => (
                                             <TableCell key={cell.id}>
                                                 {cell.info.header === "info" ? (
@@ -199,10 +208,10 @@ class DataTableRender extends React.Component {
 
 const mapStateToProps = (state) => ({
     globalServerSelected: state.servers.globalServerSelected,
-    globalEntriesList: state.entries.globalEntriesList
+    globalClustersList: state.clusters.globalClustersList,
 })
 
 export default connect(
     mapStateToProps,
-    { entriesListUpdateFunc }
+    { clustersListUpdateFunc }
 )(DataTableRender)

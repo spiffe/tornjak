@@ -89,7 +89,6 @@ class TornjakServerInfo extends Component {
             </pre>
           </div>
         }
-        {IsManager}
         <br /><br />
         {this.tornjakServerInfo()}
       </div>

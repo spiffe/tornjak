@@ -59,6 +59,8 @@ class CreateEntry extends Component {
       downstream: false,
       //token: "",
       message: "",
+      statusOK: "",
+      successJsonMessege: "",
       servers: [],
       selectedServer: "",
       agentsIdList: [],
@@ -197,8 +199,8 @@ class CreateEntry extends Component {
   }
 
   onChangeSelectorsRecommended = selected => {
-    var i = 0, sid = selected.selectedItems, selectors = "", selectorsDisplay = "";
-    for (i = 0; i < sid.length; i++) {
+    var sid = selected.selectedItems, selectors = "", selectorsDisplay = "";
+    for (let i = 0; i < sid.length; i++) {
       if (i !== sid.length - 1) {
         selectors = selectors + sid[i].label + ":\n";
         selectorsDisplay = selectorsDisplay + sid[i].label + ",";
@@ -454,8 +456,19 @@ class CreateEntry extends Component {
       return
     }
     axios.post(endpoint, cjtData)
-      .then(res => this.setState({ message: "Requst:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' ') }))
-      .catch(err => this.setState({ message: "ERROR:" + err }))
+      .then(
+        res => this.setState({ 
+          message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
+          statusOK: "OK",
+          successJsonMessege: res.data.results[0].status.message
+        })
+      )
+      .catch(
+        err => this.setState({ 
+          message: "ERROR:" + err,
+          statusOK: "ERROR"
+         })
+      )
   }
 
   render() {
@@ -466,21 +479,16 @@ class CreateEntry extends Component {
           <h3>Create New Entry</h3>
         </div>
         <form onSubmit={this.onSubmit}>
-          <div className="alert-primary" role="alert">
-            <pre>
-              {this.state.message}
-            </pre>
-          </div>
-          {IsManager}
           <br /><br />
           <div className="entry-form">
             <div className="parentId-drop-down">
               <Dropdown
+                aria-required="true"
                 ariaLabel="parentId-drop-down"
                 id="parentId-drop-down"
                 items={ParentIdList}
                 label="Select Parent ID"
-                titleText="Parent ID"
+                titleText="Parent ID [*required]"
                 //value={this.state.parentId}
                 onChange={this.onChangeParentId}
               />
@@ -489,10 +497,11 @@ class CreateEntry extends Component {
             {this.state.parentIDManualEntry === true &&
               <div className="parentId-manual-input-field">
                 <TextInput
+                  aria-required="true"
                   helperText="i.e. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent i.e. spiffe://example.org/spire/server"
                   id="parentIdManualInputField"
                   invalidText="A valid value is required - refer to helper text below"
-                  labelText="Parent ID - Manual Entry"
+                  labelText="Parent ID - Manual Entry [*required]"
                   placeholder="Enter Parent ID"
                   //value={this.state.spiffeId}
                   //defaultValue={this.state.spiffeIdPrefix}
@@ -503,10 +512,11 @@ class CreateEntry extends Component {
               </div>}
             <div className="spiffeId-input-field">
               <TextInput
+                aria-required="true"
                 helperText="i.e. spiffe://example.org/sample/spiffe/id"
                 id="spiffeIdInputField"
                 invalidText="A valid value is required - refer to helper text below"
-                labelText="SPIFFE ID"
+                labelText="SPIFFE ID [*required]"
                 placeholder="Enter SPIFFE ID"
                 //value={this.state.spiffeId}
                 defaultValue={this.state.spiffeIdPrefix}
@@ -516,12 +526,13 @@ class CreateEntry extends Component {
                   this.onChangeSpiffeId(e);
                 }}
               //onChange={this.onChangeSpiffeId}
-              />
+              required/>
             </div>
             <div className="selectors-multiselect">
               <MultiSelect.Filterable
+                aria-required="true"
                 required
-                titleText="Selectors Recommendation"
+                titleText="Selectors Recommendation [*required]"
                 helperText="i.e. k8s_sat:cluster,..."
                 placeholder={this.state.selectorsListDisplay}
                 ariaLabel="selectors-multiselect"
@@ -611,6 +622,19 @@ class CreateEntry extends Component {
             </div>
             <div className="form-group">
               <input type="submit" value="Create Entry" className="btn btn-primary" />
+            </div>
+            <div role="alert">
+              {this.state.statusOK==="OK" && this.state.successJsonMessege==="OK" &&
+                <p className="success-message">--ENTRY SUCCESSFULLY CREATED--</p>
+              }
+              {(this.state.statusOK==="ERROR" || (this.state.successJsonMessege !== "OK" && this.state.successJsonMessege !== "")) &&
+                <p className="failed-message">--ENTRY CREATION FAILED--</p>
+              }
+            </div>
+            <div className="alert-primary" role="alert">
+              <pre>
+                {this.state.message}
+              </pre>
             </div>
           </div>
         </form>
