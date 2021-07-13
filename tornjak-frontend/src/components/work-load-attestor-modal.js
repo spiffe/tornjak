@@ -27,12 +27,12 @@ class WorkLoadAttestor extends React.Component {
 
     componentDidMount() {
         this.prepareAgentData();
-        if (IsManager) {
-            this.TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
-        }
-        else {
-            this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc, this.props.globalServerSelected);
-        }
+        // if (IsManager) {
+        //     this.TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
+        // }
+        // else {
+        //     this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc, this.props.globalServerSelected);
+        // }
     }
     componentDidUpdate(prevProps, prevState) {
         if(prevProps !== this.props) {
@@ -54,8 +54,10 @@ class WorkLoadAttestor extends React.Component {
         };
         if (IsManager) {
             this.TornjakApi.registerSelectors(this.props.globalServerSelected, wLoadAttdata, this.TornjakApi.refreshSelectorsState, this.props.agentworkloadSelectorInfoFunc);
+            this.TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
         } else {
             this.TornjakApi.registerLocalSelectors(wLoadAttdata, this.TornjakApi.refreshLocalSelectorsState, this.props.agentworkloadSelectorInfoFunc);
+            this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc, this.props.globalServerSelected);
         }
         return true;
     };
@@ -99,7 +101,7 @@ class WorkLoadAttestor extends React.Component {
             <div>
                 <ModalWrapper
                     triggerButtonKind="ghost"
-                    buttonTriggerText="Add WorkLoad Attestor Info"
+                    buttonTriggerText="Add/ Edit WorkLoad Attestor"
                     primaryButtonText="Save & Add"
                     handleSubmit={this.handleSubmit}
                     shouldCloseAfterSubmit={true}

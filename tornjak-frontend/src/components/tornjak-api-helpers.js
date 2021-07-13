@@ -22,7 +22,7 @@ class TornjakApi extends Component {
   registerSelectors = (serverName, wLoadAttdata, refreshSelectorsState, agentworkloadSelectorInfoFunc) => {
     axios.post(GetApiServerUri('/manager-api/tornjak/selectors/register/') + serverName, wLoadAttdata)
       .then(res => {
-        console.log(JSON.stringify(wLoadAttdata, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '));
+        //console.log(JSON.stringify(wLoadAttdata, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '));
         refreshSelectorsState(serverName, agentworkloadSelectorInfoFunc);
       }
       )
@@ -32,10 +32,10 @@ class TornjakApi extends Component {
   }
 
   registerLocalSelectors = (wLoadAttdata, refreshLocalSelectorsState, agentworkloadSelectorInfoFunc) => {
-    console.log(wLoadAttdata)
+    //console.log(wLoadAttdata)
     axios.post(GetApiServerUri('/api/tornjak/selectors/register'), wLoadAttdata)
       .then(res => {
-        console.log(JSON.stringify(wLoadAttdata, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '));
+        //console.log(JSON.stringify(wLoadAttdata, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '));
         refreshLocalSelectorsState(agentworkloadSelectorInfoFunc);
       }
       )
@@ -63,7 +63,7 @@ class TornjakApi extends Component {
   refreshSelectorsState = (serverName, agentworkloadSelectorInfoFunc) => {
     axios.get(GetApiServerUri("/manager-api/tornjak/selectors/list/") + serverName, { crossdomain: true })
       .then(response => {
-        console.log(response.data);
+        //console.log(response.data);
         agentworkloadSelectorInfoFunc(response.data["agents"]);
       })
       .catch((error) => {
@@ -90,7 +90,7 @@ class TornjakApi extends Component {
   refreshLocalSelectorsState = (agentworkloadSelectorInfoFunc) => {
     axios.get(GetApiServerUri("/api/tornjak/selectors/list"), { crossdomain: true })
       .then(response => {
-        console.log(response.data);
+        //console.log(response.data);
         agentworkloadSelectorInfoFunc(response.data["agents"]);
       })
       .catch((error) => {

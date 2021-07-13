@@ -16,7 +16,7 @@ import (
 const (
 	// agent table with fields spiffeid and plugin
 	initAgentsTable = `CREATE TABLE IF NOT EXISTS agents 
-                            (id INTEGER PRIMARY KEY AUTOINCREMENT, spiffeid TEXT, plugin TEXT)`
+                            (id INTEGER PRIMARY KEY AUTOINCREMENT, spiffeid TEXT, plugin TEXT, UNIQUE (spiffeid))`
 	// cluster table with fields name, domainName, platformtype, managedby
 	initClustersTable = `CREATE TABLE IF NOT EXISTS clusters 
                             (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, created_at TEXT, 
