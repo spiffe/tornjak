@@ -17,7 +17,7 @@ func cleanup() {
 }
 
 // TestSelectorDB checks correctness of functions dealing with Agent Selector table
-// Uses functions NewLocalSqliteDB, db.CreateAgentsEntry, db.GetAgents, db.GetAgentPluginInfo
+// Uses functions NewLocalSqliteDB, db.CreateAgentsEntry, db.GetAgentSelectors, db.GetAgentPluginInfo
 func TestSelectorDB(t *testing.T) {
 	defer cleanup()
 	expBackoff := backoff.NewExponentialBackOff()
@@ -27,8 +27,8 @@ func TestSelectorDB(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// CHECK initial emptiness [GetAgents]
-	sList, err := db.GetAgents()
+	// CHECK initial emptiness [GetAgentSelectors]
+	sList, err := db.GetAgentSelectors()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -37,26 +37,35 @@ func TestSelectorDB(t *testing.T) {
 	}
 
 	spiffeid := "spiffe://example.org/spire/agent/"
+	spiffeidA := "spiffeA"
 	sinfo := types.AgentInfo{
 		Spiffeid: spiffeid,
 		Plugin:   "Docker",
 	}
+	sinfoNew := types.AgentInfo{
+		Spiffeid: spiffeid,
+		Plugin:   "K8s",
+	}
+	sinfoANull := types.AgentInfo{
+		Spiffeid: spiffeidA,
+	}
+	sinfoANotNull := types.AgentInfo{
+		Spiffeid: spiffeidA,
+		Plugin:   "K8s",
+	}
 
 	// ATTEMPT registration of agent plugin [CreateAgentEntry]]
-	err = db.CreateAgentEntry(types.AgentInfo{
-		Spiffeid: "spiffe://example.org/spire/agent/",
-		Plugin:   "Docker",
-	})
+	err = db.CreateAgentEntry(sinfo)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// CHECK new agent plugin [GetAgents]
-	sList, err = db.GetAgents()
+	// CHECK new agent plugin [GetAgentSelectors]
+	sList, err = db.GetAgentSelectors()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(sList.Agents) != 1 || sList.Agents[0] != sinfo {
+	if len(sList.Agents) != 1 || !agentInfoCmp(sList.Agents[0], sinfo) {
 		t.Fatal("Agents list should initially be empty")
 	}
 
@@ -65,7 +74,7 @@ func TestSelectorDB(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if info != sinfo {
+	if !agentInfoCmp(info, sinfo) {
 		t.Fatal("Wrong info obtained from GetAgentPluginInfo")
 	}
 
@@ -73,6 +82,107 @@ func TestSelectorDB(t *testing.T) {
 	_, err = db.GetAgentPluginInfo("super secret agent")
 	if err == nil {
 		t.Fatal("Failed to report non-existing agent in GetAgentPluginInfo")
+	}
+
+	// ATTEMPT editing registration of agent plugin [CreateAgentEntry]
+	err = db.CreateAgentEntry(sinfoNew)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// CHECK new agent plugin [GetAgentSelectors]
+	sList, err = db.GetAgentSelectors()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(sList.Agents) != 1 {
+		t.Fatal("There should only be one agent")
+	}
+	if !agentInfoCmp(sList.Agents[0], sinfoNew) {
+		t.Fatal("Wrong agent info stored after edit")
+	}
+
+	// ATTEMPT adding new agent with no plugin [CreateAgentEntry]
+	err = db.CreateAgentEntry(sinfoANull)
+	if err != nil {
+		t.Fatal("Cannot add agent with no plugin")
+	}
+
+	// CHECK all agents with plugins; should only have 1 [GetAgentSelectors]
+	sList, err = db.GetAgentSelectors()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(sList.Agents) != 1 {
+		t.Fatal(fmt.Sprintf("There should only be one agent %v", sList.Agents))
+	}
+	if !agentInfoCmp(sList.Agents[0], sinfoNew) {
+		t.Fatal("Wrong agent info stored after edit")
+	}
+
+	// ATTEMPT updating agent from NULL to new plugin [CreateAgentEntry]
+	err = db.CreateAgentEntry(sinfoANotNull)
+	if err != nil {
+		t.Fatal("Cannot add agent with no plugin")
+	}
+
+	// CHECK all agents with plugins; should have 2 [GetAgentSelectors]
+	sList, err = db.GetAgentSelectors()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(sList.Agents) != 2 {
+		t.Fatal("There should only be one agent")
+	}
+
+	// ATTEMPT updating agent from NOT NULL to NULL plugin [CreateAgentEntry]
+	err = db.CreateAgentEntry(sinfoANull)
+	if err != nil {
+		t.Fatal("Cannot add agent with no plugin")
+	}
+
+	// CHECK all agents with plugins; should only have 1 [GetAgentSelectors]
+	sList, err = db.GetAgentSelectors()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(sList.Agents) != 1 {
+		t.Fatal("There should only be one agent")
+	}
+	if !agentInfoCmp(sList.Agents[0], sinfoNew) {
+		t.Fatal("Wrong agent info stored after edit")
+	}
+
+	// CHECK agent metadata [GetAgentsMetadata]
+	req1 := types.AgentMetadataRequest{
+		Agents: []string{"spiffeA"},
+	}
+	req2 := types.AgentMetadataRequest{
+		Agents: []string{},
+	}
+	req3 := types.AgentMetadataRequest{
+		Agents: []string{"nonexistent spiffe"},
+	}
+	sList, err = db.GetAgentsMetadata(req1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(sList.Agents) != 1 {
+		t.Fatal(fmt.Sprintf("We requested one agent, got: %v", sList))
+	}
+	sList, err = db.GetAgentsMetadata(req2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(sList.Agents) != 2 {
+		t.Fatal(fmt.Sprintf("We requested all agents, got: %v", sList))
+	}
+	sList, err = db.GetAgentsMetadata(req3)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(sList.Agents) != 0 {
+		t.Fatal(fmt.Sprintf("We requested nonexistent agent, got: %v", sList))
 	}
 }
 
@@ -620,6 +730,10 @@ func TestClusterDelete(t *testing.T) {
 }
 
 /**** HELPER SECTION ****/
+
+func agentInfoCmp(agentInfo1 types.AgentInfo, agentInfo2 types.AgentInfo) bool {
+	return agentInfo1.Spiffeid == agentInfo2.Spiffeid && agentInfo1.Plugin == agentInfo2.Plugin
+}
 
 func inList(elem string, list []string) bool {
 	for i := 0; i < len(list); i++ {

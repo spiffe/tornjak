@@ -7,7 +7,7 @@ import (
 type AgentDB interface {
 	// AGENT - SELECTOR/PLUGIN interface
 	CreateAgentEntry(sinfo types.AgentInfo) error
-	GetAgents() (types.AgentInfoList, error)
+	GetAgentSelectors() (types.AgentInfoList, error)
 	GetAgentPluginInfo(name string) (types.AgentInfo, error)
 
 	// CLUSTER interface
@@ -19,4 +19,5 @@ type AgentDB interface {
 	// AGENT - CLUSTER Get interface (for testing)e
 	GetAgentClusterName(spiffeid string) (string, error)
 	GetClusterAgents(name string) ([]string, error)
+	GetAgentsMetadata(req types.AgentMetadataRequest) (types.AgentInfoList, error)
 }

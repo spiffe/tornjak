@@ -122,11 +122,28 @@ func (t *tornjakTxHelper) addAgentBatchToCluster(clustername string, agentsList 
 	if len(agentsList) == 0 {
 		return nil
 	}
+	// Add into agents table
+	cmdAgents := "INSERT OR IGNORE INTO agents (spiffeid, plugin) VALUES "
+	agents := []interface{}{}
+	for i := 0; i < len(agentsList); i++ {
+		cmdAgents += "(?, NULL),"
+		agents = append(agents, agentsList[i])
+	}
+	cmdAgents = strings.TrimSuffix(cmdAgents, ",")
+	statementAgentInsert, err := t.tx.PrepareContext(t.ctx, cmdAgents)
+	if err != nil {
+		return SQLError{cmdAgents, err}
+	}
+	_, err = statementAgentInsert.ExecContext(t.ctx, agents...)
+	if err != nil {
+		return SQLError{cmdAgents, err}
+	}
+
 	// generate single statement
-	cmdBatch := "INSERT OR ABORT INTO cluster_memberships (spiffeid, cluster_id) VALUES "
+	cmdBatch := "INSERT OR ABORT INTO cluster_memberships (agent_id, cluster_id) VALUES "
 	vals := []interface{}{}
 	for i := 0; i < len(agentsList); i++ {
-		cmdBatch += "(?, (SELECT id FROM clusters WHERE name=?)),"
+		cmdBatch += "((SELECT id FROM agents WHERE spiffeid=?), (SELECT id FROM clusters WHERE name=?)),"
 		vals = append(vals, agentsList[i], clustername)
 	}
 	cmdBatch = strings.TrimSuffix(cmdBatch, ",")

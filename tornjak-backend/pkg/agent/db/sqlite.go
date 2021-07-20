@@ -24,8 +24,9 @@ const (
 	// cluster - agent relation table specifying by clusterid and spiffeid
 	//                                enforces uniqueness of spiffeid
 	initClusterMemberTable = `CREATE TABLE IF NOT EXISTS cluster_memberships 
-                            (id INTEGER PRIMARY KEY AUTOINCREMENT, spiffeid TEXT, cluster_id int,
-                            FOREIGN KEY (cluster_id) REFERENCES clusters(id), UNIQUE (spiffeid))`
+                            (id INTEGER PRIMARY KEY AUTOINCREMENT, agent_id int, cluster_id int,
+                            FOREIGN KEY (agent_id) REFERENCES agents(id), 
+                            FOREIGN KEY (cluster_id) REFERENCES clusters(id), UNIQUE (agent_id))`
 )
 
 type LocalSqliteDb struct {
@@ -69,21 +70,29 @@ func NewLocalSqliteDB(dbpath string, backOffParams backoff.BackOff) (AgentDB, er
 // AGENT - SELECTOR/PLUGIN HANDLERS
 
 func (db *LocalSqliteDb) CreateAgentEntry(sinfo types.AgentInfo) error {
-	// TODO can there be multiple? plugins per agent?  handle replace
-	cmd := `INSERT OR REPLACE INTO agents (spiffeid, plugin) VALUES (?,?)`
+	cmd := `INSERT OR REPLACE INTO agents (spiffeid, plugin) VALUES `
+	if len(sinfo.Plugin) > 0 {
+		cmd += `(?, ?)`
+	} else {
+		cmd += `(?, NULL)`
+	}
 	statement, err := db.database.Prepare(cmd)
 	if err != nil {
 		return SQLError{cmd, err}
 	}
-	_, err = statement.Exec(sinfo.Spiffeid, sinfo.Plugin)
+	if len(sinfo.Plugin) > 0 {
+		_, err = statement.Exec(sinfo.Spiffeid, sinfo.Plugin)
+	} else {
+		_, err = statement.Exec(sinfo.Spiffeid)
+	}
 	if err != nil {
 		return SQLError{cmd, err}
 	}
 	return nil
 }
 
-func (db *LocalSqliteDb) GetAgents() (types.AgentInfoList, error) {
-	cmd := `SELECT spiffeid, plugin FROM agents`
+func (db *LocalSqliteDb) GetAgentSelectors() (types.AgentInfoList, error) {
+	cmd := `SELECT spiffeid, plugin FROM agents WHERE plugin IS NOT NULL`
 	rows, err := db.database.Query(cmd)
 	if err != nil {
 		return types.AgentInfoList{}, SQLError{cmd, err}
@@ -129,9 +138,10 @@ func (db *LocalSqliteDb) GetAgentPluginInfo(spiffeid string) (types.AgentInfo, e
 // GetClusterAgents takes in string cluster name and outputs array of spiffeids of agents assigned to the cluster
 func (db *LocalSqliteDb) GetClusterAgents(name string) ([]string, error) {
 	// search in clusterMemberships table
-	cmdGetMemberships := `SELECT GROUP_CONCAT(cluster_memberships.spiffeid) 
-                        FROM clusters LEFT JOIN cluster_memberships 
-                        ON clusters.id=cluster_memberships.cluster_id
+	cmdGetMemberships := `SELECT GROUP_CONCAT(agents.spiffeid) 
+                        FROM clusters 
+                        LEFT JOIN cluster_memberships ON clusters.id=cluster_memberships.cluster_id
+                        LEFT JOIN agents ON cluster_memberships.agent_id=agents.id
                         WHERE clusters.name=? 
                         GROUP BY clusters.name`
 	row := db.database.QueryRow(cmdGetMemberships, name)
@@ -159,9 +169,10 @@ func (db *LocalSqliteDb) GetClusterAgents(name string) ([]string, error) {
 func (db *LocalSqliteDb) GetAgentClusterName(spiffeid string) (string, error) {
 	var clusterName sql.NullString
 	cmdGetName := `SELECT clusters.name 
-                 FROM cluster_memberships LEFT JOIN clusters 
-                 ON clusters.id=cluster_memberships.cluster_id
-                 WHERE cluster_memberships.spiffeid=?`
+                 FROM agents 
+                 LEFT JOIN cluster_memberships ON agents.id=cluster_memberships.agent_id
+                 LEFT JOIN clusters ON cluster_memberships.cluster_id=clusters.id
+                 WHERE agents.spiffeid=?`
 	row := db.database.QueryRow(cmdGetName, spiffeid)
 	err := row.Scan(&clusterName)
 	if err == sql.ErrNoRows {
@@ -176,13 +187,74 @@ func (db *LocalSqliteDb) GetAgentClusterName(spiffeid string) (string, error) {
 	}
 }
 
+// GetAgentsMetadata takes a AgentMetadataRequest with a list of agent spiffeids
+// outputs list of agentinfo objects, where spiffeids must be in the input list
+// includes info on plugin and clustername
+func (db *LocalSqliteDb) GetAgentsMetadata(req types.AgentMetadataRequest) (types.AgentInfoList, error) {
+	spiffeids := req.Agents
+	cmd := `SELECT agents.spiffeid, agents.plugin, clusters.name 
+          FROM agents 
+          LEFT JOIN cluster_memberships ON agents.id = cluster_memberships.agent_id
+          LEFT JOIN clusters ON cluster_memberships.cluster_id = clusters.id`
+	var err error
+	var rows *sql.Rows
+	if len(spiffeids) > 0 {
+		cmd += ` WHERE agents.spiffeid IN (`
+		vals := []interface{}{}
+		for i := 0; i < len(spiffeids); i++ {
+			cmd += "?,"
+			vals = append(vals, spiffeids[i])
+		}
+		vals = append(vals, vals...)
+		cmd = strings.TrimSuffix(cmd, ",") + ")"
+		rows, err = db.database.Query(cmd, vals...)
+	} else {
+		rows, err = db.database.Query(cmd)
+	}
+
+	if err != nil {
+		return types.AgentInfoList{}, SQLError{cmd, err}
+	}
+
+	ainfos := []types.AgentInfo{}
+	var (
+		spiffeid string
+		plugin   sql.NullString
+		cluster  sql.NullString
+	)
+	for rows.Next() {
+		if err = rows.Scan(&spiffeid, &plugin, &cluster); err != nil {
+			return types.AgentInfoList{}, SQLError{cmd, err}
+		}
+
+		newAgent := types.AgentInfo{
+			Spiffeid: spiffeid,
+			Plugin:   "",
+			Cluster:  "",
+		}
+		if plugin.Valid {
+			newAgent.Plugin = plugin.String
+		}
+		if cluster.Valid {
+			newAgent.Cluster = cluster.String
+		}
+
+		ainfos = append(ainfos, newAgent)
+	}
+
+	return types.AgentInfoList{
+		Agents: ainfos,
+	}, nil
+}
+
 // GetClusters outputs a list of ClusterInfo structs with information on currently registered clusters
 func (db *LocalSqliteDb) GetClusters() (types.ClusterInfoList, error) {
 	// BEGIN transaction
 	cmd := `SELECT clusters.name, clusters.created_at, clusters.domain_name, clusters.managed_by, 
-          clusters.platform_type, GROUP_CONCAT(cluster_memberships.spiffeid) 
-          FROM clusters LEFT JOIN cluster_memberships 
-          ON clusters.id=cluster_memberships.cluster_id
+          clusters.platform_type, GROUP_CONCAT(agents.spiffeid) 
+          FROM clusters 
+          LEFT JOIN cluster_memberships ON clusters.id=cluster_memberships.cluster_id
+          LEFT JOIN agents ON cluster_memberships.agent_id=agents.id
           GROUP BY clusters.name`
 
 	rows, err := db.database.Query(cmd)
