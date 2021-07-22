@@ -99,13 +99,13 @@ func TestSelectorDB(t *testing.T) {
 		t.Fatal("There should only be one agent")
 	}
 	if !agentInfoCmp(sList.Agents[0], sinfoNew) {
-		t.Fatal("Wrong agent info stored after edit")
+		t.Fatal(fmt.Sprintf("Wrong agent info stored after edit: wanted %v, got %v", sinfoNew, sList.Agents[0]))
 	}
 
 	// ATTEMPT adding new agent with no plugin [CreateAgentEntry]
 	err = db.CreateAgentEntry(sinfoANull)
 	if err != nil {
-		t.Fatal("Cannot add agent with no plugin")
+		t.Fatal(fmt.Sprintf("Cannot add agent with no plugin, got error: %v", err))
 	}
 
 	// CHECK all agents with plugins; should only have 1 [GetAgentSelectors]
@@ -219,6 +219,11 @@ func TestClusterCreate(t *testing.T) {
 	agent3 := "agent3"
 	agent4 := "agent4"
 
+	sinfo := types.AgentInfo{
+		Spiffeid: agent1,
+		Plugin:   "Docker",
+	}
+
 	cinfo1 := types.ClusterInfo{
 		Name:         cluster1,
 		PlatformType: vms,
@@ -326,6 +331,24 @@ func TestClusterCreate(t *testing.T) {
 	err = agentListComp(agents3, []string{agent3})
 	if err != nil {
 		t.Fatal(fmt.Sprintf("Error on basic registration of agents to cluster: %v", err))
+	}
+
+	// ATTEMPT editing registration of agent plugin [CreateAgentEntry]
+	err = db.CreateAgentEntry(sinfo)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// CHECK new agent plugin [GetAgentSelectors]
+	sList, err := db.GetAgentSelectors()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(sList.Agents) != 1 {
+		t.Fatal("There should only be one agent")
+	}
+	if !agentInfoCmp(sList.Agents[0], sinfo) {
+		t.Fatal(fmt.Sprintf("Wrong agent info stored after edit: wanted %v, got %v", sinfo, sList.Agents[0]))
 	}
 
 	// FINAL CHECK agent memberships [GetAgentClusterName]

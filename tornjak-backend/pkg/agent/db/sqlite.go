@@ -70,18 +70,22 @@ func NewLocalSqliteDB(dbpath string, backOffParams backoff.BackOff) (AgentDB, er
 // AGENT - SELECTOR/PLUGIN HANDLERS
 
 func (db *LocalSqliteDb) CreateAgentEntry(sinfo types.AgentInfo) error {
-	cmd := `INSERT OR REPLACE INTO agents (spiffeid, plugin) VALUES `
+	cmdInsert := `INSERT INTO agents (spiffeid, plugin) VALUES `
+	cmdUpdate := ` ON CONFLICT(spiffeid) DO UPDATE SET plugin=`
 	if len(sinfo.Plugin) > 0 {
-		cmd += `(?, ?)`
+		cmdInsert += `(?, ?)`
+		cmdUpdate += `(?)`
 	} else {
-		cmd += `(?, NULL)`
+		cmdInsert += `(?, NULL)`
+		cmdUpdate += `NULL`
 	}
+	cmd := cmdInsert + cmdUpdate
 	statement, err := db.database.Prepare(cmd)
 	if err != nil {
 		return SQLError{cmd, err}
 	}
 	if len(sinfo.Plugin) > 0 {
-		_, err = statement.Exec(sinfo.Spiffeid, sinfo.Plugin)
+		_, err = statement.Exec(sinfo.Spiffeid, sinfo.Plugin, sinfo.Plugin)
 	} else {
 		_, err = statement.Exec(sinfo.Spiffeid)
 	}

@@ -54,7 +54,7 @@ func (t *tornjakTxHelper) insertClusterMetadata(cinfo types.ClusterInfo) error {
 		return SQLError{cmdInsert, err}
 	}
 	defer statement.Close()
-	_, err = statement.ExecContext(t.ctx, cinfo.Name, time.Now().Format("2006-01-02 15:04:05.000000"), cinfo.DomainName, cinfo.ManagedBy, cinfo.PlatformType)
+	_, err = statement.ExecContext(t.ctx, cinfo.Name, time.Now().Format("Jan 02 2006 15:04:05"), cinfo.DomainName, cinfo.ManagedBy, cinfo.PlatformType)
 	if err != nil {
 		if serr, ok := err.(sqlite3.Error); ok && serr.Code == sqlite3.ErrConstraint {
 			return PostFailure{"Cluster already exists; use Edit Cluster"}
