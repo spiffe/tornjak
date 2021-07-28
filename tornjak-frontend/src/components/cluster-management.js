@@ -3,7 +3,6 @@ import { Tabs, Tab } from 'carbon-components-react';
 import ClusterCreate from './cluster-create';
 import ClusterEdit from './cluster-edit';
 import { connect } from 'react-redux';
-import { clusterType } from '../data/data';
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
 import './style.css';
@@ -32,7 +31,6 @@ class ClusterManagement extends Component {
   }
 
   componentDidMount() {
-    this.props.clusterTypeInfoFunc(clusterType); //set cluster type info
     if (IsManager) {
       if (this.props.globalServerSelected !== "" && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
         this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
@@ -67,12 +65,10 @@ class ClusterManagement extends Component {
 
   prepareClusterTypeList() {
     let localClusterTypeList = [];
-    if (this.props.globalServerInfo.length === 0) {
-      return
-    }
-    //user prefered option
+    // user prefered option
     localClusterTypeList[0] = this.state.clusterTypeManualEntryOption;
-    //agents
+    // cluster type list
+    console.log("this.props.globalClusterTypeInfo", this.props.globalClusterTypeInfo)
     for (let i = 0; i < this.props.globalClusterTypeInfo.length; i++) {
       localClusterTypeList[i + 1] = this.props.globalClusterTypeInfo[i];
     }

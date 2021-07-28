@@ -290,10 +290,10 @@ class ClusterCreate extends Component {
               </div>
               <div>
                 {this.state.statusOK === "OK" &&
-                  <p className="success-message">--ENTRY SUCCESSFULLY CREATED--</p>
+                  <p className="success-message">--CLUSTER SUCCESSFULLY CREATED--</p>
                 }
                 {(this.state.statusOK === "ERROR") &&
-                  <p className="failed-message">--ENTRY CREATION FAILED--</p>
+                  <p className="failed-message">--CLUSTER CREATION FAILED--</p>
                 }
               </div>
               <div className="alert-primary" role="alert">

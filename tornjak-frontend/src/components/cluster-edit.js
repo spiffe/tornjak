@@ -69,7 +69,7 @@ class ClusterEdit extends Component {
         this.setState({ selectedServer: this.props.globalServerSelected });
       }
     }
-    if (prevProps.globalServerInfo !== this.props.globalServerInfo) {
+    if (prevProps.globalClustersList !== this.props.globalClustersList) {
       this.prepareClusterNameList();
     }
     if (prevProps.globalAgentsList !== this.props.globalAgentsList) {
@@ -256,6 +256,13 @@ class ClusterEdit extends Component {
           statusOK: "ERROR"
         })
       )
+      if (IsManager) {
+        if (this.props.globalServerSelected !== "" && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
+          this.TornjakApi.populateClustersUpdate(this.props.globalServerSelected, this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
+        }
+      } else {
+        this.TornjakApi.populateLocalClustersUpdate(this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
+      }
   }
   render() {
     const ClusterNames = this.state.clusterNameList, ClusterType = this.props.clusterTypeList;
@@ -370,10 +377,10 @@ class ClusterEdit extends Component {
               </div>
               <div>
                 {this.state.statusOK === "OK" &&
-                  <p className="success-message">--ENTRY SUCCESSFULLY CREATED--</p>
+                  <p className="success-message">--CLUSTER SUCCESSFULLY EDITED--</p>
                 }
                 {(this.state.statusOK === "ERROR") &&
-                  <p className="failed-message">--ENTRY CREATION FAILED--</p>
+                  <p className="failed-message">--CLUSTER EDIT FAILED--</p>
                 }
               </div>
               <div className="alert-primary" role="alert">

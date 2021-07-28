@@ -12,18 +12,14 @@ export default class NavigationBar extends Component {
   render() {
     let managerNavs;
     managerNavs =
-      <li className="navbar-item">
-        <a href="/server/manage" className="nav-link">Manage Servers</a>
-      </li>
+      <div className="dropdown">
+        <a href="/server/manage" className="dropbtn">Manage Servers</a>
+      </div>
 
     return (
-      <div className="navigation-bar">
-        <nav className="navbar navbar-dark bg-dark navbar-expand-lg">
-          <span className="logo">
-            <a href="/">
-              <img src={tornjak_logo} height="50" width="160" alt="Tornjak" /></a>
-          </span>
-          <div className="collpase navbar-collapse">
+      <div>
+        <div className="navigation-bar">
+          <div className="dropdown-container">
             <div className="dropdown">
               <a href="/clusters" className="dropbtn">Clusters </a>
               <div className="dropdown-content">
@@ -45,14 +41,21 @@ export default class NavigationBar extends Component {
                 <a href="/entry/create" className="nav-link">Create Entries</a>
               </div>
             </div>
-            <ul className="navbar-nav mr-auto">
-              <li className="navbar-item">
-                <a href="/tornjak/serverinfo" className="nav-link">Tornjak ServerInfo</a>
-              </li>
-              {IsManager && managerNavs}
-            </ul>
+            <div className="dropdown">
+              <a href="/tornjak/serverinfo" className="dropbtn">Tornjak ServerInfo</a>
+            </div>
+            <div className="dropdown">
+              <a href="/tornjak/dashboard" className="dropbtn">Tornjak Dashboard</a>
+            </div>
+            {IsManager && managerNavs}
           </div>
-        </nav>
+        </div>
+        <div className="logo">
+          <span>
+            <a href="/">
+              <img src={tornjak_logo} height="50" width="160" alt="Tornjak" /></a>
+          </span>
+        </div>
       </div>
     );
   }

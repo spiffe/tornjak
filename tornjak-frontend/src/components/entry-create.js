@@ -12,7 +12,8 @@ import {
   agentsListUpdateFunc,
   tornjakMessageFunc,
   tornjakServerInfoUpdateFunc,
-  serverInfoUpdateFunc
+  serverInfoUpdateFunc,
+  agentworkloadSelectorInfoFunc
 } from 'redux/actions';
 
 class CreateEntry extends Component {
@@ -657,5 +658,5 @@ const mapStateToProps = (state) => ({
 
 export default connect(
   mapStateToProps,
-  { serverSelectedFunc, selectorInfoFunc, agentsListUpdateFunc, tornjakMessageFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc }
+  { serverSelectedFunc, agentworkloadSelectorInfoFunc, selectorInfoFunc, agentsListUpdateFunc, tornjakMessageFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc }
 )(CreateEntry)

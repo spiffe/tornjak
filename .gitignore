@@ -33,4 +33,4 @@ agentlocaldb
 bin/
 ui/
 ui-agent/
-/agent
+agent

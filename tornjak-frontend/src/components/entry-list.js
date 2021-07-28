@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import axios from 'axios'
-import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import Table from "tables/entries-list-table";
+import TornjakApi from "./tornjak-api-helpers"
 import {
   serverSelectedFunc,
   entriesListUpdateFunc,
@@ -32,6 +31,7 @@ const Entry = props => (
 class EntryList extends Component {
   constructor(props) {
     super(props);
+    this.TornjakApi = new TornjakApi();
     this.state = { 
         servers: [],
         selectedServer: "",
@@ -41,43 +41,19 @@ class EntryList extends Component {
   componentDidMount() {
     if (IsManager) {
       if(this.props.globalServerSelected !== ""){
-        this.populateEntriesUpdate(this.props.globalServerSelected)
+        this.TornjakApi.populateEntriesUpdate(this.props.globalServerSelected, this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
       }
     } else {
-        this.populateLocalEntriesUpdate()
+        this.TornjakApi.populateLocalEntriesUpdate(this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
     }
   }
 
   componentDidUpdate(prevProps) {
     if (IsManager) {
       if(prevProps.globalServerSelected !== this.props.globalServerSelected){
-        this.populateEntriesUpdate(this.props.globalServerSelected)
+        this.TornjakApi.populateEntriesUpdate(this.props.globalServerSelected, this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
       }
     }
-  }
-
-  populateEntriesUpdate(serverName) {
-      axios.get(GetApiServerUri('/manager-api/entry/list/') + serverName, {     crossdomain: true })
-      .then(response =>{
-        this.props.entriesListUpdateFunc(response.data["entries"]);
-        this.props.tornjakMessageFunc(response.statusText);
-      }).catch(err => {
-          this.props.entriesListUpdateFunc([]);
-          this.props.tornjakMessageFunc("Error retrieving " + serverName + " : "+ err + (typeof (err.response) !== "undefined" ? ":" + err.response.data : ""));
-      });
-
-  }
-
-  populateLocalEntriesUpdate() {
-      axios.get(GetApiServerUri('/api/entry/list'), { crossdomain: true })
-      .then(response => {
-        this.props.entriesListUpdateFunc(response.data["entries"]);
-        this.props.tornjakMessageFunc(response.statusText);
-      })
-      .catch((error) => {
-        console.log(error);
-        this.props.tornjakMessageFunc(error.message);
-      })
   }
 
   entryList() {

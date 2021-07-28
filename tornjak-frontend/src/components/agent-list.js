@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import IsManager from './is_manager';
 import Table from "tables/agents-list-table";
-import { selectors, workloadSelectors} from '../data/data';
+import { selectors, workloadSelectors, clusterType } from '../data/data';
 import TornjakApi from './tornjak-api-helpers';
 import {
   serverSelectedFunc,
@@ -13,6 +13,7 @@ import {
   tornjakMessageFunc,
   workloadSelectorInfoFunc,
   agentworkloadSelectorInfoFunc,
+  clusterTypeInfoFunc,
 } from 'redux/actions';
 
 const Agent = props => (
@@ -44,12 +45,14 @@ class AgentList extends Component {
   }
 
   componentDidMount() {
+    this.props.clusterTypeInfoFunc(clusterType); //set cluster type info
     this.props.selectorInfoFunc(selectors); //set selector info
     this.props.workloadSelectorInfoFunc(workloadSelectors); //set workload selector info
     if (IsManager) {
       if (this.props.globalServerSelected !== "") {
         this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc)
         this.TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
+        this.TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
       }
     } else {
       this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
@@ -118,5 +121,5 @@ const mapStateToProps = (state) => ({
 
 export default connect(
   mapStateToProps,
-  { serverSelectedFunc, agentsListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessageFunc, workloadSelectorInfoFunc, agentworkloadSelectorInfoFunc }
+  { serverSelectedFunc, agentsListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessageFunc, workloadSelectorInfoFunc, agentworkloadSelectorInfoFunc, clusterTypeInfoFunc }
 )(AgentList)

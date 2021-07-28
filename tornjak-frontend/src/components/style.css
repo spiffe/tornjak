@@ -1,17 +1,29 @@
 .navigation-bar {
-  min-width: 900px;
+  min-width: 20px;
+  z-index: 3;
+  background-color: black;
+  min-width: 1300px;
+  width: 100%;
+}
+
+.logo {
+  margin-top: -50px;
+}
+
+.dropdown-container {
+  margin-left: 200px;
 }
 .dropbtn {
-    background-color: #373a37;
-    color: rgb(177, 176, 176);
-    padding: 14px;
-    font-size: 14px;
+    color: white;
+    padding: 30px;
+    font-size: 16px;
     border: none;
   }
   
   .dropdown {
     position: relative;
     display: inline-block;
+    padding: 15px;
   }
   
   .dropdown-content {
@@ -21,12 +33,13 @@
     display: none;
     min-width: 130px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
+    z-index: 3;
   }
   
   .dropdown-content a {
     color: black;
     padding: 12px 16px;
+    z-index: 3;
   }
   
   .dropdown-content a:hover {background-color: #ddd;}
@@ -143,4 +156,9 @@
   .failed-message {
     font-weight: bold;
     color:red;
+  }
+
+  .no-data {
+    margin-top: 120px;
+    margin-left: 200px;
   }
