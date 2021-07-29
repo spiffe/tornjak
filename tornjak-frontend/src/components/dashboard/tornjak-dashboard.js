@@ -13,7 +13,7 @@ import {
   Divider,
   IconButton,
   Container,
-  Grid, 
+  Grid,
   Paper,
   ListItem,
   ListItemIcon,
@@ -46,6 +46,7 @@ import {
   tornjakMessageFunc,
   agentworkloadSelectorInfoFunc,
   clustersListUpdateFunc,
+  clickedDashboardTabelFunc,
 } from 'redux/actions';
 import SpiffeEntryInterface from '../spiffe-entry-interface';
 
@@ -238,7 +239,7 @@ class TornjakDashboard extends React.Component {
             <div>
               <ListItem
                 button
-                onClick={() => { this.setState({clickedDashboardList: "dashboard"}); }}>
+                onClick={() => { this.props.clickedDashboardTabelFunc("dashboard"); }}>
                 <ListItemIcon>
                   <DashboardIcon />
                 </ListItemIcon>
@@ -247,7 +248,7 @@ class TornjakDashboard extends React.Component {
               <ListSubheader inset>Details</ListSubheader>
               <ListItem
                 button
-                onClick={() => { this.setState({clickedDashboardList: "clusters"}); }}>
+                onClick={() => { this.props.clickedDashboardTabelFunc("clusters"); }}>
                 <ListItemIcon>
                   <LayersIcon />
                 </ListItemIcon>
@@ -255,7 +256,7 @@ class TornjakDashboard extends React.Component {
               </ListItem>
               <ListItem
                 button
-                onClick={() => { this.setState({clickedDashboardList: "agents"}); }}>
+                onClick={() => { this.props.clickedDashboardTabelFunc("agents"); }}>
                 <ListItemIcon>
                   <PeopleIcon />
                 </ListItemIcon>
@@ -263,7 +264,7 @@ class TornjakDashboard extends React.Component {
               </ListItem>
               <ListItem
                 button
-                onClick={() => { this.setState({clickedDashboardList: "entries"}); }}>
+                onClick={() => { this.props.clickedDashboardTabelFunc("entries"); }}>
                 <ListItemIcon>
                   <BarChartIcon />
                 </ListItemIcon>
@@ -275,7 +276,7 @@ class TornjakDashboard extends React.Component {
         </Drawer>
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
-          {(this.state.clickedDashboardList === "" || this.state.clickedDashboardList === "dashboard") &&
+          {(this.props.globalClickedDashboardTable === "" || this.props.globalClickedDashboardTable === "dashboard") &&
             <Container maxWidth="lg" className={classes.container}>
               <Grid container spacing={3}>
                 {/* Pie Chart Clusters */}
@@ -293,64 +294,64 @@ class TornjakDashboard extends React.Component {
                 {/* Clusters Table */}
                 <Grid item xs={12}>
                   <Paper className={classes.paper}>
-                    <ClustersTable 
+                    <ClustersTable
                       numRows={5}
-                      tableType={"limitedView"}/>
+                      tableType={"limitedView"} />
                   </Paper>
                 </Grid>
                 {/* Agents Table */}
                 <Grid item xs={12}>
                   <Paper className={classes.paper}>
-                    <AgentsTable 
+                    <AgentsTable
                       numRows={5}
-                      tableType={"limitedView"}/>
+                      tableType={"limitedView"} />
                   </Paper>
                 </Grid>
                 {/* Entries Table */}
                 <Grid item xs={12}>
                   <Paper className={classes.paper}>
-                    <EntriesTable 
+                    <EntriesTable
                       numRows={5}
-                      tableType={"limitedView"}/>
+                      tableType={"limitedView"} />
                   </Paper>
                 </Grid>
               </Grid>
             </Container>
           }
-          {(this.state.clickedDashboardList === "clusters") &&
+          {(this.props.globalClickedDashboardTable === "clusters") &&
             <Container maxWidth="lg" className={classes.container}>
               {/* Clusters Table */}
               <Grid item xs={12}>
-                  <Paper className={classes.paper}>
-                    <ClustersTable 
-                      numRows={100}
-                      tableType={"expandedView"}/>
-                  </Paper>
-                </Grid>
+                <Paper className={classes.paper}>
+                  <ClustersTable
+                    numRows={100}
+                    tableType={"expandedView"} />
+                </Paper>
+              </Grid>
             </Container>
           }
-          {(this.state.clickedDashboardList === "agents") &&
+          {(this.props.globalClickedDashboardTable === "agents") &&
             <Container maxWidth="lg" className={classes.container}>
               {/* Agents Table */}
               <Grid item xs={12}>
-                  <Paper className={classes.paper}>
-                    <AgentsTable 
-                      numRows={100}
-                      tableType={"expandedView"}/>
-                  </Paper>
-                </Grid>
+                <Paper className={classes.paper}>
+                  <AgentsTable
+                    numRows={100}
+                    tableType={"expandedView"} />
+                </Paper>
+              </Grid>
             </Container>
           }
-          {(this.state.clickedDashboardList === "entries") &&
+          {(this.props.globalClickedDashboardTable === "entries") &&
             <Container maxWidth="lg" className={classes.container}>
               {/* Entries Table */}
               <Grid item xs={12}>
-                  <Paper className={classes.paper}>
-                    <EntriesTable 
-                      numRows={100}
-                      tableType={"expandedView"}/>
-                  </Paper>
-                </Grid>
+                <Paper className={classes.paper}>
+                  <EntriesTable
+                    numRows={100}
+                    tableType={"expandedView"} />
+                </Paper>
+              </Grid>
             </Container>
           }
         </main>
@@ -366,9 +367,10 @@ const mapStateToProps = (state) => ({
   globalErrorMessage: state.tornjak.globalErrorMessage,
   globalAgents: state.agents,
   globalEntries: state.entries.globalEntriesList,
+  globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable
 })
 
 export default withStyles(styles)(connect(
   mapStateToProps,
-  { entriesListUpdateFunc, agentsListUpdateFunc, agentworkloadSelectorInfoFunc, clustersListUpdateFunc, tornjakMessageFunc, serverInfoUpdateFunc, serverSelectedFunc, tornjakServerInfoUpdateFunc, selectorInfoFunc }
+  { entriesListUpdateFunc, agentsListUpdateFunc, agentworkloadSelectorInfoFunc, clustersListUpdateFunc, tornjakMessageFunc, serverInfoUpdateFunc, serverSelectedFunc, tornjakServerInfoUpdateFunc, selectorInfoFunc, clickedDashboardTabelFunc }
 )(TornjakDashboard))

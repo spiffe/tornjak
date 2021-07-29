@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import renderCellExpand from './render-cell-expand';
-import Table1 from './table/dashboard-table';
+import TableDashboard from './table/dashboard-table';
 import SpiffeEntryInterface from '../spiffe-entry-interface';
 
 const columns = [
@@ -79,7 +79,7 @@ class AgentDashboardTable extends React.Component {
     var data = this.agentList();
     return (
       <div>
-        <Table1 
+        <TableDashboard 
           title={"Agents"}
           numRows={numRows}
           tableType={tableType}

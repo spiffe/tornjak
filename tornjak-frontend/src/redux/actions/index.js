@@ -11,6 +11,7 @@ import {
     GLOBAL_AGENTS_WORKLOADATTESTOR_INFO,
     GLOBAL_CLUSTERS_LIST,
     GLOBAL_CLUSTER_TYPE_INFO,
+    GLOBAL_CLICKED_DASHBOARD_TABLE
 } from './types';
 
 // Expected input - List of clusters with their info
@@ -223,6 +224,17 @@ export function agentworkloadSelectorInfoFunc(globalAgentsWorkLoadAttestorInfo) 
         dispatch({
             type: GLOBAL_AGENTS_WORKLOADATTESTOR_INFO,
             payload: globalAgentsWorkLoadAttestorInfo
+        });
+    }
+}
+
+// Expected input - clicked dashboard tabel
+// clickedDashboardTabelFunc returns the clicked dashboard tabel
+export function clickedDashboardTabelFunc(globalClickedDashboardTable) {
+    return dispatch => {
+        dispatch({
+            type: GLOBAL_CLICKED_DASHBOARD_TABLE,
+            payload: globalClickedDashboardTable
         });
     }
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
-import Table1 from './table/dashboard-table';
+import TableDashboard from './table/dashboard-table';
 import SpiffeEntryInterface from '../spiffe-entry-interface';
 
 const columns = [
@@ -67,7 +67,7 @@ class ClusterDashboardTable extends React.Component {
     var data = this.clusterList();
     return (
       <div>
-        <Table1 
+        <TableDashboard 
           title={"Clusters"}
           numRows={numRows}
           tableType={tableType}

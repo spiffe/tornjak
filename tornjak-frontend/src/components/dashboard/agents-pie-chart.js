@@ -11,7 +11,7 @@ class AgentsPieChart extends React.Component {
   }
 
   agent(entry) {
-    var spiffeid = "spiffe://" + entry.id.trust_domain + entry.id.path
+    var spiffeid = this.SpiffeEntryInterface.getAgentSpiffeid(entry);
     if (typeof this.props.globalEntries.globalEntriesList !== 'undefined') {
       var check_id = this.props.globalEntries.globalEntriesList.filter(thisentry => {
         return (spiffeid) === this.SpiffeEntryInterface.getEntryParentid(thisentry)
@@ -45,13 +45,15 @@ class AgentsPieChart extends React.Component {
     var groups = this.agentList()
     return (
       <React.Fragment>
-        <Title># of Entries per Agent</Title>
+        <Title>ENTRIES PER AGENT</Title>
         {groups.length === 0 &&
           <p className="no-data">No Data To Display</p>
         }
+        {groups.length !== 0 &&
         <PieChart1
             data={groups}
         />
+        }
       </React.Fragment>
     );
   }
