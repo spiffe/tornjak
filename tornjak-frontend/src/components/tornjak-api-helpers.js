@@ -113,7 +113,7 @@ class TornjakApi extends Component {
 
   // populateLocalTornjakAgentInfo returns tornjak info of requested agents including cluster name and selector
   populateLocalTornjakAgentInfo = (agentworkloadSelectorInfoFunc, inputData) => {
-    axios.post(GetApiServerUri("/api/tornjak/agents/list/"), inputData,
+    axios.post(GetApiServerUri("/api/tornjak/agents/list"), inputData,
               { crossdomain: true,
               })
       .then(response => {

@@ -40,7 +40,7 @@ class ClusterDashboardTable extends React.Component {
     })
     var sum = entriesPerAgent.reduce((acc, curVal) => {
       return acc + curVal;
-    })
+    }, 0)
     return sum
   }
 
