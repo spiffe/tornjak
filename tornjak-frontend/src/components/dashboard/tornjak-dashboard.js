@@ -48,7 +48,7 @@ import {
   clustersListUpdateFunc,
   clickedDashboardTabelFunc,
 } from 'redux/actions';
-import SpiffeEntryInterface from '../spiffe-entry-interface';
+import SpiffeHelper from '../spiffe-helper';
 
 const drawerWidth = 240;
 const drawerHeight = '100%';
@@ -150,13 +150,13 @@ class TornjakDashboard extends React.Component {
     this.handleDrawerClose = () => this.setState({ open: false })
     this.fixedHeightPaper = clsx(classes.paper, classes.fixedHeight)
     this.TornjakApi = new TornjakApi();
-    this.SpiffeEntryInterface = new SpiffeEntryInterface();
+    this.SpiffeHelper = new SpiffeHelper();
   }
 
   agentSpiffeids() {
     if (typeof this.props.globalAgents.globalAgentsList !== undefined) {
       return this.props.globalAgents.globalAgentsList.map(currentAgent => {
-        return this.SpiffeEntryInterface.getAgentSpiffeid(currentAgent)
+        return this.SpiffeHelper.getAgentSpiffeid(currentAgent)
       })
     } else {
       return ""

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import renderCellExpand from './render-cell-expand';
 import TableDashboard from './table/dashboard-table';
-import SpiffeEntryInterface from '../spiffe-entry-interface'
+import SpiffeHelper from '../spiffe-helper'
 
 const columns = [
   { field: "id", headerName: "ID", width: 200, renderCell: renderCellExpand},
@@ -24,14 +24,14 @@ const styles = ( theme => ({
 class EntriesDashBoardTable extends React.Component {
   constructor(props) {
     super(props)
-    this.SpiffeEntryInterface = new SpiffeEntryInterface();
+    this.SpiffeHelper = new SpiffeHelper();
   }
 
   workloadEntry(entry) {
-    var thisSpiffeId = this.SpiffeEntryInterface.getEntrySpiffeid(entry)
-    var thisParentId = this.SpiffeEntryInterface.getEntryParentid(entry)
+    var thisSpiffeId = this.SpiffeHelper.getEntrySpiffeid(entry)
+    var thisParentId = this.SpiffeHelper.getEntryParentid(entry)
     // get tornjak metadata
-    var metadata_entry = this.SpiffeEntryInterface.getAgentMetadata(thisParentId, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo);
+    var metadata_entry = this.SpiffeHelper.getAgentMetadata(thisParentId, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo);
     var plugin = "None"
     var cluster = "None"
     if (metadata_entry["plugin"].length !== 0) {
@@ -41,10 +41,10 @@ class EntriesDashBoardTable extends React.Component {
       cluster = metadata_entry["cluster"]
     }
     // get spire data
-    var admin = this.SpiffeEntryInterface.getEntryAdminFlag(entry)
+    var admin = this.SpiffeHelper.getEntryAdminFlag(entry)
     var expTime = "No Expiry Time"
     if (typeof entry.expires_at !== 'undefined') {
-      var d = new Date(this.SpiffeEntryInterface.getEntryExpiryMillisecondsFromEpoch(entry))
+      var d = new Date(this.SpiffeHelper.getEntryExpiryMillisecondsFromEpoch(entry))
       expTime = d.toLocaleDateString("en-US", {month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false})
     }
     return {

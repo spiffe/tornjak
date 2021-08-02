@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import TableDashboard from './table/dashboard-table';
-import SpiffeEntryInterface from '../spiffe-entry-interface';
+import SpiffeHelper from '../spiffe-helper';
 
 const columns = [
   { field: "name", headerName: "Name", width: 200 },
@@ -20,13 +20,13 @@ const styles = theme => ({
 class ClusterDashboardTable extends React.Component {
   constructor(props) {
     super(props);
-    this.SpiffeEntryInterface = new SpiffeEntryInterface()
+    this.SpiffeHelper = new SpiffeHelper()
   }
 
   numberAgentEntries(spiffeid) {
     if (typeof this.props.globalEntries.globalEntriesList !== 'undefined') {
       var entriesList = this.props.globalEntries.globalEntriesList.filter(entry => {
-        return spiffeid === (this.SpiffeEntryInterface.getEntryParentid(entry))
+        return spiffeid === (this.SpiffeHelper.getEntryParentid(entry))
       })
       return entriesList.length
     } else {

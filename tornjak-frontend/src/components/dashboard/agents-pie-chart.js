@@ -2,19 +2,29 @@ import React from 'react';
 import { connect } from 'react-redux';
 import Title from './title';
 import PieChart1 from "charts/PieChart";
-import SpiffeEntryInterface from '../spiffe-entry-interface'
+import SpiffeHelper from '../spiffe-helper'
 
 class AgentsPieChart extends React.Component {
   constructor(props) {
     super(props);
-    this.SpiffeEntryInterface = new SpiffeEntryInterface();
+    this.SpiffeHelper = new SpiffeHelper();
   }
 
-  agent(entry) {
-    var spiffeid = this.SpiffeEntryInterface.getAgentSpiffeid(entry);
+  getChildEntries(agent, agentEntriesDict) {
+    var spiffeid = this.SpiffeHelper.getAgentSpiffeid(agent);
+    var validIds = new Set([spiffeid]);
+
+    // Also check for parent IDs associated with the agent
+    let agentEntries = agentEntriesDict[spiffeid];
+    if (agentEntries !== undefined) {
+      for (let j=0; j < agentEntries.length; j++) {
+          validIds.add(this.SpiffeHelper.getEntrySpiffeid(agentEntries[j]));
+      }
+    }
+
     if (typeof this.props.globalEntries.globalEntriesList !== 'undefined') {
       var check_id = this.props.globalEntries.globalEntriesList.filter(thisentry => {
-        return (spiffeid) === this.SpiffeEntryInterface.getEntryParentid(thisentry)
+        return validIds.has(this.SpiffeHelper.getEntryParentid(thisentry));
       });
     }
     if (typeof check_id === 'undefined') {
@@ -31,14 +41,16 @@ class AgentsPieChart extends React.Component {
   }
 
   agentList() {
-    if (typeof this.props.globalAgents.globalAgentsList !== 'undefined') {
-      var valueMapping = this.props.globalAgents.globalAgentsList.map(currentAgent => {
-        return this.agent(currentAgent);
-      })
-      return valueMapping.filter(thisentry => (thisentry.value > 0));
-    } else {
-      return []
+    if ((typeof this.props.globalEntries.globalEntriesList === 'undefined') || 
+          (typeof this.props.globalAgents.globalAgentsList === 'undefined')) {
+        return [];
     }
+
+    let agentEntriesDict = this.SpiffeHelper.getAgentsEntries(this.props.globalAgents.globalAgentsList, this.props.globalEntries.globalEntriesList)
+    var valueMapping = this.props.globalAgents.globalAgentsList.map(currentAgent => {
+      return this.getChildEntries(currentAgent, agentEntriesDict);
+    })
+    return valueMapping
   }
 
   render() {
