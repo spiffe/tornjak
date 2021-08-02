@@ -75,14 +75,13 @@ class AgentDashboardTable extends React.Component {
   }
 
   render() {
-    const { numRows, tableType } = this.props;
+    const { numRows } = this.props;
     var data = this.agentList();
     return (
       <div>
         <TableDashboard 
           title={"Agents"}
           numRows={numRows}
-          tableType={tableType}
           columns={columns}
           data={data}/>
       </div>

@@ -16,13 +16,7 @@ class TableDashboard extends React.Component {
   }
 
   render() {
-    const { numRows, tableType, data, columns, title } = this.props, viewConst = 70, limitedViewRows = 5;
-    var tableHeight = 0;
-    if (tableType === "expandedView") {
-      if (data.length < 2) {
-        tableHeight = 200; //const table height if numRows is less than 2
-      } else { tableHeight = data.length * viewConst; } //multiply by a constant to keep table height consistent}
-    } else if (tableType === "limitedView") { tableHeight = limitedViewRows * viewConst; }
+    const { numRows, data, columns, title } = this.props;
     return (
       <React.Fragment>
         <Title>
@@ -34,11 +28,12 @@ class TableDashboard extends React.Component {
             {title}
           </Button>
         </Title>
-        <div style={{ height: tableHeight, width: "100%" }}>
+        <div style={{ width: "100%" }}>
           <DataGrid
             rows={data}
             columns={columns}
             pageSize={numRows}
+            autoHeight={true}
             checkboxSelection
             components={{
               Toolbar: GridToolbar,

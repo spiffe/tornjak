@@ -69,14 +69,13 @@ class EntriesDashBoardTable extends React.Component {
   }
 
   render() {
-    const { numRows, tableType } = this.props;
+    const { numRows } = this.props;
     var data = this.entryList();
     return (
       <div>
         <TableDashboard 
           title={"Entries"}
           numRows={numRows}
-          tableType={tableType}
           columns={columns}
           data={data}/>
       </div>

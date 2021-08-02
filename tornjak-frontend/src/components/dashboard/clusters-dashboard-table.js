@@ -63,14 +63,13 @@ class ClusterDashboardTable extends React.Component {
   }
 
   render() {
-    const { numRows, tableType } = this.props;
+    const { numRows } = this.props;
     var data = this.clusterList();
     return (
       <div>
         <TableDashboard 
           title={"Clusters"}
           numRows={numRows}
-          tableType={tableType}
           columns={columns}
           data={data}/>
       </div>

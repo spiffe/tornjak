@@ -295,24 +295,21 @@ class TornjakDashboard extends React.Component {
                 <Grid item xs={12}>
                   <Paper className={classes.paper}>
                     <ClustersTable
-                      numRows={5}
-                      tableType={"limitedView"} />
+                      numRows={5} />
                   </Paper>
                 </Grid>
                 {/* Agents Table */}
                 <Grid item xs={12}>
                   <Paper className={classes.paper}>
                     <AgentsTable
-                      numRows={5}
-                      tableType={"limitedView"} />
+                      numRows={5} />
                   </Paper>
                 </Grid>
                 {/* Entries Table */}
                 <Grid item xs={12}>
                   <Paper className={classes.paper}>
                     <EntriesTable
-                      numRows={5}
-                      tableType={"limitedView"} />
+                      numRows={5} />
                   </Paper>
                 </Grid>
               </Grid>
@@ -324,8 +321,7 @@ class TornjakDashboard extends React.Component {
               <Grid item xs={12}>
                 <Paper className={classes.paper}>
                   <ClustersTable
-                    numRows={100}
-                    tableType={"expandedView"} />
+                    numRows={100} />
                 </Paper>
               </Grid>
             </Container>
@@ -336,8 +332,7 @@ class TornjakDashboard extends React.Component {
               <Grid item xs={12}>
                 <Paper className={classes.paper}>
                   <AgentsTable
-                    numRows={100}
-                    tableType={"expandedView"} />
+                    numRows={100} />
                 </Paper>
               </Grid>
             </Container>
@@ -348,8 +343,7 @@ class TornjakDashboard extends React.Component {
               <Grid item xs={12}>
                 <Paper className={classes.paper}>
                   <EntriesTable
-                    numRows={100}
-                    tableType={"expandedView"} />
+                    numRows={100} />
                 </Paper>
               </Grid>
             </Container>
