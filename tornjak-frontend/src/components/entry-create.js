@@ -113,9 +113,10 @@ class CreateEntry extends Component {
       }
     } else {
       if (prevProps.globalServerInfo !== this.props.globalServerInfo) {
+        this.prepareParentIdAgentsList();
         this.prepareSelectorsList();
       }
-      if (prevState.parentId !== this.state.parentId) {
+      if (prevState.parentId !== this.state.parentId)  {
         this.prepareSelectorsList();
       }
     }
