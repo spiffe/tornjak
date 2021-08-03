@@ -143,7 +143,21 @@ class SpiffeHelper extends Component {
       return agentEntriesDict
   }
 
+  // getCanonicalAgentSpiffeid takes in a agent entry, and returns the first 
+  // agent ID that is found associated with it.
+  getCanonicalAgentSpiffeid(entry, agents) {
+      let entrySelectors = new Set(entry.selectors.map(formatSelectors));
+      let isAssocWithEntry = a => {
+          let agentSelectors = new Set(a.selectors.map(formatSelectors));
+          return isSuperset(agentSelectors, entrySelectors);
+      }
 
+      let filteredAgents = agents.filter(isAssocWithEntry);
+      if (filteredAgents.length > 0) {
+          return this.getAgentSpiffeid(filteredAgents[0]);
+      }
+      return "";
+  }
 }
 
 

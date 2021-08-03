@@ -168,8 +168,21 @@ class CreateEntry extends Component {
         selectorsList: this.props.globalSelectorInfo[serverNodeAtt]
       });
     } else if (parentId !== "") {
+      let agentId = parentId;
+      // Check if parent ID is not canonical ID, best effort try to match it to an Agent ID for selectors
+      if (!this.props.globalAgentsList.map(e => this.SpiffeHelper.getAgentSpiffeid(e)).includes(parentId)) {
+          let fEntries= this.props.globalEntriesList.filter(e => this.SpiffeHelper.getEntrySpiffeid(e) === parentId);
+          if (fEntries.length > 0) {
+            let entry = fEntries[0];
+            let canonicalAgentId = this.SpiffeHelper.getCanonicalAgentSpiffeid(entry, this.props.globalAgentsList)
+            if (canonicalAgentId !== "") {
+              agentId = canonicalAgentId;
+            }
+          }
+      }
+
       for (let i = 0; i < globalAgentsWorkLoadAttestorInfo.length; i++) {
-        if (parentId === globalAgentsWorkLoadAttestorInfo[i].spiffeid) {
+        if (agentId === globalAgentsWorkLoadAttestorInfo[i].spiffeid) {
           this.setState({
             selectorsList: this.props.globalWorkloadSelectorInfo[globalAgentsWorkLoadAttestorInfo[i].plugin]
           });
