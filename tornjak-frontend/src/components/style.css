@@ -13,152 +13,179 @@
 .dropdown-container {
   margin-left: 200px;
 }
+
 .dropbtn {
     color: white;
     padding: 30px;
     font-size: 16px;
     border: none;
-  }
+}
   
-  .dropdown {
-    position: relative;
-    display: inline-block;
-    padding: 15px;
-  }
-  
-  .dropdown-content {
-    margin-top: 10px;
-    position: absolute;
-    background-color: #f1f1f1;
-    display: none;
-    min-width: 130px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 3;
-  }
-  
-  .dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    z-index: 3;
-  }
-  
-  .dropdown-content a:hover {background-color: #ddd;}
-  .dropdown:hover .dropdown-content {display: block;}
-  .dropdown:hover .dropbtn {color: #ffffff; text-decoration: none;}
+.dropdown {
+  position: relative;
+  display: inline-block;
+  padding: 15px;
+}
 
-  .indvidual-list-table {
-    margin-top: 10px;
-    width: 98%;
-    margin-bottom: 20px;
-  }
+.dropdown-content {
+  margin-top: 10px;
+  position: absolute;
+  background-color: #f1f1f1;
+  display: none;
+  min-width: 130px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 3;
+}
 
-  .create-entry-title {
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  .entry-form {
-    margin-left: auto;
-    margin-right: auto;
-    width: 60%;
-    border-width:1px;
-    border-style:solid;
-    border-color: rgb(180, 178, 178);
-    padding: 30px 30px 30px 30px;
-  }
-  .parentId-drop-down {
-    margin-bottom: 20px;
-  }
-  
-  .clustertype-drop-down {
-    margin-bottom: 20px;
-  }
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  z-index: 3;
+}
 
-  .parentId-manual-input-field {
-    margin-bottom: 20px;
-    margin-left: 40px;
-  }
+.dropdown-content a:hover {background-color: #ddd;}
+.dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover .dropbtn {color: #ffffff; text-decoration: none;}
 
-  .clustertype-manual-input-field {
-    margin-bottom: 20px;
-    margin-left: 40px;
-  }
+.indvidual-list-table {
+  margin-top: 10px;
+  width: 98%;
+  margin-bottom: 20px;
+}
 
-  .spiffeId-input-field {
-    margin-bottom: 20px;
-  }
+.create-entry-title {
+  margin-left: auto;
+  margin-right: auto;
+}
 
-  .cluster-domain-name-input-field {
-    margin-bottom: 20px;
-  }
+.entry-form {
+  margin-left: auto;
+  margin-right: auto;
+  width: 60%;
+  border-width:1px;
+  border-style:solid;
+  border-color: rgb(180, 178, 178);
+  padding: 30px 30px 30px 30px;
+}
+.parentId-drop-down {
+  margin-bottom: 20px;
+}
 
-  .cluster-managed-by-input-field {
-    margin-bottom: 20px;
-  }
+.clustertype-drop-down {
+  margin-bottom: 20px;
+}
 
-  .clustername-input-field {
-    margin-bottom: 20px;
-  }
+.parentId-manual-input-field {
+  margin-bottom: 20px;
+  margin-left: 40px;
+}
 
-  .parentId-helper {
-    font-size: 12px;
-    color:rgb(82, 79, 79);
-    margin-top: 2px;
-  }
+.clustertype-manual-input-field {
+  margin-bottom: 20px;
+  margin-left: 40px;
+}
 
-  .cluster-helper {
-    font-size: 12px;
-    color:rgb(82, 79, 79);
-    margin-top: 2px;  
-  }
-  .selectors-multiselect {
-    margin-bottom: 20px;
-  }
+.spiffeId-input-field {
+  margin-bottom: 20px;
+}
 
-  .agents-multiselect {
-    margin-bottom: 20px;
-  }
-  .selectors-textArea {
-    margin-bottom: 20px;
-  }
+.cluster-domain-name-input-field {
+  margin-bottom: 20px;
+}
 
-  .ttl-input {
-    display: inline-block;
-    margin-right: 20px;
-    margin-bottom: 20px;
-    width: 160px
-  }
+.cluster-managed-by-input-field {
+  margin-bottom: 20px;
+}
 
-  .expiresAt-input {
-    display: inline-block;
-    margin-bottom: 20px;
-    width: 160px;
-  }
-  
-  .federates-with-input-field {
-    margin-bottom: 20px;
-    width: 55%;
-  }
-  .dnsnames-input-field {
-    margin-bottom: 20px;
-    width: 55%;
-  }
+.clustername-input-field {
+  margin-bottom: 20px;
+}
 
-  .servers-drp-dwn {
-    margin-top: 5px;
-  }
+.parentId-helper {
+  font-size: 12px;
+  color:rgb(82, 79, 79);
+  margin-top: 2px;
+}
 
-  .success-message {
-    font-weight: bold;
-    color: green;
-  }
+.cluster-helper {
+  font-size: 12px;
+  color:rgb(82, 79, 79);
+  margin-top: 2px;  
+}
+.selectors-multiselect {
+  margin-bottom: 20px;
+}
 
-  .failed-message {
-    font-weight: bold;
-    color:red;
-  }
+.agents-multiselect {
+  margin-bottom: 20px;
+}
+.selectors-textArea {
+  margin-bottom: 20px;
+}
 
-  .no-data {
-    margin-top: 120px;
-    margin-left: 200px;
-  }
+.ttl-input {
+  margin-right: 20px;
+  margin-bottom: 20px;
+  width: 200px
+}
+
+.expiresAt-input {
+  margin-right: 20px;
+  margin-bottom: 20px;
+  width: 600px;
+}
+
+.expiry-drop-down {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 20px;
+  width: 200px;
+}
+
+.expiryEntryFields {
+  display: inline-block;
+  vertical-align: top;
+  width: 200px;
+}
+
+.expiryOption-field {
+  display: inline-block;
+  vertical-align: top;
+  width: 500px;
+}
+
+.expiryOption-entry {
+  margin-right: 20px;
+  display: inline-block;
+  vertical-align: top;
+  width: 200px;
+}
+
+.federates-with-input-field {
+  margin-bottom: 20px;
+  width: 420px;
+}
+.dnsnames-input-field {
+  margin-bottom: 20px;
+  width: 420px;
+}
+
+.servers-drp-dwn {
+  margin-top: 5px;
+}
+
+.success-message {
+  font-weight: bold;
+  color: green;
+}
+
+.failed-message {
+  font-weight: bold;
+  color:red;
+}
+
+.no-data {
+  margin-top: 120px;
+  margin-left: 200px;
+}
+

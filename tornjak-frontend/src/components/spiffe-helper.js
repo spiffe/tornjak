@@ -115,6 +115,10 @@ class SpiffeHelper extends Component {
   // n:1, this would reduce the total cost. This may be useful when 
   // performance is impacted.
   getAgentsEntries (agents, entries) {
+      if (typeof entries === 'undefined') {
+        console.log("spiffe-helper.js: getAgentEntries: this should not happen, entries undefined`")
+        //return {};
+      }
       let nodeEntries = entries.filter(e => e.parent_id.path === "/spire/server");
       var lambdas = [];
       var agentEntriesDict = {};
