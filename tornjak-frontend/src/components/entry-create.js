@@ -93,8 +93,6 @@ class CreateEntry extends Component {
       this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
       this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
       this.setState({})
-      this.prepareParentIdAgentsList();
-      this.prepareSelectorsList();
     }
   }
 
