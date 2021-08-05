@@ -57,7 +57,7 @@ class AgentsPieChart extends React.Component {
     var groups = this.agentList()
     return (
       <React.Fragment>
-        <Title>ENTRIES PER AGENT</Title>
+        <Title>Number of Workloads per Agent</Title>
         {groups.length === 0 &&
           <p className="no-data">No Data To Display</p>
         }

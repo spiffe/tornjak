@@ -33,3 +33,15 @@ CONTAINER_TAG=lumjjb/tornjak-spire-server:latest make container-agent
 ```
 
 The container is run with the same arguments as the SPIRE server image, and usage is transparent. It runs a server hosted on port 10000 accessed via http.
+
+### Testing and validating the Tornjak front-end
+To start a local version of the Tornjak front-end server 
+point at the running Tornjak APIs:
+
+```console
+cd tornjak-frontend
+REACT_APP_API_SERVER_URI=http://<tornjak_API>/  npm start
+```
+
+Assuming `npm` is installed, this will start a server on `http://localhost:3000`
+Please be patient, as it might take a few minutes to compile and start the server.
