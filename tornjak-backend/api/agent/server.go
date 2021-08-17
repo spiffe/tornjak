@@ -17,7 +17,7 @@ import (
 	"github.com/cenkalti/backoff/v4"
 	"github.com/gorilla/mux"
 
-	agentdb "github.com/lumjjb/tornjak/tornjak-backend/pkg/agent/db"
+	agentdb "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/db"
 )
 
 type Server struct {

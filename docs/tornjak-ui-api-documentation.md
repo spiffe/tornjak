@@ -27,7 +27,7 @@ This documentation details tornjak’s user interface and its interaction with t
 # 2. Tornjak User Interface (UI) Architecture
 
 ### 2.1. UI Pages (With their paths)
-Below are UI pages of Tornjak with their respective paths. For details on a specific UI component and it’s interaction with the API calls refer to the diagrams respective to the pages by clicking on the link “Details”. There are two seperate UI’s, the manager UI and the regular agent UI. The regular agent UI is utilized for configuration and management of identities (For details visit [Agent design details](https://github.com/lumjjb/tornjak/blob/main/docs/tornjak-agent.md)). The manager UI  in addition to the regular agent UI includes the manager management panel/ page used to manage SPIRE servers (For details visit [Manager design details](https://github.com/lumjjb/tornjak/blob/main/docs/tornjak-manager.md)).  
+Below are UI pages of Tornjak with their respective paths. For details on a specific UI component and it’s interaction with the API calls refer to the diagrams respective to the pages by clicking on the link “Details”. There are two seperate UI’s, the manager UI and the regular agent UI. The regular agent UI is utilized for configuration and management of identities (For details visit [Agent design details](https://github.com/spiffe/tornjak/blob/main/docs/tornjak-agent.md)). The manager UI  in addition to the regular agent UI includes the manager management panel/ page used to manage SPIRE servers (For details visit [Manager design details](https://github.com/spiffe/tornjak/blob/main/docs/tornjak-manager.md)).  
 
 
 * Tornjak Home Page (/)
@@ -388,7 +388,7 @@ Figure 6. Manage Servers Page UI-API Interactions [ONLY FOR MANAGER UI]
 
 Redux reducers are functions that mutate the current state based upon the defined action and generally as a developer one should be interfacing with the actions as those actions define the events that describe how and when the state is mutating in the application. One should only be creating reducers if modifying the data model is necessary. 
 
-## 4.1. [Reducers](https://github.com/lumjjb/tornjak/tree/main/tornjak-frontend/src/redux/reducers)
+## 4.1. [Reducers](https://github.com/spiffe/tornjak/tree/main/tornjak-frontend/src/redux/reducers)
 - Servers
   * Server Selected
     - Stores the selected server in the redux state
@@ -417,7 +417,7 @@ Redux reducers are functions that mutate the current state based upon the define
   * Tornjak Message
     - Stores the Error Message/ Success Message of an executed function in the redux store
 
-## 4.2. [Actions](https://github.com/lumjjb/tornjak/tree/main/tornjak-frontend/src/redux/actions)
+## 4.2. [Actions](https://github.com/spiffe/tornjak/tree/main/tornjak-frontend/src/redux/actions)
 - TornjakMessage
   * Expected input - "Error Message/ Success Message"                                                                                    
   * This action returns the Error Message/ Success Message of an executed function

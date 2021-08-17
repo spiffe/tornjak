@@ -1,4 +1,4 @@
-module github.com/lumjjb/tornjak
+module github.com/spiffe/tornjak
 
 go 1.15
 
