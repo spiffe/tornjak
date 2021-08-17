@@ -10,7 +10,7 @@ import (
 	entry "github.com/spiffe/spire-api-sdk/proto/spire/api/server/entry/v1"
 	types "github.com/spiffe/spire-api-sdk/proto/spire/api/types"
 
-	tornjakTypes "github.com/lumjjb/tornjak/tornjak-backend/pkg/agent/types"
+	tornjakTypes "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/types"
 )
 
 type ListAgentsRequest agent.ListAgentsRequest

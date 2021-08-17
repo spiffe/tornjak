@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/lumjjb/tornjak/tornjak-backend/pkg/manager/types"
+	"github.com/spiffe/tornjak/tornjak-backend/pkg/manager/types"
 )
 
 func cleanup() {

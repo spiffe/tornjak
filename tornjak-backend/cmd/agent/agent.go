@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	agentapi "github.com/lumjjb/tornjak/tornjak-backend/api/agent"
+	agentapi "github.com/spiffe/tornjak/tornjak-backend/api/agent"
 	"github.com/pkg/errors"
 	"github.com/spiffe/spire/cmd/spire-server/cli/run"
 	"github.com/spiffe/spire/pkg/common/catalog"
