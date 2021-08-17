@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 
 	agentapi "github.com/lumjjb/tornjak/tornjak-backend/api/agent"
 	"github.com/pkg/errors"
@@ -24,9 +23,6 @@ type cliOptions struct {
 		keyPath    string
 		tls        bool
 		mtls       bool
-	}
-	apiOptions struct {
-		args []string
 	}
 	dbOptions struct {
 		dbString string
@@ -99,14 +95,6 @@ func main() {
 				},
 			},
 			{
-				Name:  "api",
-				Usage: "Utilize the SPIRE api through tornjak",
-				Action: func(c *cli.Context) error {
-					opt.apiOptions.args = c.Args().Slice()
-					return runTornjakCmd("api", opt)
-				},
-			},
-			{
 				Name:  "serverinfo",
 				Usage: "Get the serverinfo of the SPIRE server where tornjak resides",
 				Action: func(c *cli.Context) error {
@@ -141,9 +129,6 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 			log.Fatalf("Error: %v", err)
 		}
 		fmt.Println(serverInfo)
-	case "api":
-		// default to spire-server binary
-		RunSpireApi(config, opt.apiOptions.args)
 	case "http":
 		serverInfo, err := GetServerInfo(config)
 		if err != nil {
@@ -151,7 +136,7 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 		}
 
 		apiServer := &agentapi.Server{
-			SpireServerAddr: "unix://" + config.Server.RegistrationUDSPath,
+			SpireServerAddr: getSocketPath(config),
 			ListenAddr:      opt.httpOptions.listenAddr,
 			CertPath:        opt.httpOptions.certPath,
 			KeyPath:         opt.httpOptions.keyPath,
@@ -199,55 +184,11 @@ func GetServerInfo(config *run.Config) (agentapi.TornjakServerInfo, error) {
 	}, nil
 }
 
-// Call API to show example of policy enforcement, will be deprecated, used only for
-// debugging/demo purposes.
-func RunSpireApi(config *run.Config, apiArgs []string) {
-	spireBin := "/opt/spire/bin/spire-server"
-	var args []string
-
-	for _, check := range checkList {
-		if err := check(apiArgs); err != nil {
-			log.Fatal(err)
-		}
+func getSocketPath(config *run.Config) string {
+	socketPath := config.Server.SocketPath
+	if config.Server.DeprecatedRegistrationUDSPath != "" {
+		socketPath = config.Server.DeprecatedRegistrationUDSPath
 	}
 
-	args = append(args, apiArgs...)
-	args = append(args, []string{"-registrationUDSPath", config.Server.RegistrationUDSPath}...)
-	cmd := exec.Command(spireBin, args...)
-	stdoutStderr, err := cmd.CombinedOutput()
-	if err != nil {
-		fmt.Printf("%s\n", stdoutStderr)
-		log.Fatal(err)
-	}
-	fmt.Printf("%s\n", stdoutStderr)
-}
-
-// Policies
-type checkFn func([]string) error
-
-func denyTokenGenerate(args []string) error {
-	if len(args) < 2 {
-		return nil
-	}
-
-	if args[0] == "token" {
-		return errors.New("Join token usage disabled for security reasons")
-	}
-
-	return nil
-}
-
-func noAdmin(args []string) error {
-	for _, a := range args {
-		if a == "-admin" {
-			return errors.New("Not allowed to create -admin entries")
-		}
-	}
-
-	return nil
-}
-
-var checkList []checkFn = []checkFn{
-	denyTokenGenerate,
-	noAdmin,
+	return "unix://" + socketPath
 }

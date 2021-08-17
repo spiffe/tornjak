@@ -6,9 +6,9 @@ import (
 
 	grpc "google.golang.org/grpc"
 
-	agent "github.com/spiffe/spire/proto/spire/api/server/agent/v1"
-	entry "github.com/spiffe/spire/proto/spire/api/server/entry/v1"
-	types "github.com/spiffe/spire/proto/spire/types"
+	agent "github.com/spiffe/spire-api-sdk/proto/spire/api/server/agent/v1"
+	entry "github.com/spiffe/spire-api-sdk/proto/spire/api/server/entry/v1"
+	types "github.com/spiffe/spire-api-sdk/proto/spire/api/types"
 
 	tornjakTypes "github.com/lumjjb/tornjak/tornjak-backend/pkg/agent/types"
 )
