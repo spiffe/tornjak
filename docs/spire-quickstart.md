@@ -150,7 +150,7 @@ We first need to use the Tornjak image. This can be done by modifying the image 
       serviceAccountName: spire-server
       containers:
         - name: spire-server
-          image: gcr.io/spiffe-io/spire-server:0.12.0
+          image: gcr.io/spiffe-io/spire-server:1.0.0
           args:
             - -config
             - /run/spire/config/server.conf
@@ -159,7 +159,7 @@ We first need to use the Tornjak image. This can be done by modifying the image 
 ...
 ```
 
-We want to replace the image with the Tornjak image: `tsidentity/tornjak-spire-server:0.12.0`
+We want to replace the image with the Tornjak image: `tsidentity/tornjak-spire-server:1.0.0`
 
 ```
 ➜  quickstart git:(master) cat server-statefulset.yaml
@@ -168,7 +168,7 @@ We want to replace the image with the Tornjak image: `tsidentity/tornjak-spire-s
       serviceAccountName: spire-server
       containers:
         - name: spire-server
-          image: tsidentity/tornjak-spire-server:0.12.0
+          image: tsidentity/tornjak-spire-server:1.0.0
           args:
             - -config
             - /run/spire/config/server.conf
@@ -188,7 +188,7 @@ We will then wait and verify that the `spire-server-0` pod is now started with t
 
 ```
 ➜  quickstart git:(master) ✗ kubectl -n spire describe pod spire-server-0 | grep "Image:"
-    Image:         tsidentity/tornjak-spire-server:0.12.0
+    Image:         tsidentity/tornjak-spire-server:1.0.0
 ```
 
 ### Connecting to the Tornjak UI
