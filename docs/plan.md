@@ -22,6 +22,8 @@ List of milestones
 
 ### Milestone A: Global Visibility
 
+**Status:** Completed
+
 Very simple global visibility and management of SPIRE APIs with simple authentication.
 
 Feature dependencies: None
@@ -43,6 +45,8 @@ Feature dependencies: None
 
 ### Milestone B: Global Visibility + Authentication
 
+**Status:** Completed
+
 Add ability to obtain server info and some custom tornjak APIs with simple authentication
 
 Feature dependencies: None
@@ -54,6 +58,8 @@ In addition to above:
 
 
 ### Milestone C: Policy management
+
+**Status:** In Progress
 
 Provide authorization capabilities and policy management. Showcase the ability to use
 the workload registrar usecase with a stricter threat model enforced by policy.
@@ -75,6 +81,8 @@ In addition to above:
 
 ### Milestone D: Improve Policy definitions and UX
 
+**Status:** Not Started
+
 Provide better UX around policy management and provide the ability to create
 more sophisticated identity policy.
 
@@ -87,12 +95,16 @@ In addition to above:
 
 ### Milestone E: Auditability
 
+**Status:** Not Started
+
 Feature Dependencies: Advanced Logging entries and infrastructure for SPIRE (Issue TBD)
 
 - Manager
   - Auditability of Identities and use for operations/forensics 
 
 ### Milestone F: Advanced Authentication
+
+**Status:** Not Started
 
 Feature dependencies: [More Admin Authentication mechanisms for SPIRE server (Issue #2099)](https://github.com/spiffe/spire/issues/2099)
 
@@ -102,6 +114,8 @@ Other missing features:
 
 
 ### Milestone G: Enhancing SPIRE API
+
+**Status:** Not Started
 
 Feature dependencies: Augment SPIRE API (Issue TBD)
 
