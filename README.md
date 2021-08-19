@@ -7,6 +7,16 @@ The project aims to provide a management plane and capabilities for SPIFFE ident
 The goals are to provide global visibility, auditability, and configuration and policy management for identities.
 This can be thought about as a central management plane for identities across SPIRE servers, with the aim for use by an administrator or CISO to govern an organization's workload identities.
 
+## Get Started
+
+The following are guides on how to try out Tornjak:
+- [Tornjak simple deployment with SPIRE k8s quickstart](docs/spire-quickstart.md)
+
+Here are a few additional resources:
+- [Tornjak basic functions demo](https://www.youtube.com/watch?v=dOdRu4psKJ8)
+
+## Architecture and roadmap
+
 The architecture consists of 2 main components, the agent and the manager.
 - The manager provides a management control plane for SPIRE servers, and a central point of data collection. It interacts with the agents, SPIRE servers, and corresponding components to achieve this.
 - The agent provides a way for the management plane to communicate with the SPIRE servers and provide introspection and configuration of identities.
@@ -15,11 +25,6 @@ For more details of the components and execution plan, please refer to these doc
 - [Manager design and details](docs/tornjak-manager.md)
 - [Agent design and details](docs/tornjak-agent.md)
 - [Execution plan](docs/plan.md)
-
-## Get Started
-
-The following are guides on how to try out Tornjak:
-- [Tornjak simple deployment with SPIRE k8s quickstart](docs/spire-quickstart.md)
 
 ## Development: Building and pushing
 
