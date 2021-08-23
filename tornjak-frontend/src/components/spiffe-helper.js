@@ -218,6 +218,40 @@ class SpiffeHelper extends Component {
     entriesList = entriesList.concat(entriesAgent);
     return entriesList;
   }
+
+  // workloadEntry takes in an entry metadata and workload attestor info for specified agents
+  // returns entry metadata info for dashboard table
+  workloadEntry(entry, WorkLoadAttestorInfo) {
+    var thisSpiffeId = this.getEntrySpiffeid(entry)
+    var thisParentId = this.getEntryParentid(entry)
+    // get tornjak metadata
+    var metadata_entry = this.getAgentMetadata(thisParentId, WorkLoadAttestorInfo);
+    var plugin = "None"
+    var cluster = "None"
+    if (metadata_entry["plugin"].length !== 0) {
+      plugin = metadata_entry["plugin"]
+    }
+    if (metadata_entry["cluster"].length !== 0) {
+      cluster = metadata_entry["cluster"]
+    }
+    // get spire data
+    var admin = this.getEntryAdminFlag(entry)
+    var expTime = "No Expiry Time"
+    if (typeof entry.expires_at !== 'undefined') {
+      var d = new Date(this.getEntryExpiryMillisecondsFromEpoch(entry))
+      expTime = d.toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false })
+    }
+    return {
+      id: entry.id,
+      spiffeid: thisSpiffeId,
+      parentId: thisParentId,
+      adminFlag: admin,
+      entryExpireTime: expTime,
+      platformType: plugin,
+      clusterName: cluster,
+    }
+  }
+
 }
 
 
