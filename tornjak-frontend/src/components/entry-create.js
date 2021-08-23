@@ -32,7 +32,13 @@ class CreateEntry extends Component {
     this.prepareSelectorsList = this.prepareSelectorsList.bind(this);
     this.onChangeSelectorsRecommended = this.onChangeSelectorsRecommended.bind(this);
     this.onChangeTtl = this.onChangeTtl.bind(this);
-    this.onChangeExpiresAt = this.onChangeExpiresAt.bind(this);
+    this.onChangeExpiryOption = this.onChangeExpiryOption.bind(this);
+    this.expiryTimeUpdate = this.expiryTimeUpdate.bind(this);
+    this.onChangeExpiresAtSeconds = this.onChangeExpiresAtSeconds.bind(this);
+    this.isValidDate = this.isValidDate.bind(this);
+    this.updateValidDateAndTime = this.updateValidDateAndTime.bind(this);
+    this.onChangeExpiresAtTime = this.onChangeExpiresAtTime.bind(this);
+    this.onChangeExpiresAtDate = this.onChangeExpiresAtDate.bind(this);
     this.onChangeFederatesWith = this.onChangeFederatesWith.bind(this);
     this.onChangeDownStream = this.onChangeDownStream.bind(this);
     this.onChangeDnsNames = this.onChangeDnsNames.bind(this);
@@ -57,7 +63,13 @@ class CreateEntry extends Component {
       adminFlag: false,
 
       ttl: 0,
+      expiryOption: "None",
+      expiryOptionList: ["None", "Seconds Since Epoch", "Date/Time"],
+      expiryDate: "1/1/2021",
+      expiryTime: "00:00",
       expiresAt: 0,
+      expiryUnsafe: false,
+      expiryInvalid: false,
       dnsNames: [],
       federatesWith: [],
       downstream: false,
@@ -116,7 +128,7 @@ class CreateEntry extends Component {
         this.prepareParentIdAgentsList();
         this.prepareSelectorsList();
       }
-      if (prevState.parentId !== this.state.parentId)  {
+      if (prevState.parentId !== this.state.parentId) {
         this.prepareSelectorsList();
       }
     }
@@ -140,13 +152,13 @@ class CreateEntry extends Component {
       let agentSpiffeid = this.SpiffeHelper.getAgentSpiffeid(this.props.globalAgentsList[i]);
       localAgentsIdList[idx] = agentSpiffeid;
       idx++;
-      
+
       // Add entries associated with this agent
       let agentEntries = agentEntriesDict[agentSpiffeid];
       if (agentEntries !== undefined) {
-        for (let j=0; j < agentEntries.length; j++) {
-            localAgentsIdList[idx] = this.SpiffeHelper.getEntrySpiffeid(agentEntries[j]);
-            idx++;
+        for (let j = 0; j < agentEntries.length; j++) {
+          localAgentsIdList[idx] = this.SpiffeHelper.getEntrySpiffeid(agentEntries[j]);
+          idx++;
         }
       }
     }
@@ -171,14 +183,14 @@ class CreateEntry extends Component {
       let agentId = parentId;
       // Check if parent ID is not canonical ID, best effort try to match it to an Agent ID for selectors
       if (!this.props.globalAgentsList.map(e => this.SpiffeHelper.getAgentSpiffeid(e)).includes(parentId)) {
-          let fEntries= this.props.globalEntriesList.filter(e => this.SpiffeHelper.getEntrySpiffeid(e) === parentId);
-          if (fEntries.length > 0) {
-            let entry = fEntries[0];
-            let canonicalAgentId = this.SpiffeHelper.getCanonicalAgentSpiffeid(entry, this.props.globalAgentsList)
-            if (canonicalAgentId !== "") {
-              agentId = canonicalAgentId;
-            }
+        let fEntries = this.props.globalEntriesList.filter(e => this.SpiffeHelper.getEntrySpiffeid(e) === parentId);
+        if (fEntries.length > 0) {
+          let entry = fEntries[0];
+          let canonicalAgentId = this.SpiffeHelper.getCanonicalAgentSpiffeid(entry, this.props.globalAgentsList)
+          if (canonicalAgentId !== "") {
+            agentId = canonicalAgentId;
           }
+        }
       }
 
       for (let i = 0; i < globalAgentsWorkLoadAttestorInfo.length; i++) {
@@ -204,10 +216,63 @@ class CreateEntry extends Component {
     });
   }
 
-  onChangeExpiresAt(e) {
+  onChangeExpiryOption(e) {
     this.setState({
-      expiresAt: Number(e.imaginaryTarget.value)
+      expiresAt: 0,
+      expiryOption: e.selectedItem,
+      expiryUnsafe: false,
+      expiryInvalid: false
     });
+  }
+
+  isValidExpiryTime(seconds) {
+    const JSMaxSafeTime = 8640000000000 // JS cannot represent times safely larger than this
+    return seconds > 0 && seconds <= JSMaxSafeTime
+  }
+
+  expiryTimeUpdate(seconds) {
+    this.setState({
+      expiresAt: seconds,
+      expiryUnsafe: !this.isValidExpiryTime(seconds)
+    })
+  }
+
+  onChangeExpiresAtSeconds(e) {
+    var seconds = Number(e.imaginaryTarget.value)
+    this.expiryTimeUpdate(seconds)
+  }
+
+  // TODO some odd behavior with dates like February 33 exists
+  isValidDate(d) { // date is successfully translated in Javascript
+    return d instanceof Date && isFinite(d)
+  }
+
+  updateValidDateAndTime(d, t) {
+    var testDate = new Date(d + ", " + t)
+    this.setState({ // should always reflect what the user sees
+      expiryDate: d,
+      expiryTime: t
+    })
+    if (this.isValidDate(testDate)) {
+      this.setState({
+        expiryInvalid: false,
+      })
+      var seconds = Math.round(testDate / 1000)
+      this.expiryTimeUpdate(seconds)
+      console.log(d, t, this.state.expiryDate, this.state.expiryTime)
+      return
+    }
+    this.setState({
+      expiryInvalid: true,
+    })
+  }
+
+  onChangeExpiresAtDate(e) {
+    this.updateValidDateAndTime(e.target.value, this.state.expiryTime)
+  }
+
+  onChangeExpiresAtTime(e) {
+    this.updateValidDateAndTime(this.state.expiryDate, e.target.value)
   }
 
   onChangeDownStream = selected => {
@@ -408,6 +473,7 @@ class CreateEntry extends Component {
     newTags.splice(currPos, 1);
     newTags.splice(newPos, 0, tag);
 
+
     // re-render
     this.setState({ tags: newTags });
   }
@@ -490,17 +556,17 @@ class CreateEntry extends Component {
     }
     axios.post(endpoint, cjtData)
       .then(
-        res => this.setState({ 
+        res => this.setState({
           message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
           statusOK: "OK",
           successJsonMessege: res.data.results[0].status.message
         })
       )
       .catch(
-        err => this.setState({ 
+        err => this.setState({
           message: "ERROR:" + err,
           statusOK: "ERROR"
-         })
+        })
       )
   }
 
@@ -558,8 +624,8 @@ class CreateEntry extends Component {
                   e.target.value = this.state.spiffeIdPrefix + input.substr(this.state.spiffeIdPrefix.length);
                   this.onChangeSpiffeId(e);
                 }}
-              //onChange={this.onChangeSpiffeId}
-              required/>
+                //onChange={this.onChangeSpiffeId}
+                required />
             </div>
             <div className="selectors-multiselect">
               <MultiSelect.Filterable
@@ -605,17 +671,80 @@ class CreateEntry extends Component {
                   />
                 </div>
                 <div className="expiresAt-input">
-                  <NumberInput
-                    helperText="Entry expires at (seconds since Unix epoch)"
-                    id="expiresAt-input"
-                    invalidText="Number is not valid"
-                    label="Expires At"
-                    //max={100}
-                    min={0}
-                    step={1}
-                    value={0}
-                    onChange={this.onChangeExpiresAt}
-                  />
+                  <div className="expiry-drop-down">
+                    <Dropdown
+                      //aria-required="true"
+                      //ariaLabel="expiry-drop-down"
+                      id="expiry-drop-down"
+                      items={this.state.expiryOptionList}
+                      label="None"
+                      defaultValue="None"
+                      titleText="Entry Expiry"
+                      helperText="Choose Entry Expiry Format"
+                      onChange={this.onChangeExpiryOption}
+                    />
+                  </div>
+                  {this.state.expiryOption !== "None" && <div className="expiryEntryFields">
+                    {this.state.expiryOption === "Seconds Since Epoch" &&
+                      <div className="expiryOption-field">
+                        <div className="expiryOption-entry">
+                          <NumberInput
+                            aria-required="true"
+                            helperText="(seconds since Unix epoch)"
+                            id="expiresAt-input"
+                            invalidText="Number is not valid"
+                            label="Enter expiry time [*required]"
+                            min={1}
+                            step={1}
+                            onChange={this.onChangeExpiresAtSeconds}
+                          />
+                        </div>
+                      </div>
+                    }
+                    {this.state.expiryOption === "Date/Time" &&
+                      <div className="expiryOption-field">
+                        <div className="expiryOption-entry">
+                          <TextInput
+                            labelText="Enter expiry date [*required]"
+                            helperText="mm/dd/yyyy or mm/dd/yyyyy"
+                            placeholder="08/13/2345"
+                            pattern={["^\\d{2}/\\d{2}/\\d{4,5}$"]}
+                            onChange={this.onChangeExpiresAtDate}
+                            required
+                          />
+                        </div>
+                        <div className="expiryOption-entry">
+                          <TextInput
+                            labelText="Enter local time [*required]"
+                            helperText="00:00:00 - 23:59:59"
+                            placeholder="hh:mm:ss"
+                            pattern={["^([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\d$"]}
+                            onChange={this.onChangeExpiresAtTime}
+                            invalidText="NotGoodTime"
+                            required
+                          />
+                        </div>
+                      </div>
+                    }
+                  </div>
+
+
+                  }
+                  {(this.state.expiryUnsafe || this.state.expiryInvalid) &&
+                    <div role="alert">
+                      <p className="failed-message">Warning: expiry time either in invalid format, is negative, or is too large.  Submitting this time may result in undefined behavior.</p>
+                      {this.state.expiryOption === "Seconds Since Epoch" && this.state.expiryUnsafe &&
+                        <p className="failed-message">Seconds must be positive and less than 8640000000000</p>
+                      }
+                      {this.state.expiryOption === "Date/Time" && this.state.expiryUnsafe &&
+                        <p className="failed-message">Date must be past January 1, 1970 @ 12:00AM GMT</p>
+                      }
+                      {this.state.expiryOption === "Date/Time" && this.state.expiryInvalid &&
+                        <p className="failed-message">Date or time format is invalid</p>
+                      }
+                    </div>
+                  }
+
                 </div>
                 <div className="federates-with-input-field">
                   <TextInput
@@ -657,10 +786,10 @@ class CreateEntry extends Component {
               <input type="submit" value="Create Entry" className="btn btn-primary" />
             </div>
             <div role="alert">
-              {this.state.statusOK==="OK" && this.state.successJsonMessege==="OK" &&
+              {this.state.statusOK === "OK" && this.state.successJsonMessege === "OK" &&
                 <p className="success-message">--ENTRY SUCCESSFULLY CREATED--</p>
               }
-              {(this.state.statusOK==="ERROR" || (this.state.successJsonMessege !== "OK" && this.state.successJsonMessege !== "")) &&
+              {(this.state.statusOK === "ERROR" || (this.state.successJsonMessege !== "OK" && this.state.successJsonMessege !== "")) &&
                 <p className="failed-message">--ENTRY CREATION FAILED--</p>
               }
             </div>
