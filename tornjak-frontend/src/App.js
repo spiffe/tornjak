@@ -1,6 +1,9 @@
 import React from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
+import store from 'redux/store';
+import IsManager from './components/is_manager';
 import { BrowserRouter as Router, Route } from "react-router-dom";
+import { Provider } from 'react-redux'; //enables all components to have access to everything inside our react app
 import NavigationBar from "./components/navbar";
 import SelectServer from "./components/select-server";
 import ClusterList from "./components/cluster-list";
@@ -12,9 +15,7 @@ import EntryCreate from "./components/entry-create";
 import ServerManagement from "./components/server-management";
 import TornjakServerInfo from "./components/tornjak-server-info";
 import TornjakDashBoard from "./components/dashboard/tornjak-dashboard";
-import { Provider } from 'react-redux'; //enables all components to have access to everything inside our react app
-import store from 'redux/store';
-import IsManager from './components/is_manager';
+import DashboardDetailsRender from 'components/dashboard/dashboard-details-render';
 import './App.css';
 
 function App() {
@@ -38,6 +39,10 @@ function App() {
                         <Route path="/cluster/clustermanagement" exact component={ClusterManagement} />
                         <Route path="/tornjak/serverinfo" exact component={TornjakServerInfo} />
                         <Route path="/tornjak/dashboard" exact component={TornjakDashBoard} />
+                        <Route
+                            path="/tornjak/dashboard/details/:entity/:id"
+                            render={(props) => (<DashboardDetailsRender {...props} params={props.match.params} />)}
+                        />
                         <Route path="/server/manage" exact component={ServerManagement} />
                         <br /><br /><br />
                         <svg className="endbanneroutput">

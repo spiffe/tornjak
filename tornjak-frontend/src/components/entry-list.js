@@ -53,6 +53,8 @@ class EntryList extends Component {
       if(prevProps.globalServerSelected !== this.props.globalServerSelected){
         this.TornjakApi.populateEntriesUpdate(this.props.globalServerSelected, this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
       }
+    } else {
+      this.TornjakApi.populateLocalEntriesUpdate(this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
     }
   }
 

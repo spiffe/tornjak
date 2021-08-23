@@ -7,10 +7,10 @@ import SpiffeHelper from '../spiffe-helper';
 
 const columns = [
   { field: "spiffeid", headerName: "Name", flex: 1, renderCell: renderCellExpand },
+  { field: "clusterName", headerName: "Cluster Name", width: 190 },
   { field: "numEntries", headerName: "Number of Entries", width: 200 },
   { field: "status", headerName: "Status", width: 120 },
   { field: "platformType", headerName: "Platform Type", width: 170 },
-  { field: "clusterName", headerName: "Cluster Name", width: 190 }
 ];
 
 const styles = theme => ({
@@ -22,69 +22,33 @@ const styles = theme => ({
 class AgentDashboardTable extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+    };
     this.SpiffeHelper = new SpiffeHelper()
   }
 
-  numberEntries(spiffeid, agentEntriesDict) {
-    var validIds = new Set([spiffeid]);
-
-    // Also check for parent IDs associated with the agent
-    let agentEntries = agentEntriesDict[spiffeid];
-    if (agentEntries !== undefined) {
-      for (let j=0; j < agentEntries.length; j++) {
-          validIds.add(this.SpiffeHelper.getEntrySpiffeid(agentEntries[j]));
-      }
-    }
-
-    if (typeof this.props.globalEntries.globalEntriesList !== 'undefined') {
-      var entriesList = this.props.globalEntries.globalEntriesList.filter(entry=> {
-        return (typeof entry !== 'undefined') && validIds.has(this.SpiffeHelper.getEntryParentid(entry));
-      });
-
-      if (typeof entriesList === 'undefined') {
-        return 0
-      } else {
-        return entriesList.length
-      }
-    } else {
-      return 0
-    }
-  }
-
-  getChildEntries(agent, agentEntriesDict) {
-    var thisSpiffeid = this.SpiffeHelper.getAgentSpiffeid(agent);
-    // get status
-    var status = this.SpiffeHelper.getAgentStatusString(agent);
-    // get tornjak metadata
-    var metadata_entry = this.SpiffeHelper.getAgentMetadata(thisSpiffeid, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo);
-    var plugin = "None"
-    var cluster = "None"
-    if (typeof metadata_entry["plugin"] !== 'undefined' && metadata_entry["plugin"].length !== 0) {
-      plugin = metadata_entry["plugin"]
-    }
-    if (typeof metadata_entry["cluster"] !== 'undefined' && metadata_entry["cluster"].length !== 0) {
-      cluster = metadata_entry["cluster"]
-    }
-    return {
-      id: thisSpiffeid,
-      spiffeid: thisSpiffeid,
-      numEntries: this.numberEntries(thisSpiffeid, agentEntriesDict),
-      status: status,
-      platformType: plugin,
-      clusterName: cluster,
-    }
-  }
-
   agentList() {
+    var filteredData = [], selectedDataKey = this.props.selectedDataKey;
+    let agentsList = [];
     if ((typeof this.props.globalEntries.globalEntriesList === 'undefined') ||
-          (typeof this.props.globalAgents.globalAgentsList === 'undefined')) {
-        return [];
+      (typeof this.props.globalAgents.globalAgentsList === 'undefined')) {
+      return [];
     }
-
-    let agentEntriesDict = this.SpiffeHelper.getAgentsEntries(this.props.globalAgents.globalAgentsList, this.props.globalEntries.globalEntriesList)
-    return this.props.globalAgents.globalAgentsList.map(currentAgent => {
-      return this.getChildEntries(currentAgent, agentEntriesDict);
+    let agentEntriesDict = this.SpiffeHelper.getAgentsEntries(this.props.globalAgents.globalAgentsList, this.props.globalEntries.globalEntriesList);
+    agentsList = this.props.globalAgents.globalAgentsList.map(currentAgent => {
+      return this.SpiffeHelper.getChildEntries(currentAgent, agentEntriesDict, this.props.globalEntries.globalEntriesList, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo)
     })
+    
+    //For details page filtering data
+    if (selectedDataKey !== undefined) {
+      for (let i = 0; i < agentsList.length; i++) {
+        if ((agentsList[i].clusterName === selectedDataKey["agentsFilter"]) || (agentsList[i].id === selectedDataKey["agentsFilter"])) {
+          filteredData.push(agentsList[i]);
+        }
+      }
+      return filteredData;
+    }
+    return agentsList;
   }
 
   render() {
@@ -92,11 +56,11 @@ class AgentDashboardTable extends React.Component {
     var data = this.agentList();
     return (
       <div>
-        <TableDashboard 
+        <TableDashboard
           title={"Agents"}
           numRows={numRows}
           columns={columns}
-          data={data}/>
+          data={data} />
       </div>
     );
   }
@@ -106,6 +70,7 @@ class AgentDashboardTable extends React.Component {
 const mapStateToProps = (state) => ({
   globalAgents: state.agents,
   globalEntries: state.entries,
+  globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 })
 
 export default withStyles(styles)(
