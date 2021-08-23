@@ -11,7 +11,7 @@ import {
     GLOBAL_AGENTS_WORKLOADATTESTOR_INFO,
     GLOBAL_CLUSTERS_LIST,
     GLOBAL_CLUSTER_TYPE_INFO,
-    GLOBAL_CLICKED_DASHBOARD_TABLE
+    GLOBAL_CLICKED_DASHBOARD_TABLE,
 } from './types';
 
 // Expected input - List of clusters with their info

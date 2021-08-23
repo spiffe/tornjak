@@ -8,11 +8,15 @@ import {
 import {
   clickedDashboardTabelFunc,
 } from 'redux/actions';
+import TornjakHelper from 'components/tornjak-helper';
+
 class TableDashboard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      selectedRows: [],
     };
+    this.TornjakHelper = new TornjakHelper();
   }
 
   render() {
@@ -28,13 +32,31 @@ class TableDashboard extends React.Component {
             {title}
           </Button>
         </Title>
+        <Button //Selected Details Button
+          href={this.TornjakHelper.detailsLink(this.state.selectedRows, title)}
+          style={{ width: 160, marginLeft: 1040, marginBottom: 20 }}
+          color="primary"
+          size="small"
+          variant="outlined"
+          onClick={() => {
+            if (this.state.selectedRows.length === 0) {
+              window.alert("Please Select a Row to See Details.");
+            } else {
+              this.props.clickedDashboardTabelFunc(title.toLowerCase() + "details")
+            }
+          }}
+        >
+          Selected Details
+        </Button>
         <div style={{ width: "100%" }}>
           <DataGrid
             rows={data}
             columns={columns}
             pageSize={numRows}
             autoHeight={true}
-            checkboxSelection
+            onRowSelected={(selectedRows) => {
+              this.setState({ selectedRows: selectedRows.data })
+            }}
             components={{
               Toolbar: GridToolbar,
             }}
@@ -46,7 +68,7 @@ class TableDashboard extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable
+  globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 })
 
 export default connect(

@@ -7,8 +7,8 @@ import SpiffeHelper from '../spiffe-helper';
 const columns = [
   { field: "name", headerName: "Name", width: 200 },
   { field: "created", headerName: "Created", width: 300 },
-  { field: "numNodes", headerName: "Number Of Nodes", width: 300},
-  { field: "numEntries", headerName: "Number of Entries", width: 200}
+  { field: "numNodes", headerName: "Number Of Nodes", width: 300 },
+  { field: "numEntries", headerName: "Number of Entries", width: 200 }
 ];
 
 const styles = theme => ({
@@ -23,43 +23,24 @@ class ClusterDashboardTable extends React.Component {
     this.SpiffeHelper = new SpiffeHelper()
   }
 
-  numberAgentEntries(spiffeid) {
-    if (typeof this.props.globalEntries.globalEntriesList !== 'undefined') {
-      var entriesList = this.props.globalEntries.globalEntriesList.filter(entry => {
-        return spiffeid === (this.SpiffeHelper.getEntryParentid(entry))
-      })
-      return entriesList.length
-    } else {
-      return 0
-    }
-  }
-
-  numberClusterEntries(entry) {
-    var entriesPerAgent = entry.agentsList.map(currentAgent => {
-      return this.numberAgentEntries(currentAgent);
-    })
-    var sum = entriesPerAgent.reduce((acc, curVal) => {
-      return acc + curVal;
-    }, 0)
-    return sum
-  }
-
-  cluster(entry) {
-    return {
-      id: entry.name,
-      name: entry.name,
-      created: entry.creationTime,
-      numNodes: entry.agentsList.length,
-      numEntries: this.numberClusterEntries(entry),
-    }
-  }
-
   clusterList() {
-    if (typeof this.props.globalClustersList !== 'undefined') {
-      return this.props.globalClustersList.map(a => this.cluster(a))
-    } else {
-      return []
+    var filteredData = [], selectedDataKey = this.props.selectedDataKey;
+    let clustersList = [];
+    if (typeof this.props.globalClustersList === 'undefined') {
+      return [];
     }
+    clustersList = this.props.globalClustersList.map(a => this.SpiffeHelper.cluster(a, this.props.globalEntries.globalEntriesList));
+
+    //For details page filtering data
+    if (selectedDataKey !== undefined) {
+      for (let i = 0; i < clustersList.length; i++) {
+        if ((clustersList[i].clusterName === selectedDataKey["clustersFilter"]) || (clustersList[i].name === selectedDataKey["clustersFilter"])) {
+          filteredData.push(clustersList[i]);
+        }
+      }
+      return filteredData;
+    }
+    return clustersList;
   }
 
   render() {
@@ -67,11 +48,11 @@ class ClusterDashboardTable extends React.Component {
     var data = this.clusterList();
     return (
       <div>
-        <TableDashboard 
+        <TableDashboard
           title={"Clusters"}
           numRows={numRows}
           columns={columns}
-          data={data}/>
+          data={data} />
       </div>
     );
   }

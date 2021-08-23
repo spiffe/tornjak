@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import IsManager from './is_manager';
 import 'carbon-components/css/carbon-components.min.css';
 import './style.css';
 import tornjak_logo from "res/tornjak_logo.png";
+import {
+  clickedDashboardTabelFunc,
+} from 'redux/actions';
 
-export default class NavigationBar extends Component {
+class NavigationBar extends Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -45,7 +49,15 @@ export default class NavigationBar extends Component {
               <a href="/tornjak/serverinfo" className="dropbtn">Tornjak ServerInfo</a>
             </div>
             <div className="dropdown">
-              <a href="/tornjak/dashboard" className="dropbtn">Tornjak Dashboard</a>
+              <a
+                href="/tornjak/dashboard"
+                className="dropbtn"
+                onClick={() => {
+                  if (this.props.globalClickedDashboardTable !== "dashboard") {
+                    this.props.clickedDashboardTabelFunc("dashboard")
+                  }
+                }}
+              >Tornjak Dashboard</a>
             </div>
             {IsManager && managerNavs}
           </div>
@@ -60,3 +72,12 @@ export default class NavigationBar extends Component {
     );
   }
 }
+
+const mapStateToProps = (state) => ({
+  globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
+})
+
+export default connect(
+  mapStateToProps,
+  { clickedDashboardTabelFunc }
+)(NavigationBar)
