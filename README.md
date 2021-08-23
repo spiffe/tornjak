@@ -1,6 +1,11 @@
 # Tornjak
 
-_**WARNING: This project is still in early development and should not be used in production**_
+![Tornjak logo](logos/tornjak_logo.jpg)
+
+**WARNING:** This project is in the
+["Development"](https://github.com/spiffe/spiffe/blob/main/MATURITY.md#development) 
+phase of the [SPIFFE Project Maturity
+Phases](https://github.com/spiffe/spiffe/blob/main/MATURITY.md).
 
 
 The project aims to provide a management plane and capabilities for SPIFFE identities managed by SPIRE.
