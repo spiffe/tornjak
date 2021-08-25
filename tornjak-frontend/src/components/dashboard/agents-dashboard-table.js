@@ -4,6 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import renderCellExpand from './render-cell-expand';
 import TableDashboard from './table/dashboard-table';
 import SpiffeHelper from '../spiffe-helper';
+import TornjakHelper from 'components/tornjak-helper';
 
 const columns = [
   { field: "spiffeid", headerName: "Name", flex: 1, renderCell: renderCellExpand },
@@ -24,11 +25,12 @@ class AgentDashboardTable extends React.Component {
     super(props);
     this.state = {
     };
-    this.SpiffeHelper = new SpiffeHelper()
+    this.SpiffeHelper = new SpiffeHelper();
+    this.TornjakHelper = new TornjakHelper();
   }
 
   agentList() {
-    var filteredData = [], selectedDataKey = this.props.selectedDataKey;
+    var filterByValue = [], selectedDataKey = this.props.selectedDataKey;
     let agentsList = [];
     if ((typeof this.props.globalEntries.globalEntriesList === 'undefined') ||
       (typeof this.props.globalAgents.globalAgentsList === 'undefined')) {
@@ -36,17 +38,17 @@ class AgentDashboardTable extends React.Component {
     }
     let agentEntriesDict = this.SpiffeHelper.getAgentsEntries(this.props.globalAgents.globalAgentsList, this.props.globalEntries.globalEntriesList);
     agentsList = this.props.globalAgents.globalAgentsList.map(currentAgent => {
-      return this.SpiffeHelper.getChildEntries(currentAgent, agentEntriesDict, this.props.globalEntries.globalEntriesList, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo)
+      return this.TornjakHelper.getChildEntries(currentAgent, agentEntriesDict, this.props.globalEntries.globalEntriesList, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo)
     })
     
     //For details page filtering data
     if (selectedDataKey !== undefined) {
       for (let i = 0; i < agentsList.length; i++) {
         if ((agentsList[i].clusterName === selectedDataKey["agentsFilter"]) || (agentsList[i].id === selectedDataKey["agentsFilter"])) {
-          filteredData.push(agentsList[i]);
+          filterByValue.push(agentsList[i]);
         }
       }
-      return filteredData;
+      return filterByValue;
     }
     return agentsList;
   }

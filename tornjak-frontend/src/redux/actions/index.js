@@ -229,8 +229,8 @@ export function agentworkloadSelectorInfoFunc(globalAgentsWorkLoadAttestorInfo) 
 }
 
 // Expected input - clicked dashboard tabel
-// clickedDashboardTabelFunc returns the clicked dashboard tabel
-export function clickedDashboardTabelFunc(globalClickedDashboardTable) {
+// clickedDashboardTableFunc returns the clicked dashboard tabel
+export function clickedDashboardTableFunc(globalClickedDashboardTable) {
     return dispatch => {
         dispatch({
             type: GLOBAL_CLICKED_DASHBOARD_TABLE,

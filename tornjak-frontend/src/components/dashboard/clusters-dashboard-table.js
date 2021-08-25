@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import TableDashboard from './table/dashboard-table';
 import SpiffeHelper from '../spiffe-helper';
+import TornjakHelper from 'components/tornjak-helper';
 
 const columns = [
   { field: "name", headerName: "Name", width: 200 },
@@ -20,25 +21,26 @@ const styles = theme => ({
 class ClusterDashboardTable extends React.Component {
   constructor(props) {
     super(props);
-    this.SpiffeHelper = new SpiffeHelper()
+    this.SpiffeHelper = new SpiffeHelper();
+    this.TornjakHelper = new TornjakHelper();
   }
 
   clusterList() {
-    var filteredData = [], selectedDataKey = this.props.selectedDataKey;
+    var filterByValue = [], selectedDataKey = this.props.selectedDataKey;
     let clustersList = [];
     if (typeof this.props.globalClustersList === 'undefined') {
       return [];
     }
-    clustersList = this.props.globalClustersList.map(a => this.SpiffeHelper.cluster(a, this.props.globalEntries.globalEntriesList));
+    clustersList = this.props.globalClustersList.map(a => this.TornjakHelper.getClusterMetadata(a, this.props.globalEntries.globalEntriesList));
 
     //For details page filtering data
     if (selectedDataKey !== undefined) {
       for (let i = 0; i < clustersList.length; i++) {
         if ((clustersList[i].clusterName === selectedDataKey["clustersFilter"]) || (clustersList[i].name === selectedDataKey["clustersFilter"])) {
-          filteredData.push(clustersList[i]);
+          filterByValue.push(clustersList[i]);
         }
       }
-      return filteredData;
+      return filterByValue;
     }
     return clustersList;
   }

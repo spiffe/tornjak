@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import renderCellExpand from './render-cell-expand';
 import TableDashboard from './table/dashboard-table';
-import SpiffeHelper from '../spiffe-helper'
+import SpiffeHelper from '../spiffe-helper';
+import TornjakHelper from 'components/tornjak-helper';
 
 const columns = [
   { field: "id", headerName: "ID", width: 170, renderCell: renderCellExpand },
@@ -25,10 +26,11 @@ class EntriesDashBoardTable extends React.Component {
   constructor(props) {
     super(props)
     this.SpiffeHelper = new SpiffeHelper();
+    this.TornjakHelper = new TornjakHelper();
   }
 
   entryList() {
-    var filteredData = [], selectedDataKey = this.props.selectedDataKey;
+    var filterByValue = [], selectedDataKey = this.props.selectedDataKey;
     let entriesList = [];
     if ((typeof this.props.globalEntries.globalEntriesList === 'undefined') ||
       (typeof this.props.globalAgents.globalAgentsList === 'undefined')) {
@@ -36,17 +38,17 @@ class EntriesDashBoardTable extends React.Component {
     }
 
     entriesList = this.props.globalEntries.globalEntriesList.map(currentEntry => {
-      return this.SpiffeHelper.workloadEntry(currentEntry, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo);
+      return this.TornjakHelper.workloadEntry(currentEntry, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo);
     })
 
-    //For details page filtering data
+    // For details page filtering data
     if (selectedDataKey !== undefined) {
       for (let i = 0; i < entriesList.length; i++) {
         if ((entriesList[i].clusterName === selectedDataKey["entriesFilter"]) || (entriesList[i].parentId === selectedDataKey["entriesFilter"])) {
-          filteredData.push(entriesList[i]);
+          filterByValue.push(entriesList[i]);
         }
       }
-      return filteredData;
+      return filterByValue;
     }
     return entriesList;
   }
