@@ -1,38 +1,22 @@
 import React from "react";
 import { connect } from 'react-redux';
-import { DataTable } from "carbon-components-react";
-import ResetIcon from "@carbon/icons-react/es/reset--alt/20";
 import GetApiServerUri from 'components/helpers';
 import IsManager from 'components/is_manager';
 import axios from 'axios'
 import {
     entriesListUpdateFunc
 } from 'redux/actions';
-const {
-    TableContainer,
-    Table,
-    TableHead,
-    TableRow,
-    TableBody,
-    TableCell,
-    TableHeader,
-    TableSelectRow,
-    TableSelectAll,
-    TableToolbar,
-    TableToolbarSearch,
-    TableToolbarContent,
-    TableBatchActions,
-    TableBatchAction,
-} = DataTable;
+import Table from './list-table';
 
 class DataTableRender extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             listData: props.data,
-            listTableData: [{"id":"0"}],
+            listTableData: [{ "id": "0" }],
         };
         this.prepareTableData = this.prepareTableData.bind(this);
+        this.deleteEntry = this.deleteEntry.bind(this);
     }
 
     componentDidMount() {
@@ -125,74 +109,13 @@ class DataTableRender extends React.Component {
             },
         ];
         return (
-            <DataTable
-                isSortable
-                rows={listTableData}
-                headers={headerData}
-                render={({
-                    rows,
-                    headers,
-                    getHeaderProps,
-                    getSelectionProps,
-                    onInputChange,
-                    getPaginationProps,
-                    getBatchActionProps,
-                    getTableContainerProps,
-                    selectedRows,
-                }) => (
-                    <TableContainer
-                        {...getTableContainerProps()}
-                    >
-                        <TableToolbar>
-                            <TableToolbarContent>
-                                <TableToolbarSearch onChange={(e) => onInputChange(e)} />
-                            </TableToolbarContent>
-                            <TableBatchActions
-                                {...getBatchActionProps()}
-                            >
-                                <TableBatchAction
-                                    renderIcon={ResetIcon}
-                                    iconDescription="Delete"
-                                    onClick={() => {
-                                        this.deleteEntry(selectedRows);
-                                    }}
-                                >
-                                    Delete
-                                </TableBatchAction>
-                            </TableBatchActions>
-                        </TableToolbar>
-                        <Table size="short" useZebraStyles>
-                            <TableHead>
-                                <TableRow>
-                                    <TableSelectAll {...getSelectionProps()} />
-                                    {headers.map((header) => (
-                                        <TableHeader {...getHeaderProps({ header })}>
-                                            {header.header}
-                                        </TableHeader>
-                                    ))}
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {rows.map((row, key) => (
-                                    <TableRow key={key}>
-                                        <TableSelectRow {...getSelectionProps({ row })} />
-                                        {row.cells.map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {cell.info.header === "info" ? (
-                                                    <div style={{ overflowX: 'auto', width: "400px" }}>
-                                                        <pre>{cell.value}</pre>
-                                                    </div>
-                                                ) : (
-                                                    cell.value)}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                )}
-            />
+            <div>
+                <Table
+                    listTableData={listTableData}
+                    headerData={headerData}
+                    deleteEntity={this.deleteEntry}
+                />
+            </div>
         );
     }
 }
