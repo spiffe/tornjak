@@ -94,7 +94,7 @@ class TornjakHelper extends Component {
 
   // numberEntries takes in spiffe id of an agent, avialble agents' spiffeids and list of entries
   // agentEntriesDict is the output of the function SpiffeHelper.getAgentsEntries
-  // returns cluster metadata info for dashboard table
+  // returns number of entries in an agent
   numberEntries(spiffeid, agentEntriesDict, globalEntries) {
     var validIds = new Set([spiffeid]);
 
