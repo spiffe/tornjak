@@ -20,9 +20,7 @@ class SpiffeHelper extends Component {
   }
 
   getEntryAdminFlag(entry) {
-    return typeof entry !== 'undefined' &&
-      typeof entry.admin !== 'undefined' &&
-      entry.admin;
+    return typeof entry !== 'undefined' && typeof entry.admin !== 'undefined' && entry.admin;
   }
 
   // check if format strictly adhered to
@@ -115,7 +113,10 @@ class SpiffeHelper extends Component {
   // n:1, this would reduce the total cost. This may be useful when 
   // performance is impacted.
   getAgentsEntries(agents, entries) {
-    let nodeEntries = entries.filter(e => e.parent_id.path === "/spire/server");
+    let nodeEntries = [];
+    if(entries !== undefined) {
+      nodeEntries = entries.filter(e => e.parent_id.path === "/spire/server");
+    }
     var lambdas = [];
     var agentEntriesDict = {};
 
@@ -157,130 +158,6 @@ class SpiffeHelper extends Component {
       return this.getAgentSpiffeid(filteredAgents[0]);
     }
     return "";
-  }
-
-  // numberAgentEntries takes in spiffe id of an agent and entries list 
-  // returns number of entries for an agent
-  numberAgentEntries(spiffeid, globalEntries) {
-    if (typeof globalEntries !== 'undefined') {
-      var entriesList = globalEntries.filter(entry => {
-        return spiffeid === (this.getEntryParentid(entry))
-      })
-      return entriesList.length
-    } else {
-      return 0
-    }
-  }
-
-  // numberClusterEntries takes in an entry cluster metadata and list of entries
-  // returns number of entries in a cluster
-  numberClusterEntries(entry, globalEntries) {
-    var entriesPerAgent = entry.agentsList.map(currentAgent => {
-      return this.numberAgentEntries(currentAgent, globalEntries);
-    })
-    var sum = entriesPerAgent.reduce((acc, curVal) => {
-      return acc + curVal;
-    }, 0)
-    return sum
-  }
-
-  // cluster takes in an entry cluster metadata and list of entries
-  // returns cluster metadata info for dashboard table
-  cluster(entry, globalEntries) {
-    return {
-      id: entry.name,
-      name: entry.name,
-      created: entry.creationTime,
-      numNodes: entry.agentsList.length,
-      numEntries: this.numberClusterEntries(entry, globalEntries),
-    }
-  }
-
-  // numberEntries takes in spiffe id of an agent, avialble agents' spiffeids and list of entries
-  // returns cluster metadata info for dashboard table
-  numberEntries(spiffeid, agentEntriesDict, globalEntries) {
-    var validIds = new Set([spiffeid]);
-
-    // Also check for parent IDs associated with the agent
-    let agentEntries = agentEntriesDict[spiffeid];
-    if (agentEntries !== undefined) {
-      for (let j = 0; j < agentEntries.length; j++) {
-        validIds.add(this.getEntrySpiffeid(agentEntries[j]));
-      }
-    }
-
-    if (typeof globalEntries !== 'undefined') {
-      var entriesList = globalEntries.filter(entry => {
-        return (typeof entry !== 'undefined') && validIds.has(this.getEntryParentid(entry));
-      });
-
-      if (typeof entriesList === 'undefined') {
-        return 0
-      } else {
-        return entriesList.length
-      }
-    } else {
-      return 0
-    }
-  }
-
-  // getChildEntries takes in an agent metadata, avialble agents' spiffeids, list of entries and workload attestor info for specified agents
-  // returns agent metadata info for dashboard table
-  getChildEntries(agent, agentEntriesDict, globalEntries, WorkLoadAttestorInfo) {
-    var thisSpiffeid = this.getAgentSpiffeid(agent);
-    // get status
-    var status = this.getAgentStatusString(agent);
-    // get tornjak metadata
-    var metadata_entry = this.getAgentMetadata(thisSpiffeid, WorkLoadAttestorInfo);
-    var plugin = "None"
-    var cluster = "None"
-    if (typeof metadata_entry["plugin"] !== 'undefined' && metadata_entry["plugin"].length !== 0) {
-      plugin = metadata_entry["plugin"]
-    }
-    if (typeof metadata_entry["cluster"] !== 'undefined' && metadata_entry["cluster"].length !== 0) {
-      cluster = metadata_entry["cluster"]
-    }
-    return {
-      id: thisSpiffeid,
-      spiffeid: thisSpiffeid,
-      numEntries: this.numberEntries(thisSpiffeid, agentEntriesDict, globalEntries),
-      status: status,
-      platformType: plugin,
-      clusterName: cluster,
-    }
-  }
-
-  // workloadEntry takes in an entry metadata and workload attestor info for specified agents
-  // returns entry metadata info for dashboard table
-  workloadEntry(entry, WorkLoadAttestorInfo) {
-    var thisSpiffeId = this.getEntrySpiffeid(entry)
-    var thisParentId = this.getEntryParentid(entry)
-    // get tornjak metadata
-    var metadata_entry = this.getAgentMetadata(thisParentId, WorkLoadAttestorInfo);
-    var plugin = "None"
-    var cluster = "None"
-    if (metadata_entry["plugin"].length !== 0) {
-      plugin = metadata_entry["plugin"]
-    }
-    if (metadata_entry["cluster"].length !== 0) {
-      cluster = metadata_entry["cluster"]
-    }
-    // get spire data
-    var admin = this.getEntryAdminFlag(entry)
-    var expTime = "No Expiry Time"
-    if (typeof entry.expires_at !== 'undefined') {
-      var d = new Date(this.getEntryExpiryMillisecondsFromEpoch(entry))
-      expTime = d.toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false })
-    }
-    return {
-      id: entry.id,
-      spiffeid: thisSpiffeId,
-      parentId: thisParentId,
-      adminFlag: admin,
-      entryExpireTime: expTime,
-      platformType: plugin,
-      clusterName: cluster,
-    }
   }
 
 }

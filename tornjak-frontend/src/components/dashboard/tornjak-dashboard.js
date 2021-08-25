@@ -27,7 +27,7 @@ import {
   tornjakMessageFunc,
   agentworkloadSelectorInfoFunc,
   clustersListUpdateFunc,
-  clickedDashboardTabelFunc,
+  clickedDashboardTableFunc,
 } from 'redux/actions';
 import SpiffeHelper from '../spiffe-helper';
 import DashboardDrawer from './dashboard-drawer';
@@ -216,5 +216,5 @@ const mapStateToProps = (state) => ({
 
 export default withStyles(styles)(connect(
   mapStateToProps,
-  { entriesListUpdateFunc, agentsListUpdateFunc, agentworkloadSelectorInfoFunc, clustersListUpdateFunc, tornjakMessageFunc, serverInfoUpdateFunc, serverSelectedFunc, tornjakServerInfoUpdateFunc, selectorInfoFunc, clickedDashboardTabelFunc }
+  { entriesListUpdateFunc, agentsListUpdateFunc, agentworkloadSelectorInfoFunc, clustersListUpdateFunc, tornjakMessageFunc, serverInfoUpdateFunc, serverSelectedFunc, tornjakServerInfoUpdateFunc, selectorInfoFunc, clickedDashboardTableFunc }
 )(TornjakDashboard))

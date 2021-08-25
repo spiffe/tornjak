@@ -25,7 +25,7 @@ import PeopleIcon from '@material-ui/icons/People';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
 import {
-    clickedDashboardTabelFunc,
+    clickedDashboardTableFunc,
 } from 'redux/actions';
 const drawerWidth = 240;
 const drawerHeight = '100%';
@@ -129,7 +129,7 @@ class DashboardDrawer extends React.Component {
     }
 
     assignDashboardPath(entity) {
-        this.props.clickedDashboardTabelFunc(entity);
+        this.props.clickedDashboardTableFunc(entity);
         const path = "/tornjak/dashboard";
         if (window.location.href !== window.location.origin + path)
             window.location.href = path;
@@ -227,5 +227,5 @@ const mapStateToProps = (state) => ({
 })
 
 export default withStyles(styles)(
-    connect(mapStateToProps, { clickedDashboardTabelFunc })(DashboardDrawer)
+    connect(mapStateToProps, { clickedDashboardTableFunc })(DashboardDrawer)
 )

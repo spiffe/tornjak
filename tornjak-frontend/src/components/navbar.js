@@ -5,7 +5,7 @@ import 'carbon-components/css/carbon-components.min.css';
 import './style.css';
 import tornjak_logo from "res/tornjak_logo.png";
 import {
-  clickedDashboardTabelFunc,
+  clickedDashboardTableFunc,
 } from 'redux/actions';
 
 class NavigationBar extends Component {
@@ -54,7 +54,7 @@ class NavigationBar extends Component {
                 className="dropbtn"
                 onClick={() => {
                   if (this.props.globalClickedDashboardTable !== "dashboard") {
-                    this.props.clickedDashboardTabelFunc("dashboard")
+                    this.props.clickedDashboardTableFunc("dashboard")
                   }
                 }}
               >Tornjak Dashboard</a>
@@ -79,5 +79,5 @@ const mapStateToProps = (state) => ({
 
 export default connect(
   mapStateToProps,
-  { clickedDashboardTabelFunc }
+  { clickedDashboardTableFunc }
 )(NavigationBar)

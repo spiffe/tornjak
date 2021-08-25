@@ -6,7 +6,7 @@ import {
   Button,
 } from '@material-ui/core';
 import {
-  clickedDashboardTabelFunc,
+  clickedDashboardTableFunc,
 } from 'redux/actions';
 import TornjakHelper from 'components/tornjak-helper';
 
@@ -27,7 +27,7 @@ class TableDashboard extends React.Component {
           <Button
             color="inherit"
             size="large"
-            onClick={() => { this.props.clickedDashboardTabelFunc(title.toLowerCase()); }}
+            onClick={() => { this.props.clickedDashboardTableFunc(title.toLowerCase()); }}
           >
             {title}
           </Button>
@@ -42,7 +42,7 @@ class TableDashboard extends React.Component {
             if (this.state.selectedRows.length === 0) {
               window.alert("Please Select a Row to See Details.");
             } else {
-              this.props.clickedDashboardTabelFunc(title.toLowerCase() + "details")
+              this.props.clickedDashboardTableFunc(title.toLowerCase() + "details")
             }
           }}
         >
@@ -73,5 +73,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { clickedDashboardTabelFunc }
+  { clickedDashboardTableFunc }
 )(TableDashboard);
