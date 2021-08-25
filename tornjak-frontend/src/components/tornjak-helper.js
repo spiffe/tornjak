@@ -30,7 +30,7 @@ class TornjakHelper extends Component {
     if (urlParams.entity === "clusters") {
       for (let i = 0; i < globalClustersList.length; i++) {
         if (globalClustersList[i].name === id) {
-          selectedData = this.getClusterMetadata(globalClustersList[i], globalEntriesList)
+          selectedData = this.getClusterMetadata(globalClustersList[i], globalEntriesList, globalAgentsList)
         }
       }
     } else if (urlParams.entity === "agents") {
@@ -53,11 +53,15 @@ class TornjakHelper extends Component {
 
   // numberAgentEntries takes in spiffe id of an agent and entries list 
   // returns number of entries for an agent
-  numberAgentEntries(spiffeid, globalEntries) {
+  numberAgentEntries(spiffeid, globalEntries, globalAgents) {
     if (typeof globalEntries !== 'undefined') {
+      var curAgent = globalAgents.filter(agent => {
+        return "spiffe://"+agent.id.trust_domain+agent.id.path === spiffeid
+      })
       var entriesList = globalEntries.filter(entry => {
         return spiffeid === (this.SpiffeHelper.getEntryParentid(entry))
       })
+      entriesList = entriesList.concat(this.SpiffeHelper.getAgentEntries(curAgent, globalEntries)); //include node entries
       return entriesList.length
     } else {
       return NaN
@@ -66,9 +70,9 @@ class TornjakHelper extends Component {
 
   // numberClusterEntries takes in an entry cluster metadata and list of entries
   // returns number of entries in a cluster
-  numberClusterEntries(entry, globalEntries) {
+  numberClusterEntries(entry, globalEntries, globalAgents) {
     var entriesPerAgent = entry.agentsList.map(currentAgent => {
-      return this.numberAgentEntries(currentAgent, globalEntries);
+      return this.numberAgentEntries(currentAgent, globalEntries, globalAgents);
     })
     var sum = entriesPerAgent.reduce((acc, curVal) => {
       return acc + curVal;
@@ -78,13 +82,13 @@ class TornjakHelper extends Component {
 
   // getClusterMetadata takes in an entry cluster metadata and list of entries
   // returns cluster metadata info for dashboard table
-  getClusterMetadata(entry, globalEntries) {
+  getClusterMetadata(entry, globalEntries, globalAgents) {
     return {
       id: entry.name,
       name: entry.name,
       created: entry.creationTime,
       numNodes: entry.agentsList.length,
-      numEntries: this.numberClusterEntries(entry, globalEntries),
+      numEntries: this.numberClusterEntries(entry, globalEntries, globalAgents),
     }
   }
 

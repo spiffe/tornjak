@@ -31,12 +31,12 @@ class ClusterDashboardTable extends React.Component {
     if (typeof this.props.globalClustersList === 'undefined') {
       return [];
     }
-    clustersList = this.props.globalClustersList.map(a => this.TornjakHelper.getClusterMetadata(a, this.props.globalEntries.globalEntriesList));
+    clustersList = this.props.globalClustersList.map(a => this.TornjakHelper.getClusterMetadata(a, this.props.globalEntries.globalEntriesList, this.props.globalAgents.globalAgentsList));
 
     //For details page filtering data
     if (selectedDataKey !== undefined) {
       for (let i = 0; i < clustersList.length; i++) {
-        if ((clustersList[i].clusterName === selectedDataKey["clustersFilter"]) || (clustersList[i].name === selectedDataKey["clustersFilter"])) {
+        if ((clustersList[i].clusterName === selectedDataKey) || (clustersList[i].name === selectedDataKey)) {
           filterByValue.push(clustersList[i]);
         }
       }

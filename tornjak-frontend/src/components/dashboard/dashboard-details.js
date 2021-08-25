@@ -58,7 +58,9 @@ class DashboardDetails extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-        };
+            selectedDataKey: this.selectedDataKey()
+        }
+        
     }
 
     selectedDataKey() {
@@ -85,6 +87,7 @@ class DashboardDetails extends React.Component {
     }
 
     render() {
+        const { selectedDataKey} = this.state;
         const { classes, selectedData } = this.props;
         return (
             <div className={classes.root}>
@@ -113,7 +116,7 @@ class DashboardDetails extends React.Component {
                                             <Paper className={classes.paper}>
                                                 <AgentsTable
                                                     numRows={100}
-                                                    selectedDataKey={this.selectedDataKey()} />
+                                                    selectedDataKey={selectedDataKey["agentsFilter"]} />
                                             </Paper>
                                         </Grid>
                                     </Container>
@@ -123,7 +126,7 @@ class DashboardDetails extends React.Component {
                                             <Paper className={classes.paper}>
                                                 <EntriesTable
                                                     numRows={100}
-                                                    selectedDataKey={this.selectedDataKey()} />
+                                                    selectedDataKey={selectedDataKey["entriesFilter"]} />
                                             </Paper>
                                         </Grid>
                                     </Container>
@@ -150,7 +153,7 @@ class DashboardDetails extends React.Component {
                                             <Paper className={classes.paper}>
                                                 <ClustersTable
                                                     numRows={100}
-                                                    selectedDataKey={this.selectedDataKey()} />
+                                                    selectedDataKey={selectedDataKey["clustersFilter"]} />
                                             </Paper>
                                         </Grid>
                                     </Container>
@@ -160,7 +163,7 @@ class DashboardDetails extends React.Component {
                                             <Paper className={classes.paper}>
                                                 <EntriesTable
                                                     numRows={100}
-                                                    selectedDataKey={this.selectedDataKey()} />
+                                                    selectedDataKey={selectedDataKey["entriesFilter"]} />
                                             </Paper>
                                         </Grid>
                                     </Container>
@@ -189,7 +192,7 @@ class DashboardDetails extends React.Component {
                                             <Paper className={classes.paper}>
                                                 <ClustersTable
                                                     numRows={100}
-                                                    selectedDataKey={this.selectedDataKey()} />
+                                                    selectedDataKey={selectedDataKey["clustersFilter"]} />
                                             </Paper>
                                         </Grid>
                                     </Container>
@@ -199,7 +202,7 @@ class DashboardDetails extends React.Component {
                                             <Paper className={classes.paper}>
                                                 <AgentsTable
                                                     numRows={100}
-                                                    selectedDataKey={this.selectedDataKey()} />
+                                                    selectedDataKey={selectedDataKey["agentsFilter"]} />
                                             </Paper>
                                         </Grid>
                                     </Container>

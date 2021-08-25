@@ -44,7 +44,7 @@ class AgentDashboardTable extends React.Component {
     //For details page filtering data
     if (selectedDataKey !== undefined) {
       for (let i = 0; i < agentsList.length; i++) {
-        if ((agentsList[i].clusterName === selectedDataKey["agentsFilter"]) || (agentsList[i].id === selectedDataKey["agentsFilter"])) {
+        if ((agentsList[i].clusterName === selectedDataKey) || (agentsList[i].id === selectedDataKey)) {
           filterByValue.push(agentsList[i]);
         }
       }

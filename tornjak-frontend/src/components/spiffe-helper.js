@@ -88,16 +88,15 @@ class SpiffeHelper extends Component {
   // the list of entries which are associated with this agent
   getAgentEntries(agent, entries) {
     let nodeEntries = entries.filter(e => e.parent_id.path === "/spire/server")
-    let agentSelectors = new Set(agent.selectors.map(formatSelectors))
+    let agentSelectors = new Set(agent[0].selectors.map(formatSelectors))
     let isAssocWithAgent = e => {
       let entrySelectors = new Set(e.selectors.map(formatSelectors))
       return isSuperset(agentSelectors, entrySelectors)
     }
-
     return nodeEntries.filter(isAssocWithAgent)
   }
 
-  // getAgentEntries provides list of agents and a list of entries 
+  // getAgentsEntries provides list of agents and a list of entries 
   // and returns a dictionary with the fully qualified spiffe ID (as per 
   // getAgentSpiffeid) as keys, and values being the the list of entries 
   // which are associated with that agent.

@@ -44,7 +44,7 @@ class EntriesDashBoardTable extends React.Component {
     // For details page filtering data
     if (selectedDataKey !== undefined) {
       for (let i = 0; i < entriesList.length; i++) {
-        if ((entriesList[i].clusterName === selectedDataKey["entriesFilter"]) || (entriesList[i].parentId === selectedDataKey["entriesFilter"])) {
+        if ((entriesList[i].clusterName === selectedDataKey) || (entriesList[i].parentId === selectedDataKey)) {
           filterByValue.push(entriesList[i]);
         }
       }
