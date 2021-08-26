@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
 import { Dropdown, TextInput, MultiSelect, TextArea } from 'carbon-components-react';
+import Button from '@material-ui/core/Button';
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
@@ -29,6 +30,7 @@ class ClusterEdit extends Component {
     this.onChangeClusterManagedBy = this.onChangeClusterManagedBy.bind(this);
     this.prepareClusterNameList = this.prepareClusterNameList.bind(this);
     this.onChangeAgentsList = this.onChangeAgentsList.bind(this);
+    this.deleteCluster = this.deleteCluster.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
 
     this.state = {
@@ -210,6 +212,42 @@ class ClusterEdit extends Component {
     }
   }
 
+  deleteCluster() {
+    var cluster = this.state.clusterName, endpoint = "";
+    let promises = [];
+    if (IsManager) {
+      endpoint = GetApiServerUri('/manager-api/tornjak/clusters/delete') + "/" + this.props.globalServerSelected;
+    } else {
+      endpoint = GetApiServerUri('/api/tornjak/clusters/delete');
+    }
+
+    if (cluster === "") {
+      window.alert("Please Choose a Cluster!");
+    } else {
+      var confirm = window.confirm("Are you sure you want to delete the cluster?");
+      if (confirm) {
+        promises.push(axios.post(endpoint, {
+          "cluster": {
+            "name": cluster
+          }
+        }))
+        Promise.all(promises)
+          .then(responses => {
+            this.props.clustersListUpdateFunc(this.props.globalClustersList.filter(el =>
+              el.name !== cluster.name));
+            window.alert("CLUSTER DELETED SUCCESSFULLY!");
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+      }
+      else {
+        return 0;
+      }
+    }
+  }
+
   onSubmit(e) {
     e.preventDefault();
 
@@ -256,13 +294,13 @@ class ClusterEdit extends Component {
           statusOK: "ERROR"
         })
       )
-      if (IsManager) {
-        if (this.props.globalServerSelected !== "" && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
-          this.TornjakApi.populateClustersUpdate(this.props.globalServerSelected, this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
-        }
-      } else {
-        this.TornjakApi.populateLocalClustersUpdate(this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
+    if (IsManager) {
+      if (this.props.globalServerSelected !== "" && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
+        this.TornjakApi.populateClustersUpdate(this.props.globalServerSelected, this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
       }
+    } else {
+      this.TornjakApi.populateLocalClustersUpdate(this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
+    }
   }
   render() {
     const ClusterNames = this.state.clusterNameList, ClusterType = this.props.clusterTypeList;
@@ -372,8 +410,16 @@ class ClusterEdit extends Component {
                   disabled
                 />
               </div>
-              <div className="form-group">
+              <div className="edit-cluster-button">
                 <input type="submit" value="Edit Cluster" className="btn btn-primary" />
+              </div>
+              <div className="delete-cluster-button">
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={this.deleteCluster}>
+                  Delete Cluster
+                </Button>
               </div>
               <div>
                 {this.state.statusOK === "OK" &&

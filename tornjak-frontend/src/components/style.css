@@ -162,3 +162,11 @@
     margin-top: 120px;
     margin-left: 200px;
   }
+
+  .edit-cluster-button {
+    display: inline-block;
+  }
+  .delete-cluster-button {
+    width: 180px;
+    float: right;
+  }
