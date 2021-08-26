@@ -38,7 +38,7 @@ class AgentDashboardTable extends React.Component {
     }
     let agentEntriesDict = this.SpiffeHelper.getAgentsEntries(this.props.globalAgents.globalAgentsList, this.props.globalEntries.globalEntriesList);
     agentsList = this.props.globalAgents.globalAgentsList.map(currentAgent => {
-      return this.TornjakHelper.getChildEntries(currentAgent, agentEntriesDict, this.props.globalEntries.globalEntriesList, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo)
+      return this.TornjakHelper.getDashboardAgentMetaData(currentAgent, agentEntriesDict, this.props.globalEntries.globalEntriesList, this.props.globalAgents.globalAgentsList, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo)
     })
     
     //For details page filtering data
