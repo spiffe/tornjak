@@ -8,9 +8,11 @@ const {
     TableCell,
 } = DataTable;
 
-// Body take in entityType, rows of data to be rendered on table body and 
-// getSelectionProps func for selecting rows from DataTable
-// Body returns the body of the table for the specified entity
+// Body take in 
+// entityType: type of entity 
+// rows: rows of data to be rendered on table body
+// getSelectionProps: getSelectionProps func for selecting rows from DataTable
+// returns the body of the table for the specified entity
 class Body extends React.Component {
     constructor(props) {
         super(props);

@@ -8,7 +8,10 @@ import {
 } from 'redux/actions';
 import Table from './list-table';
 
-class DataTableRender extends React.Component {
+// EntriesListTable takes in 
+// listTableData: entries data to be rendered on table
+// returns entries data inside a carbon component table with specified functions
+class EntriesListTable extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -128,4 +131,4 @@ const mapStateToProps = (state) => ({
 export default connect(
     mapStateToProps,
     { entriesListUpdateFunc }
-)(DataTableRender)
+)(EntriesListTable)

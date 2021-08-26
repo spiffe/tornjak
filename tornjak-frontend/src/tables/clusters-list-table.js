@@ -8,7 +8,10 @@ import {
 } from 'redux/actions';
 import Table from './list-table';
 
-class ClusterListTable extends React.Component {
+// ClusterListTable takes in 
+// listTableData: clusters data to be rendered on table
+// returns clusters data inside a carbon component table with specified functions
+class ClustersListTable extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -130,4 +133,4 @@ const mapStateToProps = (state) => ({
 export default connect(
     mapStateToProps,
     { clustersListUpdateFunc }
-)(ClusterListTable)
+)(ClustersListTable)

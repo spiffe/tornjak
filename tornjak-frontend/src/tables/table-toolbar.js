@@ -12,11 +12,13 @@ const {
     TableBatchAction,
 } = DataTable;
 
-// TableToolBar takes in onInputChange function for the search functionality from DataTable, 
-// getBatchActionProps function for functions on toolbar from DataTable,
-// delete row function and ban row function for specified entity if applicable,
-// and selectedRows from DataTable
-// TableToolBar returns the toolbar of the table for the specified entity
+// TableToolBar takes in 
+// onInputChange: onInputChange function for the search functionality from DataTable
+// getBatchActionProps: getBatchActionProps function for functions on toolbar from DataTable
+// deleteEntity: delete row function specified entity if applicable
+// banEntity: ban row function for specified entity if applicable
+// selectedRows: selectedRows from DataTable
+// returns the toolbar of the table for the specified entity
 class TableToolBar extends React.Component {
     constructor(props) {
         super(props);

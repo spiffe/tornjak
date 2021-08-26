@@ -8,7 +8,10 @@ import {
 } from 'redux/actions';
 import Table from './list-table';
 
-class AgentListTable extends React.Component {
+// AgentListTable takes in 
+// listTableData: agents data to be rendered on table
+// returns agents data inside a carbon component table with specified functions
+class AgentsListTable extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -169,4 +172,4 @@ const mapStateToProps = (state) => ({
 export default connect(
     mapStateToProps,
     { agentsListUpdateFunc }
-)(AgentListTable)
+)(AgentsListTable)

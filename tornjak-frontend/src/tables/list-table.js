@@ -8,9 +8,13 @@ const {
     Table,
 } = DataTable;
 
-// DataTableRender takes in entityType, data to be rendered on table, headerData of table, 
-// delete row function and ban row function for specified entity if applicable
-// DataTableRender returns data inside a carbon component table with specified functions for entity
+// DataTableRender takes in 
+// entityType: type of entity, 
+// listTableData: data to be rendered on table, 
+// headerData: headerData of table, 
+// deleteEntity: delete row function for specified entity
+// banEntity: ban row function for specified entity if applicable
+// returns data inside a carbon component table with specified functions for entity
 class DataTableRender extends React.Component {
     constructor(props) {
         super(props);

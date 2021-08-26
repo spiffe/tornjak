@@ -7,9 +7,11 @@ const {
     TableHeader,
 } = DataTable;
 
-// Head takes in getSelectionProps function for selecting all rows from DataTable, 
-// headerData of table and getHeaderProps functiin from DataTable
-// Head returns header of the table for the specified entity
+// Head takes in 
+// getSelectionProps: getSelectionProps function for selecting all rows from DataTable
+// headers: headerData of table
+// getHeaderProps: getHeaderProps function from DataTable
+// returns header of the table for the specified entity
 class Head extends React.Component {
     constructor(props) {
         super(props);
