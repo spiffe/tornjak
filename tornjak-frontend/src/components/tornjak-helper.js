@@ -38,7 +38,7 @@ class TornjakHelper extends Component {
         let agentId = "spiffe://" + globalAgentsList[i].id.trust_domain + globalAgentsList[i].id.path;
         if (agentId === id) {
           let agentEntriesDict = this.SpiffeHelper.getAgentsEntries(globalAgentsList, globalEntriesList)
-          selectedData = this.getChildEntries(globalAgentsList[i], agentEntriesDict, globalEntriesList, globalAgentsWorkLoadAttestorInfo)
+          selectedData = this.getDashboardAgentMetaData(globalAgentsList[i], agentEntriesDict, globalEntriesList, globalAgentsList, globalAgentsWorkLoadAttestorInfo)
         }
       }
     } else if (urlParams.entity === "entries") {
@@ -51,28 +51,22 @@ class TornjakHelper extends Component {
     return selectedData;
   }
 
-  // numberAgentEntries takes in spiffe id of an agent and entries list 
-  // returns number of entries for an agent
-  numberAgentEntries(spiffeid, globalEntries, globalAgents) {
+  // numberEntriesFromAgent takes in spiffe id of an agent and entries list 
+  // returns number of workload/child entries for an agent
+  numberEntriesFromAgent(spiffeid, globalEntries, globalAgents) {
     if (typeof globalEntries !== 'undefined') {
-      var curAgent = globalAgents.filter(agent => {
-        return "spiffe://"+agent.id.trust_domain+agent.id.path === spiffeid
-      })
-      var entriesList = globalEntries.filter(entry => {
-        return spiffeid === (this.SpiffeHelper.getEntryParentid(entry))
-      })
-      entriesList = entriesList.concat(this.SpiffeHelper.getAgentEntries(curAgent, globalEntries)); //include node entries
+      var entriesList = this.SpiffeHelper.getChildEntries(spiffeid, globalAgents, globalEntries);
       return entriesList.length
     } else {
       return NaN
     }
   }
 
-  // numberClusterEntries takes in an entry cluster metadata and list of entries
-  // returns number of entries in a cluster
-  numberClusterEntries(entry, globalEntries, globalAgents) {
+  // numberEntriesFromCluster takes in an entry cluster metadata and list of entries
+  // returns number of workload/child entries for a cluster
+  numberEntriesFromCluster(entry, globalEntries, globalAgents) {
     var entriesPerAgent = entry.agentsList.map(currentAgent => {
-      return this.numberAgentEntries(currentAgent, globalEntries, globalAgents);
+      return this.numberEntriesFromAgent(currentAgent, globalEntries, globalAgents);
     })
     var sum = entriesPerAgent.reduce((acc, curVal) => {
       return acc + curVal;
@@ -88,42 +82,13 @@ class TornjakHelper extends Component {
       name: entry.name,
       created: entry.creationTime,
       numNodes: entry.agentsList.length,
-      numEntries: this.numberClusterEntries(entry, globalEntries, globalAgents),
+      numEntries: this.numberEntriesFromCluster(entry, globalEntries, globalAgents),
     }
   }
 
-  // numberEntries takes in spiffe id of an agent, avialble agents' spiffeids and list of entries
-  // agentEntriesDict is the output of the function SpiffeHelper.getAgentsEntries
-  // returns number of entries in an agent
-  numberEntries(spiffeid, agentEntriesDict, globalEntries) {
-    var validIds = new Set([spiffeid]);
-
-    // Also check for parent IDs associated with the agent
-    let agentEntries = agentEntriesDict[spiffeid];
-    if (agentEntries !== undefined) {
-      for (let j = 0; j < agentEntries.length; j++) {
-        validIds.add(this.SpiffeHelper.getEntrySpiffeid(agentEntries[j]));
-      }
-    }
-
-    if (typeof globalEntries !== 'undefined') {
-      var entriesList = globalEntries.filter(entry => {
-        return (typeof entry !== 'undefined') && validIds.has(this.SpiffeHelper.getEntryParentid(entry));
-      });
-
-      if (typeof entriesList === 'undefined') {
-        return NaN
-      } else {
-        return entriesList.length
-      }
-    } else {
-      return NaN
-    }
-  }
-
-  // getChildEntries takes in an agent metadata, avialble agents' spiffeids, list of entries and workload attestor info for specified agents
+  // getDashboardAgentMetaData takes in an agent metadata, avialble agents' spiffeids, list of entries and workload attestor info for specified agents
   // returns agent metadata info for dashboard table
-  getChildEntries(agent, agentEntriesDict, globalEntries, WorkLoadAttestorInfo) {
+  getDashboardAgentMetaData(agent, agentEntriesDict, globalEntries, globalAgents, WorkLoadAttestorInfo) {
     var thisSpiffeid = this.SpiffeHelper.getAgentSpiffeid(agent);
     // get status
     var status = this.SpiffeHelper.getAgentStatusString(agent);
@@ -140,7 +105,7 @@ class TornjakHelper extends Component {
     return {
       id: thisSpiffeid,
       spiffeid: thisSpiffeid,
-      numEntries: this.numberEntries(thisSpiffeid, agentEntriesDict, globalEntries),
+      numEntries: this.SpiffeHelper.numberEntries(thisSpiffeid, agentEntriesDict, globalEntries, globalAgents),
       status: status,
       platformType: plugin,
       clusterName: cluster,
