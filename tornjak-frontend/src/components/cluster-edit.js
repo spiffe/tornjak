@@ -213,39 +213,27 @@ class ClusterEdit extends Component {
   }
 
   deleteCluster() {
-    var cluster = this.state.clusterName, endpoint = "";
-    let promises = [];
-    if (IsManager) {
-      endpoint = GetApiServerUri('/manager-api/tornjak/clusters/delete') + "/" + this.props.globalServerSelected;
-    } else {
-      endpoint = GetApiServerUri('/api/tornjak/clusters/delete');
+    var cluster = this.state.clusterName;
+    var inputData =
+    {
+      "cluster": {
+        "name": cluster
+      }
     }
-
     if (cluster === "") {
-      window.alert("Please Choose a Cluster!");
-    } else {
-      var confirm = window.confirm("Are you sure you want to delete the cluster?");
-      if (confirm) {
-        promises.push(axios.post(endpoint, {
-          "cluster": {
-            "name": cluster
-          }
-        }))
-        Promise.all(promises)
-          .then(responses => {
-            this.props.clustersListUpdateFunc(this.props.globalClustersList.filter(el =>
-              el.name !== cluster.name));
-            window.alert("CLUSTER DELETED SUCCESSFULLY!");
-            window.location.reload();
-          })
-          .catch((error) => {
-            console.log(error);
-          })
-      }
-      else {
-        return 0;
-      }
+      return window.alert("Please Choose a Cluster!");
     }
+    var confirm = window.confirm("Are you sure you want to delete the cluster?");
+    if (!confirm) {
+      return
+    }
+    if (IsManager) {
+      this.TornjakApi.clusterDelete(this.props.globalServerSelected, inputData, this.props.clustersListUpdateFunc, this.props.globalClustersList);
+    } else {
+      this.TornjakApi.localClusterDelete(inputData, this.props.clustersListUpdateFunc, this.props.globalClustersList);
+    }
+    window.alert("CLUSTER DELETED SUCCESSFULLY!");
+    window.location.reload();
   }
 
   onSubmit(e) {
