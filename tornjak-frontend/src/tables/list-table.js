@@ -22,12 +22,11 @@ class DataTableRender extends React.Component {
     }
 
     render() {
-        const { entityType, listTableData, headerData, deleteEntity, banEntity } = this.props;
         return (
             <DataTable
                 isSortable
-                rows={listTableData}
-                headers={headerData}
+                rows={this.props.listTableData}
+                headers={this.props.headerData}
                 render={({
                     rows,
                     headers,
@@ -45,8 +44,8 @@ class DataTableRender extends React.Component {
                         <ToolBar
                             onInputChange={onInputChange}
                             getBatchActionProps={getBatchActionProps}
-                            deleteEntity={deleteEntity}
-                            banEntity={banEntity}
+                            deleteEntity={this.props.deleteEntity}
+                            banEntity={this.props.banEntity}
                             selectedRows={selectedRows}
                         />
                         <Table size="short" useZebraStyles>
@@ -56,7 +55,7 @@ class DataTableRender extends React.Component {
                                 headers={headers}
                             />
                             <Body
-                                entityType={entityType}
+                                entityType={this.props.entityType}
                                 rows={rows}
                                 getSelectionProps={getSelectionProps}
                             />

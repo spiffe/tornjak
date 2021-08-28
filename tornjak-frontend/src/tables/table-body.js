@@ -20,12 +20,11 @@ class Body extends React.Component {
     }
 
     render() {
-        const { entityType, rows, getSelectionProps } = this.props;
         return (
             <TableBody>
-                {rows.map((row, key) => (
+                {this.props.rows.map((row, key) => (
                     <TableRow key={key}>
-                        <TableSelectRow {...getSelectionProps({ row })} />
+                        <TableSelectRow {...this.props.getSelectionProps({ row })} />
                         {row.cells.map((cell) => (
                             <TableCell key={cell.id}>
                                 {cell.info.header === "info" ? (
@@ -36,7 +35,7 @@ class Body extends React.Component {
                                     cell.value)}
                             </TableCell>
                         ))}
-                        {entityType === "Agent" &&
+                        {this.props.entityType === "Agent" &&
                             <TableCell>
                                 <div>
                                     <WorkLoadAttestor

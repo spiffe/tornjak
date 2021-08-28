@@ -19,13 +19,12 @@ class Head extends React.Component {
     }
 
     render() {
-        const { getSelectionProps, headers, getHeaderProps } = this.props;
         return (
             <TableHead>
                 <TableRow>
-                    <TableSelectAll {...getSelectionProps()} />
-                    {headers.map((header) => (
-                        <TableHeader key={header.header} {...getHeaderProps({ header })}>
+                    <TableSelectAll {...this.props.getSelectionProps()} />
+                    {this.props.headers.map((header) => (
+                        <TableHeader key={header.header} {...this.props.getHeaderProps({ header })}>
                             {header.header}
                         </TableHeader>
                     ))}

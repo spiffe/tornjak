@@ -26,32 +26,31 @@ class TableToolBar extends React.Component {
     }
 
     render() {
-        const { onInputChange, getBatchActionProps, deleteEntity, banEntity, selectedRows } = this.props;
         return (
             <TableToolbar>
                 <TableToolbarContent>
-                    <TableToolbarSearch onChange={(e) => onInputChange(e)} />
+                    <TableToolbarSearch onChange={(e) => this.props.onInputChange(e)} />
                 </TableToolbarContent>
-                <TableBatchActions {...getBatchActionProps()}>
-                    {deleteEntity !== undefined &&
+                <TableBatchActions {...this.props.getBatchActionProps()}>
+                    {this.props.deleteEntity !== undefined &&
                         <TableBatchAction
                             renderIcon={Delete}
                             iconDescription="Delete"
                             onClick={() => {
-                                deleteEntity(selectedRows);
-                                getBatchActionProps().onCancel();
+                                this.props.deleteEntity(this.props.selectedRows);
+                                this.props.getBatchActionProps().onCancel();
                             }}
                         >
                             Delete
                         </TableBatchAction>
                     }
-                    {banEntity !== undefined &&
+                    {this.props.banEntity !== undefined &&
                         <TableBatchAction
                             renderIcon={ResetIcon}
                             iconDescription="Ban"
                             onClick={() => {
-                                banEntity(selectedRows);
-                                getBatchActionProps().onCancel();
+                                this.props.banEntity(this.props.selectedRows);
+                                this.props.getBatchActionProps().onCancel();
                             }}
                         >
                             Ban
