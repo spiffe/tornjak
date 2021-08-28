@@ -22,7 +22,8 @@ class TornjakHelper extends Component {
     return detailsLink;
   }
 
-  // detailsDataParse takes in url parameters for a specific url and properties of a class
+  // detailsDataParse takes in url parameters for a specific url for details page and
+  // properties of a class including clustersList, agentsList, entriesList and agentsWorkLoadAttestorInfo
   // returns a parsed and filtered data for the specifed entity from the url parameteres 
   detailsDataParse(urlParams, props) {
     let selectedData = [{}], id = decodeURIComponent(urlParams.id);
@@ -30,21 +31,20 @@ class TornjakHelper extends Component {
     if (urlParams.entity === "clusters") {
       for (let i = 0; i < globalClustersList.length; i++) {
         if (globalClustersList[i].name === id) {
-          selectedData = this.getClusterMetadata(globalClustersList[i], globalEntriesList, globalAgentsList)
+          selectedData = this.getClusterMetadata(globalClustersList[i], globalEntriesList, globalAgentsList);
         }
       }
     } else if (urlParams.entity === "agents") {
       for (let i = 0; i < globalAgentsList.length; i++) {
-        let agentId = "spiffe://" + globalAgentsList[i].id.trust_domain + globalAgentsList[i].id.path;
+        let agentId = this.SpiffeHelper.getAgentSpiffeid(globalAgentsList[i]);
         if (agentId === id) {
-          let agentEntriesDict = this.SpiffeHelper.getAgentsEntries(globalAgentsList, globalEntriesList)
-          selectedData = this.getDashboardAgentMetaData(globalAgentsList[i], agentEntriesDict, globalEntriesList, globalAgentsList, globalAgentsWorkLoadAttestorInfo)
+          selectedData = this.getDashboardAgentMetaData(globalAgentsList[i], globalEntriesList, globalAgentsList, globalAgentsWorkLoadAttestorInfo);
         }
       }
     } else if (urlParams.entity === "entries") {
       for (let i = 0; i < globalEntriesList.length; i++) {
         if (globalEntriesList[i].id === id) {
-          selectedData = this.workloadEntry(globalEntriesList[i], globalAgentsWorkLoadAttestorInfo)
+          selectedData = this.workloadEntry(globalEntriesList[i], globalAgentsWorkLoadAttestorInfo);
         }
       }
     }
@@ -86,9 +86,9 @@ class TornjakHelper extends Component {
     }
   }
 
-  // getDashboardAgentMetaData takes in an agent metadata, avialble agents' spiffeids, list of entries and workload attestor info for specified agents
+  // getDashboardAgentMetaData takes in an agent metadata, list of entries and workload attestor info for specified agents
   // returns agent metadata info for dashboard table
-  getDashboardAgentMetaData(agent, agentEntriesDict, globalEntries, globalAgents, WorkLoadAttestorInfo) {
+  getDashboardAgentMetaData(agent, globalEntries, globalAgents, WorkLoadAttestorInfo) {
     var thisSpiffeid = this.SpiffeHelper.getAgentSpiffeid(agent);
     // get status
     var status = this.SpiffeHelper.getAgentStatusString(agent);
@@ -105,7 +105,7 @@ class TornjakHelper extends Component {
     return {
       id: thisSpiffeid,
       spiffeid: thisSpiffeid,
-      numEntries: this.SpiffeHelper.numberEntries(thisSpiffeid, agentEntriesDict, globalEntries, globalAgents),
+      numEntries: this.SpiffeHelper.numberEntries(thisSpiffeid, globalEntries, globalAgents),
       status: status,
       platformType: plugin,
       clusterName: cluster,
