@@ -251,7 +251,6 @@ class SpiffeHelper extends Component {
       clusterName: cluster,
     }
   }
-
 }
 
 
