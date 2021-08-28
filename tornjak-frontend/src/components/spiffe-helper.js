@@ -159,19 +159,9 @@ class SpiffeHelper extends Component {
     return "";
   }
 
-  // numberEntries takes in spiffe id of an agent, avialble agents' spiffeids and list of entries
-  // agentEntriesDict is the output of the function SpiffeHelper.getAgentsEntries
+  // numberEntries takes in spiffe id of an agent and list of entries
   // returns number of entries in an agent
-  numberEntries(spiffeid, agentEntriesDict, globalEntries, globalAgents) {
-    var validIds = new Set([spiffeid]);
-
-    // Also check for parent IDs associated with the agent
-    let agentEntries = agentEntriesDict[spiffeid];
-    if (agentEntries !== undefined) {
-      for (let j = 0; j < agentEntries.length; j++) {
-        validIds.add(this.getEntrySpiffeid(agentEntries[j]));
-      }
-    }
+  numberEntries(spiffeid, globalEntries, globalAgents) {
     if (typeof globalEntries !== 'undefined') {
       var entriesList = this.getChildEntries(spiffeid, globalAgents, globalEntries);
       if (typeof entriesList === 'undefined') {
@@ -184,23 +174,21 @@ class SpiffeHelper extends Component {
     }
   }
 
-  // getChildEntries takes in spiffeid of agent, entries, and a set of agentEntries
+  // getChildEntries takes in spiffeid of agent, list of agents, and a list of entries
   // returns list of child entries
   getChildEntries(spiffeid, globalAgents, globalEntries) {
-    if (typeof globalEntries !== 'undefined') {
-      var curAgent = globalAgents.filter(agent => {
-        return this.getAgentSpiffeid(agent) === spiffeid
-      })
-      var entriesList = globalEntries.filter(entry => {
-        return spiffeid === (this.getEntryParentid(entry))
-      })
-      entriesList = entriesList.concat(this.getAgentEntries(curAgent, globalEntries)); //include node entries
-      return entriesList;
-    } else {
+    if (typeof globalEntries === 'undefined') {
       return NaN;
     }
+    var curAgent = globalAgents.filter(agent => {
+      return this.getAgentSpiffeid(agent) === spiffeid
+    })
+    var entriesList = globalEntries.filter(entry => {
+      return spiffeid === (this.getEntryParentid(entry))
+    })
+    entriesList = entriesList.concat(this.getAgentEntries(curAgent, globalEntries)); //include node entries
+    return entriesList;
   }
-
 }
 
 

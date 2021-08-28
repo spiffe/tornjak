@@ -20,6 +20,8 @@ import {
     clickedDashboardTableFunc,
 } from 'redux/actions';
 
+// DashboardDetailsRender takes in details url parameters
+// returns details page for dashboard for a specific entity
 class DashboardDetailsRender extends Component {
     constructor(props) {
         super(props);

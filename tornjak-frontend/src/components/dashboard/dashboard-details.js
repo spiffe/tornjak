@@ -54,6 +54,8 @@ const styles = theme => ({
     }
 });
 
+// DashboardDetails takes in the selected data and props from dashboard table for a specific entity 
+// returns details page for dashboard
 class DashboardDetails extends React.Component {
     constructor(props) {
         super(props);
