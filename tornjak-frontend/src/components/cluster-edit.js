@@ -232,8 +232,6 @@ class ClusterEdit extends Component {
     } else {
       this.TornjakApi.localClusterDelete(inputData, this.props.clustersListUpdateFunc, this.props.globalClustersList);
     }
-    window.alert("CLUSTER DELETED SUCCESSFULLY!");
-    window.location.reload();
   }
 
   onSubmit(e) {

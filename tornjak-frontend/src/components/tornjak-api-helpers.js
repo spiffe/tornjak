@@ -264,9 +264,12 @@ class TornjakApi extends Component {
         clustersListUpdateFunc(globalClustersList.filter(el =>
           el.name !== inputData))
           console.log(response.data)
+          window.alert("CLUSTER DELETED SUCCESSFULLY!");
+          window.location.reload();
       })
       .catch((error) => {
         console.log(error);
+        window.alert("Error deleting cluster: " + error.message);
       })
   }
 
@@ -279,10 +282,13 @@ class TornjakApi extends Component {
       .then(response => {
         clustersListUpdateFunc(globalClustersList.filter(el =>
           el.name !== inputData))
-          console.log(response.data)
+          console.log(response)
+          window.alert("CLUSTER DELETED SUCCESSFULLY!");
+          window.location.reload();
       })
       .catch((error) => {
         console.log(error);
+        window.alert("Error deleting cluster: " + error.message);
       })
   }
 
