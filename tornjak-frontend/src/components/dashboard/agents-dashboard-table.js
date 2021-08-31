@@ -76,12 +76,11 @@ class AgentDashboardTable extends React.Component {
   }
 
   agentList() {
-    if ((typeof this.props.globalEntries.globalEntriesList === 'undefined') ||
-          (typeof this.props.globalAgents.globalAgentsList === 'undefined')) {
+    if ((typeof this.props.globalAgents.globalAgentsList === 'undefined')) {
         return [];
     }
 
-    let agentEntriesDict = this.SpiffeHelper.getAgentsEntries(this.props.globalAgents.globalAgentsList, this.props.globalEntries.globalEntriesList)
+    let agentEntriesDict = this.SpiffeHelper.getAgentsEntries(this.props.globalAgents.globalAgentsList, this.props.globalEntries.globalEntriesList) // TODO this.props.globalEntries.globalEntriesList may be undefined if there are no entries
     return this.props.globalAgents.globalAgentsList.map(currentAgent => {
       return this.getChildEntries(currentAgent, agentEntriesDict);
     })
