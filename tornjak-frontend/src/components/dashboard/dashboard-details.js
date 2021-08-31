@@ -118,7 +118,7 @@ class DashboardDetails extends React.Component {
                                             <Paper className={classes.paper}>
                                                 <AgentsTable
                                                     numRows={100}
-                                                    selectedDataKey={selectedDataKey["agentsFilter"]} />
+                                                    filterByCluster={selectedDataKey["agentsFilter"]} />
                                             </Paper>
                                         </Grid>
                                     </Container>
@@ -128,7 +128,7 @@ class DashboardDetails extends React.Component {
                                             <Paper className={classes.paper}>
                                                 <EntriesTable
                                                     numRows={100}
-                                                    selectedDataKey={selectedDataKey["entriesFilter"]} />
+                                                    filterByCluster={selectedDataKey["entriesFilter"]} />
                                             </Paper>
                                         </Grid>
                                     </Container>
@@ -155,7 +155,7 @@ class DashboardDetails extends React.Component {
                                             <Paper className={classes.paper}>
                                                 <ClustersTable
                                                     numRows={100}
-                                                    selectedDataKey={selectedDataKey["clustersFilter"]} />
+                                                    filterByCluster={selectedDataKey["clustersFilter"]} />
                                             </Paper>
                                         </Grid>
                                     </Container>
@@ -165,7 +165,7 @@ class DashboardDetails extends React.Component {
                                             <Paper className={classes.paper}>
                                                 <EntriesTable
                                                     numRows={100}
-                                                    selectedDataKey={selectedDataKey["entriesFilter"]} />
+                                                    filterByAgentId={selectedDataKey["entriesFilter"]} />
                                             </Paper>
                                         </Grid>
                                     </Container>
@@ -194,7 +194,7 @@ class DashboardDetails extends React.Component {
                                             <Paper className={classes.paper}>
                                                 <ClustersTable
                                                     numRows={100}
-                                                    selectedDataKey={selectedDataKey["clustersFilter"]} />
+                                                    filterByCluster={selectedDataKey["clustersFilter"]} />
                                             </Paper>
                                         </Grid>
                                     </Container>
@@ -204,7 +204,7 @@ class DashboardDetails extends React.Component {
                                             <Paper className={classes.paper}>
                                                 <AgentsTable
                                                     numRows={100}
-                                                    selectedDataKey={selectedDataKey["agentsFilter"]} />
+                                                    filterByAgentId={selectedDataKey["agentsFilter"]} />
                                             </Paper>
                                         </Grid>
                                     </Container>

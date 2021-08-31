@@ -186,15 +186,14 @@ class SpiffeHelper extends Component {
     var entriesList = globalEntries.filter(entry => {
       return spiffeid === (this.getEntryParentid(entry))
     })
-    entriesList = entriesList.concat(this.getAgentEntries(curAgent, globalEntries)); //include node entries
     // Add entries associated with this agent
-    let agentEntriesDict = this.getAgentsEntries(globalAgents, globalEntries)
+    let agentEntriesDict = this.getAgentEntries(curAgent, globalEntries)
     let agentEntries = agentEntriesDict[spiffeid];
     let entriesAgent = [];
     if (agentEntries !== undefined) {
-      for (let j=0; j < agentEntries.length; j++) {
-        entriesAgent[j] = this.getEntrySpiffeid(agentEntries[j]);
-      }
+      entriesAgent = agentEntries.map(cur => {
+        return this.getEntrySpiffeid(cur)
+      })
     }
     entriesList = entriesList.concat(entriesAgent);
     return entriesList;

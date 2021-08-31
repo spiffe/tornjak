@@ -26,23 +26,23 @@ class ClusterDashboardTable extends React.Component {
   }
 
   clusterList() {
-    var filterByValue = [], selectedDataKey = this.props.selectedDataKey;
+    var filterByValue = [];
+    const { filterByCluster } = this.props;
     let clustersList = [];
     if (typeof this.props.globalClustersList === 'undefined') {
       return [];
     }
     clustersList = this.props.globalClustersList.map(a => this.TornjakHelper.getClusterMetadata(a, this.props.globalEntries.globalEntriesList, this.props.globalAgents.globalAgentsList));
-
     //For details page filtering data
-    if (selectedDataKey !== undefined) {
-      for (let i = 0; i < clustersList.length; i++) {
-        if ((clustersList[i].clusterName === selectedDataKey) || (clustersList[i].name === selectedDataKey)) {
-          filterByValue.push(clustersList[i]);
-        }
-      }
-      return filterByValue;
+    if (filterByCluster === undefined) {
+      return clustersList;
     }
-    return clustersList;
+    for (let i = 0; i < clustersList.length; i++) {
+      if ((filterByCluster !== undefined && clustersList[i].name === filterByCluster)) {
+        filterByValue.push(clustersList[i]);
+      }
+    }
+    return filterByValue;
   }
 
   render() {
