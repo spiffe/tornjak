@@ -10,9 +10,7 @@ class PieChart1 extends React.Component {
         resizable: true,
         height: "300px",
         legend: {
-          //enabled: false,
           position: "right",
-          //alignment: "center",
           truncation: {
             "type": "mid_line",
             "threshold": 15,
