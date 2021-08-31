@@ -30,7 +30,8 @@ class EntriesDashBoardTable extends React.Component {
   }
 
   entryList() {
-    var filterByValue = [], selectedDataKey = this.props.selectedDataKey;
+    var filterByValue = [];
+    const { filterByCluster, filterByAgentId } = this.props;
     let entriesList = [];
     if ((typeof this.props.globalEntries.globalEntriesList === 'undefined') ||
       (typeof this.props.globalAgents.globalAgentsList === 'undefined')) {
@@ -42,15 +43,15 @@ class EntriesDashBoardTable extends React.Component {
     })
 
     // For details page filtering data
-    if (selectedDataKey !== undefined) {
-      for (let i = 0; i < entriesList.length; i++) {
-        if ((entriesList[i].clusterName === selectedDataKey) || (entriesList[i].parentId === selectedDataKey)) {
-          filterByValue.push(entriesList[i]);
-        }
-      }
-      return filterByValue;
+    if (filterByCluster === undefined && filterByAgentId === undefined) {
+      return entriesList;
     }
-    return entriesList;
+    for (let i = 0; i < entriesList.length; i++) {
+      if ((filterByCluster !== undefined && entriesList[i].clusterName === filterByCluster) || (filterByAgentId !== undefined && entriesList[i].parentId === filterByAgentId)) {
+        filterByValue.push(entriesList[i]);
+      }
+    }
+    return filterByValue;
   }
 
   render() {

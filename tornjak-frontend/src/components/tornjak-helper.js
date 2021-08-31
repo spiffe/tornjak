@@ -1,5 +1,5 @@
 // Additional objects the functions take
-// entriesMetaData, agentsSpiffeIdDict, WorkLoadAttestorInfo, entryClusterMetadata
+// entriesMetaData, agentsSpiffeIdDict, workLoadAttestorInfo, clusterEntry
 import { Component } from 'react';
 import SpiffeHelper from './spiffe-helper';
 
@@ -62,9 +62,9 @@ class TornjakHelper extends Component {
     }
   }
 
-  // numberEntriesFromCluster takes in an entry cluster metadata and list of entries
+  // entryClusterMetadata takes in an clusterEntry and list of entries
   // returns number of workload/child entries for a cluster
-  numberEntriesFromCluster(entry, globalEntries, globalAgents) {
+  entryClusterMetadata(entry, globalEntries, globalAgents) {
     var entriesPerAgent = entry.agentsList.map(currentAgent => {
       return this.numberEntriesFromAgent(currentAgent, globalEntries, globalAgents);
     })
@@ -74,7 +74,7 @@ class TornjakHelper extends Component {
     return sum
   }
 
-  // getClusterMetadata takes in an entry cluster metadata and list of entries
+  // getClusterMetadata takes in an clusterEntry and list of entries
   // returns cluster metadata info for dashboard table
   getClusterMetadata(entry, globalEntries, globalAgents) {
     return {
@@ -82,18 +82,18 @@ class TornjakHelper extends Component {
       name: entry.name,
       created: entry.creationTime,
       numNodes: entry.agentsList.length,
-      numEntries: this.numberEntriesFromCluster(entry, globalEntries, globalAgents),
+      numEntries: this.entryClusterMetadata(entry, globalEntries, globalAgents),
     }
   }
 
   // getDashboardAgentMetaData takes in an agent metadata, list of entries and workload attestor info for specified agents
   // returns agent metadata info for dashboard table
-  getDashboardAgentMetaData(agent, globalEntries, globalAgents, WorkLoadAttestorInfo) {
+  getDashboardAgentMetaData(agent, globalEntries, globalAgents, workLoadAttestorInfo) {
     var thisSpiffeid = this.SpiffeHelper.getAgentSpiffeid(agent);
     // get status
     var status = this.SpiffeHelper.getAgentStatusString(agent);
     // get tornjak metadata
-    var metadata_entry = this.SpiffeHelper.getAgentMetadata(thisSpiffeid, WorkLoadAttestorInfo);
+    var metadata_entry = this.SpiffeHelper.getAgentMetadata(thisSpiffeid, workLoadAttestorInfo);
     var plugin = "None"
     var cluster = "None"
     if (typeof metadata_entry["plugin"] !== 'undefined' && metadata_entry["plugin"].length !== 0) {
@@ -114,11 +114,11 @@ class TornjakHelper extends Component {
 
   // workloadEntry takes in an entry metadata and workload attestor info for specified agents
   // returns entry metadata info for dashboard table
-  workloadEntry(entry, WorkLoadAttestorInfo) {
+  workloadEntry(entry, workLoadAttestorInfo) {
     var thisSpiffeId = this.SpiffeHelper.getEntrySpiffeid(entry)
     var thisParentId = this.SpiffeHelper.getEntryParentid(entry)
     // get tornjak metadata
-    var metadata_entry = this.SpiffeHelper.getAgentMetadata(thisParentId, WorkLoadAttestorInfo);
+    var metadata_entry = this.SpiffeHelper.getAgentMetadata(thisParentId, workLoadAttestorInfo);
     var plugin = "None"
     var cluster = "None"
     if (metadata_entry["plugin"].length !== 0) {

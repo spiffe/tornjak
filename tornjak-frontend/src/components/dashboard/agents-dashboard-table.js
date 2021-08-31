@@ -30,7 +30,8 @@ class AgentDashboardTable extends React.Component {
   }
 
   agentList() {
-    var filterByValue = [], selectedDataKey = this.props.selectedDataKey;
+    var filterByValue = [];
+    const { filterByCluster, filterByAgentId } = this.props;
     let agentsList = [];
     if ((typeof this.props.globalEntries.globalEntriesList === 'undefined') ||
       (typeof this.props.globalAgents.globalAgentsList === 'undefined')) {
@@ -39,17 +40,16 @@ class AgentDashboardTable extends React.Component {
     agentsList = this.props.globalAgents.globalAgentsList.map(currentAgent => {
       return this.TornjakHelper.getDashboardAgentMetaData(currentAgent, this.props.globalEntries.globalEntriesList, this.props.globalAgents.globalAgentsList, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo)
     })
-    
-    //For details page filtering data
-    if (selectedDataKey !== undefined) {
-      for (let i = 0; i < agentsList.length; i++) {
-        if ((agentsList[i].clusterName === selectedDataKey) || (agentsList[i].id === selectedDataKey)) {
-          filterByValue.push(agentsList[i]);
-        }
-      }
-      return filterByValue;
+    // For details page filtering data
+    if (filterByCluster === undefined && filterByAgentId === undefined) {
+      return agentsList;
     }
-    return agentsList;
+    for (let i = 0; i < agentsList.length; i++) {
+      if ((filterByCluster !== undefined && agentsList[i].clusterName === filterByCluster) || (filterByAgentId !== undefined && agentsList[i].id === filterByAgentId)) { // for filtering agents for a specific cluster or filtering agents for entries
+        filterByValue.push(agentsList[i]);
+      }
+    }
+    return filterByValue;
   }
 
   render() {
