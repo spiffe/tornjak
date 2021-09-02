@@ -254,44 +254,39 @@ class TornjakApi extends Component {
       })
   }
 
-  // clusterDelete - 
-  clusterDelete = (serverName, inputData, clustersListUpdateFunc, globalClustersList) => {
-    axios.post(GetApiServerUri("/manager-api/tornjak/clusters/delete/") + serverName, inputData,
+  // clusterDelete - returns success message after successful deletion of a cluster in manager mode
+  async clusterDelete(serverName, inputData, clustersListUpdateFunc, globalClustersList) {
+    const response = await axios.post(GetApiServerUri("/manager-api/tornjak/clusters/delete/") + serverName, inputData,
       {
         crossdomain: true,
       })
-      .then(response => {
+      .then(function (response) {
         clustersListUpdateFunc(globalClustersList.filter(el =>
           el.name !== inputData))
-          console.log(response.data)
-          window.alert("CLUSTER DELETED SUCCESSFULLY!");
-          window.location.reload();
+        return response.data;
       })
-      .catch((error) => {
-        console.log(error);
-        window.alert("Error deleting cluster: " + error.message);
+      .catch(function (error) {
+        return error.message;
       })
+      return response;
   }
 
-  // clusterDelete - 
-  localClusterDelete = (inputData, clustersListUpdateFunc, globalClustersList) => {
-    axios.post(GetApiServerUri("/api/tornjak/clusters/delete"), inputData,
+  // localClusterDelete - returns success message after successful deletion of a cluster in Local mode for the server
+  async localClusterDelete(inputData, clustersListUpdateFunc, globalClustersList) {
+    const response = await axios.post(GetApiServerUri("/api/tornjak/clusters/delete"), inputData,
       {
         crossdomain: true,
       })
-      .then(response => {
+      .then(function (response) {
         clustersListUpdateFunc(globalClustersList.filter(el =>
           el.name !== inputData))
-          console.log(response)
-          window.alert("CLUSTER DELETED SUCCESSFULLY!");
-          window.location.reload();
+        return response.data;
       })
-      .catch((error) => {
-        console.log(error);
-        window.alert("Error deleting cluster: " + error.message);
+      .catch(function (error) {
+        return error.message;
       })
+      return response;
   }
-
 }
 
 export default TornjakApi;

@@ -213,7 +213,7 @@ class ClusterEdit extends Component {
   }
 
   deleteCluster() {
-    var cluster = this.state.clusterName;
+    var cluster = this.state.clusterName, successMessage = "";
     var inputData =
     {
       "cluster": {
@@ -228,10 +228,18 @@ class ClusterEdit extends Component {
       return
     }
     if (IsManager) {
-      this.TornjakApi.clusterDelete(this.props.globalServerSelected, inputData, this.props.clustersListUpdateFunc, this.props.globalClustersList);
+      successMessage = this.TornjakApi.clusterDelete(this.props.globalServerSelected, inputData, this.props.clustersListUpdateFunc, this.props.globalClustersList);
     } else {
-      this.TornjakApi.localClusterDelete(inputData, this.props.clustersListUpdateFunc, this.props.globalClustersList);
+      successMessage = this.TornjakApi.localClusterDelete(inputData, this.props.clustersListUpdateFunc, this.props.globalClustersList);
     }
+    successMessage.then(function (result) {
+      if (result === "SUCCESS") {
+        window.alert("CLUSTER DELETED SUCCESSFULLY!");
+        window.location.reload();
+      } else {
+        window.alert("Error deleting cluster: " + result);
+      }
+    })
   }
 
   onSubmit(e) {
