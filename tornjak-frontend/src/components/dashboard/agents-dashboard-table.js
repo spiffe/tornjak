@@ -45,7 +45,8 @@ class AgentDashboardTable extends React.Component {
       return agentsList;
     }
     for (let i = 0; i < agentsList.length; i++) {
-      if ((filterByCluster !== undefined && agentsList[i].clusterName === filterByCluster) || (filterByAgentId !== undefined && agentsList[i].id === filterByAgentId)) { // for filtering agents for a specific cluster or filtering agents for entries
+      if ((filterByCluster !== undefined && agentsList[i].clusterName === filterByCluster) ||
+        (filterByAgentId !== undefined && agentsList[i].id === filterByAgentId)) { // for filtering agents for a specific cluster or filtering agents for entries
         filterByValue.push(agentsList[i]);
       }
     }

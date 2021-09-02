@@ -47,7 +47,8 @@ class EntriesDashBoardTable extends React.Component {
       return entriesList;
     }
     for (let i = 0; i < entriesList.length; i++) {
-      if ((filterByCluster !== undefined && entriesList[i].clusterName === filterByCluster) || (filterByAgentId !== undefined && entriesList[i].parentId === filterByAgentId)) {
+      if ((filterByCluster !== undefined && entriesList[i].clusterName === filterByCluster) ||
+        (filterByAgentId !== undefined && entriesList[i].parentId === filterByAgentId)) {
         filterByValue.push(entriesList[i]);
       }
     }

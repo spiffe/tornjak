@@ -1,5 +1,8 @@
 // Additional objects the functions take
-// entriesMetaData, agentsSpiffeIdDict, workLoadAttestorInfo, clusterEntry
+// entriesMetaData - https://github.com/spiffe/tornjak/blob/main/docs/tornjak-ui-api-documentation.md#:~:text=GET-,/api/entry/list,-Request%20%0Aapi/entry
+// agentsSpiffeIdDict - list of avaialble agent's spiffe ids
+// workLoadAttestorInfo - https://github.com/spiffe/tornjak/blob/main/docs/tornjak-ui-api-documentation.md#:~:text=AgentWorkloadSelectorInfo
+// clusterEntry = single cluster metadata entry
 import { Component } from 'react';
 import SpiffeHelper from './spiffe-helper';
 
