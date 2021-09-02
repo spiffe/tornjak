@@ -13,7 +13,7 @@ const columns = [
   { field: "clusterName", headerName: "Cluster Name", width: 170 },
   { field: "entryExpireTime", headerName: "Entry Expire Time", width: 190 },
   { field: "platformType", headerName: "Platform Type", width: 170 },
-  { field: "adminFlag", headerName: "Admin Flag", width: 150 },
+  { field: "adminFlag", headerName: "Admin Flag", width: 150, type: 'boolean'},
 ];
 
 const styles = (theme => ({
