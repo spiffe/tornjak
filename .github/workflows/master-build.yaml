@@ -1,0 +1,41 @@
+name: Tornjak Artifact push
+on:
+  push:
+    branches:
+    - main
+jobs:
+  tornjak-build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Install Golang
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.15.5'
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '15'
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.29
+          args: --timeout 5m
+      - name: Log in to GHCR.io
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # Create sha tagged image for container-agent
+      - name: Set Image names
+        run: echo "CONTAINER_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-spire-server:$GITHUB_SHA" >> $GITHUB_ENV
+      - name: Build and push tornjak agent image
+        run: make container-agent-push
+      # Create tagged versioned images
+      - name: Push artifacts for container-agent-multiversions
+        run: make release-container-agent-multiversions-ghcr
+      - run: echo "🍏 This job's status is ${{ job.status }}."
