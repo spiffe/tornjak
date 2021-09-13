@@ -18,9 +18,10 @@ class TornjakHelper extends Component {
   // returns a specfic routing link/ URL for an entity
   detailsLink(selectedRows, entity) {
     const dashboardDetailsLink = "/tornjak/dashboard/details/";
-    var detailsLink = "";
+    var detailsLink = "", searchParams = new URLSearchParams(window.location.search);;
     if (selectedRows.length !== 0) {
-      detailsLink = dashboardDetailsLink + entity.toLowerCase() + "/" + encodeURIComponent(selectedRows.id); //encode URL since spiffeid contains special characters
+      searchParams.set("id", encodeURIComponent(selectedRows.id)); //encode URL since spiffeid contains special characters
+      detailsLink = dashboardDetailsLink + entity.toLowerCase() + "?" + searchParams.toString();
     }
     return detailsLink;
   }
@@ -29,7 +30,9 @@ class TornjakHelper extends Component {
   // properties of a class including clustersList, agentsList, entriesList and agentsWorkLoadAttestorInfo
   // returns a parsed and filtered data for the specifed entity from the url parameteres 
   detailsDataParse(urlParams, props) {
-    let selectedData = [{}], id = decodeURIComponent(urlParams.id);
+    const searchParams = new URLSearchParams(window.location.search);
+    const parsed = searchParams.get("id")
+    let selectedData = [{}], id = decodeURIComponent(parsed);
     const { globalClustersList, globalAgentsList, globalEntriesList, globalAgentsWorkLoadAttestorInfo } = props;
     if (urlParams.entity === "clusters") {
       for (let i = 0; i < globalClustersList.length; i++) {
