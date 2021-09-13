@@ -40,7 +40,7 @@ function App() {
                         <Route path="/tornjak/serverinfo" exact component={TornjakServerInfo} />
                         <Route path="/tornjak/dashboard" exact component={TornjakDashBoard} />
                         <Route
-                            path="/tornjak/dashboard/details/:entity/:id"
+                            path="/tornjak/dashboard/details/:entity"
                             render={(props) => (<DashboardDetailsRender {...props} params={props.match.params} />)}
                         />
                         <Route path="/server/manage" exact component={ServerManagement} />
