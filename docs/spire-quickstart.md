@@ -188,7 +188,7 @@ We will then wait and verify that the `spire-server-0` pod is now started with t
 
 ```
 ➜  quickstart git:(master) ✗ kubectl -n spire describe pod spire-server-0 | grep "Image:"
-    Image:         tghcr.io/spiffe/tornjak-spire-server:1.0.0
+    Image:         ghcr.io/spiffe/tornjak-spire-server:1.0.0
 ```
 
 ### Connecting to the Tornjak UI
