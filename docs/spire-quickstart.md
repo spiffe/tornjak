@@ -136,7 +136,7 @@ CA #1 Valid Until:	2021-04-07 20:12:30 +0000 UTC
 
 ## Step 2: Configuring Tornjak
 
-Now that we have the SPIRE deployment set up, it should be fairly simple to use Tornjak. 
+Now that we have the SPIRE deployment set up, it should be fairly simple to use Tornjak.
 
 ### Replacing the SPIRE server image
 
@@ -159,7 +159,7 @@ We first need to use the Tornjak image. This can be done by modifying the image 
 ...
 ```
 
-We want to replace the image with the Tornjak image: `tsidentity/tornjak-spire-server:1.0.0`
+We want to replace the image with the Tornjak image: `ghcr.io/spiffe/tornjak-spire-server:1.0.1`
 
 ```
 ➜  quickstart git:(master) cat server-statefulset.yaml
@@ -168,7 +168,7 @@ We want to replace the image with the Tornjak image: `tsidentity/tornjak-spire-s
       serviceAccountName: spire-server
       containers:
         - name: spire-server
-          image: tsidentity/tornjak-spire-server:1.0.0
+          image: ghcr.io/spiffe/tornjak-spire-server:1.0.1
           args:
             - -config
             - /run/spire/config/server.conf
@@ -188,7 +188,7 @@ We will then wait and verify that the `spire-server-0` pod is now started with t
 
 ```
 ➜  quickstart git:(master) ✗ kubectl -n spire describe pod spire-server-0 | grep "Image:"
-    Image:         tsidentity/tornjak-spire-server:1.0.0
+    Image:         tghcr.io/spiffe/tornjak-spire-server:1.0.1
 ```
 
 ### Connecting to the Tornjak UI

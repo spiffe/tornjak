@@ -1,4 +1,4 @@
-.PHONY: ui vendor build ui-agent ui-manager container-agent container-agent-push container-manager container-manager-push release-container-agent-multiversions 
+.PHONY: ui vendor build ui-agent ui-manager container-agent container-agent-push container-manager container-manager-push release-container-agent-multiversions
 
 CONTAINER_TAG ?= tsidentity/tornjak-spire-server:latest
 CONTAINER_VERSION_IMAGEPATH ?= tsidentity/tornjak-spire-server
