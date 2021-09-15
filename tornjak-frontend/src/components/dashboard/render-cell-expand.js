@@ -2,7 +2,7 @@ import React from 'react';
 import { makeStyles } from '@material-ui/styles';
 import PropTypes from 'prop-types';
 import { Popper, Typography, Paper } from '@material-ui/core';
-import { isOverflown } from '@material-ui/data-grid';
+import { isOverflown } from '@material-ui/x-grid';
 
 const useStyles = makeStyles(() => ({
     root: {

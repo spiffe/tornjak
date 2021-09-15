@@ -3,7 +3,7 @@ import { DataTable } from "carbon-components-react";
 import {
     Delete16 as Delete,
 } from '@carbon/icons-react';
-import ResetIcon from "@carbon/icons-react/es/reset--alt/20";
+import { IoBan } from "react-icons/io5";
 const {
     TableToolbar,
     TableToolbarSearch,
@@ -46,7 +46,7 @@ class TableToolBar extends React.Component {
                     }
                     {this.props.banEntity !== undefined &&
                         <TableBatchAction
-                            renderIcon={ResetIcon}
+                            renderIcon={IoBan}
                             iconDescription="Ban"
                             onClick={() => {
                                 this.props.banEntity(this.props.selectedRows);

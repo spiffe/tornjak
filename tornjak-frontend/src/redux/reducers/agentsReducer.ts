@@ -1,14 +1,17 @@
 import {
+    AgentsListAction,
+    AgentsReducerStateType,
+    AgentWorkloadSelectorInfoAction,
     GLOBAL_AGENTS_LIST,
     GLOBAL_AGENTS_WORKLOADATTESTOR_INFO,
 } from '../actions/types';
 
-const initialState = {
+const initialState: AgentsReducerStateType = {
     globalAgentsList: [],
     globalAgentsWorkLoadAttestorInfo: [],
 };
 
-export default function agentsReducer(state = initialState, action) {
+export default function agentsReducer(state: AgentsReducerStateType = initialState, action: AgentsListAction | AgentWorkloadSelectorInfoAction) {
     switch (action.type) {
         case GLOBAL_AGENTS_LIST:
             return {
