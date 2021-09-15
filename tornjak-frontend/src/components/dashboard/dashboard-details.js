@@ -65,8 +65,18 @@ class DashboardDetails extends React.Component {
         
     }
 
+    componentDidUpdate(prevProps) {
+        if(prevProps !== this.props) {
+            console.log(true)
+            this.setState({
+                selectedDataKey: this.selectedDataKey()
+            })
+        }
+    }
+
     selectedDataKey() {
-        var selectedData = this.props.selectedData, clickedDashboardTable = this.props.globalClickedDashboardTable, selectedDataKey = [];
+        var { selectedData } = this.props; 
+        var clickedDashboardTable = this.props.globalClickedDashboardTable, selectedDataKey = [];
         if (selectedData !== undefined) {
             if (clickedDashboardTable === "clustersdetails") {
                 //to filter agents in clustersdetails
