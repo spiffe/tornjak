@@ -129,9 +129,14 @@ class SpiffeHelper extends Component {
       let agent = agents[i];
       let agentId = this.getAgentSpiffeid(agent);
       agentEntriesDict[agentId] = [];
-
+      if(agent.selectors === undefined) {
+        agent.selectors = [];
+      }
       let agentSelectors = new Set(agent.selectors.map(formatSelectors));
       let isAssocWithAgent = e => {
+        if(e.selectors === undefined) {
+          e.selectors = [];
+        }
         let entrySelectors = new Set(e.selectors.map(formatSelectors))
         if (isSuperset(agentSelectors, entrySelectors)) {
           agentEntriesDict[agentId].push(e);
@@ -152,8 +157,14 @@ class SpiffeHelper extends Component {
   // getCanonicalAgentSpiffeid takes in a agent entry, and returns the first 
   // agent ID that is found associated with it.
   getCanonicalAgentSpiffeid(entry, agents) {
+    if(entry.selectors === undefined) {
+      entry.selectors = [];
+    }
     let entrySelectors = new Set(entry.selectors.map(formatSelectors));
     let isAssocWithEntry = a => {
+      if(a.selectors === undefined) {
+        a.selectors = [];
+      }
       let agentSelectors = new Set(a.selectors.map(formatSelectors));
       return isSuperset(agentSelectors, entrySelectors);
     }
