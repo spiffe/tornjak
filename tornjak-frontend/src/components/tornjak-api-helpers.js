@@ -173,9 +173,7 @@ class TornjakApi extends Component {
   populateEntriesUpdate = (serverName, entriesListUpdateFunc, tornjakMessageFunc) => {
     axios.get(GetApiServerUri('/manager-api/entry/list/') + serverName, {crossdomain: true})
     .then(response => {
-      if(!response.data["entries"]) {
-        entriesListUpdateFunc([]);
-      } else {entriesListUpdateFunc(response.data["entries"]);}
+      entriesListUpdateFunc(response.data["entries"]);
       tornjakMessageFunc(response.statusText);
     }).catch(error => {
       entriesListUpdateFunc([]);
@@ -186,9 +184,7 @@ class TornjakApi extends Component {
   populateLocalEntriesUpdate = (entriesListUpdateFunc, tornjakMessageFunc) => {
     axios.get(GetApiServerUri('/api/entry/list'), {crossdomain: true})
     .then(response => {
-      if(!response.data["entries"]) {
-        entriesListUpdateFunc([]);
-      } else {entriesListUpdateFunc(response.data["entries"]);}
+      entriesListUpdateFunc(response.data["entries"]);
       tornjakMessageFunc(response.statusText);
     }).catch(error => {
       console.log(error);
@@ -201,9 +197,7 @@ class TornjakApi extends Component {
   populateAgentsUpdate = (serverName, agentsListUpdateFunc, tornjakMessageFunc) => {
     axios.get(GetApiServerUri('/manager-api/agent/list/') + serverName, { crossdomain: true })
       .then(response => {
-        if(!response.data["agents"]) {
-          agentsListUpdateFunc([]);
-        } else {agentsListUpdateFunc(response.data["agents"]);}
+        agentsListUpdateFunc(response.data["agents"]);
         tornjakMessageFunc(response.statusText);
       }).catch(error => {
         agentsListUpdateFunc([]);
@@ -216,9 +210,7 @@ class TornjakApi extends Component {
   populateLocalAgentsUpdate = (agentsListUpdateFunc, tornjakMessageFunc) => {
     axios.get(GetApiServerUri('/api/agent/list'), { crossdomain: true })
       .then(response => {
-        if(!response.data["agents"]) {
-          agentsListUpdateFunc([]);
-        } else {agentsListUpdateFunc(response.data["agents"]);}
+        agentsListUpdateFunc(response.data["agents"]);
         tornjakMessageFunc(response.statusText);
       })
       .catch((error) => {

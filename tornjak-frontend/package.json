@@ -20,7 +20,6 @@
     "node-sass": "^6.0.1",
     "query-string": "^7.0.1",
     "react": "^16.6.3",
-    "react-chartjs-2": "^3.0.4",
     "react-dom": "^16.6.3",
     "react-redux": "^7.2.2",
     "react-router-dom": "^5.2.0",
