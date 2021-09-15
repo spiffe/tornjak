@@ -122,9 +122,10 @@ class SpiffeHelper extends Component {
   // performance is impacted.
   getAgentsEntries(agents, entries) {
     let nodeEntries = [];
-    if (entries !== undefined) {
-      nodeEntries = entries.filter(e => e.parent_id.path === "/spire/server");
+    if (entries === undefined) {
+      return undefined
     }
+    nodeEntries = entries.filter(e => e.parent_id.path === "/spire/server");
     var lambdas = [];
     var agentEntriesDict = {};
 
@@ -179,20 +180,61 @@ class SpiffeHelper extends Component {
     return "";
   }
 
-  // numberEntries takes in spiffe id of an agent and list of entries
-  // returns number of entries in an agent
-  numberEntries(spiffeid, globalEntries, globalAgents) {
-    if (typeof globalEntries !== 'undefined') {
-      var entriesList = this.getChildEntries(spiffeid, globalAgents, globalEntries);
-      if (typeof entriesList === 'undefined') {
-        return NaN
-      } else {
-        return entriesList.length
-      }
-    } else {
-      return NaN
+  // numberEntriesOfAgent takes in an agent and list of entries
+  // returns number of entries in the agent
+  numberEntriesOfAgent(agent, globalEntries) {
+    if (globalEntries === undefined) {
+      return undefined
     }
+    var agentEntries = this.getAgentEntries(agent, globalEntries)
+    var validIds = new Set([this.getAgentSpiffeid(agent)]);
+
+    for (let j=0; j < agentEntries.length; j++) {
+        validIds.add(this.getEntrySpiffeid(agentEntries[j]));
+    }
+
+    var entriesList = globalEntries.filter(entry=> {
+      return (typeof entry !== 'undefined') && validIds.has(this.getEntryParentid(entry));
+    });
+
+    return entriesList.length
   }
+
+// 
+//  ********************************************************************
+//  KEEP THIS PIECE OF CODE THAT CAN BE USEFUL LATER ON FOR OPTIMIZATION
+//  WHEN HANDLING MULTIPLE AGENTS AT THE SAME TIME
+//  ********************************************************************
+// // numberEntriesOfAgent takes in spiffe id of an agent and list of entries
+// // returns number of entries in the agent
+// numberEntriesOfAgent(agent, globalEntries) {
+//   var agentEntriesDict = this.getAgentEntries(
+//   var validIds = new Set([spiffeid]);
+// 
+//   // Also check for parent IDs associated with the agent
+//   let agentEntries = agentEntriesDict[spiffeid];
+//   if (agentEntries !== undefined) {
+//     for (let j=0; j < agentEntries.length; j++) {
+//         validIds.add(this.SpiffeHelper.getEntrySpiffeid(agentEntries[j]));
+//     }
+//   }
+// 
+//   if (typeof this.props.globalEntries.globalEntriesList !== 'undefined') {
+//     var entriesList = this.props.globalEntries.globalEntriesList.filter(entry=> {
+//       return (typeof entry !== 'undefined') && validIds.has(this.SpiffeHelper.getEntryParentid(entry));
+//     });
+// 
+//     if (typeof entriesList === 'undefined') {
+//       return 0
+//     } else {
+//       return entriesList.length
+//     }
+//   } else {
+//     return 0
+//   }
+// }
+
+
 
   // getChildEntries takes in spiffeid of agent, list of agents, and a list of entries
   // returns list of child entries
@@ -219,40 +261,7 @@ class SpiffeHelper extends Component {
     return entriesList;
   }
 
-  // workloadEntry takes in an entry metadata and workload attestor info for specified agents
-  // returns entry metadata info for dashboard table
-  workloadEntry(entry, WorkLoadAttestorInfo) {
-    var thisSpiffeId = this.getEntrySpiffeid(entry)
-    var thisParentId = this.getEntryParentid(entry)
-    // get tornjak metadata
-    var metadata_entry = this.getAgentMetadata(thisParentId, WorkLoadAttestorInfo);
-    var plugin = "None"
-    var cluster = "None"
-    if (metadata_entry["plugin"].length !== 0) {
-      plugin = metadata_entry["plugin"]
-    }
-    if (metadata_entry["cluster"].length !== 0) {
-      cluster = metadata_entry["cluster"]
-    }
-    // get spire data
-    var admin = this.getEntryAdminFlag(entry)
-    var expTime = "No Expiry Time"
-    if (typeof entry.expires_at !== 'undefined') {
-      var d = new Date(this.getEntryExpiryMillisecondsFromEpoch(entry))
-      expTime = d.toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false })
-    }
-    return {
-      id: entry.id,
-      spiffeid: thisSpiffeId,
-      parentId: thisParentId,
-      adminFlag: admin,
-      entryExpireTime: expTime,
-      platformType: plugin,
-      clusterName: cluster,
-    }
-  }
 }
-
 
 function isSuperset(set, subset) {
   for (let elem of subset) {

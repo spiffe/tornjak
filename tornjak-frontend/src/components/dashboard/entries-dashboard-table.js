@@ -39,16 +39,19 @@ class EntriesDashBoardTable extends React.Component {
     }
 
     entriesList = this.props.globalEntries.globalEntriesList.map(currentEntry => {
-      return this.TornjakHelper.workloadEntry(currentEntry, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo);
+      return this.TornjakHelper.workloadEntry(currentEntry, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo, this.props.globalAgents.globalAgentsList, this.props.globalEntries.globalEntriesList);
     })
 
     // For details page filtering data
     if (filterByCluster === undefined && filterByAgentId === undefined) {
       return entriesList;
     }
+
     for (let i = 0; i < entriesList.length; i++) {
       if ((filterByCluster !== undefined && entriesList[i].clusterName === filterByCluster) ||
-        (filterByAgentId !== undefined && entriesList[i].parentId === filterByAgentId)) {
+        (filterByAgentId !== undefined && entriesList[i].parentId === filterByAgentId) ||
+        (filterByAgentId !== undefined && entriesList[i].canonicalAgentId=== filterByAgentId)
+      ) {
         filterByValue.push(entriesList[i]);
       }
     }

@@ -1,14 +1,17 @@
 import {
     GLOBAL_MESSAGE,
     GLOBAL_CLICKED_DASHBOARD_TABLE,
+    TornjakReducerStateType,
+    TornjakMessageAction,
+    ClickedDashboardTableAction,
 } from '../actions/types';
 
-const initialState = {
+const initialState: TornjakReducerStateType = {
     globalErrorMessage: "",
     globalClickedDashboardTable: "",
 };
 
-export default function tornjakReducer(state = initialState, action) {
+export default function tornjakReducer(state: TornjakReducerStateType = initialState, action: TornjakMessageAction | ClickedDashboardTableAction) {
     switch (action.type) {
         case GLOBAL_MESSAGE:
             return {
