@@ -24,6 +24,7 @@ function loadFromLocalStorage() {
     }
 }
 
+export const middlewares = [thunk];
 const persistedState = loadFromLocalStorage()
 // STORE -> Globalized state - where to store all data
 const store = createStore(

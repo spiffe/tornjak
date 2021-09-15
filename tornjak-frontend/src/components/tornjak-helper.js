@@ -29,6 +29,9 @@ class TornjakHelper extends Component {
   // properties of a class including clustersList, agentsList, entriesList and agentsWorkLoadAttestorInfo
   // returns a parsed and filtered data for the specifed entity from the url parameteres 
   detailsDataParse(urlParams, props) {
+    if(urlParams === undefined) {
+      return
+    }
     const searchParams = new URLSearchParams(window.location.search);
     const parsed = searchParams.get("id")
     let selectedData = [{}], id = decodeURIComponent(parsed);
@@ -82,6 +85,9 @@ class TornjakHelper extends Component {
   // getClusterMetadata takes in an clusterEntry and list of entries
   // returns cluster metadata info for dashboard table
   getClusterMetadata(entry, globalEntries, globalAgents) {
+    if(entry === undefined || entry.agentsList === undefined) {
+      return;
+    }
     return {
       id: entry.name,
       name: entry.name,

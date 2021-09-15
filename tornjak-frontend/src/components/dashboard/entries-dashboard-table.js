@@ -5,6 +5,7 @@ import renderCellExpand from './render-cell-expand';
 import TableDashboard from './table/dashboard-table';
 import SpiffeHelper from '../spiffe-helper';
 import TornjakHelper from 'components/tornjak-helper';
+import PropTypes from "prop-types";
 
 const columns = [
   { field: "id", headerName: "ID", width: 170, renderCell: renderCellExpand },
@@ -59,7 +60,7 @@ class EntriesDashBoardTable extends React.Component {
     const { numRows } = this.props;
     var data = this.entryList();
     return (
-      <div>
+      <div data-test="entries-dashboard-table">
         <TableDashboard
           title={"Entries"}
           numRows={numRows}
@@ -76,6 +77,23 @@ const mapStateToProps = state => ({
   globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 })
 
+EntriesDashBoardTable.propTypes = {
+  classes: PropTypes.object,
+  numRows: PropTypes.number,
+  filterByCluster: PropTypes.string,
+  filterByAgentId: PropTypes.string,
+  globalAgents: PropTypes.objectOf(PropTypes.shape({
+    globalAgentsList: PropTypes.array,
+    globalAgentsWorkLoadAttestorInfo: PropTypes.array
+  })),
+  globalEntries: PropTypes.objectOf(PropTypes.shape({
+    globalEntriesList: PropTypes.array,
+  })),
+  globalClickedDashboardTable: PropTypes.string,
+};
+
 export default withStyles(styles)(
   connect(mapStateToProps, {})(EntriesDashBoardTable)
 )
+
+export { EntriesDashBoardTable };

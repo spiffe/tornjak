@@ -9,6 +9,7 @@ import {
   tornjakServerInfoUpdateFunc,
   tornjakMessageFunc,
 } from 'redux/actions';
+import PropTypes from "prop-types";
 
 const pluginTagColorMapper = {
   "NodeAttestor": "red",
@@ -80,7 +81,7 @@ class TornjakServerInfo extends Component {
 
   render() {
     return (
-      <div>
+      <div data-test="tornjak-server">
         <h3>Server Info</h3>
         {this.props.globalErrorMessage !== "OK" &&
           <div className="alert-primary" role="alert">
@@ -103,7 +104,21 @@ const mapStateToProps = (state) => ({
   globalErrorMessage: state.tornjak.globalErrorMessage,
 })
 
+TornjakServerInfo.propTypes = {
+  globalServerSelected: PropTypes.string,
+  globalServerInfo: PropTypes.object,
+  globalTornjakServerInfo: PropTypes.object,
+  globalErrorMessage: PropTypes.string,
+  serverSelectedFunc: PropTypes.func,
+  tornjakServerInfoUpdateFunc: PropTypes.func,
+  serverInfoUpdateFunc: PropTypes.func,
+  tornjakMessageFunc: PropTypes.func,
+
+};
+
 export default connect(
   mapStateToProps,
   { serverSelectedFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, tornjakMessageFunc }
 )(TornjakServerInfo)
+
+export { TornjakServerInfo };

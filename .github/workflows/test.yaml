@@ -1,0 +1,14 @@
+name: Tornjak UI Tests
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - uses: actions/checkout@v2
+      - name: Install npm modules
+        run: npm install --prefix tornjak-frontend
+      - name: Run UI Tests
+        run: npm test --prefix tornjak-frontend

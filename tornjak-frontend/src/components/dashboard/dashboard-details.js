@@ -8,6 +8,7 @@ import ClustersTable from "./clusters-dashboard-table";
 import AgentsTable from "./agents-dashboard-table";
 import EntriesTable from "./entries-dashboard-table";
 import DashboardDrawer from "./dashboard-drawer";
+import PropTypes from "prop-types";
 
 const styles = (theme) => ({
   root: {
@@ -99,7 +100,7 @@ class DashboardDetails extends React.Component {
     const { selectedDataKey } = this.state;
     const { classes, selectedData } = this.props;
     return (
-      <div className={classes.root}>
+      <div className={classes.root} data-test="dashboard-details">
         <DashboardDrawer />
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
@@ -321,6 +322,14 @@ const mapStateToProps = (state) => ({
   globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 });
 
+DashboardDetails.propTypes = {
+  globalClickedDashboardTable: PropTypes.string,
+  classes: PropTypes.object, 
+  selectedData: PropTypes.array,
+};
+
 export default withStyles(styles)(
   connect(mapStateToProps, {})(DashboardDetails)
 );
+
+export { DashboardDetails };
