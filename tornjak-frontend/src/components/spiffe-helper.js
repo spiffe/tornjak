@@ -88,6 +88,9 @@ class SpiffeHelper extends Component {
   // the list of entries which are associated with this agent
   getAgentEntries(agent, entries) {
     let nodeEntries = entries.filter(e => e.parent_id.path === "/spire/server")
+    if(agent === undefined) {
+      return [];
+    }
     if(agent.selectors === undefined) {
       agent.selectors = [];
     }
