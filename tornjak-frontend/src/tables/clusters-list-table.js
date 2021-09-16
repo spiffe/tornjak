@@ -1,25 +1,40 @@
 import React from "react";
+import { DataTable } from "carbon-components-react";
 import { connect } from 'react-redux';
+import {
+    Delete16 as Delete,
+} from '@carbon/icons-react';
 import IsManager from 'components/is_manager';
 import GetApiServerUri from 'components/helpers';
 import axios from 'axios';
 import {
     clustersListUpdateFunc
 } from 'redux/actions';
-import Table from './list-table';
+const {
+    TableContainer,
+    Table,
+    TableHead,
+    TableRow,
+    TableBody,
+    TableCell,
+    TableHeader,
+    TableSelectRow,
+    TableSelectAll,
+    TableToolbar,
+    TableToolbarSearch,
+    TableToolbarContent,
+    TableBatchActions,
+    TableBatchAction,
+} = DataTable;
 
-// ClusterListTable takes in 
-// listTableData: clusters data to be rendered on table
-// returns clusters data inside a carbon component table with specified functions
-class ClustersListTable extends React.Component {
+class DataTableRender extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             listData: props.data,
-            listTableData: [{ "id": "0" }],
+            listTableData: [{"id":"0"}],
         };
         this.prepareTableData = this.prepareTableData.bind(this);
-        this.deleteCluster = this.deleteCluster.bind(this);
     }
 
     componentDidMount() {
@@ -60,10 +75,12 @@ class ClustersListTable extends React.Component {
         } else {
             endpoint = GetApiServerUri('/api/tornjak/clusters/delete');
         }
+        console.log("selectedRows", selectedRows)
         if (selectedRows.length !== 0) {
             for (let i = 0; i < selectedRows.length; i++) {
                 cluster[i] = {}
                 cluster[i]["name"] = selectedRows[i].cells[1].value;
+                console.log("cluster", cluster)
                 promises.push(axios.post(endpoint, {
                     "cluster": {
                         "name": cluster[i].name
@@ -114,13 +131,77 @@ class ClustersListTable extends React.Component {
             },
         ];
         return (
-            <div>
-                <Table
-                    listTableData={listTableData}
-                    headerData={headerData}
-                    deleteEntity={this.deleteCluster}
-                />
-            </div>
+            <DataTable
+                isSortable
+                rows={listTableData}
+                headers={headerData}
+                render={({
+                    rows,
+                    headers,
+                    getHeaderProps,
+                    getSelectionProps,
+                    onInputChange,
+                    getPaginationProps,
+                    getBatchActionProps,
+                    getTableContainerProps,
+                    selectedRows,
+                }) => (
+                    <TableContainer
+                        {...getTableContainerProps()}
+                    >
+                        <TableToolbar>
+                            <TableToolbarContent>
+                                <TableToolbarSearch onChange={(e) => onInputChange(e)} />
+                            </TableToolbarContent>
+                            <TableBatchActions
+                                {...getBatchActionProps()}
+                            >
+                                <TableBatchAction
+                                    renderIcon={Delete}
+                                    iconDescription="Delete"
+                                    onClick={() => {
+                                        this.deleteCluster(selectedRows);
+                                        getBatchActionProps().onCancel();
+                                    }}
+                                >
+                                    Delete
+                                </TableBatchAction>
+                            </TableBatchActions>
+                        </TableToolbar>
+                        <Table size="short" useZebraStyles>
+                            <TableHead>
+                                <TableRow>
+                                    <TableSelectAll
+                                        {...getSelectionProps()} />
+                                    {headers.map((header) => (
+                                        <TableHeader key={header.header} {...getHeaderProps({ header })}>
+                                            {header.header}
+                                        </TableHeader>
+                                    ))}
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {rows.map((row, key) => (
+                                    <TableRow key={key}>
+                                        <TableSelectRow
+                                            {...getSelectionProps({ row })} />
+                                        {row.cells.map((cell) => (
+                                            <TableCell key={cell.id}>
+                                                {cell.info.header === "info" ? (
+                                                    <div style={{ overflowX: 'auto', width: "400px" }}>
+                                                        <pre>{cell.value}</pre>
+                                                    </div>
+                                                ) : (
+                                                    cell.value)}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                )}
+            />
         );
     }
 }
@@ -133,4 +214,4 @@ const mapStateToProps = (state) => ({
 export default connect(
     mapStateToProps,
     { clustersListUpdateFunc }
-)(ClustersListTable)
+)(DataTableRender)

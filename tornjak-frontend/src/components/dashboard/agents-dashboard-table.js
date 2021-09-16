@@ -4,13 +4,14 @@ import { withStyles } from '@material-ui/core/styles';
 import renderCellExpand from './render-cell-expand';
 import TableDashboard from './table/dashboard-table';
 import SpiffeHelper from '../spiffe-helper';
+import TornjakHelper from 'components/tornjak-helper';
 
 const columns = [
   { field: "spiffeid", headerName: "Name", flex: 1, renderCell: renderCellExpand },
+  { field: "clusterName", headerName: "Cluster Name", width: 190 },
   { field: "numEntries", headerName: "Number of Entries", width: 200 },
   { field: "status", headerName: "Status", width: 120 },
   { field: "platformType", headerName: "Platform Type", width: 170 },
-  { field: "clusterName", headerName: "Cluster Name", width: 190 }
 ];
 
 const styles = theme => ({
@@ -22,69 +23,34 @@ const styles = theme => ({
 class AgentDashboardTable extends React.Component {
   constructor(props) {
     super(props);
-    this.SpiffeHelper = new SpiffeHelper()
-  }
-
-  numberEntries(spiffeid, agentEntriesDict) {
-    var validIds = new Set([spiffeid]);
-
-    // Also check for parent IDs associated with the agent
-    let agentEntries = agentEntriesDict[spiffeid];
-    if (agentEntries !== undefined) {
-      for (let j=0; j < agentEntries.length; j++) {
-          validIds.add(this.SpiffeHelper.getEntrySpiffeid(agentEntries[j]));
-      }
-    }
-
-    if (typeof this.props.globalEntries.globalEntriesList !== 'undefined') {
-      var entriesList = this.props.globalEntries.globalEntriesList.filter(entry=> {
-        return (typeof entry !== 'undefined') && validIds.has(this.SpiffeHelper.getEntryParentid(entry));
-      });
-
-      if (typeof entriesList === 'undefined') {
-        return 0
-      } else {
-        return entriesList.length
-      }
-    } else {
-      return 0
-    }
-  }
-
-  getChildEntries(agent, agentEntriesDict) {
-    var thisSpiffeid = this.SpiffeHelper.getAgentSpiffeid(agent);
-    // get status
-    var status = this.SpiffeHelper.getAgentStatusString(agent);
-    // get tornjak metadata
-    var metadata_entry = this.SpiffeHelper.getAgentMetadata(thisSpiffeid, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo);
-    var plugin = "None"
-    var cluster = "None"
-    if (typeof metadata_entry["plugin"] !== 'undefined' && metadata_entry["plugin"].length !== 0) {
-      plugin = metadata_entry["plugin"]
-    }
-    if (typeof metadata_entry["cluster"] !== 'undefined' && metadata_entry["cluster"].length !== 0) {
-      cluster = metadata_entry["cluster"]
-    }
-    return {
-      id: thisSpiffeid,
-      spiffeid: thisSpiffeid,
-      numEntries: this.numberEntries(thisSpiffeid, agentEntriesDict),
-      status: status,
-      platformType: plugin,
-      clusterName: cluster,
-    }
+    this.state = {
+    };
+    this.SpiffeHelper = new SpiffeHelper();
+    this.TornjakHelper = new TornjakHelper();
   }
 
   agentList() {
+    var filterByValue = [];
+    const { filterByCluster, filterByAgentId } = this.props;
+    let agentsList = [];
     if ((typeof this.props.globalEntries.globalEntriesList === 'undefined') ||
-          (typeof this.props.globalAgents.globalAgentsList === 'undefined')) {
-        return [];
+      (typeof this.props.globalAgents.globalAgentsList === 'undefined')) {
+      return [];
     }
-
-    let agentEntriesDict = this.SpiffeHelper.getAgentsEntries(this.props.globalAgents.globalAgentsList, this.props.globalEntries.globalEntriesList)
-    return this.props.globalAgents.globalAgentsList.map(currentAgent => {
-      return this.getChildEntries(currentAgent, agentEntriesDict);
+    agentsList = this.props.globalAgents.globalAgentsList.map(currentAgent => {
+      return this.TornjakHelper.getDashboardAgentMetaData(currentAgent, this.props.globalEntries.globalEntriesList, this.props.globalAgents.globalAgentsList, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo)
     })
+    // For details page filtering data
+    if (filterByCluster === undefined && filterByAgentId === undefined) {
+      return agentsList;
+    }
+    for (let i = 0; i < agentsList.length; i++) {
+      if ((filterByCluster !== undefined && agentsList[i].clusterName === filterByCluster) ||
+        (filterByAgentId !== undefined && agentsList[i].id === filterByAgentId)) { // for filtering agents for a specific cluster or filtering agents for entries
+        filterByValue.push(agentsList[i]);
+      }
+    }
+    return filterByValue;
   }
 
   render() {
@@ -92,11 +58,11 @@ class AgentDashboardTable extends React.Component {
     var data = this.agentList();
     return (
       <div>
-        <TableDashboard 
+        <TableDashboard
           title={"Agents"}
           numRows={numRows}
           columns={columns}
-          data={data}/>
+          data={data} />
       </div>
     );
   }
@@ -106,6 +72,7 @@ class AgentDashboardTable extends React.Component {
 const mapStateToProps = (state) => ({
   globalAgents: state.agents,
   globalEntries: state.entries,
+  globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 })
 
 export default withStyles(styles)(
