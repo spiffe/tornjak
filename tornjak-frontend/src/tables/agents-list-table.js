@@ -1,43 +1,26 @@
 import React from "react";
-// import { DataTable, OverflowMenu} from "carbon-components-react";
-import { DataTable } from "carbon-components-react";
 import { connect } from 'react-redux';
-import {
-    Delete16 as Delete,
-} from '@carbon/icons-react';
-import ResetIcon from "@carbon/icons-react/es/reset--alt/20";
 import GetApiServerUri from 'components/helpers';
 import IsManager from 'components/is_manager';
-import WorkLoadAttestor from 'components/work-load-attestor-modal';
 import axios from 'axios';
 import {
     agentsListUpdateFunc
 } from 'redux/actions';
-const {
-    TableContainer,
-    Table,
-    TableHead,
-    TableRow,
-    TableBody,
-    TableCell,
-    TableHeader,
-    TableSelectRow,
-    TableSelectAll,
-    TableToolbar,
-    TableToolbarSearch,
-    TableToolbarContent,
-    TableBatchActions,
-    TableBatchAction,
-} = DataTable;
+import Table from './list-table';
 
-class DataTableRender extends React.Component {
+// AgentListTable takes in 
+// listTableData: agents data to be rendered on table
+// returns agents data inside a carbon component table with specified functions
+class AgentsListTable extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             listData: props.data,
-            listTableData: [{"id":"0"}],
+            listTableData: [{ "id": "0" }],
         };
         this.prepareTableData = this.prepareTableData.bind(this);
+        this.deleteAgent = this.deleteAgent.bind(this);
+        this.banAgent = this.banAgent.bind(this);
     }
 
     componentDidMount() {
@@ -87,7 +70,7 @@ class DataTableRender extends React.Component {
         } else {
             endpoint = GetApiServerUri('/api/agent/delete');
         }
-        if (selectedRows.length !== 0) {
+        if (selectedRows !== undefined && selectedRows.length !== 0) {
             for (let i = 0; i < selectedRows.length; i++) {
                 id[i] = {}
                 id[i]["trust_domain"] = selectedRows[i].cells[1].value;
@@ -122,7 +105,7 @@ class DataTableRender extends React.Component {
         } else {
             endpoint = GetApiServerUri('/api/agent/ban')
         }
-        if (selectedRows.length !== 0) {
+        if (selectedRows !== undefined && selectedRows.length !== 0) {
             for (i = 0; i < selectedRows.length; i++) {
                 id[i] = {}
                 id[i]["trust_domain"] = selectedRows[i].cells[1].value;
@@ -167,97 +150,15 @@ class DataTableRender extends React.Component {
             }
         ];
         return (
-            <DataTable
-                isSortable
-                rows={listTableData}
-                headers={headerData}
-                render={({
-                    rows,
-                    headers,
-                    getHeaderProps,
-                    getSelectionProps,
-                    onInputChange,
-                    getPaginationProps,
-                    getBatchActionProps,
-                    getTableContainerProps,
-                    selectedRows,
-                }) => (
-                    <TableContainer
-                        {...getTableContainerProps()}
-                    >
-                        <TableToolbar>
-                            <TableToolbarContent>
-                                <TableToolbarSearch onChange={(e) => onInputChange(e)} />
-                            </TableToolbarContent>
-                            <TableBatchActions
-                                {...getBatchActionProps()}
-                            >
-                                <TableBatchAction
-                                    renderIcon={Delete}
-                                    iconDescription="Delete"
-                                    onClick={() => {
-                                        this.deleteAgent(selectedRows);
-                                        getBatchActionProps().onCancel();
-                                    }}
-                                >
-                                    Delete
-                                </TableBatchAction>
-                                <TableBatchAction
-                                    renderIcon={ResetIcon}
-                                    iconDescription="Ban"
-                                    onClick={() => {
-                                        this.banAgent(selectedRows);
-                                        getBatchActionProps().onCancel();
-                                    }}
-                                >
-                                    Ban
-                                </TableBatchAction>
-                            </TableBatchActions>
-                        </TableToolbar>
-                        <Table size="short" useZebraStyles>
-                            <TableHead>
-                                <TableRow>
-                                    <TableSelectAll
-                                        {...getSelectionProps()} />
-                                    {headers.map((header) => (
-                                        <TableHeader key={header.header} {...getHeaderProps({ header })}>
-                                            {header.header}
-                                        </TableHeader>
-                                    ))}
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {rows.map((row, key) => (
-                                    <TableRow key={key}>
-                                        <TableSelectRow
-                                            {...getSelectionProps({ row })} />
-                                        {row.cells.map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {cell.info.header === "info" ? (
-                                                    <div style={{ overflowX: 'auto', width: "400px" }}>
-                                                        <pre>{cell.value}</pre>
-                                                    </div>
-                                                ) : (
-                                                    cell.value)}
-                                            </TableCell>
-                                        ))}
-                                        <TableCell>
-                                            <div>
-                                                {/* <OverflowMenu flipped> */}
-                                                    <WorkLoadAttestor
-                                                        spiffeid={row.cells[2].value}
-                                                        agentData={row}
-                                                    />
-                                                {/* </OverflowMenu> */}
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                )}
-            />
+            <div>
+                <Table
+                    entityType={"Agent"}
+                    listTableData={listTableData}
+                    headerData={headerData}
+                    deleteEntity={this.deleteAgent}
+                    banEntity={this.banAgent}
+                />
+            </div>
         );
     }
 }
@@ -271,4 +172,4 @@ const mapStateToProps = (state) => ({
 export default connect(
     mapStateToProps,
     { agentsListUpdateFunc }
-)(DataTableRender)
+)(AgentsListTable)

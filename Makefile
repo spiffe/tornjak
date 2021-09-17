@@ -2,6 +2,7 @@
 
 CONTAINER_TAG ?= tsidentity/tornjak-spire-server:latest
 CONTAINER_VERSION_IMAGEPATH ?= tsidentity/tornjak-spire-server
+CONTAINER_VERSION_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-spire-server
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:latest
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
 
@@ -52,6 +53,12 @@ release-container-agent-multiversions: bin/tornjak-agent ui-agent
 	for i in $(shell cat SPIRE_BUILD_VERSIONS); do \
 		./build-and-push-versioned-container.sh $$i ${CONTAINER_VERSION_IMAGEPATH}; \
 	done
+
+release-container-agent-multiversions-ghcr: bin/tornjak-agent ui-agent
+	for i in $(shell cat SPIRE_BUILD_VERSIONS); do \
+		./build-and-push-versioned-container.sh $$i ${CONTAINER_VERSION_GHCR_IMAGEPATH}; \
+	done
+
 
 clean:
 	rm -rf bin/

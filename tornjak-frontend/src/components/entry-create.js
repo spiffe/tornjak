@@ -83,8 +83,6 @@ class CreateEntry extends Component {
         this.TornjakApi.populateEntriesUpdate(this.props.globalServerSelected, this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
         this.TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
         this.setState({ selectedServer: this.props.globalServerSelected });
-        this.prepareParentIdAgentsList();
-        this.prepareSelectorsList();
       }
     } else {
       // agent doesnt need to do anything
@@ -101,23 +99,41 @@ class CreateEntry extends Component {
       if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
         this.setState({ selectedServer: this.props.globalServerSelected });
       }
+
       if (prevProps.globalServerInfo !== this.props.globalServerInfo) {
-        this.prepareParentIdAgentsList();
+        if (this.props.globalAgentsList !== undefined && this.props.globalEntriesList !== undefined) {
+          this.prepareParentIdAgentsList();
+        }
         this.prepareSelectorsList();
       }
-      if (prevProps.globalAgentsList !== this.props.globalAgentsList) {
-        this.prepareParentIdAgentsList();
+
+      if (prevProps.globalAgentsList !== this.props.globalAgentsList || prevProps.globalEntriesList !== this.props.globalEntriesList) {
+        if (this.props.globalAgentsList !== undefined && this.props.globalEntriesList !== undefined) {
+          this.prepareParentIdAgentsList();
+        }
+        this.prepareSelectorsList();
       }
+
       if (prevState.parentId !== this.state.parentId) {
         this.prepareSelectorsList();
       }
     } else {
       if (prevProps.globalServerInfo !== this.props.globalServerInfo) {
-        this.prepareParentIdAgentsList();
+        if (this.props.globalAgentsList !== undefined && this.props.globalEntriesList !== undefined) {
+          this.prepareParentIdAgentsList();
+        }
         this.prepareSelectorsList();
       }
-      if (prevState.parentId !== this.state.parentId)  {
+
+      if (prevProps.globalAgentsList !== this.props.globalAgentsList || prevProps.globalEntriesList !== this.props.globalEntriesList) {
+        if (this.props.globalAgentsList !== undefined && this.props.globalEntriesList !== undefined) {
+          this.prepareParentIdAgentsList();
+        }
         this.prepareSelectorsList();
+      }
+
+      if (prevState.parentId !== this.state.parentId)  {
+          this.prepareSelectorsList();
       }
     }
   }
