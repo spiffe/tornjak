@@ -20,9 +20,7 @@ class SpiffeHelper extends Component {
   }
 
   getEntryAdminFlag(entry) {
-    return typeof entry !== 'undefined' &&
-           typeof entry.admin !== 'undefined' &&
-           entry.admin;
+    return typeof entry !== 'undefined' && typeof entry.admin !== 'undefined' && entry.admin;
   }
 
   // check if format strictly adhered to
@@ -30,7 +28,7 @@ class SpiffeHelper extends Component {
     if (typeof trust_domain === 'undefined' || typeof path === 'undefined') {
       return false
     } else if (trust_domain.length === 0 || path.length === 0) {
-        return false
+      return false
     } else if (trust_domain.charAt(0) === '/') {
       return false
     } else if (trust_domain.slice(-1) === "/" && path.charAt(0) !== "/") {
@@ -83,23 +81,31 @@ class SpiffeHelper extends Component {
         return metadata[0]
       }
     }
-    return {"plugin":"", "cluster":""}
+    return { "plugin": "", "cluster": "" }
   }
 
   // getAgentEntries provides an agent and a list of entries and returns
   // the list of entries which are associated with this agent
-  getAgentEntries (agent, entries) {
-      let nodeEntries = entries.filter(e => e.parent_id.path === "/spire/server")
-      let agentSelectors = new Set(agent.selectors.map(formatSelectors))
-      let isAssocWithAgent = e => {
-          let entrySelectors = new Set(e.selectors.map(formatSelectors))
-          return isSuperset(agentSelectors, entrySelectors)
+  getAgentEntries(agent, entries) {
+    let nodeEntries = entries.filter(e => e.parent_id.path === "/spire/server")
+    if(agent === undefined) {
+      return [];
+    }
+    if(agent.selectors === undefined) {
+      agent.selectors = [];
+    }
+    let agentSelectors = new Set(agent.selectors.map(formatSelectors))
+    let isAssocWithAgent = e => {
+      if(e.selectors === undefined) {
+        e.selectors = [];
       }
-
-      return nodeEntries.filter(isAssocWithAgent)
+      let entrySelectors = new Set(e.selectors.map(formatSelectors))
+      return isSuperset(agentSelectors, entrySelectors)
+    }
+    return nodeEntries.filter(isAssocWithAgent)
   }
 
-  // getAgentEntries provides list of agents and a list of entries 
+  // getAgentsEntries provides list of agents and a list of entries 
   // and returns a dictionary with the fully qualified spiffe ID (as per 
   // getAgentSpiffeid) as keys, and values being the the list of entries 
   // which are associated with that agent.
@@ -114,64 +120,151 @@ class SpiffeHelper extends Component {
   // since the association with entries and agent selectors are likely to be 
   // n:1, this would reduce the total cost. This may be useful when 
   // performance is impacted.
-  getAgentsEntries (agents, entries) {
-      let nodeEntries = entries.filter(e => e.parent_id.path === "/spire/server");
-      var lambdas = [];
-      var agentEntriesDict = {};
+  getAgentsEntries(agents, entries) {
+    let nodeEntries = [];
+    if (entries !== undefined) {
+      nodeEntries = entries.filter(e => e.parent_id.path === "/spire/server");
+    }
+    var lambdas = [];
+    var agentEntriesDict = {};
 
-      for (let i=0; i < agents.length; i++) {
-          let agent = agents[i];
-          let agentId = this.getAgentSpiffeid(agent);
-          agentEntriesDict[agentId] = [];
-
-          let agentSelectors = new Set(agent.selectors.map(formatSelectors));
-          let isAssocWithAgent = e => {
-              let entrySelectors = new Set(e.selectors.map(formatSelectors))
-              if (isSuperset(agentSelectors, entrySelectors)) {
-                  agentEntriesDict[agentId].push(e);
-              }
-          };
-          lambdas.push(isAssocWithAgent);
+    for (let i = 0; i < agents.length; i++) {
+      let agent = agents[i];
+      let agentId = this.getAgentSpiffeid(agent);
+      agentEntriesDict[agentId] = [];
+      if(agent.selectors === undefined) {
+        agent.selectors = [];
       }
+      let agentSelectors = new Set(agent.selectors.map(formatSelectors));
+      let isAssocWithAgent = e => {
+        if(e.selectors === undefined) {
+          e.selectors = [];
+        }
+        let entrySelectors = new Set(e.selectors.map(formatSelectors))
+        if (isSuperset(agentSelectors, entrySelectors)) {
+          agentEntriesDict[agentId].push(e);
+        }
+      };
+      lambdas.push(isAssocWithAgent);
+    }
 
-      for (let i=0; i < nodeEntries.length; i++) {
-          for (let j=0; j < lambdas.length; j++) {
-              lambdas[j](nodeEntries[i])
-          }
+    for (let i = 0; i < nodeEntries.length; i++) {
+      for (let j = 0; j < lambdas.length; j++) {
+        lambdas[j](nodeEntries[i])
       }
+    }
 
-      return agentEntriesDict
+    return agentEntriesDict
   }
 
   // getCanonicalAgentSpiffeid takes in a agent entry, and returns the first 
   // agent ID that is found associated with it.
   getCanonicalAgentSpiffeid(entry, agents) {
-      let entrySelectors = new Set(entry.selectors.map(formatSelectors));
-      let isAssocWithEntry = a => {
-          let agentSelectors = new Set(a.selectors.map(formatSelectors));
-          return isSuperset(agentSelectors, entrySelectors);
+    if(entry.selectors === undefined) {
+      entry.selectors = [];
+    }
+    let entrySelectors = new Set(entry.selectors.map(formatSelectors));
+    let isAssocWithEntry = a => {
+      if(a.selectors === undefined) {
+        a.selectors = [];
       }
+      let agentSelectors = new Set(a.selectors.map(formatSelectors));
+      return isSuperset(agentSelectors, entrySelectors);
+    }
 
-      let filteredAgents = agents.filter(isAssocWithEntry);
-      if (filteredAgents.length > 0) {
-          return this.getAgentSpiffeid(filteredAgents[0]);
+    let filteredAgents = agents.filter(isAssocWithEntry);
+    if (filteredAgents.length > 0) {
+      return this.getAgentSpiffeid(filteredAgents[0]);
+    }
+    return "";
+  }
+
+  // numberEntries takes in spiffe id of an agent and list of entries
+  // returns number of entries in an agent
+  numberEntries(spiffeid, globalEntries, globalAgents) {
+    if (typeof globalEntries !== 'undefined') {
+      var entriesList = this.getChildEntries(spiffeid, globalAgents, globalEntries);
+      if (typeof entriesList === 'undefined') {
+        return NaN
+      } else {
+        return entriesList.length
       }
-      return "";
+    } else {
+      return NaN
+    }
+  }
+
+  // getChildEntries takes in spiffeid of agent, list of agents, and a list of entries
+  // returns list of child entries
+  getChildEntries(spiffeid, globalAgents, globalEntries) {
+    if (typeof globalEntries === 'undefined') {
+      return NaN;
+    }
+    var curAgent = globalAgents.filter(agent => {
+      return this.getAgentSpiffeid(agent) === spiffeid
+    })
+    var entriesList = globalEntries.filter(entry => {
+      return spiffeid === (this.getEntryParentid(entry))
+    })
+    // Add entries associated with this agent
+    let agentEntriesDict = this.getAgentEntries(curAgent[0], globalEntries)
+    let agentEntries = agentEntriesDict[spiffeid];
+    let entriesAgent = [];
+    if (agentEntries !== undefined) {
+      entriesAgent = agentEntries.map(cur => {
+        return this.getEntrySpiffeid(cur)
+      })
+    }
+    entriesList = entriesList.concat(entriesAgent);
+    return entriesList;
+  }
+
+  // workloadEntry takes in an entry metadata and workload attestor info for specified agents
+  // returns entry metadata info for dashboard table
+  workloadEntry(entry, WorkLoadAttestorInfo) {
+    var thisSpiffeId = this.getEntrySpiffeid(entry)
+    var thisParentId = this.getEntryParentid(entry)
+    // get tornjak metadata
+    var metadata_entry = this.getAgentMetadata(thisParentId, WorkLoadAttestorInfo);
+    var plugin = "None"
+    var cluster = "None"
+    if (metadata_entry["plugin"].length !== 0) {
+      plugin = metadata_entry["plugin"]
+    }
+    if (metadata_entry["cluster"].length !== 0) {
+      cluster = metadata_entry["cluster"]
+    }
+    // get spire data
+    var admin = this.getEntryAdminFlag(entry)
+    var expTime = "No Expiry Time"
+    if (typeof entry.expires_at !== 'undefined') {
+      var d = new Date(this.getEntryExpiryMillisecondsFromEpoch(entry))
+      expTime = d.toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false })
+    }
+    return {
+      id: entry.id,
+      spiffeid: thisSpiffeId,
+      parentId: thisParentId,
+      adminFlag: admin,
+      entryExpireTime: expTime,
+      platformType: plugin,
+      clusterName: cluster,
+    }
   }
 }
 
 
 function isSuperset(set, subset) {
-    for (let elem of subset) {
-        if (!set.has(elem)) {
-            return false
-        }
+  for (let elem of subset) {
+    if (!set.has(elem)) {
+      return false
     }
-    return true
+  }
+  return true
 }
 
-function formatSelectors (s) {
-    return s.type + ":" + s.value;
+function formatSelectors(s) {
+  return s.type + ":" + s.value;
 }
 
 
