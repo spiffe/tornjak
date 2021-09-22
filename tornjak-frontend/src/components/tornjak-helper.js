@@ -148,6 +148,7 @@ class TornjakHelper extends Component {
       entryExpireTime: expTime,
       platformType: plugin,
       clusterName: cluster,
+      canonicalAgentId: canonicalParentId,
     }
   }
 

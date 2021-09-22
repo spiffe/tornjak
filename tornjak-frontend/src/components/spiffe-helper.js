@@ -123,7 +123,7 @@ class SpiffeHelper extends Component {
   getAgentsEntries(agents, entries) {
     let nodeEntries = [];
     if (entries === undefined) {
-        return undefined
+      return undefined
     }
     nodeEntries = entries.filter(e => e.parent_id.path === "/spire/server");
     var lambdas = [];
