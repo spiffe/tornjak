@@ -39,7 +39,7 @@ class EntriesDashBoardTable extends React.Component {
     }
 
     entriesList = this.props.globalEntries.globalEntriesList.map(currentEntry => {
-      return this.TornjakHelper.workloadEntry(currentEntry, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo);
+      return this.TornjakHelper.workloadEntry(currentEntry, this.props.globalAgents.globalAgentsWorkLoadAttestorInfo, this.props.globalAgents.globalAgentsList, this.props.globalEntries.globalEntriesList);
     })
 
     // For details page filtering data
