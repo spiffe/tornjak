@@ -6,10 +6,10 @@ import (
 	"log"
 	"os"
 
-	agentapi "github.com/spiffe/tornjak/tornjak-backend/api/agent"
 	"github.com/pkg/errors"
 	"github.com/spiffe/spire/cmd/spire-server/cli/run"
 	"github.com/spiffe/spire/pkg/common/catalog"
+	agentapi "github.com/spiffe/tornjak/tornjak-backend/api/agent"
 	"github.com/urfave/cli/v2"
 )
 
@@ -188,6 +188,14 @@ func getSocketPath(config *run.Config) string {
 	socketPath := config.Server.SocketPath
 	if config.Server.DeprecatedRegistrationUDSPath != "" {
 		socketPath = config.Server.DeprecatedRegistrationUDSPath
+	}
+
+	if socketPath == "" {
+		// TODO: temporary fix for issue with socket path resolution
+		// using the defaultSocketPath in the SPIRE pkg, manually importing
+		// since it is not a public variable.
+		// https://github.com/spiffe/spire/blob/main/cmd/spire-server/cli/run/run.go#L44
+		socketPath = "/tmp/spire-server/private/api.sock"
 	}
 
 	return "unix://" + socketPath
