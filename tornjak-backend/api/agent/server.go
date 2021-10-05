@@ -36,8 +36,6 @@ type Server struct {
 }
 
 func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Endpoint Hit: Agent List")
-
 	var input ListAgentsRequest
 	buf := new(strings.Builder)
 
@@ -80,8 +78,6 @@ func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) agentBan(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Endpoint Hit: Agent Ban")
-
 	var input BanAgentRequest
 	buf := new(strings.Builder)
 
@@ -125,7 +121,6 @@ func (s *Server) agentBan(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) agentDelete(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Endpoint Hit: Agent Delete")
 	// TODO update backend to also delete agent metadata
 
 	var input DeleteAgentRequest
@@ -171,8 +166,6 @@ func (s *Server) agentDelete(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) agentCreateJoinToken(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Endpoint Hit: Agent Create Join Token")
-
 	var input CreateJoinTokenRequest
 	buf := new(strings.Builder)
 
@@ -214,8 +207,6 @@ func (s *Server) agentCreateJoinToken(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) entryList(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Endpoint Hit: Entry List")
-
 	var input ListEntriesRequest
 	buf := new(strings.Builder)
 
@@ -257,8 +248,6 @@ func (s *Server) entryList(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) entryCreate(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Endpoint Hit: Entry BatchCreate")
-
 	var input BatchCreateEntryRequest
 	buf := new(strings.Builder)
 
@@ -300,8 +289,6 @@ func (s *Server) entryCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) entryDelete(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Endpoint Hit: Entry BatchDelete")
-
 	var input BatchDeleteEntryRequest
 	buf := new(strings.Builder)
 
@@ -368,8 +355,6 @@ func corsHandler(f func(w http.ResponseWriter, r *http.Request)) http.HandlerFun
 }
 
 func (s *Server) tornjakGetServerInfo(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Endpoint Hit: Server Info")
-
 	var input GetTornjakServerInfoRequest
 	buf := new(strings.Builder)
 
@@ -533,7 +518,6 @@ func NewAgentsDB(dbString string) (agentdb.AgentDB, error) {
 }
 
 func (s *Server) tornjakSelectorsList(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Endpoint Hit: Selector List")
 	buf := new(strings.Builder)
 	n, err := io.Copy(buf, r.Body)
 	if err != nil {
@@ -605,7 +589,6 @@ func (s *Server) tornjakPluginDefine(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) tornjakAgentsList(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Endpoint Hit: Tornjak Agent List")
 	buf := new(strings.Builder)
 	n, err := io.Copy(buf, r.Body)
 	if err != nil {
@@ -644,8 +627,6 @@ func (s *Server) tornjakAgentsList(w http.ResponseWriter, r *http.Request) {
 /********* CLUSTER *********/
 
 func (s *Server) clusterList(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Endpoint Hit: Cluster List")
-
 	var input ListClustersRequest
 	buf := new(strings.Builder)
 
@@ -685,8 +666,6 @@ func (s *Server) clusterList(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) clusterCreate(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Endpoint Hit: Cluster Create")
-
 	buf := new(strings.Builder)
 	n, err := io.Copy(buf, r.Body)
 	if err != nil {
@@ -722,8 +701,6 @@ func (s *Server) clusterCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) clusterEdit(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Endpoint Hit: Cluster Edit")
-
 	buf := new(strings.Builder)
 	n, err := io.Copy(buf, r.Body)
 	if err != nil {
@@ -759,8 +736,6 @@ func (s *Server) clusterEdit(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) clusterDelete(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Endpoint Hit: Cluster Delete")
-
 	buf := new(strings.Builder)
 	n, err := io.Copy(buf, r.Body)
 	if err != nil {
