@@ -524,7 +524,7 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
   }
 }
 
-const mapStateToProps = (state: { clusters: { globalClusterTypeInfo: []; globalClustersList: []; }; servers: { globalServerSelected: string; globalSelectorInfo: any; globalServerInfo: []; globalTornjakServerInfo: ""; globalWorkloadSelectorInfo: []; }; agents: { globalAgentsList: []; globalAgentsWorkLoadAttestorInfo: []; }; tornjak: { globalErrorMessage: string; }; }) => ({
+const mapStateToProps = (state: { clusters: { globalClusterTypeInfo: []; globalClustersList: []; }; servers: { globalServerSelected: string; globalSelectorInfo: {}; globalServerInfo: []; globalTornjakServerInfo: {}; globalWorkloadSelectorInfo: []; }; agents: { globalAgentsList: []; globalAgentsWorkLoadAttestorInfo: []; }; tornjak: { globalErrorMessage: string; }; }) => ({
   globalClusterTypeInfo: state.clusters.globalClusterTypeInfo,
   globalClustersList: state.clusters.globalClustersList,
   globalServerSelected: state.servers.globalServerSelected,

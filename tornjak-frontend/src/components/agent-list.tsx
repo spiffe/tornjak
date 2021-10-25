@@ -26,7 +26,7 @@ type AgentListProp = {
   tornjakMessageFunc: Function,
   agentworkloadSelectorInfoFunc: Function,
   tornjakServerInfoUpdateFunc: Function,
-  globalTornjakServerInfo: string,
+  globalTornjakServerInfo: Object,
   serverInfoUpdateFunc: Function,
   globalAgentsList: [],
   globalErrorMessage: string,
@@ -135,7 +135,7 @@ class AgentList extends Component<AgentListProp, AgentListState> {
   }
 }
 
-const mapStateToProps = (state: { servers: { globalServerSelected: string; globalTornjakServerInfo: string; }; agents: { globalAgentsList: []; }; tornjak: { globalErrorMessage: string; }; }) => ({
+const mapStateToProps = (state: { servers: { globalServerSelected: string; globalTornjakServerInfo: {}; }; agents: { globalAgentsList: []; }; tornjak: { globalErrorMessage: string; }; }) => ({
   globalServerSelected: state.servers.globalServerSelected,
   globalAgentsList: state.agents.globalAgentsList,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,

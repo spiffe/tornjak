@@ -25,7 +25,7 @@ type CreateEntryProp = {
   globalAgentsList: [],
   globalEntriesList: [],
   globalServerInfo: any,
-  globalTornjakServerInfo: {},
+  globalTornjakServerInfo: Object,
   globalErrorMessage: string,
   globalWorkloadSelectorInfo: [],
   globalAgentsWorkLoadAttestorInfo: any,
@@ -64,7 +64,7 @@ type CreateEntryState = {
   spiffeIdPrefix: string,
   parentIdManualEntryOption: string,
   parentIDManualEntry: boolean,
-  selectorsList: [],
+  selectorsList: Array<Object>,
   selectorsListDisplay: string,
 }
 
@@ -750,7 +750,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
 }
 
 
-const mapStateToProps = (state: { servers: { globalServerSelected: string; globalSelectorInfo: []; globalServerInfo: []; globalTornjakServerInfo: string; globalWorkloadSelectorInfo: []; }; agents: { globalAgentsList: []; globalAgentsWorkLoadAttestorInfo: []; }; entries: { globalEntriesList: []; }; tornjak: { globalErrorMessage: string; }; }) => ({
+const mapStateToProps = (state: { servers: { globalServerSelected: string; globalSelectorInfo: []; globalServerInfo: []; globalTornjakServerInfo: {}; globalWorkloadSelectorInfo: []; }; agents: { globalAgentsList: []; globalAgentsWorkLoadAttestorInfo: []; }; entries: { globalEntriesList: []; }; tornjak: { globalErrorMessage: string; }; }) => ({
   globalServerSelected: state.servers.globalServerSelected,
   globalSelectorInfo: state.servers.globalSelectorInfo,
   globalAgentsList: state.agents.globalAgentsList,

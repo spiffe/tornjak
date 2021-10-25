@@ -112,10 +112,10 @@ describe('Entries Reducer', () => {
 describe('Server Reducer', () => {
     const initialState = {
         globalServerSelected: "",
-        globalTornjakServerInfo: "",
-        globalServerInfo: [],
+        globalTornjakServerInfo: {},
+        globalServerInfo: {},
         globalServersList: [],
-        globalSelectorInfo:[],
+        globalSelectorInfo:{},
         globalWorkloadSelectorInfo:[],
     };
     test('Should return default state for servers reducer', () => {

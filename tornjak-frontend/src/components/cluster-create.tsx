@@ -32,7 +32,7 @@ type ClusterCreateProp = {
   agentsListUpdateFunc: Function,
   tornjakMessageFunc: Function,
   tornjakServerInfoUpdateFunc: Function,
-  globalTornjakServerInfo: string,
+  globalTornjakServerInfo: Object,
   serverInfoUpdateFunc: Function,
 }
 
@@ -429,7 +429,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
   }
 }
 
-const mapStateToProps = (state: { clusters: { globalClusterTypeInfo: []; }; servers: { globalServerSelected: string; globalSelectorInfo: []; globalServerInfo: []; globalTornjakServerInfo: ""; globalWorkloadSelectorInfo: []; }; agents: { globalAgentsList: []; globalAgentsWorkLoadAttestorInfo: []; }; tornjak: { globalErrorMessage: string; }; }) => ({
+const mapStateToProps = (state: { clusters: { globalClusterTypeInfo: []; }; servers: { globalServerSelected: string; globalSelectorInfo: {}; globalServerInfo: []; globalTornjakServerInfo: {}; globalWorkloadSelectorInfo: []; }; agents: { globalAgentsList: []; globalAgentsWorkLoadAttestorInfo: []; }; tornjak: { globalErrorMessage: string; }; }) => ({
   globalClusterTypeInfo: state.clusters.globalClusterTypeInfo,
   globalServerSelected: state.servers.globalServerSelected,
   globalSelectorInfo: state.servers.globalSelectorInfo,

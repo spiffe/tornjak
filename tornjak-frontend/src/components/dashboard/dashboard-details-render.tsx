@@ -23,7 +23,7 @@ import {
 
 type DashboardDetailsRenderProp = {
     params: { entity: string; },
-    globalTornjakServerInfo: string,
+    globalTornjakServerInfo: Object,
     globalServerInfo: [],
     globalServerSelected: string | undefined,
     clickedDashboardTableFunc: Function,
@@ -85,7 +85,7 @@ class DashboardDetailsRender extends Component<DashboardDetailsRenderProp, Dashb
     }
 }
 
-const mapStateToProps = (state: { servers: { globalServerInfo: []; globalTornjakServerInfo: string; }; clusters: { globalClustersList: []; }; agents: { globalAgentsList: []; globalAgentsWorkLoadAttestorInfo: []; }; entries: { globalEntriesList: []; }; }) => ({
+const mapStateToProps = (state: { servers: { globalServerInfo: []; globalTornjakServerInfo: {}; }; clusters: { globalClustersList: []; }; agents: { globalAgentsList: []; globalAgentsWorkLoadAttestorInfo: []; }; entries: { globalEntriesList: []; }; }) => ({
     globalServerInfo: state.servers.globalServerInfo,
     globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
     globalClustersList: state.clusters.globalClustersList,
