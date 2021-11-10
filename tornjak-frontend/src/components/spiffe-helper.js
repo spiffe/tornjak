@@ -61,7 +61,7 @@ class SpiffeHelper extends Component {
   getAgentStatusString(entry) {
     if (typeof entry !== 'undefined') {
       var banned = entry.banned
-      var status = "OK"
+      var status = "Expired"
       var expiry = this.getAgentExpiryMillisecondsFromEpoch(entry)
       var currentTime = this.getMillisecondsFromEpoch()
       if (banned) {
