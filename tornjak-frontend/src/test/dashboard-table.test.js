@@ -38,6 +38,11 @@ describe("Dashboard Table Component", () => {
       expect(entityTitleComp.length).toBe(1);
     });
 
+    test("Should Render Entity Title Button Component without Errors", () => {
+      const entityTitleComp = findByTestId(wrapper, "entity-title-button");
+      expect(entityTitleComp.length).toBe(1);
+    });
+
     test("Should Render Entity Details Button without Errors", () => {
       const entityDetailsButtonComp = findByTestId(wrapper, "entity-details-button");
       expect(entityDetailsButtonComp.length).toBe(1);
@@ -47,5 +52,20 @@ describe("Dashboard Table Component", () => {
       const entityTableComp = findByTestId(wrapper, "entity-table");
       expect(entityTableComp.length).toBe(1);
     });
+
+    test("Dispatch the right action for clickedDashboardTableFunc entity-title-button without Errors", () => {
+      const entityTableComp = findByTestId(wrapper, "entity-title-button");
+      entityTableComp.simulate('click');
+      expect(props.clickedDashboardTableFunc).toHaveBeenCalledWith(props.title.toLowerCase());
+    });
+
+    // test("Dispatch the right action for clickedDashboardTableFunc entity-details-button without Errors", () => {
+    //   const jsdomAlert = window.alert;  // remember the jsdom alert
+    //   window.alert = () => {}; 
+    //   const entityTableComp = findByTestId(wrapper, "entity-details-button");
+    //   entityTableComp.simulate('click');
+    //   expect(props.clickedDashboardTableFunc).toHaveBeenCalledWith(props.title.toLowerCase());
+    //   window.alert = jsdomAlert;  // restore the jsdom alert
+    // });
   });
 });

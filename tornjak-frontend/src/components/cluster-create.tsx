@@ -264,7 +264,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
         agentsList: agentsList,
       },
     };
-
+    
     let endpoint = this.getApiEntryCreateEndpoint();
     if (endpoint === "") {
       return;
@@ -304,6 +304,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
               data-test="clustername-input-field"
             >
               <TextInput
+                data-test="clustername-Text-input-field"
                 aria-required="true"
                 helperText="i.e. exampleabc"
                 id="clusterNameInputField"
@@ -352,6 +353,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
               data-test="cluster-domain-name-input-field"
             >
               <TextInput
+                data-test="cluster-domain-name-input-text-field"
                 helperText="i.e. example.org"
                 id="clusterDomainNameInputField"
                 invalidText="A valid value is required - refer to helper text below"
@@ -365,6 +367,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
               data-test="cluster-managed-by-input-field"
             >
               <TextInput
+                data-test="cluster-managed-by-input-text-field"
                 helperText="i.e. person-A"
                 id="clusterNameInputField"
                 invalidText="A valid value is required - refer to helper text below"

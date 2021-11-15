@@ -35,6 +35,7 @@ class TableDashboard extends React.Component<TableDashboardProp, TableDashboardS
       <React.Fragment>
         <Title data-test="entity-title">
           <Button
+            data-test="entity-title-button"
             color="inherit"
             size="large"
             onClick={() => {

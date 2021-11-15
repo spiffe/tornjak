@@ -346,6 +346,53 @@ describe("Cluster Create Component", () => {
     });
   });
 
+  describe("Renders The Correct Input Change", () => {
+    let wrapper, store;
+    let onSubmitSpy;
+    let clusterCreateClassInstance;
+    beforeEach(() => {
+      onSubmitSpy = jest.fn();
+      store = mockStore(props);
+      wrapper = shallow(<ClusterCreate {...props} onSubmit={onSubmitSpy} />);
+      clusterCreateClassInstance = wrapper.instance();
+    });
+
+    test("Renders correct input change for clustername-Text-input-field without Errors", () => {
+      const clusterNameInput = findByTestId(wrapper, "clustername-Text-input-field");
+      clusterNameInput.simulate('change', {target: {value: 'TestSimulateClusterName'}});
+      clusterCreateClassInstance.onChangeClusterName();
+      const newState = {
+        clusterName: clusterCreateClassInstance.state.clusterName,
+      };
+      expect(newState.clusterName).toStrictEqual('TestSimulateClusterName');
+      // const createClusterButton = findByTestId(wrapper, "create-cluster-form");
+      // createClusterButton.simulate('submit', { preventDefault: () => {} });
+      // const callback = mockFunc.mock.calls;
+      // expect(callback.length).toBe(1);
+      //expect(props.clickedDashboardTableFunc).toHaveBeenCalledWith(props.title.toLowerCase());
+      //expect(createClusterComp.length).toBe(1);
+    });
+
+    test("Renders correct input change for cluster-domain-name-input-field without Errors", () => {
+      const clusterDomainNameInput = findByTestId(wrapper, "cluster-domain-name-input-text-field");
+      clusterDomainNameInput.simulate('change', {target: {value: 'TestSimulateClusterDomainName'}});
+      clusterCreateClassInstance.onChangeClusterDomainName();
+      const newState = {
+        clusterDomainName: clusterCreateClassInstance.state.clusterDomainName,
+      };
+      expect(newState.clusterDomainName).toStrictEqual('TestSimulateClusterDomainName');
+    });
+
+    test("Renders correct input change for cluster-managed-by-input-text-field without Errors", () => {
+      const clusterManagedByInput = findByTestId(wrapper, "cluster-managed-by-input-text-field");
+      clusterManagedByInput.simulate('change', {target: {value: 'TestSimulateClusterManagedBy'}});
+      clusterCreateClassInstance.onChangeClusterManagedBy();
+      const newState = {
+        clusterManagedBy: clusterCreateClassInstance.state.clusterManagedBy,
+      };
+      expect(newState.clusterManagedBy).toStrictEqual('TestSimulateClusterManagedBy');
+    });
+  });
   // describe('Render with Puppeter', () => {
   //     // cleanup after each test
   //     afterEach(cleanup);
