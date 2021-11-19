@@ -25,7 +25,6 @@ func (s ServerInfo) HttpClient() (*http.Client, error) {
 			if len(s.Cert) == 0 || len(s.Key) == 0 {
 				return nil, errors.New("Cannot configure MTLS if not key or cert is provided")
 			}
-
 			cert, err := tls.X509KeyPair(s.Cert, s.Key)
 			if err != nil {
 				return nil, err

@@ -25,6 +25,7 @@ type Server struct {
 	SpireServerAddr string
 	CertPath        string
 	KeyPath         string
+	MTlsCaPath      string
 	TlsEnabled      bool
 	MTlsEnabled     bool
 
@@ -478,6 +479,16 @@ func (s *Server) HandleRequests() {
 		}
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
+
+		// If mTLS is enabled, add mTLS CA path to cert pool as well
+
+		if s.MTlsCaPath != "" {
+			mTLSCaCert, err := ioutil.ReadFile(s.MTlsCaPath)
+			if err != nil {
+				log.Fatal(err)
+			}
+			caCertPool.AppendCertsFromPEM(mTLSCaCert)
+		}
 
 		// Create the TLS Config with the CA pool and enable Client certificate validation
 
