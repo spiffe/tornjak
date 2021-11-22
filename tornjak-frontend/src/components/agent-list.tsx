@@ -15,51 +15,41 @@ import {
   agentworkloadSelectorInfoFunc,
   clusterTypeInfoFunc,
 } from 'redux/actions';
+import { AgentItem } from './types';
 // import PropTypes from "prop-types";
 
 type AgentListProp = {
   clusterTypeInfoFunc: Function,
   selectorInfoFunc: Function,
   workloadSelectorInfoFunc: Function,
-  globalServerSelected: string,
   agentsListUpdateFunc: Function,
   tornjakMessageFunc: Function,
   agentworkloadSelectorInfoFunc: Function,
   tornjakServerInfoUpdateFunc: Function,
-  globalTornjakServerInfo: Object,
   serverInfoUpdateFunc: Function,
-  globalAgentsList: [],
+  globalServerSelected: string,
   globalErrorMessage: string,
-  agent: {},
-  banAgent: Function,
-  deleteAgent: Function
+  globalTornjakServerInfo: Object,
+  agent: Object,
+  globalAgentsList: Array<AgentItem> | undefined,
 }
 
-type AgentListState = {}
+type AgentListState = {
+  message: string,
+}
 
-const Agent = (props: { agent: { id: { trust_domain: {} | null | undefined; path: string; }; }; banAgent: Function; deleteAgent: Function; }) => (
+const Agent = (props: { agent: AgentItem }) => (
   <tr>
     <td>{props.agent.id.trust_domain}</td>
     <td>{"spiffe://" + props.agent.id.trust_domain + props.agent.id.path}</td>
     <td><div style={{ overflowX: 'auto', width: "400px" }}>
       <pre>{JSON.stringify(props.agent, null, ' ')}</pre>
     </div></td>
-
-    <td>
-      {/*
-        // <Link to={"/agentView/"+props.agent._id}>view</Link> |
-      */}
-      <a href="/#" onClick={() => { props.banAgent(props.agent.id) }}>ban</a>
-      <br />
-      <a href="/#" onClick={() => { props.deleteAgent(props.agent.id) }}>delete</a>
-    </td>
   </tr>
 )
 
 class AgentList extends Component<AgentListProp, AgentListState> {
   TornjakApi: TornjakApi;
-  banAgent: any;
-  deleteAgent: any;
   constructor(props: AgentListProp) {
     super(props);
     this.TornjakApi = new TornjakApi();
@@ -104,11 +94,9 @@ class AgentList extends Component<AgentListProp, AgentListState> {
 
   agentList() {
     if (typeof this.props.globalAgentsList !== 'undefined') {
-      return this.props.globalAgentsList.map((currentAgent: any) => {
-        return <Agent key={currentAgent.id}
-          agent={currentAgent}
-          banAgent={this.banAgent}
-          deleteAgent={this.deleteAgent} />;
+      return this.props.globalAgentsList.map((currentAgent: AgentItem) => {
+        return <Agent key={currentAgent.id.path}
+          agent={currentAgent} />;
       })
     } else {
       return ""
@@ -135,7 +123,7 @@ class AgentList extends Component<AgentListProp, AgentListState> {
   }
 }
 
-const mapStateToProps = (state: { servers: { globalServerSelected: string; globalTornjakServerInfo: {}; }; agents: { globalAgentsList: []; }; tornjak: { globalErrorMessage: string; }; }) => ({
+const mapStateToProps = (state: { servers: { globalServerSelected: string; globalTornjakServerInfo: Object; }; agents: { globalAgentsList: Array<AgentItem> | undefined; }; tornjak: { globalErrorMessage: string; }; }) => ({
   globalServerSelected: state.servers.globalServerSelected,
   globalAgentsList: state.agents.globalAgentsList,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,

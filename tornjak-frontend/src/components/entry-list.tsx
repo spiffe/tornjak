@@ -9,67 +9,55 @@ import {
   tornjakMessageFunc,
 } from 'redux/actions';
 // import PropTypes from "prop-types";
+import { EntryItem } from './types';
 
 type EntryListProp = {
-  entry: {},
-  deleteEntry: Function,
-  globalServerSelected: string,
-  globalEntriesList: any,
-  globalErrorMessage: string,
   serverSelectedFunc: Function,
   entriesListUpdateFunc: Function,
   tornjakMessageFunc: Function,
+  deleteEntry: Function,
+  globalErrorMessage: string,
+  globalServerSelected: string,
+  globalEntriesList: Array<EntryItem> | undefined,
 }
 
 type EntryListState = {
-  servers: [],
-  selectedServer: string,
 }
 
-const Entry = (props: { entry: { id: number; spiffe_id: { trust_domain: string; path: string; }; parent_id: { trust_domain: string; path: string; }; selectors: { type: string; value: string; }[]; }; deleteEntry: Function; }) => (
+const Entry = (props: { entry: EntryItem }) => (
   <tr>
     <td>{props.entry.id}</td>
-    <td>{ "spiffe://" + props.entry.spiffe_id.trust_domain + props.entry.spiffe_id.path}</td>
-    <td>{ "spiffe://" + props.entry.parent_id.trust_domain + props.entry.parent_id.path}</td>
-    <td>{ props.entry.selectors.map((s: { type: string; value: string; }) => s.type + ":" + s.value).join(', ')}</td>
-    
+    <td>{"spiffe://" + props.entry.spiffe_id.trust_domain + props.entry.spiffe_id.path}</td>
+    <td>{"spiffe://" + props.entry.parent_id.trust_domain + props.entry.parent_id.path}</td>
     <td>
-      <br/>
-      <a href="/#" onClick={() => { props.deleteEntry (props.entry.id) }}>delete</a>
+      <div style={{ overflowX: 'auto', width: "400px" }}>
+        <pre>{JSON.stringify(props.entry, null, ' ')}</pre>
+      </div>
     </td>
-
-    <td><div style={{overflowX: 'auto', width: "400px"}}>
-    <pre>{JSON.stringify(props.entry, null, ' ')}</pre>
-    </div></td>
-
   </tr>
 )
 
 class EntryList extends Component<EntryListProp, EntryListState> {
   TornjakApi: TornjakApi;
-  deleteEntry: any;
-  constructor(props:EntryListProp) {
+  constructor(props: EntryListProp) {
     super(props);
     this.TornjakApi = new TornjakApi();
-    this.state = { 
-        servers: [],
-        selectedServer: "",
-    };
+    this.state = {};
   }
 
   componentDidMount() {
     if (IsManager) {
-      if(this.props.globalServerSelected !== ""){
+      if (this.props.globalServerSelected !== "") {
         this.TornjakApi.populateEntriesUpdate(this.props.globalServerSelected, this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
       }
     } else {
-        this.TornjakApi.populateLocalEntriesUpdate(this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
+      this.TornjakApi.populateLocalEntriesUpdate(this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
     }
   }
 
-  componentDidUpdate(prevProps:EntryListProp) {
+  componentDidUpdate(prevProps: EntryListProp) {
     if (IsManager) {
-      if(prevProps.globalServerSelected !== this.props.globalServerSelected){
+      if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
         this.TornjakApi.populateEntriesUpdate(this.props.globalServerSelected, this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
       }
     } else {
@@ -78,19 +66,17 @@ class EntryList extends Component<EntryListProp, EntryListState> {
   }
 
   entryList() {
-  if (typeof this.props.globalEntriesList !== 'undefined') {
-      return this.props.globalEntriesList.map((currentEntry:any) => {
-        return <Entry key={currentEntry.id} 
-                  entry={currentEntry} 
-                  deleteEntry={this.deleteEntry}/>;
+    if (typeof this.props.globalEntriesList !== 'undefined') {
+      return this.props.globalEntriesList.map((currentEntry: EntryItem) => {
+        return <Entry key={currentEntry.id}
+          entry={currentEntry} />;
       })
-  } else {
+    } else {
       return ""
+    }
   }
-}
 
   render() {
-
     return (
       <div data-test="entry-list">
         <h3>Entries List</h3>
@@ -101,7 +87,7 @@ class EntryList extends Component<EntryListProp, EntryListState> {
             </pre>
           </div>
         }
-        <br/><br/>
+        <br /><br />
         <div className="indvidual-list-table">
           <Table data={this.entryList()} id="table-1" />
         </div>
@@ -111,7 +97,7 @@ class EntryList extends Component<EntryListProp, EntryListState> {
 }
 
 
-const mapStateToProps = (state: { servers: { globalServerSelected: string; }; entries: { globalEntriesList: []; }; tornjak: { globalErrorMessage: string; }; }) => ({
+const mapStateToProps = (state: { servers: { globalServerSelected: string; }; entries: { globalEntriesList: Array<EntryItem>; }; tornjak: { globalErrorMessage: string; }; }) => ({
   globalServerSelected: state.servers.globalServerSelected,
   globalEntriesList: state.entries.globalEntriesList,
   globalErrorMessage: state.tornjak.globalErrorMessage,

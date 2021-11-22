@@ -17,18 +17,11 @@ import {
   serverInfoUpdateFunc,
   agentworkloadSelectorInfoFunc
 } from 'redux/actions';
+import { selectors, workloadSelectors } from '../data/data';
+import { ServerInfo, AgentItem, EntryItem, AgentsWorkloadAttestorInfoItem } from './types';
 // import PropTypes from "prop-types";
 
 type CreateEntryProp = {
-  globalServerSelected: string,
-  globalSelectorInfo: [],
-  globalAgentsList: [],
-  globalEntriesList: [],
-  globalServerInfo: any,
-  globalTornjakServerInfo: Object,
-  globalErrorMessage: string,
-  globalWorkloadSelectorInfo: [],
-  globalAgentsWorkLoadAttestorInfo: any,
   serverSelectedFunc: Function,
   agentsListUpdateFunc: Function,
   tornjakServerInfoUpdateFunc: Function,
@@ -37,6 +30,15 @@ type CreateEntryProp = {
   selectorInfoFunc: Function,
   tornjakMessageFunc: Function,
   agentworkloadSelectorInfoFunc: Function,
+  globalServerSelected: string,
+  globalErrorMessage: string,
+  globalTornjakServerInfo: Object,
+  globalSelectorInfo: typeof selectors,
+  globalAgentsList: Array<AgentItem>,
+  globalEntriesList: Array<EntryItem>,
+  globalWorkloadSelectorInfo: typeof workloadSelectors,
+  globalAgentsWorkLoadAttestorInfo: Array<AgentsWorkloadAttestorInfoItem>,
+  globalServerInfo: ServerInfo,
 }
 
 type CreateEntryState = {
@@ -52,15 +54,14 @@ type CreateEntryState = {
   adminFlag: boolean,
   ttl: number,
   expiresAt: number,
-  dnsNames: any,
-  federatesWith: any,
+  dnsNames: string,
+  federatesWith: string,
   downstream: boolean,
   message: string,
   statusOK: string,
   successJsonMessege: string,
-  servers: [],
   selectedServer: string,
-  agentsIdList: any,
+  agentsIdList: String[],
   spiffeIdPrefix: string,
   parentIdManualEntryOption: string,
   parentIDManualEntry: boolean,
@@ -110,14 +111,13 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
 
       ttl: 0,
       expiresAt: 0,
-      dnsNames: [],
-      federatesWith: [],
+      dnsNames: "",
+      federatesWith: "",
       downstream: false,
       //token: "",
       message: "",
       statusOK: "",
       successJsonMessege: "",
-      servers: [],
       selectedServer: "",
       agentsIdList: [],
       spiffeIdPrefix: "",
@@ -192,10 +192,8 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
 
   prepareParentIdAgentsList() {
     var idx = 0, prefix = "spiffe://";
-    let localAgentsIdList = [];
-    if (this.props.globalServerInfo.length === 0) {
-      return
-    }
+    let localAgentsIdList:String[] = [];
+    if (Object.keys(this.props.globalServerInfo).length === 0) {return}
     //user prefered option
     localAgentsIdList[0] = this.state.parentIdManualEntryOption;
     //default option
@@ -210,7 +208,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       idx++;
       
       // Add entries associated with this agent
-      let agentEntries = agentEntriesDict[agentSpiffeid];
+      let agentEntries: Object[] = agentEntriesDict[agentSpiffeid];
       if (agentEntries !== undefined) {
         for (let j=0; j < agentEntries.length; j++) {
             localAgentsIdList[idx] = this.SpiffeHelper.getEntrySpiffeid(agentEntries[j]);
@@ -218,7 +216,6 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
         }
       }
     }
-
     this.setState({
       agentsIdList: localAgentsIdList
     });
@@ -234,11 +231,28 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       var defaultServer = prefix + this.props.globalServerInfo.data.trustDomain + "/spire/server";
       var globalAgentsWorkLoadAttestorInfo = this.props.globalAgentsWorkLoadAttestorInfo;
       if (parentId === defaultServer) {
-        if (this.props.globalServerInfo.length === 0) { return }
+        if (Object.keys(this.props.globalServerInfo).length === 0) { return }
         let serverNodeAtt = this.props.globalServerInfo.data.nodeAttestorPlugin;
-        this.setState({
-          selectorsList: this.props.globalSelectorInfo[serverNodeAtt]
-        });
+        if(serverNodeAtt === "aws_iid") {
+          this.setState({
+            selectorsList: this.props.globalSelectorInfo["aws_iid"]
+          });
+        }
+        else if(serverNodeAtt === "gcp_iit") {
+          this.setState({
+            selectorsList: this.props.globalSelectorInfo["gcp_iit"]
+          });
+        }
+        else if(serverNodeAtt === "k8s_sat") {
+          this.setState({
+            selectorsList: this.props.globalSelectorInfo["k8s_sat"]
+          });
+        }
+        else if(serverNodeAtt === "k8s_psat") {
+          this.setState({
+            selectorsList: this.props.globalSelectorInfo["k8s_psat"]
+          });
+        }
       } else if (parentId !== "") {
         let agentId = parentId;
         // Check if parent ID is not canonical ID, best effort try to match it to an Agent ID for selectors
@@ -255,9 +269,20 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
 
         for (let i = 0; i < globalAgentsWorkLoadAttestorInfo.length; i++) {
           if (agentId === globalAgentsWorkLoadAttestorInfo[i].spiffeid) {
-            this.setState({
-              selectorsList: this.props.globalWorkloadSelectorInfo[globalAgentsWorkLoadAttestorInfo[i].plugin]
-            });
+            let assignedPlugin = globalAgentsWorkLoadAttestorInfo[i].plugin;
+            if(assignedPlugin === "Docker") {
+              this.setState({
+                selectorsList: this.props.globalWorkloadSelectorInfo["Docker"]
+              });
+            } else if(assignedPlugin === "Kubernetes") {
+              this.setState({
+                selectorsList: this.props.globalWorkloadSelectorInfo["Kubernetes"]
+              });
+            } else if(assignedPlugin === "Unix") {
+              this.setState({
+                selectorsList: this.props.globalWorkloadSelectorInfo["Unix"]
+              });
+            }
             agentSelectorSet = true;
           }
         }
@@ -305,6 +330,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   }
 
   onChangeSelectorsRecommended = (selected: { selectedItems: any; }) => {
+    console.log(selected.selectedItems)
     var sid = selected.selectedItems, selectors = "", selectorsDisplay = "";
     for (let i = 0; i < sid.length; i++) {
       if (i !== sid.length - 1) {
@@ -750,7 +776,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
 }
 
 
-const mapStateToProps = (state: { servers: { globalServerSelected: string; globalSelectorInfo: []; globalServerInfo: []; globalTornjakServerInfo: {}; globalWorkloadSelectorInfo: []; }; agents: { globalAgentsList: []; globalAgentsWorkLoadAttestorInfo: []; }; entries: { globalEntriesList: []; }; tornjak: { globalErrorMessage: string; }; }) => ({
+const mapStateToProps = (state: { servers: { globalServerSelected: string; globalSelectorInfo: typeof selectors; globalServerInfo: ServerInfo; globalTornjakServerInfo: {}; globalWorkloadSelectorInfo: typeof workloadSelectors; }; agents: { globalAgentsList: Array<AgentItem>; globalAgentsWorkLoadAttestorInfo: Array<AgentsWorkloadAttestorInfoItem>; }; entries: { globalEntriesList: Array<EntryItem>; }; tornjak: { globalErrorMessage: string; }; }) => ({
   globalServerSelected: state.servers.globalServerSelected,
   globalSelectorInfo: state.servers.globalSelectorInfo,
   globalAgentsList: state.agents.globalAgentsList,

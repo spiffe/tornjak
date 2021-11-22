@@ -15,31 +15,27 @@ import {
   clustersListUpdateFunc,
 } from 'redux/actions';
 // import PropTypes from "prop-types";
+import { ClusterItem } from './types';
 
-type clusterType = {
-  name: string; platformType: string; domainName: string; managedBy: string; agentsList: [];
-}
 type ClusterListProp = {
+  clustersListUpdateFunc: Function,
+  tornjakMessageFunc: Function,
+  serverInfoUpdateFunc: Function,
   name: string,
   platformType: string,
   domainName: string,
   managedBy: string,
-  agentsList: [],
   globalServerSelected: string,
+  globalErrorMessage: string,
   globalTornjakServerInfo: Object,
-  clustersListUpdateFunc: Function,
-  tornjakMessageFunc: Function,
-  serverInfoUpdateFunc: Function,
-  globalClustersList: [],
-  globalErrorMessage: string
-
+  globalClustersList: Array<ClusterItem>,
 }
 
 type ClusterListState = {
   message: string
 }
 
-const Cluster = (props: {cluster: clusterType}) => (
+const Cluster = (props: { cluster: ClusterItem }) => (
   <tr>
     <td>{props.cluster.name}</td>
     <td>{props.cluster.platformType}</td>
@@ -53,7 +49,7 @@ const Cluster = (props: {cluster: clusterType}) => (
 
 class ClusterList extends Component<ClusterListProp, ClusterListState> {
   TornjakApi: TornjakApi;
-  constructor(props:ClusterListProp) {
+  constructor(props: ClusterListProp) {
     super(props);
     this.TornjakApi = new TornjakApi();
     this.state = {
@@ -74,7 +70,7 @@ class ClusterList extends Component<ClusterListProp, ClusterListState> {
     }
   }
 
-  componentDidUpdate(prevProps:ClusterListProp) {
+  componentDidUpdate(prevProps: ClusterListProp) {
     if (IsManager) {
       if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
         this.TornjakApi.populateClustersUpdate(this.props.globalServerSelected, this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
@@ -88,8 +84,9 @@ class ClusterList extends Component<ClusterListProp, ClusterListState> {
 
   clusterList() {
     if (typeof this.props.globalClustersList !== 'undefined') {
-      return this.props.globalClustersList.map((currentCluster: clusterType) => {
-        return <Cluster key={currentCluster.name}
+      return this.props.globalClustersList.map((currentCluster: ClusterItem) => {
+        return <Cluster
+          key={currentCluster.name}
           cluster={currentCluster} />;
       })
     } else {
@@ -117,7 +114,7 @@ class ClusterList extends Component<ClusterListProp, ClusterListState> {
   }
 }
 
-const mapStateToProps = (state: { servers: { globalServerSelected: string; globalTornjakServerInfo: {}; }; clusters: { globalClustersList: []; }; tornjak: { globalErrorMessage: string; }; }) => ({
+const mapStateToProps = (state: { servers: { globalServerSelected: string; globalTornjakServerInfo: Object; }; clusters: { globalClustersList: Array<ClusterItem>; }; tornjak: { globalErrorMessage: string; }; }) => ({
   globalServerSelected: state.servers.globalServerSelected,
   globalClustersList: state.clusters.globalClustersList,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
