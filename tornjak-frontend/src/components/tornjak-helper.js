@@ -19,7 +19,7 @@ class TornjakHelper extends Component {
     const dashboardDetailsLink = "/tornjak/dashboard/details/";
     var detailsLink = "", searchParams = new URLSearchParams(window.location.search);;
     if (selectedRows.length !== 0) {
-      searchParams.set("id", encodeURIComponent(selectedRows.id)); //encode URL since spiffeid contains special characters
+      searchParams.set("id", encodeURIComponent(selectedRows)); //encode URL since spiffeid contains special characters
       detailsLink = dashboardDetailsLink + entity.toLowerCase() + "?" + searchParams.toString();
     }
     return detailsLink;
