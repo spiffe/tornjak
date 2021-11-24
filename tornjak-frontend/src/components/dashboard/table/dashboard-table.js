@@ -53,9 +53,14 @@ class TableDashboard extends React.Component {
             rows={data}
             columns={columns}
             pageSize={numRows}
+            rowsPerPageOptions={[numRows]}
             autoHeight={true}
-            onRowSelected={(selectedRows) => {
-              this.setState({ selectedRows: selectedRows.data })
+            // depreciated 
+            // onRowSelected={(selectedRows) => {
+            //   this.setState({ selectedRows: selectedRows.data })
+            // }}
+            onSelectionModelChange={(newSelection) =>{
+              this.setState({ selectedRows: newSelection[0] })
             }}
             components={{
               Toolbar: GridToolbar,
