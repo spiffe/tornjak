@@ -15,8 +15,11 @@ import {
   agentworkloadSelectorInfoFunc,
   clusterTypeInfoFunc,
 } from 'redux/actions';
-import { AgentItem } from './types';
-// import PropTypes from "prop-types";
+import { RootState } from 'redux/reducers';
+import {
+  AgentsListType,
+} from 'redux/actions/types'
+//import PropTypes from "prop-types";
 
 type AgentListProp = {
   clusterTypeInfoFunc: Function,
@@ -31,14 +34,14 @@ type AgentListProp = {
   globalErrorMessage: string,
   globalTornjakServerInfo: Object,
   agent: Object,
-  globalAgentsList: Array<AgentItem> | undefined,
+  globalAgentsList: AgentsListType[] | undefined,
 }
 
 type AgentListState = {
   message: string,
 }
 
-const Agent = (props: { agent: AgentItem }) => (
+const Agent = (props: { agent: AgentsListType }) => (
   <tr>
     <td>{props.agent.id.trust_domain}</td>
     <td>{"spiffe://" + props.agent.id.trust_domain + props.agent.id.path}</td>
@@ -72,7 +75,7 @@ class AgentList extends Component<AgentListProp, AgentListState> {
       this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
       this.TornjakApi.populateLocalAgentsUpdate(this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
       this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
-      if (this.props.globalTornjakServerInfo !== "") {
+      if (this.props.globalTornjakServerInfo !== "" && JSON.stringify(this.props.globalTornjakServerInfo) !== '{}') {
         this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
       }
     }
@@ -94,7 +97,7 @@ class AgentList extends Component<AgentListProp, AgentListState> {
 
   agentList() {
     if (typeof this.props.globalAgentsList !== 'undefined') {
-      return this.props.globalAgentsList.map((currentAgent: AgentItem) => {
+      return this.props.globalAgentsList.map((currentAgent: AgentsListType) => {
         return <Agent key={currentAgent.id.path}
           agent={currentAgent} />;
       })
@@ -123,13 +126,14 @@ class AgentList extends Component<AgentListProp, AgentListState> {
   }
 }
 
-const mapStateToProps = (state: { servers: { globalServerSelected: string; globalTornjakServerInfo: Object; }; agents: { globalAgentsList: Array<AgentItem> | undefined; }; tornjak: { globalErrorMessage: string; }; }) => ({
+const mapStateToProps = (state: RootState) => ({
   globalServerSelected: state.servers.globalServerSelected,
   globalAgentsList: state.agents.globalAgentsList,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
   globalErrorMessage: state.tornjak.globalErrorMessage,
 })
 
+// Note: Needed for UI testing - will be removed after
 // AgentList.propTypes = {
 //   globalServerSelected: PropTypes.string,
 //   globalAgentsList: PropTypes.array,

@@ -21,19 +21,15 @@ export interface AgentsWorkLoadAttestorInfoType {
 }
 
 export interface AgentsReducerStateType {
-    globalAgentsList: AgentsListType[],
+    globalAgentsList: AgentsListType[] | undefined,
     globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfoType[],
 }
 
 export interface AgentsListAction extends Action<typeof GLOBAL_AGENTS_LIST>{
-    payload: {
-        globalAgentsList: AgentsListType[];
-    }
+    payload: AgentsListType[];
 }
 export interface AgentWorkloadSelectorInfoAction extends Action<typeof GLOBAL_AGENTS_WORKLOADATTESTOR_INFO>{
-    payload: {
-        globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfoType[];
-    }
+    payload: AgentsWorkLoadAttestorInfoType[];
 }
 
 //clusters
@@ -55,14 +51,10 @@ export interface ClustersReducerStateType {
 }
 
 export interface ClustersListUpdateAction extends Action<typeof GLOBAL_CLUSTERS_LIST>{
-    payload: {
-        globalClustersList: ClustersListType[];
-    }
+    payload: ClustersListType[];
 }
 export interface ClusterTypeInfoAction extends Action<typeof GLOBAL_CLUSTER_TYPE_INFO>{
-    payload: {
-        globalClusterTypeInfo: string[];
-    }
+    payload: string[];
 }
 
 //entries
@@ -81,13 +73,11 @@ export interface EntriesListType {
 }
 
 export interface EntriesReducerStateType {
-    globalEntriesList: EntriesListType[],
+    globalEntriesList: EntriesListType[]
 }
 
 export interface EntriesListAction extends Action<typeof GLOBAL_ENTRIES_LIST>{
-    payload: {
-        globalEntriesList: EntriesListType[];
-    }
+    payload: EntriesListType[];
 }
 
 //servers
@@ -120,37 +110,25 @@ export interface ServersReducerStateType {
 }
 
 export interface ServerSelectedAction extends Action<typeof GLOBAL_SERVER_SELECTED>{
-    payload: {
-        globalServerSelected: string
-    };
+    payload: string;
 }
 
 export interface ServerInfoAction extends Action<typeof GLOBAL_SERVER_INFO>{
-    payload: {
-        globalServerInfo: Object
-    };
+    payload: Object;
 }
 
 export interface TornjakServerInfoAction extends Action<typeof GLOBAL_TORNJAK_SERVER_INFO>{
-    payload: {
-        globalTornjakServerInfo: Object
-    };
+    payload: Object;
 }
 
 export interface ServersListAction extends Action<typeof GLOBAL_SERVERS_LIST>{
-    payload: {
-        globalServersList: Array<string>
-    };
+    payload: Array<string>;
 }
 export interface SelectorInfoAction extends Action<typeof GLOBAL_SELECTOR_INFO>{
-    payload: {
-        globalSelectorInfo: Object
-    };
+    payload: Object;
 }
 export interface WorkloadSelectorInfoAction extends Action<typeof GLOBAL_WORKLOAD_SELECTOR_INFO>{
-    payload: {
-        globalWorkloadSelectorInfo: Object
-    };
+    payload: Object;
 }
 
 export type ServersAction =
@@ -170,8 +148,8 @@ export interface TornjakReducerStateType {
 }
 
 export interface TornjakMessageAction extends Action<typeof GLOBAL_MESSAGE>{
-    payload?: string;
+    payload: string;
 }
 export interface ClickedDashboardTableAction extends Action<typeof GLOBAL_CLICKED_DASHBOARD_TABLE>{
-    payload?: string;
+    payload: string;
 }

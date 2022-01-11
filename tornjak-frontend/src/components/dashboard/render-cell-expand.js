@@ -1,24 +1,14 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/styles';
 import PropTypes from 'prop-types';
 import { Popper, Typography, Paper } from '@material-ui/core';
-import { isOverflown } from '@material-ui/x-grid';
+import Box from '@mui/material/Box';
 
-const useStyles = makeStyles(() => ({
-    root: {
-        width: '100%',
-        height: '100%',
-        position: 'relative',
-        alignItems: 'center',
-        display: 'flex',
-        lineHeight: '24px',
-        '& .cellValue': {
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-        },
-    },
-}));
+function isOverflown(element) {
+    return (
+      element.scrollHeight > element.clientHeight ||
+      element.scrollWidth > element.clientWidth
+    );
+}
 
 const GridCellExpand = React.memo(function GridCellExpand(props) {
     const { width, value } = props;
@@ -26,7 +16,6 @@ const GridCellExpand = React.memo(function GridCellExpand(props) {
     const cellDiv = React.useRef(null);
     const wrapper = React.useRef(null);
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const classes = useStyles();
     const [showFullCell, setShowFullCell] = React.useState(false);
     const [showPopper, setShowPopper] = React.useState(false);
 
@@ -60,15 +49,22 @@ const GridCellExpand = React.memo(function GridCellExpand(props) {
     }, [setShowFullCell, showFullCell]);
 
     return (
-        <div
+        <Box
             ref={wrapper}
-            className={classes.root}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            sx={{
+                alignItems: 'center',
+                lineHeight: '24px',
+                width: 1,
+                height: 1,
+                position: 'relative',
+                display: 'flex',
+              }}
         >
-            <div
+            <Box
                 ref={cellDiv}
-                style={{
+                sx={{
                     height: 1,
                     width,
                     display: 'block',
@@ -76,9 +72,12 @@ const GridCellExpand = React.memo(function GridCellExpand(props) {
                     top: 0,
                 }}
             />
-            <div ref={cellValue} className="cellValue">
+            <Box 
+                ref={cellValue} 
+                sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} 
+            >
                 {value}
-            </div>
+            </Box>
             {showPopper && (
                 <Popper
                     open={showFullCell && anchorEl !== null}
@@ -95,7 +94,7 @@ const GridCellExpand = React.memo(function GridCellExpand(props) {
                     </Paper>
                 </Popper>
             )}
-        </div>
+        </Box>
     );
 });
 
@@ -108,7 +107,7 @@ export default function renderCellExpand(params) {
     return (
         <GridCellExpand
             value={params.value ? params.value.toString() : ''}
-            width={params.colDef.width}
+            width={params.colDef.computedWidth}
         />
     );
 }
