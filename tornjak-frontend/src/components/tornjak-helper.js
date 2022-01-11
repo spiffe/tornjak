@@ -49,7 +49,7 @@ class TornjakHelper extends Component {
     } else if (urlParams.entity === "entries") {
       for (let i = 0; i < globalEntriesList.length; i++) {
         if (globalEntriesList[i].id === id) {
-          selectedData = this.workloadEntry(globalEntriesList[i], globalAgentsWorkLoadAttestorInfo);
+          selectedData = this.workloadEntry(globalEntriesList[i], globalAgentsWorkLoadAttestorInfo, globalAgentsList, globalEntriesList);
         }
       }
     }
