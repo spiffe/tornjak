@@ -1,4 +1,5 @@
 import { Action } from "redux";
+import { selectors, workloadSelectors } from "data/data";
 
 //agents
 export const GLOBAL_AGENTS_LIST = 'GLOBAL_AGENTS_LIST';
@@ -93,20 +94,20 @@ export const GLOBAL_WORKLOAD_SELECTOR_INFO = 'GLOBAL_WORKLOAD_SELECTOR_INFO';
 //     verboseConfig: string;
 // }
 
-// interface ServerInfoType {
-//     data: {
-//         trustDomain: string;
-//         nodeAttestorPlugin: string;
-//     }
-// }
+export interface ServerInfoType {
+    data: {
+        trustDomain: string;
+        nodeAttestorPlugin: string;
+    }
+}
 
 export interface ServersReducerStateType {
     globalServerSelected: string,
-    globalServerInfo: Object,
+    globalServerInfo: ServerInfoType,
     globalTornjakServerInfo: Object,
     globalServersList: Array<string>,
-    globalSelectorInfo: Object,
-    globalWorkloadSelectorInfo: Object,
+    globalSelectorInfo: typeof selectors,
+    globalWorkloadSelectorInfo: typeof workloadSelectors,
 }
 
 export interface ServerSelectedAction extends Action<typeof GLOBAL_SERVER_SELECTED>{
@@ -114,7 +115,7 @@ export interface ServerSelectedAction extends Action<typeof GLOBAL_SERVER_SELECT
 }
 
 export interface ServerInfoAction extends Action<typeof GLOBAL_SERVER_INFO>{
-    payload: Object;
+    payload: ServerInfoType;
 }
 
 export interface TornjakServerInfoAction extends Action<typeof GLOBAL_TORNJAK_SERVER_INFO>{
@@ -125,10 +126,10 @@ export interface ServersListAction extends Action<typeof GLOBAL_SERVERS_LIST>{
     payload: Array<string>;
 }
 export interface SelectorInfoAction extends Action<typeof GLOBAL_SELECTOR_INFO>{
-    payload: Object;
+    payload: typeof selectors;
 }
 export interface WorkloadSelectorInfoAction extends Action<typeof GLOBAL_WORKLOAD_SELECTOR_INFO>{
-    payload: Object;
+    payload: typeof workloadSelectors;
 }
 
 export type ServersAction =

@@ -1,5 +1,6 @@
 import { ThunkAction } from 'redux-thunk';
 import { RootState } from 'redux/reducers';
+import { selectors, workloadSelectors } from "data/data";
 import {
     GLOBAL_SERVER_SELECTED,
     GLOBAL_ENTRIES_LIST,
@@ -30,7 +31,8 @@ import {
     ClustersListType,
     EntriesListType,
     AgentsListType,
-    AgentsWorkLoadAttestorInfoType
+    AgentsWorkLoadAttestorInfoType,
+    ServerInfoType
 } from './types';
 
 // Expected input - List of clusters with their info
@@ -102,7 +104,7 @@ export function tornjakServerInfoUpdateFunc(globalTornjakServerInfo: Object): Th
 //      }
 //  }
 // serverInfoUpdateFunc returns the server trust domain and nodeAttestorPlugin
-export function serverInfoUpdateFunc(globalServerInfo: Object): ThunkAction<void, RootState, undefined, ServerInfoAction> {
+export function serverInfoUpdateFunc(globalServerInfo: ServerInfoType): ThunkAction<void, RootState, undefined, ServerInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_SERVER_INFO,
@@ -158,7 +160,7 @@ export function serversListUpdateFunc(globalServersList: Array<string>): ThunkAc
 //    ]
 // ]
 // selectorInfoFunc returns the list of available selectors and their options
-export function selectorInfoFunc(globalSelectorInfo: Object): ThunkAction<void, RootState, undefined, SelectorInfoAction> {
+export function selectorInfoFunc(globalSelectorInfo: typeof selectors): ThunkAction<void, RootState, undefined, SelectorInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_SELECTOR_INFO,
@@ -211,7 +213,7 @@ export function agentsListUpdateFunc(globalAgentsList: AgentsListType[]): ThunkA
 //   ]
 // ]
 // workloadSelectorInfoFunc returns the list of available workload selectors and their options
-export function workloadSelectorInfoFunc(globalWorkloadSelectorInfo: Object): ThunkAction<void, RootState, undefined, WorkloadSelectorInfoAction> {
+export function workloadSelectorInfoFunc(globalWorkloadSelectorInfo: typeof workloadSelectors): ThunkAction<void, RootState, undefined, WorkloadSelectorInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_WORKLOAD_SELECTOR_INFO,

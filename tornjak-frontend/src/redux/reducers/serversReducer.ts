@@ -8,14 +8,15 @@ import {
     ServersReducerStateType,
     ServersAction,
 } from '../actions/types';
+import { selectors, workloadSelectors } from "data/data";
 
 const initialState: ServersReducerStateType = {
     globalServerSelected: "",
-    globalServerInfo: {},
+    globalServerInfo: {"data" : {trustDomain: "", nodeAttestorPlugin: ""}},
     globalTornjakServerInfo: {},
     globalServersList: [],
-    globalSelectorInfo: {},
-    globalWorkloadSelectorInfo: [],
+    globalSelectorInfo: selectors,
+    globalWorkloadSelectorInfo: workloadSelectors,
 };
 
 export default function serversReducer(state: ServersReducerStateType = initialState, action: ServersAction) {

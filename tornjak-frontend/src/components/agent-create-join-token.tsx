@@ -6,9 +6,28 @@ import IsManager from './is_manager';
 import {
   serverSelectedFunc
 } from 'redux/actions';
+import { RootState } from 'redux/reducers';
+// import PropTypes from "prop-types";
 
-class CreateJoinToken extends Component {
-  constructor(props) {
+type CreateJoinTokenProp = {
+  globalServerSelected: string, 
+
+}
+
+type CreateJoinTokenState = {
+  name: string,
+  ttl: number,
+  token: string,
+  spiffeId: string,
+  trustDomain: string | boolean,
+  path: string | boolean,
+  message: string,
+  servers: [],
+  selectedServer: string,
+}
+
+class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenState> {
+  constructor(props: CreateJoinTokenProp) {
     super(props);
 
     this.onChangeName = this.onChangeName.bind(this);
@@ -42,7 +61,7 @@ class CreateJoinToken extends Component {
       }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: CreateJoinTokenProp) {
     if (IsManager) {
       if(prevProps.globalServerSelected !== this.props.globalServerSelected){
         this.setState({selectedServer: this.props.globalServerSelected});
@@ -51,25 +70,25 @@ class CreateJoinToken extends Component {
   }
 
 
-  onChangeName(e) {
+  onChangeName(e: { target: { value: string; }; }) {
     this.setState({
       name: e.target.value
     });
   }
 
-  onChangeTtl(e) {
+  onChangeTtl(e: { target: { value: string; }; }) {
     this.setState({
       ttl: Number(e.target.value)
     });
   }
 
-  onChangeToken(e) {
+  onChangeToken(e: { target: { value: string; }; }) {
     this.setState({
       token: e.target.value
     });
   }
 
-  parseSpiffeId(sid) {
+  parseSpiffeId(sid: string) {
     if (sid.startsWith('spiffe://')) {
         var sub = sid.substr("spiffe://".length)
         var sp = sub.indexOf("/")
@@ -82,7 +101,7 @@ class CreateJoinToken extends Component {
     return [ false, "", "" ];
   }
 
-  onChangeSpiffeId(e) {
+  onChangeSpiffeId(e: { target: { value: string; }; }) {
     var sid = e.target.value;
     if (sid.length === 0) {
         this.setState({
@@ -114,31 +133,6 @@ class CreateJoinToken extends Component {
     return
   }
 
-
-  // Tag related things
-
-  handleTagDelete(i) {
-    const { tags } = this.state;
-    this.setState({
-      tags: tags.filter((tag, index) => index !== i),
-    });
-  }
-
-  handleTagAddition(tag) {
-    this.setState(state => ({ tags: [...state.tags, tag] }));
-  }
-
-  handleTagDrag(tag, currPos, newPos) {
-    const tags = [...this.state.tags];
-    const newTags = tags.slice();
-
-    newTags.splice(currPos, 1);
-    newTags.splice(newPos, 0, tag);
-
-    // re-render
-    this.setState({ tags: newTags });
-  }
-
   getApiTokenEndpoint() {
       if (!IsManager) {
           return GetApiServerUri('/api/agent/createjointoken')
@@ -151,7 +145,7 @@ class CreateJoinToken extends Component {
 
 
   }
-  onSubmit(e) {
+  onSubmit(e: { preventDefault: () => void; }) {
     e.preventDefault();
 
     if (this.state.spiffeId !== "") {
@@ -163,6 +157,9 @@ class CreateJoinToken extends Component {
     }
     var cjtData = {
         "ttl": this.state.ttl,
+        "trust_domain": this.state.trustDomain,
+        "path": this.state.path,
+        "token": this.state.token,
     };
     if (this.state.trustDomain !== "" && this.state.path !== "") {
         cjtData["trust_domain"] = this.state.trustDomain;
@@ -183,7 +180,7 @@ class CreateJoinToken extends Component {
 
   render() {
     return (
-      <div>
+      <div data-test="agent-create-token">
         <h3>Create New Agent Join Token</h3>
         <form onSubmit={this.onSubmit}>
           <div className="alert-primary" role="alert">
@@ -234,11 +231,19 @@ class CreateJoinToken extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: RootState) => ({
   globalServerSelected: state.servers.globalServerSelected,
 })
+
+// Note: Needed for UI testing - will be removed after
+// CreateJoinToken.propTypes = {
+//   serverSelectedFunc: PropTypes.func,
+//   globalServerSelected: PropTypes.string,
+// };
 
 export default connect(
   mapStateToProps,
   { serverSelectedFunc }
 )(CreateJoinToken)
+
+export { CreateJoinToken }; 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
-import { Dropdown, TextInput, MultiSelect, Checkbox, TextArea, NumberInput } from 'carbon-components-react';
+import { Dropdown, TextInput, FilterableMultiSelect, Checkbox, TextArea, NumberInput } from 'carbon-components-react';
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
@@ -17,9 +17,68 @@ import {
   serverInfoUpdateFunc,
   agentworkloadSelectorInfoFunc
 } from 'redux/actions';
+import {
+  EntriesListType,
+  AgentsListType,
+  AgentsWorkLoadAttestorInfoType,
+  ServerInfoType,
+} from 'redux/actions/types'
+import { selectors, workloadSelectors } from '../data/data';
+import { RootState } from 'redux/reducers';
+// import PropTypes from "prop-types";
 
-class CreateEntry extends Component {
-  constructor(props) {
+type CreateEntryProp = {
+  serverSelectedFunc: Function,
+  agentsListUpdateFunc: Function,
+  tornjakServerInfoUpdateFunc: Function,
+  serverInfoUpdateFunc: Function,
+  entriesListUpdateFunc: Function,
+  selectorInfoFunc: Function,
+  tornjakMessageFunc: Function,
+  agentworkloadSelectorInfoFunc: Function,
+  globalServerSelected: string,
+  globalErrorMessage: string,
+  globalTornjakServerInfo: Object,
+  globalSelectorInfo: typeof selectors,
+  globalAgentsList: AgentsListType[] | undefined,
+  globalEntriesList: EntriesListType[] | undefined,
+  globalWorkloadSelectorInfo: typeof workloadSelectors,
+  globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfoType[],
+  globalServerInfo: ServerInfoType,
+}
+
+type CreateEntryState = {
+  name: string,
+  spiffeId: string,
+  spiffeIdTrustDomain: string | boolean,
+  spiffeIdPath: string | boolean,
+  parentId: string,
+  parentIdTrustDomain: string | boolean,
+  parentIdPath: string | boolean,
+  selectors: string,
+  selectorsRecommendationList: string,
+  adminFlag: boolean,
+  ttl: number,
+  expiresAt: number,
+  dnsNames: string,
+  federatesWith: string,
+  downstream: boolean,
+  message: string,
+  statusOK: string,
+  successJsonMessege: string,
+  selectedServer: string,
+  agentsIdList: String[],
+  spiffeIdPrefix: string,
+  parentIdManualEntryOption: string,
+  parentIDManualEntry: boolean,
+  selectorsList: Array<Object>,
+  selectorsListDisplay: string,
+}
+
+class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
+  TornjakApi: TornjakApi;
+  SpiffeHelper: SpiffeHelper;
+  constructor(props: CreateEntryProp) {
     super(props);
     this.TornjakApi = new TornjakApi();
     this.SpiffeHelper = new SpiffeHelper();
@@ -58,14 +117,13 @@ class CreateEntry extends Component {
 
       ttl: 0,
       expiresAt: 0,
-      dnsNames: [],
-      federatesWith: [],
+      dnsNames: "",
+      federatesWith: "",
       downstream: false,
       //token: "",
       message: "",
       statusOK: "",
       successJsonMessege: "",
-      servers: [],
       selectedServer: "",
       agentsIdList: [],
       spiffeIdPrefix: "",
@@ -94,7 +152,7 @@ class CreateEntry extends Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps: CreateEntryProp, prevState: CreateEntryState) {
     if (IsManager) {
       if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
         this.setState({ selectedServer: this.props.globalServerSelected });
@@ -140,25 +198,29 @@ class CreateEntry extends Component {
 
   prepareParentIdAgentsList() {
     var idx = 0, prefix = "spiffe://";
-    let localAgentsIdList = [];
-    if (this.props.globalServerInfo.length === 0) {
-      return
-    }
+    let localAgentsIdList:String[] = [];
+    if (Object.keys(this.props.globalServerInfo).length === 0) {return}
     //user prefered option
     localAgentsIdList[0] = this.state.parentIdManualEntryOption;
     //default option
     localAgentsIdList[1] = prefix + this.props.globalServerInfo.data.trustDomain + "/spire/server";
 
     //agents
-    let agentEntriesDict = this.SpiffeHelper.getAgentsEntries(this.props.globalAgentsList, this.props.globalEntriesList)
+    let agentEntriesDict:any = this.SpiffeHelper.getAgentsEntries(this.props.globalAgentsList, this.props.globalEntriesList)
     idx = 2
+    if(this.props.globalAgentsList === undefined) {
+      return
+    }
     for (let i = 0; i < this.props.globalAgentsList.length; i++) {
-      let agentSpiffeid = this.SpiffeHelper.getAgentSpiffeid(this.props.globalAgentsList[i]);
+      let agentSpiffeid:string = this.SpiffeHelper.getAgentSpiffeid(this.props.globalAgentsList[i]);
       localAgentsIdList[idx] = agentSpiffeid;
       idx++;
       
       // Add entries associated with this agent
-      let agentEntries = agentEntriesDict[agentSpiffeid];
+      if(agentEntriesDict === undefined) {
+        return
+      }
+      let agentEntries: Object[] = agentEntriesDict[agentSpiffeid];
       if (agentEntries !== undefined) {
         for (let j=0; j < agentEntries.length; j++) {
             localAgentsIdList[idx] = this.SpiffeHelper.getEntrySpiffeid(agentEntries[j]);
@@ -166,88 +228,121 @@ class CreateEntry extends Component {
         }
       }
     }
-
     this.setState({
       agentsIdList: localAgentsIdList
     });
   }
 
   prepareSelectorsList() {
+    if(this.props.globalServerInfo === undefined || this.props.globalAgentsList === undefined || this.props.globalEntriesList === undefined){
+      return
+    }
     var prefix = "spiffe://", agentSelectorSet = false;
     var parentId = this.state.parentId;
-    var defaultServer = prefix + this.props.globalServerInfo.data.trustDomain + "/spire/server";
-    var globalAgentsWorkLoadAttestorInfo = this.props.globalAgentsWorkLoadAttestorInfo;
-    if (parentId === defaultServer) {
-      if (this.props.globalServerInfo.length === 0) { return }
-      let serverNodeAtt = this.props.globalServerInfo.data.nodeAttestorPlugin;
-      this.setState({
-        selectorsList: this.props.globalSelectorInfo[serverNodeAtt]
-      });
-    } else if (parentId !== "") {
-      let agentId = parentId;
-      // Check if parent ID is not canonical ID, best effort try to match it to an Agent ID for selectors
-      if (!this.props.globalAgentsList.map(e => this.SpiffeHelper.getAgentSpiffeid(e)).includes(parentId)) {
-          let fEntries= this.props.globalEntriesList.filter(e => this.SpiffeHelper.getEntrySpiffeid(e) === parentId);
-          if (fEntries.length > 0) {
-            let entry = fEntries[0];
-            let canonicalAgentId = this.SpiffeHelper.getCanonicalAgentSpiffeid(entry, this.props.globalAgentsList)
-            if (canonicalAgentId !== "") {
-              agentId = canonicalAgentId;
-            }
-          }
-      }
-
-      for (let i = 0; i < globalAgentsWorkLoadAttestorInfo.length; i++) {
-        if (agentId === globalAgentsWorkLoadAttestorInfo[i].spiffeid) {
+    if(this.props.globalServerInfo.data !== undefined){
+      var defaultServer = prefix + this.props.globalServerInfo.data.trustDomain + "/spire/server";
+      var globalAgentsWorkLoadAttestorInfo = this.props.globalAgentsWorkLoadAttestorInfo;
+      if (parentId === defaultServer) {
+        if (Object.keys(this.props.globalServerInfo).length === 0) { return }
+        let serverNodeAtt = this.props.globalServerInfo.data.nodeAttestorPlugin;
+        if(serverNodeAtt === "aws_iid") {
           this.setState({
-            selectorsList: this.props.globalWorkloadSelectorInfo[globalAgentsWorkLoadAttestorInfo[i].plugin]
+            selectorsList: this.props.globalSelectorInfo["aws_iid"]
           });
-          agentSelectorSet = true;
         }
-      }
-      if (!agentSelectorSet) {
-        this.setState({
-          selectorsList: [],
-          selectorsListDisplay: "Select Selectors",
-        });
+        else if(serverNodeAtt === "gcp_iit") {
+          this.setState({
+            selectorsList: this.props.globalSelectorInfo["gcp_iit"]
+          });
+        }
+        else if(serverNodeAtt === "k8s_sat") {
+          this.setState({
+            selectorsList: this.props.globalSelectorInfo["k8s_sat"]
+          });
+        }
+        else if(serverNodeAtt === "k8s_psat") {
+          this.setState({
+            selectorsList: this.props.globalSelectorInfo["k8s_psat"]
+          });
+        }
+      } else if (parentId !== "") {
+        let agentId = parentId;
+        // Check if parent ID is not canonical ID, best effort try to match it to an Agent ID for selectors
+        if (!this.props.globalAgentsList.map(e => this.SpiffeHelper.getAgentSpiffeid(e)).includes(parentId)) {
+            let fEntries= this.props.globalEntriesList.filter(e => this.SpiffeHelper.getEntrySpiffeid(e) === parentId);
+            if (fEntries.length > 0) {
+              let entry = fEntries[0];
+              let canonicalAgentId = this.SpiffeHelper.getCanonicalAgentSpiffeid(entry, this.props.globalAgentsList)
+              if (canonicalAgentId !== "") {
+                agentId = canonicalAgentId;
+              }
+            }
+        }
+
+        for (let i = 0; i < globalAgentsWorkLoadAttestorInfo.length; i++) {
+          if (agentId === globalAgentsWorkLoadAttestorInfo[i].spiffeid) {
+            let assignedPlugin = globalAgentsWorkLoadAttestorInfo[i].plugin;
+            if(assignedPlugin === "Docker") {
+              this.setState({
+                selectorsList: this.props.globalWorkloadSelectorInfo["Docker"]
+              });
+            } else if(assignedPlugin === "Kubernetes") {
+              this.setState({
+                selectorsList: this.props.globalWorkloadSelectorInfo["Kubernetes"]
+              });
+            } else if(assignedPlugin === "Unix") {
+              this.setState({
+                selectorsList: this.props.globalWorkloadSelectorInfo["Unix"]
+              });
+            }
+            agentSelectorSet = true;
+          }
+        }
+        if (!agentSelectorSet) {
+          this.setState({
+            selectorsList: [],
+            selectorsListDisplay: "Select Selectors",
+          });
+        }
       }
     }
   }
 
-  onChangeTtl(e) {
+  onChangeTtl(e: any) {
     this.setState({
-      ttl: Number(e.imaginaryTarget.value)
+      ttl: Number(e.target.value)
     });
   }
 
-  onChangeExpiresAt(e) {
+  onChangeExpiresAt(e: any) {
+    console.log(e)
     this.setState({
-      expiresAt: Number(e.imaginaryTarget.value)
+      expiresAt: Number(e.target.value)
     });
   }
 
-  onChangeDownStream = selected => {
+  onChangeDownStream = (selected: boolean) => {
     var sid = selected;
     this.setState({
       downstream: sid,
     });
   }
 
-  onChangeDnsNames(e) {
+  onChangeDnsNames(e: any) {
     var sid = e.target.value;
     this.setState({
       dnsNames: sid,
     });
   }
 
-  onChangeFederatesWith(e) {
+  onChangeFederatesWith(e: any) {
     var sid = e.target.value;
     this.setState({
       federatesWith: sid,
     });
   }
 
-  onChangeSelectorsRecommended = selected => {
+  onChangeSelectorsRecommended = (selected: { selectedItems: any; }) => {
     var sid = selected.selectedItems, selectors = "", selectorsDisplay = "";
     for (let i = 0; i < sid.length; i++) {
       if (i !== sid.length - 1) {
@@ -267,7 +362,7 @@ class CreateEntry extends Component {
     });
   }
 
-  onChangeSelectors(e) {
+  onChangeSelectors(e: { target: { value: string; }; }) {
     var sid = e.target.value, selectors = "";
     selectors = sid.replace(/\n/g, ",");
     this.setState({
@@ -275,14 +370,14 @@ class CreateEntry extends Component {
     });
   }
 
-  onChangeAdminFlag = selected => {
+  onChangeAdminFlag = (selected: boolean) => {
     var sid = selected;
     this.setState({
       adminFlag: sid,
     });
   }
 
-  parseSpiffeId(sid) {
+  parseSpiffeId(sid: string) {
     if (sid.startsWith('spiffe://')) {
       var sub = sid.substr("spiffe://".length)
       var sp = sub.indexOf("/")
@@ -295,7 +390,7 @@ class CreateEntry extends Component {
     return [false, "", ""];
   }
 
-  onChangeSpiffeId(e) {
+  onChangeSpiffeId(e: { target: { value: string; }; }) {
     var sid = e.target.value;
     if (sid.length === 0) {
       this.setState({
@@ -327,7 +422,7 @@ class CreateEntry extends Component {
     return
   }
 
-  onChangeParentId = selected => {
+  onChangeParentId = (selected: { selectedItem: any; }) => {
     var prefix = "spiffe://", sid = selected.selectedItem;
     if (sid.length === 0) {
       this.setState({
@@ -371,7 +466,7 @@ class CreateEntry extends Component {
     return
   }
 
-  onChangeManualParentId(e) {
+  onChangeManualParentId(e: { target: { value: string; }; }) {
     var prefix = "spiffe://", sid = e.target.value;
     if (sid.length === 0) {
       this.setState({
@@ -404,30 +499,6 @@ class CreateEntry extends Component {
     return
   }
 
-  // Tag related things
-
-  handleTagDelete(i) {
-    const { tags } = this.state;
-    this.setState({
-      tags: tags.filter((tag, index) => index !== i),
-    });
-  }
-
-  handleTagAddition(tag) {
-    this.setState(state => ({ tags: [...state.tags, tag] }));
-  }
-
-  handleTagDrag(tag, currPos, newPos) {
-    const tags = [...this.state.tags];
-    const newTags = tags.slice();
-
-    newTags.splice(currPos, 1);
-    newTags.splice(newPos, 0, tag);
-
-    // re-render
-    this.setState({ tags: newTags });
-  }
-
   getApiEntryCreateEndpoint() {
     if (!IsManager) {
       return GetApiServerUri('/api/entry/create')
@@ -439,8 +510,8 @@ class CreateEntry extends Component {
     }
   }
 
-  onSubmit(e) {
-    let selectorStrings = [], federatedWithList = [], dnsNamesWithList = [];
+  onSubmit(e: { preventDefault: () => void; }) {
+    let selectorStrings: string[] = [], federatedWithList: string[] = [], dnsNamesWithList: string[] = [];
     e.preventDefault();
 
     const validSpiffeId = (this.parseSpiffeId(this.state.spiffeId))[0];
@@ -474,10 +545,10 @@ class CreateEntry extends Component {
     }
 
     if (this.state.federatesWith.length !== 0) {
-      federatedWithList = this.state.federatesWith.split(',').map(x => x.trim())
+      federatedWithList = this.state.federatesWith.split(',').map((x:string) => x.trim())
     }
     if (this.state.dnsNames.length !== 0) {
-      dnsNamesWithList = this.state.dnsNames.split(',').map(x => x.trim())
+      dnsNamesWithList = this.state.dnsNames.split(',').map((x:string) => x.trim())
     }
 
     var cjtData = {
@@ -523,14 +594,14 @@ class CreateEntry extends Component {
   render() {
     const ParentIdList = this.state.agentsIdList;
     return (
-      <div>
-        <div className="create-entry-title">
+      <div data-test="create-entry">
+        <div className="create-entry-title" data-test="create-entry-title">
           <h3>Create New Entry</h3>
         </div>
-        <form onSubmit={this.onSubmit}>
+        <form onSubmit={this.onSubmit} data-test="entry-create-form">
           <br /><br />
           <div className="entry-form">
-            <div className="parentId-drop-down">
+            <div className="parentId-drop-down" data-test="parentId-drop-down">
               <Dropdown
                 aria-required="true"
                 ariaLabel="parentId-drop-down"
@@ -544,7 +615,7 @@ class CreateEntry extends Component {
               <p className="parentId-helper">i.e. spiffe://example.org/agent/myagent1 - For node entries, select spiffe server as parent i.e. spiffe://example.org/spire/server</p>
             </div>
             {this.state.parentIDManualEntry === true &&
-              <div className="parentId-manual-input-field">
+              <div className="parentId-manual-input-field" data-test="parentId-manual-input-field">
                 <TextInput
                   aria-required="true"
                   helperText="i.e. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent i.e. spiffe://example.org/spire/server"
@@ -554,12 +625,12 @@ class CreateEntry extends Component {
                   placeholder="Enter Parent ID"
                   //value={this.state.spiffeId}
                   //defaultValue={this.state.spiffeIdPrefix}
-                  onChange={(e) => {
+                  onChange={(e: { target: { value: string; }; }) => {
                     this.onChangeManualParentId(e);
                   }}
                 />
               </div>}
-            <div className="spiffeId-input-field">
+            <div className="spiffeId-input-field" data-test="spiffeId-input-field">
               <TextInput
                 aria-required="true"
                 helperText="i.e. spiffe://example.org/sample/spiffe/id"
@@ -569,7 +640,7 @@ class CreateEntry extends Component {
                 placeholder="Enter SPIFFE ID"
                 //value={this.state.spiffeId}
                 defaultValue={this.state.spiffeIdPrefix}
-                onChange={(e) => {
+                onChange={(e: { target: { value: string; }; }) => {
                   const input = e.target.value
                   e.target.value = this.state.spiffeIdPrefix + input.substr(this.state.spiffeIdPrefix.length);
                   this.onChangeSpiffeId(e);
@@ -577,21 +648,21 @@ class CreateEntry extends Component {
               //onChange={this.onChangeSpiffeId}
               required/>
             </div>
-            <div className="selectors-multiselect">
-              <MultiSelect.Filterable
+            <div className="selectors-multiselect" data-test="selectors-multiselect">
+              <FilterableMultiSelect
                 aria-required="true"
-                required
+                //required
                 titleText="Selectors Recommendation [*required]"
                 helperText="i.e. k8s_sat:cluster,..."
                 placeholder={this.state.selectorsListDisplay}
-                ariaLabel="selectors-multiselect"
+                //ariaLabel="selectors-multiselect"
                 id="selectors-multiselect"
                 items={this.state.selectorsList}
                 label={this.state.selectorsListDisplay}
                 onChange={this.onChangeSelectorsRecommended}
               />
             </div>
-            <div className="selectors-textArea">
+            <div className="selectors-textArea" data-test="selectors-textArea">
               <TextArea
                 cols={50}
                 helperText="i.e. k8s_sat:cluster:demo-cluster,..."
@@ -607,7 +678,7 @@ class CreateEntry extends Component {
             <div className="advanced">
               <fieldset className="bx--fieldset">
                 <legend className="bx--label">Advanced</legend>
-                <div className="ttl-input">
+                <div className="ttl-input" data-test="ttl-input">
                   <NumberInput
                     helperText="Ttl for identities issued for this entry (In seconds)"
                     id="ttl-input"
@@ -620,7 +691,7 @@ class CreateEntry extends Component {
                     onChange={this.onChangeTtl}
                   />
                 </div>
-                <div className="expiresAt-input">
+                <div className="expiresAt-input" data-test="expiresAt-input">
                   <NumberInput
                     helperText="Entry expires at (seconds since Unix epoch)"
                     id="expiresAt-input"
@@ -633,7 +704,7 @@ class CreateEntry extends Component {
                     onChange={this.onChangeExpiresAt}
                   />
                 </div>
-                <div className="federates-with-input-field">
+                <div className="federates-with-input-field" data-test="federates-with-input-field">
                   <TextInput
                     helperText="i.e. example.org,abc.com (Separated By Commas)"
                     id="federates-with-input-field"
@@ -643,7 +714,7 @@ class CreateEntry extends Component {
                     onChange={this.onChangeFederatesWith}
                   />
                 </div>
-                <div className="dnsnames-input-field">
+                <div className="dnsnames-input-field" data-test="dnsnames-input-field">
                   <TextInput
                     helperText="i.e. example.org,abc.com (Separated By Commas)"
                     id="dnsnames-input-field"
@@ -653,14 +724,14 @@ class CreateEntry extends Component {
                     onChange={this.onChangeDnsNames}
                   />
                 </div>
-                <div className="admin-flag-checkbox">
+                <div className="admin-flag-checkbox" data-test="admin-flag-checkbox">
                   <Checkbox
                     labelText="Admin Flag"
                     id="admin-flag"
                     onChange={this.onChangeAdminFlag}
                   />
                 </div>
-                <div className="down-stream-checkbox">
+                <div className="down-stream-checkbox" data-test="down-stream-checkbox">
                   <Checkbox
                     labelText="Down Stream"
                     id="down-steam"
@@ -672,7 +743,7 @@ class CreateEntry extends Component {
             <div className="form-group">
               <input type="submit" value="Create Entry" className="btn btn-primary" />
             </div>
-            <div role="alert">
+            <div role="alert" data-test="success-message">
               {this.state.statusOK==="OK" && this.state.successJsonMessege==="OK" &&
                 <p className="success-message">--ENTRY SUCCESSFULLY CREATED--</p>
               }
@@ -680,7 +751,7 @@ class CreateEntry extends Component {
                 <p className="failed-message">--ENTRY CREATION FAILED--</p>
               }
             </div>
-            <div className="alert-primary" role="alert">
+            <div className="alert-primary" role="alert" data-test="alert-primary">
               <pre>
                 {this.state.message}
               </pre>
@@ -693,7 +764,7 @@ class CreateEntry extends Component {
 }
 
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: RootState) => ({
   globalServerSelected: state.servers.globalServerSelected,
   globalSelectorInfo: state.servers.globalSelectorInfo,
   globalAgentsList: state.agents.globalAgentsList,
@@ -705,7 +776,29 @@ const mapStateToProps = (state) => ({
   globalAgentsWorkLoadAttestorInfo: state.agents.globalAgentsWorkLoadAttestorInfo,
 })
 
+// CreateEntry.propTypes = {
+//   globalServerSelected: PropTypes.string,
+//   globalSelectorInfo: PropTypes.array,
+//   globalAgentsList: PropTypes.array,
+//   globalEntriesList: PropTypes.array,
+//   globalServerInfo: PropTypes.object,
+//   globalTornjakServerInfo: PropTypes.object,
+//   globalErrorMessage: PropTypes.string,
+//   globalWorkloadSelectorInfo: PropTypes.object,
+//   globalAgentsWorkLoadAttestorInfo: PropTypes.array,
+//   serverSelectedFunc: PropTypes.func,
+//   agentsListUpdateFunc: PropTypes.func,
+//   tornjakServerInfoUpdateFunc: PropTypes.func,
+//   serverInfoUpdateFunc: PropTypes.func,
+//   entriesListUpdateFunc: PropTypes.func,
+//   selectorInfoFunc: PropTypes.func,
+//   tornjakMessageFunc: PropTypes.func,
+//   agentworkloadSelectorInfoFunc: PropTypes.func,
+// };
+
 export default connect(
   mapStateToProps,
   { serverSelectedFunc, agentworkloadSelectorInfoFunc, selectorInfoFunc, agentsListUpdateFunc, entriesListUpdateFunc, tornjakMessageFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc }
 )(CreateEntry)
+
+export { CreateEntry };
