@@ -17,19 +17,19 @@ import {
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
 import {
-  AgentsListType,
+  AgentsListType, AgentsWorkLoadAttestorInfoType,
 } from 'redux/actions/types'
 //import PropTypes from "prop-types";
 
 type AgentListProp = {
-  clusterTypeInfoFunc: Function,
-  selectorInfoFunc: Function,
-  workloadSelectorInfoFunc: Function,
-  agentsListUpdateFunc: Function,
-  tornjakMessageFunc: Function,
-  agentworkloadSelectorInfoFunc: Function,
-  tornjakServerInfoUpdateFunc: Function,
-  serverInfoUpdateFunc: Function,
+  clusterTypeInfoFunc: (globalClusterTypeInfo: string[]) => void,
+  selectorInfoFunc: (globalSelectorInfo: Object) => void,
+  workloadSelectorInfoFunc: (globalWorkloadSelectorInfo: Object) => void,
+  agentsListUpdateFunc: (globalAgentsList: AgentsListType[]) => void,
+  tornjakMessageFunc: (globalErrorMessage: string) => void,
+  agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfoType[]) => void,
+  tornjakServerInfoUpdateFunc: (globalTornjakServerInfo: Object) => void,
+  serverInfoUpdateFunc: (globalServerInfo: Object) => void,
   globalServerSelected: string,
   globalErrorMessage: string,
   globalTornjakServerInfo: Object,
