@@ -75,7 +75,7 @@ class AgentList extends Component<AgentListProp, AgentListState> {
       this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
       this.TornjakApi.populateLocalAgentsUpdate(this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
       this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
-      if (this.props.globalTornjakServerInfo !== "" && JSON.stringify(this.props.globalTornjakServerInfo) !== '{}') {
+      if (this.props.globalTornjakServerInfo && Object.keys(this.props.globalTornjakServerInfo).length) {
         this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
       }
     }
@@ -96,7 +96,7 @@ class AgentList extends Component<AgentListProp, AgentListState> {
   }
 
   agentList() {
-    if (typeof this.props.globalAgentsList !== 'undefined') {
+    if (this.props.globalAgentsList && this.props.globalAgentsList.length) {
       return this.props.globalAgentsList.map((currentAgent: AgentsListType) => {
         return <Agent key={currentAgent.id.path}
           agent={currentAgent} />;

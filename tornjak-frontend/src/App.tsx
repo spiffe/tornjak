@@ -41,7 +41,7 @@ function App() {
                         <Route path="/tornjak/dashboard" exact component={TornjakDashBoard} />
                         <Route
                             path="/tornjak/dashboard/details/:entity"
-                            render={(props) => (<DashboardDetailsRender globalServerSelected={undefined} {...props} params={props.match.params} />)}
+                            render={(props) => (<DashboardDetailsRender {...props} params={props.match.params} />)}
                         />
                         <Route path="/server/manage" exact component={ServerManagement} />
                         <br /><br /><br />
