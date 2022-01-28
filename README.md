@@ -35,7 +35,7 @@ The binary and container can be built with the following command, replacing the 
 This makes the tornjak agent + spire server container:
 
 ```
-CONTAINER_TAG=lumjjb/tornjak-spire-server:latest make container-agent
+CONTAINER_TAG=tsidentity/tornjak-spire-server:latest make container-agent
 ```
 
 The container is run with the same arguments as the SPIRE server image, and usage is transparent. It runs a server hosted on port 10000 accessed via http.
