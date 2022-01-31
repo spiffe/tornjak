@@ -16,29 +16,31 @@ import {
   clusterTypeInfoFunc,
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
-import {
-  AgentsListType, AgentsWorkLoadAttestorInfoType, ServerInfoType,
-} from 'redux/actions/types'
+import { 
+  AgentsListType, 
+  AgentsWorkLoadAttestorInfoType, 
+  ServerInfoType, 
+  TornjakServerInfoType 
+} from './types';
 //import PropTypes from "prop-types";
 
 type AgentListProp = {
-  clusterTypeInfoFunc: (globalClusterTypeInfo: string[]) => void,
-  selectorInfoFunc: (globalSelectorInfo: typeof selectors) => void,
-  workloadSelectorInfoFunc: (globalWorkloadSelectorInfo: typeof workloadSelectors) => void,
-  agentsListUpdateFunc: (globalAgentsList: AgentsListType[]) => void,
-  tornjakMessageFunc: (globalErrorMessage: string) => void,
-  agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfoType[]) => void,
-  tornjakServerInfoUpdateFunc: (globalTornjakServerInfo: Object) => void,
-  serverInfoUpdateFunc: (globalServerInfo: ServerInfoType) => void,
-  globalServerSelected: string,
-  globalErrorMessage: string,
-  globalTornjakServerInfo: Object,
-  agent: Object,
-  globalAgentsList: AgentsListType[] | undefined,
+  clusterTypeInfoFunc: (globalClusterTypeInfo: string[]) => void,  // dispatches a payload for list of available cluster types as array of strings and has a return type of void
+  selectorInfoFunc: (globalSelectorInfo: typeof selectors) => void,  // dispatches a payload for list of available selectors and their options as an object and has a return type of void
+  workloadSelectorInfoFunc: (globalWorkloadSelectorInfo: typeof workloadSelectors) => void, // dispatches a payload for list of available workload selectors and their options as an object and has a return type of void
+  agentsListUpdateFunc: (globalAgentsList: AgentsListType[]) => void,  // dispatches a payload for list of agents with their metadata info as an array of AgentListType and has a return type of void
+  tornjakMessageFunc: (globalErrorMessage: string) => void,  // dispatches a payload for an Error Message/ Success Message of an executed function as a string and has a return type of void
+  agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfoType[]) => void, // dispatches a payload for the the workload selector info for the agents as an array of AgentsWorkLoadAttestorInfoType and has a return type of void
+  tornjakServerInfoUpdateFunc: (globalTornjakServerInfo: TornjakServerInfoType) => void, // dispatches a payload for the tornjak server info of the selected server and has a return type of void
+  serverInfoUpdateFunc: (globalServerInfo: ServerInfoType) => void,  // dispatches a payload for the server trust domain and nodeAttestorPlugin as a ServerInfoType and has a return type of void
+  globalServerSelected: string,  // the selected server for manager mode 
+  globalErrorMessage: string, // error/ success messege returned for a specific function
+  globalTornjakServerInfo: TornjakServerInfoType,  // tornjak server info of the selected server
+  globalAgentsList: AgentsListType[] | undefined, //list of available agents as array of AgentsListType or can be undefined if no array present
 }
 
 type AgentListState = {
-  message: string,
+  message: string, // error/ success messege returned for a specific function for this specific component
 }
 
 const Agent = (props: { agent: AgentsListType }) => (

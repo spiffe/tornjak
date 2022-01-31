@@ -28,12 +28,16 @@ import {
     WorkloadSelectorInfoAction,
     AgentWorkloadSelectorInfoAction,
     ClickedDashboardTableAction,
-    ClustersListType,
-    EntriesListType,
-    AgentsListType,
-    AgentsWorkLoadAttestorInfoType,
-    ServerInfoType
 } from './types';
+
+import { 
+    AgentsListType, 
+    AgentsWorkLoadAttestorInfoType, 
+    ClustersListType, 
+    EntriesListType, 
+    ServerInfoType, 
+    TornjakServerInfoType 
+} from 'components/types';
 
 // Expected input - List of clusters with their info
 // clustersListUpdateFunc returns the list of clusters with their info
@@ -86,7 +90,7 @@ export function serverSelectedFunc(globalServerSelected: string): ThunkAction<vo
 // Expected input - "TornjakServerInfo" struct (as JSON) based on 
 // TornjakServerInfo in /api/types.go
 // tornjakServerInfoUpdateFunc returns the tornjak server info of the selected server
-export function tornjakServerInfoUpdateFunc(globalTornjakServerInfo: Object): ThunkAction<void, RootState, undefined, TornjakServerInfoAction> {
+export function tornjakServerInfoUpdateFunc(globalTornjakServerInfo: TornjakServerInfoType): ThunkAction<void, RootState, undefined, TornjakServerInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_TORNJAK_SERVER_INFO,

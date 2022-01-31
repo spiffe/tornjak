@@ -13,7 +13,7 @@ import { selectors, workloadSelectors } from "data/data";
 const initialState: ServersReducerStateType = {
     globalServerSelected: "",
     globalServerInfo: {"data" : {trustDomain: "", nodeAttestorPlugin: ""}},
-    globalTornjakServerInfo: {},
+    globalTornjakServerInfo: {"plugins": {"DataStore": [], "KeyManager": [], "NodeAttestor": [], "NodeResolver": [], "Notifier": [] }, "trustDomain": "", "verboseConfig": ""},
     globalServersList: [],
     globalSelectorInfo: selectors,
     globalWorkloadSelectorInfo: workloadSelectors,
