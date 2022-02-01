@@ -186,10 +186,6 @@ func GetServerInfo(config *run.Config) (agentapi.TornjakServerInfo, error) {
 
 func getSocketPath(config *run.Config) string {
 	socketPath := config.Server.SocketPath
-	if config.Server.SocketPath != "" {
-		socketPath = config.Server.SocketPath
-	}
-
 	if socketPath == "" {
 		// TODO: temporary fix for issue with socket path resolution
 		// using the defaultSocketPath in the SPIRE pkg, manually importing
