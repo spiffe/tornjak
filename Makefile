@@ -1,4 +1,4 @@
-.PHONY: ui vendor build ui-agent ui-manager container-agent container-agent-push container-manager container-manager-push release-container-agent-multiversions
+.PHONY: ui vendor build ui-agent ui-manager container-agent container-agent-push container-manager container-manager-push release-container-agent-multiversions push
 
 CONTAINER_TAG ?= tsidentity/tornjak-spire-server:latest
 CONTAINER_VERSION_IMAGEPATH ?= tsidentity/tornjak-spire-server
@@ -65,3 +65,7 @@ clean:
 	rm -rf tornjak-frontend/build
 	rm -rf ui-agent/
 	rm -rf ui-manager/
+
+push:
+	docker push ${CONTAINER_TAG}
+	docker push ${CONTAINER_MANAGER_TAG}

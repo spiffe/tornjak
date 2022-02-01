@@ -186,8 +186,8 @@ func GetServerInfo(config *run.Config) (agentapi.TornjakServerInfo, error) {
 
 func getSocketPath(config *run.Config) string {
 	socketPath := config.Server.SocketPath
-	if config.Server.DeprecatedRegistrationUDSPath != "" {
-		socketPath = config.Server.DeprecatedRegistrationUDSPath
+	if config.Server.SocketPath != "" {
+		socketPath = config.Server.SocketPath
 	}
 
 	if socketPath == "" {
