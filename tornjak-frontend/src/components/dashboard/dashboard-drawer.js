@@ -27,6 +27,7 @@ import LayersIcon from '@material-ui/icons/Layers';
 import {
     clickedDashboardTableFunc,
 } from 'redux/actions';
+import PropTypes from "prop-types";
 const drawerWidth = 240;
 const drawerHeight = '100%';
 
@@ -138,7 +139,7 @@ class DashboardDrawer extends React.Component {
     render() {
         const { classes } = this.props;
         return (
-            <div>
+            <div data-test="dashboard-drawer">
                 <CssBaseline />
                 <AppBar position="absolute" className={clsx(classes.appBar, this.state.open && classes.appBarShift)}>
                     <Toolbar className={classes.toolbar}>
@@ -226,6 +227,13 @@ const mapStateToProps = (state) => ({
     globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 })
 
+DashboardDrawer.propTypes = {
+    globalClickedDashboardTable: PropTypes.string,
+    classes: PropTypes.object, 
+  };
+
 export default withStyles(styles)(
     connect(mapStateToProps, { clickedDashboardTableFunc })(DashboardDrawer)
 )
+
+export { DashboardDrawer };

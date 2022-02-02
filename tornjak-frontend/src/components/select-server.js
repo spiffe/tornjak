@@ -4,6 +4,7 @@ import axios from 'axios';
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
+import PropTypes from "prop-types";
 
 import {
     serverSelectedFunc,
@@ -122,7 +123,22 @@ const mapStateToProps = (state) => ({
     globalErrorMessage: state.tornjak.globalErrorMessage,
 })
 
+SelectServer.propTypes = {
+    globalServerSelected: PropTypes.string,
+    globalServersList: PropTypes.array,
+    globalTornjakServerInfo: PropTypes.object,
+    globalErrorMessage: PropTypes.string,
+    serverSelectedFunc: PropTypes.func,
+    serversListUpdateFunc: PropTypes.func,
+    tornjakServerInfoUpdateFunc: PropTypes.func,
+    serverInfoUpdateFunc: PropTypes.func,
+    agentsListUpdateFunc: PropTypes.func,
+    tornjakMessageFunc: PropTypes.func,
+  };
+
 export default connect(
     mapStateToProps,
     { serverSelectedFunc, serversListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, agentsListUpdateFunc, tornjakMessageFunc }
 )(SelectServer)
+
+export { SelectServer };

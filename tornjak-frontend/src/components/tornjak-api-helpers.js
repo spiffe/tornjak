@@ -154,7 +154,7 @@ class TornjakApi extends Component {
     if (serverInfo === "" || serverInfo === undefined) {
       return
     }
-    if (serverInfo.plugins["NodeAttestor"].length === 0) {
+    if (serverInfo.plugins === undefined || serverInfo.plugins["NodeAttestor"].length === 0) {
       return
     }
     let nodeAtt = serverInfo.plugins["NodeAttestor"][0];

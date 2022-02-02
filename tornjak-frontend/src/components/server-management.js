@@ -6,6 +6,7 @@ import IsManager from './is_manager';
 import {
   serversListUpdateFunc
 } from 'redux/actions';
+import PropTypes from "prop-types";
 
 const Server = props => (
   <tr>
@@ -246,7 +247,14 @@ const mapStateToProps = (state) => ({
   globalServersList: state.servers.globalServersList
 })
 
+ServerManagement.propTypes = {
+  globalServersList: PropTypes.array,
+  serversListUpdateFunc: PropTypes.func,
+};
+
 export default connect(
   mapStateToProps,
   { serversListUpdateFunc }
 )(ServerManagement)
+
+export { ServerManagement };

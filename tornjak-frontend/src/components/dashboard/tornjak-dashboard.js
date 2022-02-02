@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import clsx from 'clsx';
 import { withStyles } from '@material-ui/core/styles';
+import PropTypes from "prop-types";
 // Components
 import {
   Container,
@@ -122,7 +123,7 @@ class TornjakDashboard extends React.Component {
   render() {
     const { classes } = this.props;
     return (
-      <div className={classes.root}>
+      <div className={classes.root} data-test="tornjak-dashboard">
         <DashboardDrawer />
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
@@ -214,7 +215,32 @@ const mapStateToProps = (state) => ({
   globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 })
 
+TornjakDashboard.propTypes = {
+  classes: PropTypes.object,
+  globalServerSelected: PropTypes.string,
+  globalClustersList: PropTypes.array,
+  globalTornjakServerInfo: PropTypes.object,
+  globalErrorMessage: PropTypes.string,
+  globalAgents: PropTypes.objectOf(PropTypes.shape({
+    globalAgentsList: PropTypes.array,
+    globalAgentsWorkLoadAttestorInfo: PropTypes.array
+  })),
+  globalEntries: PropTypes.objectOf(PropTypes.shape({
+    globalEntriesList: PropTypes.array,
+  })),
+  globalClickedDashboardTable: PropTypes.string,
+  agentsListUpdateFunc: PropTypes.func,
+  clustersListUpdateFunc: PropTypes.func,
+  selectorInfoFunc: PropTypes.func,
+  serverInfoUpdateFunc: PropTypes.func,
+  serverSelectedFunc: PropTypes.func,
+  tornjakMessageFunc: PropTypes.func,
+  tornjakServerInfoUpdateFunc: PropTypes.func,
+};
+
 export default withStyles(styles)(connect(
   mapStateToProps,
   { entriesListUpdateFunc, agentsListUpdateFunc, agentworkloadSelectorInfoFunc, clustersListUpdateFunc, tornjakMessageFunc, serverInfoUpdateFunc, serverSelectedFunc, tornjakServerInfoUpdateFunc, selectorInfoFunc, clickedDashboardTableFunc }
 )(TornjakDashboard))
+
+export { TornjakDashboard };
