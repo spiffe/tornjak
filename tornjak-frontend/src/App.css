@@ -52,3 +52,30 @@
   bottom: 0;
   z-index: 2;
 }
+
+
+
+  .carbon-toast .Toastify__toast {
+    padding: 0 !important;
+    /* background: $inverse-02 !important; */
+  }
+
+  .carbon-toast .Toastify__toast > svg {
+    margin-top: 1.375rem;
+    margin-right: 1rem;
+    /* fill: $inverse-01; */
+  }
+
+  .carbon-toast .Toastify__toast-body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .carbon-toast .Toastify__toast-container {
+    width: auto !important;
+    height: auto !important;
+  }
+
+  .carbon-toast .bx--toast-notification{
+    margin: 0;
+  }

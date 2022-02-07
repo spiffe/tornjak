@@ -13,3 +13,28 @@ export default function GetApiServerUri (uri: string): string {
     }
 }
 
+// const IS_DUBUG = process.env["REACT_APP_DEBUG_TORNJAK"] || window.DEBUG_TORNJAK;
+// console.log(process.env["REACT_APP_DEBUG_TORNJAK"]);
+// console.log(window.DEBUG_TORNJAK);
+
+export const logDebug = function (...args){
+    if (process.env["REACT_APP_DEBUG_TORNJAK"] || window.DEBUG_TORNJAK){ // real time variable
+        console.log(...args);
+    }
+};
+
+export const logError = function (...args){
+    if (process.env["REACT_APP_DEBUG_TORNJAK"] || window.DEBUG_TORNJAK){ // real time variable
+        console.error(...args);
+    }
+};
+
+export const logWarn = function (...args){
+    if (process.env["REACT_APP_DEBUG_TORNJAK"] || window.DEBUG_TORNJAK){ // real time variable
+        console.warn(...args);
+    }
+};
+
+
+// IS_MANAGER
+
