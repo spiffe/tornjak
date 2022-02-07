@@ -1,6 +1,5 @@
 import { ThunkAction } from 'redux-thunk';
 import { RootState } from 'redux/reducers';
-import { selectors, workloadSelectors } from "data/data";
 import {
     GLOBAL_SERVER_SELECTED,
     GLOBAL_ENTRIES_LIST,
@@ -164,7 +163,7 @@ export function serversListUpdateFunc(globalServersList: Array<string>): ThunkAc
 //    ]
 // ]
 // selectorInfoFunc returns the list of available selectors and their options
-export function selectorInfoFunc(globalSelectorInfo: typeof selectors): ThunkAction<void, RootState, undefined, SelectorInfoAction> {
+export function selectorInfoFunc(globalSelectorInfo: {[index: string]: {label: string}[]}): ThunkAction<void, RootState, undefined, SelectorInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_SELECTOR_INFO,
@@ -217,7 +216,7 @@ export function agentsListUpdateFunc(globalAgentsList: AgentsListType[]): ThunkA
 //   ]
 // ]
 // workloadSelectorInfoFunc returns the list of available workload selectors and their options
-export function workloadSelectorInfoFunc(globalWorkloadSelectorInfo: typeof workloadSelectors): ThunkAction<void, RootState, undefined, WorkloadSelectorInfoAction> {
+export function workloadSelectorInfoFunc(globalWorkloadSelectorInfo: {[index: string]: {label: string}[]}): ThunkAction<void, RootState, undefined, WorkloadSelectorInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_WORKLOAD_SELECTOR_INFO,

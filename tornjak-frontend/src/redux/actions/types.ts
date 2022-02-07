@@ -1,5 +1,4 @@
 import { Action } from "redux";
-import { selectors, workloadSelectors } from "data/data";
 import { 
     AgentsListType, 
     AgentsWorkLoadAttestorInfoType, 
@@ -65,8 +64,8 @@ export interface ServersReducerStateType {
     globalServerInfo: ServerInfoType,
     globalTornjakServerInfo: TornjakServerInfoType,
     globalServersList: Array<string>,
-    globalSelectorInfo: typeof selectors,
-    globalWorkloadSelectorInfo: typeof workloadSelectors,
+    globalSelectorInfo: {[index: string]: {label: string}[]},
+    globalWorkloadSelectorInfo: {[index: string]: {label: string}[]} ,
 }
 
 export interface ServerSelectedAction extends Action<typeof GLOBAL_SERVER_SELECTED> {
@@ -85,10 +84,10 @@ export interface ServersListAction extends Action<typeof GLOBAL_SERVERS_LIST> {
     payload: Array<string>;
 }
 export interface SelectorInfoAction extends Action<typeof GLOBAL_SELECTOR_INFO> {
-    payload: typeof selectors;
+    payload: {[index: string]: {label: string}[]};
 }
 export interface WorkloadSelectorInfoAction extends Action<typeof GLOBAL_WORKLOAD_SELECTOR_INFO> {
-    payload: typeof workloadSelectors;
+    payload: {[index: string]: {label: string}[]};
 }
 
 export type ServersAction =
