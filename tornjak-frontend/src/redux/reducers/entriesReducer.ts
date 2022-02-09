@@ -1,14 +1,14 @@
 import {
     EntriesListAction,
-    EntriesReducerStateType,
+    EntriesReducerState,
     GLOBAL_ENTRIES_LIST,
 } from '../actions/types';
 
-const initialState: EntriesReducerStateType = {
+const initialState: EntriesReducerState = {
     globalEntriesList: [],
 };
 
-export default function entriesReducer(state: EntriesReducerStateType = initialState, action: EntriesListAction) {
+export default function entriesReducer(state: EntriesReducerState = initialState, action: EntriesListAction) {
     switch (action.type) {
         case GLOBAL_ENTRIES_LIST:
             return {

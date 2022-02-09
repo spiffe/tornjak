@@ -1,6 +1,6 @@
 // agents
 
-export interface SPIFFEIDType {
+export interface SPIFFEID {
   // From https://github.com/spiffe/spire-api-sdk/blob/main/proto/spire/api/types/spiffeid.pb.go
   // Trust domain portion the SPIFFE ID (e.g. "example.org")
   trust_domain: string;
@@ -10,7 +10,7 @@ export interface SPIFFEIDType {
   path: string;
 }
 
-export interface SelectorType {
+export interface Selector {
   // From https://github.com/spiffe/spire-api-sdk/blob/main/proto/spire/api/types/selector.pb.go
   // The type of the selector. This is typically the name of the plugin that
   // produces the selector.
@@ -18,16 +18,16 @@ export interface SelectorType {
   value: string;
 }
 
-export interface AgentsListType {
+export interface AgentsList {
   // From https://github.com/spiffe/spire-api-sdk/blob/main/proto/spire/api/types/agent.pb.go
-  id: SPIFFEIDType; // SPIFFE ID of the agent.
+  id: SPIFFEID; // SPIFFE ID of the agent.
   attetstation_type: string; // The method by which the agent attested.
   x509svid_serial_number: string; // The X509-SVID serial number.
-  x509svid_expires_at: number; //  The X509-SVID expiration (seconds since Unix epoch).
-  selectors: Array<SelectorType>; // The selectors attributed to the agent during attestation.
+  x509svid_expires_at: bigint; //  The X509-SVID expiration (seconds since Unix epoch).
+  selectors: Array<Selector>; // The selectors attributed to the agent during attestation.
 }
 
-export interface AgentsWorkLoadAttestorInfoType {
+export interface AgentsWorkLoadAttestorInfo {
   spiffeid: string; // SPIFFEE ID of agent
   plugin: string; // Workload attestor plugin selected for agent
   cluster: string; // Cluster agent is associated with
@@ -35,7 +35,7 @@ export interface AgentsWorkLoadAttestorInfoType {
 
 
 // clusters
-export interface ClustersListType {
+export interface ClustersList {
   name: string; // Name of Cluster
   editedName: string; // Edited Name if Cluster Name is edited from original
   creationTime: string; // Time cluster is created
@@ -46,20 +46,20 @@ export interface ClustersListType {
 }
 
 // entries
-export interface EntriesListType {
+export interface EntriesList {
   // From https://github.com/spiffe/spire-api-sdk/blob/main/proto/spire/api/types/entry.pb.go
   id: string; // Globally unique ID for the entry.
-  spiffe_id: SPIFFEIDType; // The SPIFFE ID of the identity described by this entry.
+  spiffe_id: SPIFFEID; // The SPIFFE ID of the identity described by this entry.
   // Who the entry is delegated to. If the entry describes a node, this is
   // set to the SPIFFE ID of the SPIRE server of the trust domain (e.g.
   // spiffe://example.org/spire/server). Otherwise, it will be set to a node
   // SPIFFE ID.
-  parent_id: SPIFFEIDType;
+  parent_id: SPIFFEID;
   // The selectors which identify which entities match this entry. If this is
   // an entry for a node, these selectors represent selectors produced by
   // node attestation. Otherwise, these selectors represent those produced by
   // workload attestation.
-  selectors: Array<SelectorType>;
+  selectors: Array<Selector>;
   ttl: number; // The time to live for identities issued for this entry (in seconds).
   federates_with: string[]; // The names of trust domains the identity described by this entry federates with
   // Whether or not the identity described by this entry is an administrative
@@ -78,7 +78,7 @@ export interface EntriesListType {
 }
 
 // servers
-export interface TornjakServerInfoType {
+export interface TornjakServerInfo {
   // Plugins for tornjak server info
   plugins: {
     DataStore: string[];
@@ -91,9 +91,7 @@ export interface TornjakServerInfoType {
   verboseConfig: string; // More detailed metadata on server
 }
 
-export interface ServerInfoType {
-  data: {
-    trustDomain: string; // Trust domain of server
-    nodeAttestorPlugin: string; // Node Attestor Plugin of server
-  }
+export interface ServerInfo {
+  trustDomain: string; // Trust domain of server
+  nodeAttestorPlugin: string; // Node Attestor Plugin of server
 }

@@ -30,17 +30,17 @@ import {
 } from './types';
 
 import { 
-    AgentsListType, 
-    AgentsWorkLoadAttestorInfoType, 
-    ClustersListType, 
-    EntriesListType, 
-    ServerInfoType, 
-    TornjakServerInfoType 
+    AgentsList, 
+    AgentsWorkLoadAttestorInfo, 
+    ClustersList, 
+    EntriesList, 
+    ServerInfo, 
+    TornjakServerInfo 
 } from 'components/types';
 
 // Expected input - List of clusters with their info
 // clustersListUpdateFunc returns the list of clusters with their info
-export function clustersListUpdateFunc(globalClustersList: ClustersListType[]): ThunkAction<void, RootState, undefined, ClustersListUpdateAction> {
+export function clustersListUpdateFunc(globalClustersList: ClustersList[]): ThunkAction<void, RootState, undefined, ClustersListUpdateAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_CLUSTERS_LIST,
@@ -89,7 +89,7 @@ export function serverSelectedFunc(globalServerSelected: string): ThunkAction<vo
 // Expected input - "TornjakServerInfo" struct (as JSON) based on 
 // TornjakServerInfo in /api/types.go
 // tornjakServerInfoUpdateFunc returns the tornjak server info of the selected server
-export function tornjakServerInfoUpdateFunc(globalTornjakServerInfo: TornjakServerInfoType): ThunkAction<void, RootState, undefined, TornjakServerInfoAction> {
+export function tornjakServerInfoUpdateFunc(globalTornjakServerInfo: TornjakServerInfo): ThunkAction<void, RootState, undefined, TornjakServerInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_TORNJAK_SERVER_INFO,
@@ -107,7 +107,7 @@ export function tornjakServerInfoUpdateFunc(globalTornjakServerInfo: TornjakServ
 //      }
 //  }
 // serverInfoUpdateFunc returns the server trust domain and nodeAttestorPlugin
-export function serverInfoUpdateFunc(globalServerInfo: ServerInfoType): ThunkAction<void, RootState, undefined, ServerInfoAction> {
+export function serverInfoUpdateFunc(globalServerInfo: ServerInfo): ThunkAction<void, RootState, undefined, ServerInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_SERVER_INFO,
@@ -175,7 +175,7 @@ export function selectorInfoFunc(globalSelectorInfo: {[index: string]: {label: s
 // Expected input - List of entries with their info
 // json representation from SPIFFE golang documentation - https://github.com/spiffe/spire/blob/v0.12.0/proto/spire/types/entry.pb.go#L28-L67
 // entriesListUpdateFunc returns the list of entries with their info
-export function entriesListUpdateFunc(globalEntriesList: EntriesListType[]): ThunkAction<void, RootState, undefined, EntriesListAction> {
+export function entriesListUpdateFunc(globalEntriesList: EntriesList[]): ThunkAction<void, RootState, undefined, EntriesListAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_ENTRIES_LIST,
@@ -187,7 +187,7 @@ export function entriesListUpdateFunc(globalEntriesList: EntriesListType[]): Thu
 // Expected input - List of agents with their info
 // json representation from SPIFFE golang documentation - https://github.com/spiffe/spire/blob/v0.12.0/proto/spire/types/agent.pb.go#L28-L45
 // agentsListUpdateFunc returns the list of agents with their info
-export function agentsListUpdateFunc(globalAgentsList: AgentsListType[]): ThunkAction<void, RootState, undefined, AgentsListAction> {
+export function agentsListUpdateFunc(globalAgentsList: AgentsList[]): ThunkAction<void, RootState, undefined, AgentsListAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_AGENTS_LIST,
@@ -243,7 +243,7 @@ export function workloadSelectorInfoFunc(globalWorkloadSelectorInfo: {[index: st
 //   ]
 //]
 // agentworkloadSelectorInfoFunc returns the workload selector info for the agents
-export function agentworkloadSelectorInfoFunc(globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfoType[]): ThunkAction<void, RootState, undefined, AgentWorkloadSelectorInfoAction> {
+export function agentworkloadSelectorInfoFunc(globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]): ThunkAction<void, RootState, undefined, AgentWorkloadSelectorInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_AGENTS_WORKLOADATTESTOR_INFO,

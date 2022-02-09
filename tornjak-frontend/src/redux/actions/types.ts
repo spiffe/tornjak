@@ -1,40 +1,40 @@
 import { Action } from "redux";
 import { 
-    AgentsListType, 
-    AgentsWorkLoadAttestorInfoType, 
-    ClustersListType, 
-    EntriesListType, 
-    ServerInfoType, 
-    TornjakServerInfoType 
+    AgentsList, 
+    AgentsWorkLoadAttestorInfo, 
+    ClustersList, 
+    EntriesList, 
+    ServerInfo, 
+    TornjakServerInfo 
 } from "components/types";
 
 // agents
 export const GLOBAL_AGENTS_LIST = 'GLOBAL_AGENTS_LIST';
 export const GLOBAL_AGENTS_WORKLOADATTESTOR_INFO = 'GLOBAL_AGENTS_WORKLOADATTESTOR_INFO'
 
-export interface AgentsReducerStateType {
-    globalAgentsList: AgentsListType[] | undefined,
-    globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfoType[],
+export interface AgentsReducerState {
+    globalAgentsList: AgentsList[] | undefined,
+    globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[],
 }
 
 export interface AgentsListAction extends Action<typeof GLOBAL_AGENTS_LIST> {
-    payload: AgentsListType[];
+    payload: AgentsList[];
 }
 export interface AgentWorkloadSelectorInfoAction extends Action<typeof GLOBAL_AGENTS_WORKLOADATTESTOR_INFO> {
-    payload: AgentsWorkLoadAttestorInfoType[];
+    payload: AgentsWorkLoadAttestorInfo[];
 }
 
 // clusters
 export const GLOBAL_CLUSTERS_LIST = 'GLOBAL_CLUSTERS_LIST';
 export const GLOBAL_CLUSTER_TYPE_INFO = 'GLOBAL_CLUSTER_TYPE_INFO';
 
-export interface ClustersReducerStateType {
-    globalClustersList: ClustersListType[] | undefined,
+export interface ClustersReducerState {
+    globalClustersList: ClustersList[] | undefined,
     globalClusterTypeInfo: string[],
 }
 
 export interface ClustersListUpdateAction extends Action<typeof GLOBAL_CLUSTERS_LIST> {
-    payload: ClustersListType[];
+    payload: ClustersList[];
 }
 export interface ClusterTypeInfoAction extends Action<typeof GLOBAL_CLUSTER_TYPE_INFO> {
     payload: string[];
@@ -43,12 +43,12 @@ export interface ClusterTypeInfoAction extends Action<typeof GLOBAL_CLUSTER_TYPE
 // entries
 export const GLOBAL_ENTRIES_LIST = 'GLOBAL_ENTRIES_LIST';
 
-export interface EntriesReducerStateType {
-    globalEntriesList: EntriesListType[]
+export interface EntriesReducerState {
+    globalEntriesList: EntriesList[]
 }
 
 export interface EntriesListAction extends Action<typeof GLOBAL_ENTRIES_LIST> {
-    payload: EntriesListType[];
+    payload: EntriesList[];
 }
 
 // servers
@@ -59,10 +59,10 @@ export const GLOBAL_SERVERS_LIST = 'GLOBAL_SERVERS_LIST';
 export const GLOBAL_SELECTOR_INFO = 'GLOBAL_SELECTOR_INFO';
 export const GLOBAL_WORKLOAD_SELECTOR_INFO = 'GLOBAL_WORKLOAD_SELECTOR_INFO';
 
-export interface ServersReducerStateType {
+export interface ServersReducerState {
     globalServerSelected: string,
-    globalServerInfo: ServerInfoType,
-    globalTornjakServerInfo: TornjakServerInfoType,
+    globalServerInfo: ServerInfo,
+    globalTornjakServerInfo: TornjakServerInfo,
     globalServersList: Array<string>,
     globalSelectorInfo: {[index: string]: {label: string}[]},
     globalWorkloadSelectorInfo: {[index: string]: {label: string}[]} ,
@@ -73,11 +73,11 @@ export interface ServerSelectedAction extends Action<typeof GLOBAL_SERVER_SELECT
 }
 
 export interface ServerInfoAction extends Action<typeof GLOBAL_SERVER_INFO> {
-    payload: ServerInfoType;
+    payload: ServerInfo;
 }
 
 export interface TornjakServerInfoAction extends Action<typeof GLOBAL_TORNJAK_SERVER_INFO> {
-    payload: TornjakServerInfoType;
+    payload: TornjakServerInfo;
 }
 
 export interface ServersListAction extends Action<typeof GLOBAL_SERVERS_LIST> {
@@ -101,7 +101,7 @@ export type ServersAction =
 // tornjak
 export const GLOBAL_MESSAGE = 'GLOBAL_MESSAGE';
 export const GLOBAL_CLICKED_DASHBOARD_TABLE = 'GLOBAL_CLICKED_DASHBOARD_TABLE';
-export interface TornjakReducerStateType {
+export interface TornjakReducerState {
     globalErrorMessage: string,
     globalClickedDashboardTable: string,
 }

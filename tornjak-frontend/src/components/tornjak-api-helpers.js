@@ -161,11 +161,8 @@ class TornjakApi extends Component {
     let trustDomain = serverInfo.trustDomain;
     var reqInfo =
     {
-      "data":
-      {
-        "trustDomain": trustDomain,
-        "nodeAttestorPlugin": nodeAtt
-      }
+      "trustDomain": trustDomain,
+      "nodeAttestorPlugin": nodeAtt
     }
     serverInfoUpdateFunc(reqInfo);
   }

@@ -5,21 +5,21 @@ import {
     GLOBAL_SERVERS_LIST,
     GLOBAL_SELECTOR_INFO,
     GLOBAL_WORKLOAD_SELECTOR_INFO,
-    ServersReducerStateType,
+    ServersReducerState,
     ServersAction,
 } from '../actions/types';
 import { selectors, workloadSelectors } from "data/data";
 
-const initialState: ServersReducerStateType = {
+const initialState: ServersReducerState = {
     globalServerSelected: "",
-    globalServerInfo: {"data" : {trustDomain: "", nodeAttestorPlugin: ""}},
+    globalServerInfo: {trustDomain: "", nodeAttestorPlugin: ""},
     globalTornjakServerInfo: {"plugins": {"DataStore": [], "KeyManager": [], "NodeAttestor": [], "NodeResolver": [], "Notifier": [] }, "trustDomain": "", "verboseConfig": ""},
     globalServersList: [],
     globalSelectorInfo: selectors,
     globalWorkloadSelectorInfo: workloadSelectors,
 };
 
-export default function serversReducer(state: ServersReducerStateType = initialState, action: ServersAction) {
+export default function serversReducer(state: ServersReducerState = initialState, action: ServersAction) {
     switch (action.type) {
         case GLOBAL_SERVER_SELECTED:
             return {
