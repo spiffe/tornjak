@@ -1,10 +1,11 @@
-//---redux--------------------------------------
+//---redux---//
 import {applyMiddleware, createStore} from 'redux';
 import allReducers from './reducers'; //import all reducers
 import thunk from "redux-thunk";
 import { composeWithDevTools } from 'redux-devtools-extension'; //for Redox dev
+import { RootState } from './reducers';
 
-function saveToLocalStorage(state) {
+function saveToLocalStorage(state: RootState) {
     try {
         const serializedState = JSON.stringify(state)
         sessionStorage.setItem('state', serializedState)
@@ -24,6 +25,7 @@ function loadFromLocalStorage() {
     }
 }
 
+export const middlewares = [thunk];
 const persistedState = loadFromLocalStorage()
 // STORE -> Globalized state - where to store all data
 const store = createStore(

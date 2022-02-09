@@ -13,4 +13,6 @@ const allReducers = combineReducers({
     tornjak: tornjakReducer,
 });
 
+export type RootState = ReturnType<typeof allReducers>;
+
 export default allReducers;

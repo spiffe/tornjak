@@ -151,7 +151,7 @@ class TornjakApi extends Component {
   // populateServerInfo returns the server trust domain and nodeAttestorPlugin
   populateServerInfo = (serverInfo, serverInfoUpdateFunc) => {
     //node attestor plugin
-    if (serverInfo === "" || serverInfo === undefined) {
+    if (serverInfo === "" || serverInfo === undefined || JSON.stringify(serverInfo) === '{}') {
       return
     }
     if (serverInfo.plugins["NodeAttestor"].length === 0) {
@@ -161,11 +161,8 @@ class TornjakApi extends Component {
     let trustDomain = serverInfo.trustDomain;
     var reqInfo =
     {
-      "data":
-      {
-        "trustDomain": trustDomain,
-        "nodeAttestorPlugin": nodeAtt
-      }
+      "trustDomain": trustDomain,
+      "nodeAttestorPlugin": nodeAtt
     }
     serverInfoUpdateFunc(reqInfo);
   }

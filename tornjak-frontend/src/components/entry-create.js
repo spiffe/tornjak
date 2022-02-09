@@ -147,7 +147,7 @@ class CreateEntry extends Component {
     //user prefered option
     localAgentsIdList[0] = this.state.parentIdManualEntryOption;
     //default option
-    localAgentsIdList[1] = prefix + this.props.globalServerInfo.data.trustDomain + "/spire/server";
+    localAgentsIdList[1] = prefix + this.props.globalServerInfo.trustDomain + "/spire/server";
 
     //agents
     let agentEntriesDict = this.SpiffeHelper.getAgentsEntries(this.props.globalAgentsList, this.props.globalEntriesList)
@@ -175,11 +175,11 @@ class CreateEntry extends Component {
   prepareSelectorsList() {
     var prefix = "spiffe://", agentSelectorSet = false;
     var parentId = this.state.parentId;
-    var defaultServer = prefix + this.props.globalServerInfo.data.trustDomain + "/spire/server";
+    var defaultServer = prefix + this.props.globalServerInfo.trustDomain + "/spire/server";
     var globalAgentsWorkLoadAttestorInfo = this.props.globalAgentsWorkLoadAttestorInfo;
     if (parentId === defaultServer) {
       if (this.props.globalServerInfo.length === 0) { return }
-      let serverNodeAtt = this.props.globalServerInfo.data.nodeAttestorPlugin;
+      let serverNodeAtt = this.props.globalServerInfo.nodeAttestorPlugin;
       this.setState({
         selectorsList: this.props.globalSelectorInfo[serverNodeAtt]
       });

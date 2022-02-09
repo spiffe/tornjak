@@ -1,14 +1,17 @@
 import {
+    ClustersListUpdateAction,
+    ClustersReducerState,
+    ClusterTypeInfoAction,
     GLOBAL_CLUSTERS_LIST,
     GLOBAL_CLUSTER_TYPE_INFO,
 } from '../actions/types';
 
-const initialState = {
+const initialState: ClustersReducerState = {
     globalClustersList: [],
     globalClusterTypeInfo: [],
 };
 
-export default function clustersReducer(state = initialState, action) {
+export default function clustersReducer(state: ClustersReducerState = initialState, action: ClustersListUpdateAction | ClusterTypeInfoAction) {
     switch (action.type) {
         case GLOBAL_CLUSTERS_LIST:
             return {

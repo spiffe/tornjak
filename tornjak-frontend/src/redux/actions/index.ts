@@ -1,3 +1,5 @@
+import { ThunkAction } from 'redux-thunk';
+import { RootState } from 'redux/reducers';
 import {
     GLOBAL_SERVER_SELECTED,
     GLOBAL_ENTRIES_LIST,
@@ -12,11 +14,33 @@ import {
     GLOBAL_CLUSTERS_LIST,
     GLOBAL_CLUSTER_TYPE_INFO,
     GLOBAL_CLICKED_DASHBOARD_TABLE,
+    ClustersListUpdateAction,
+    ClusterTypeInfoAction,
+    TornjakMessageAction,
+    ServerSelectedAction,
+    TornjakServerInfoAction,
+    ServerInfoAction,
+    ServersListAction,
+    SelectorInfoAction,
+    EntriesListAction,
+    AgentsListAction,
+    WorkloadSelectorInfoAction,
+    AgentWorkloadSelectorInfoAction,
+    ClickedDashboardTableAction,
 } from './types';
+
+import { 
+    AgentsList, 
+    AgentsWorkLoadAttestorInfo, 
+    ClustersList, 
+    EntriesList, 
+    ServerInfo, 
+    TornjakServerInfo 
+} from 'components/types';
 
 // Expected input - List of clusters with their info
 // clustersListUpdateFunc returns the list of clusters with their info
-export function clustersListUpdateFunc(globalClustersList) {
+export function clustersListUpdateFunc(globalClustersList: ClustersList[]): ThunkAction<void, RootState, undefined, ClustersListUpdateAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_CLUSTERS_LIST,
@@ -31,7 +55,7 @@ export function clustersListUpdateFunc(globalClustersList) {
 //  "label": "clustertype2"
 // }
 // clusterTypeInfoFunc returns the list of available cluster types
-export function clusterTypeInfoFunc(globalClusterTypeInfo) {
+export function clusterTypeInfoFunc(globalClusterTypeInfo: string[]): ThunkAction<void, RootState, undefined, ClusterTypeInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_CLUSTER_TYPE_INFO,
@@ -42,7 +66,7 @@ export function clusterTypeInfoFunc(globalClusterTypeInfo) {
 
 // Expected input - "Error Message/ Success Message"
 // tornjakMessageFunc returns the Error Message/ Success Message of an executed function
-export function tornjakMessageFunc(globalErrorMessage) {
+export function tornjakMessageFunc(globalErrorMessage: string): ThunkAction<void, RootState, undefined, TornjakMessageAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_MESSAGE,
@@ -53,7 +77,7 @@ export function tornjakMessageFunc(globalErrorMessage) {
 
 // Expected input - "ServerName"
 // serverSelectedFunc returns the server selected in the redux state
-export function serverSelectedFunc(globalServerSelected) {
+export function serverSelectedFunc(globalServerSelected: string): ThunkAction<void, RootState, undefined, ServerSelectedAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_SERVER_SELECTED,
@@ -65,7 +89,7 @@ export function serverSelectedFunc(globalServerSelected) {
 // Expected input - "TornjakServerInfo" struct (as JSON) based on 
 // TornjakServerInfo in /api/types.go
 // tornjakServerInfoUpdateFunc returns the tornjak server info of the selected server
-export function tornjakServerInfoUpdateFunc(globalTornjakServerInfo) {
+export function tornjakServerInfoUpdateFunc(globalTornjakServerInfo: TornjakServerInfo): ThunkAction<void, RootState, undefined, TornjakServerInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_TORNJAK_SERVER_INFO,
@@ -83,7 +107,7 @@ export function tornjakServerInfoUpdateFunc(globalTornjakServerInfo) {
 //      }
 //  }
 // serverInfoUpdateFunc returns the server trust domain and nodeAttestorPlugin
-export function serverInfoUpdateFunc(globalServerInfo) {
+export function serverInfoUpdateFunc(globalServerInfo: ServerInfo): ThunkAction<void, RootState, undefined, ServerInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_SERVER_INFO,
@@ -110,7 +134,7 @@ export function serverInfoUpdateFunc(globalServerInfo) {
 //      }
 //  ]
 // serversListUpdateFunc returns the list of available servers and their basic info
-export function serversListUpdateFunc(globalServersList) {
+export function serversListUpdateFunc(globalServersList: Array<string>): ThunkAction<void, RootState, undefined, ServersListAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_SERVERS_LIST,
@@ -139,7 +163,7 @@ export function serversListUpdateFunc(globalServersList) {
 //    ]
 // ]
 // selectorInfoFunc returns the list of available selectors and their options
-export function selectorInfoFunc(globalSelectorInfo) {
+export function selectorInfoFunc(globalSelectorInfo: {[index: string]: {label: string}[]}): ThunkAction<void, RootState, undefined, SelectorInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_SELECTOR_INFO,
@@ -151,7 +175,7 @@ export function selectorInfoFunc(globalSelectorInfo) {
 // Expected input - List of entries with their info
 // json representation from SPIFFE golang documentation - https://github.com/spiffe/spire/blob/v0.12.0/proto/spire/types/entry.pb.go#L28-L67
 // entriesListUpdateFunc returns the list of entries with their info
-export function entriesListUpdateFunc(globalEntriesList) {
+export function entriesListUpdateFunc(globalEntriesList: EntriesList[]): ThunkAction<void, RootState, undefined, EntriesListAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_ENTRIES_LIST,
@@ -163,7 +187,7 @@ export function entriesListUpdateFunc(globalEntriesList) {
 // Expected input - List of agents with their info
 // json representation from SPIFFE golang documentation - https://github.com/spiffe/spire/blob/v0.12.0/proto/spire/types/agent.pb.go#L28-L45
 // agentsListUpdateFunc returns the list of agents with their info
-export function agentsListUpdateFunc(globalAgentsList) {
+export function agentsListUpdateFunc(globalAgentsList: AgentsList[]): ThunkAction<void, RootState, undefined, AgentsListAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_AGENTS_LIST,
@@ -192,7 +216,7 @@ export function agentsListUpdateFunc(globalAgentsList) {
 //   ]
 // ]
 // workloadSelectorInfoFunc returns the list of available workload selectors and their options
-export function workloadSelectorInfoFunc(globalWorkloadSelectorInfo) {
+export function workloadSelectorInfoFunc(globalWorkloadSelectorInfo: {[index: string]: {label: string}[]}): ThunkAction<void, RootState, undefined, WorkloadSelectorInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_WORKLOAD_SELECTOR_INFO,
@@ -219,7 +243,7 @@ export function workloadSelectorInfoFunc(globalWorkloadSelectorInfo) {
 //   ]
 //]
 // agentworkloadSelectorInfoFunc returns the workload selector info for the agents
-export function agentworkloadSelectorInfoFunc(globalAgentsWorkLoadAttestorInfo) {
+export function agentworkloadSelectorInfoFunc(globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]): ThunkAction<void, RootState, undefined, AgentWorkloadSelectorInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_AGENTS_WORKLOADATTESTOR_INFO,
@@ -230,7 +254,7 @@ export function agentworkloadSelectorInfoFunc(globalAgentsWorkLoadAttestorInfo) 
 
 // Expected input - clicked dashboard tabel
 // clickedDashboardTableFunc returns the clicked dashboard tabel
-export function clickedDashboardTableFunc(globalClickedDashboardTable) {
+export function clickedDashboardTableFunc(globalClickedDashboardTable: string): ThunkAction<void, RootState, undefined, ClickedDashboardTableAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_CLICKED_DASHBOARD_TABLE,
@@ -238,3 +262,4 @@ export function clickedDashboardTableFunc(globalClickedDashboardTable) {
         });
     }
 }
+
