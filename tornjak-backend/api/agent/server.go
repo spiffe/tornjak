@@ -14,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cenkalti/backoff/v4"
 	"github.com/gorilla/mux"
 
 	agentdb "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/db"
@@ -481,7 +480,6 @@ func (s *Server) HandleRequests() {
 		caCertPool.AppendCertsFromPEM(caCert)
 
 		// If mTLS is enabled, add mTLS CA path to cert pool as well
-
 		if s.MTlsCaPath != "" {
 			mTLSCaCert, err := ioutil.ReadFile(s.MTlsCaPath)
 			if err != nil {
