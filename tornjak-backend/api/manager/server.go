@@ -72,7 +72,8 @@ func (s *Server) apiServerProxyFunc(apiPath string) func(w http.ResponseWriter, 
 			retError(w, emsg, http.StatusBadRequest)
 			return
 		}
-		fmt.Printf("%+v\n", sinfo)
+		fmt.Printf("Name:%s\n Address:%s\n TLS:%t, mTLS:%t\n CA:%s\n Cert:%s\n Key:%s\n", sinfo.Name, sinfo.Address, sinfo.TLS, sinfo.MTLS,
+			string(sinfo.CA), string(sinfo.Cert), string(sinfo.Key))
 
 		client, err := sinfo.HttpClient()
 		if err != nil {
