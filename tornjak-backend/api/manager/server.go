@@ -16,6 +16,8 @@ import (
 
 var (
 	jsonContentType string = "application/json"
+	keyShowLen      int    = 40
+	certShowLen     int    = 50
 )
 
 type Server struct {
@@ -72,8 +74,23 @@ func (s *Server) apiServerProxyFunc(apiPath string) func(w http.ResponseWriter, 
 			retError(w, emsg, http.StatusBadRequest)
 			return
 		}
+
+		// Show the end of certs and key for debugging
+		var certSub, caSub, keySub string
+		certStr := string(sinfo.CA)
+		if len(string(certStr)) > certShowLen {
+			certSub = "\n..." + certStr[len(certStr)-certShowLen:len(certStr)]
+		}
+		caStr := string(sinfo.Cert)
+		if len(string(caStr)) > certShowLen {
+			caSub = "\n..." + caStr[len(caStr)-certShowLen:len(caStr)]
+		}
+		keyStr := string(sinfo.Key)
+		if len(string(keyStr)) > keyShowLen {
+			keySub = "\n..." + keyStr[len(keyStr)-keyShowLen:len(keyStr)]
+		}
 		fmt.Printf("Name:%s\n Address:%s\n TLS:%t, mTLS:%t\n CA:%s\n Cert:%s\n Key:%s\n", sinfo.Name, sinfo.Address, sinfo.TLS, sinfo.MTLS,
-			string(sinfo.CA), string(sinfo.Cert), string(sinfo.Key))
+			certSub, caSub, keySub)
 
 		client, err := sinfo.HttpClient()
 		if err != nil {

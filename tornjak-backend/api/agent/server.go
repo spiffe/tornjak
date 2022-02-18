@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cenkalti/backoff/v3"
 	"github.com/gorilla/mux"
 
 	agentdb "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/db"
@@ -479,13 +480,18 @@ func (s *Server) HandleRequests() {
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
 
+		tlsType := "TLS"
 		// If mTLS is enabled, add mTLS CA path to cert pool as well
 		if s.MTlsCaPath != "" {
+			if _, err := os.Stat(s.MTlsCaPath); os.IsNotExist(err) {
+				log.Fatalf("File does not exist %s", s.MTlsCaPath)
+			}
 			mTLSCaCert, err := ioutil.ReadFile(s.MTlsCaPath)
 			if err != nil {
 				log.Fatal(err)
 			}
 			caCertPool.AppendCertsFromPEM(mTLSCaCert)
+			tlsType = "mTLS"
 		}
 
 		// Create the TLS Config with the CA pool and enable Client certificate validation
@@ -505,7 +511,13 @@ func (s *Server) HandleRequests() {
 			TLSConfig: tlsConfig,
 		}
 
-		fmt.Printf("Starting to listen with TLS on %s...\n", s.ListenAddr)
+		fmt.Printf("Starting to listen with %s on %s...\n", tlsType, s.ListenAddr)
+		if _, err := os.Stat(s.CertPath); os.IsNotExist(err) {
+			log.Fatalf("File does not exist %s", s.CertPath)
+		}
+		if _, err := os.Stat(s.KeyPath); os.IsNotExist(err) {
+			log.Fatalf("File does not exist %s", s.KeyPath)
+		}
 		log.Fatal(server.ListenAndServeTLS(s.CertPath, s.KeyPath))
 		return
 	} else {
