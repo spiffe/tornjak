@@ -7,9 +7,22 @@ import tornjak_logo from "res/tornjak_logo.png";
 import {
   clickedDashboardTableFunc,
 } from 'redux/actions';
+import { RootState } from 'redux/reducers';
 
-class NavigationBar extends Component {
-  constructor(props) {
+type NavigationBarProp = {
+  // dispatches a payload for the clicked table in a dashboard as a string and has a return type of void
+  clickedDashboardTableFunc: (globalClickedDashboardTable: string) => void,
+  // the clicked dashboard table
+  globalClickedDashboardTable: string,
+}
+
+type NavigationBarState = {
+
+}
+
+
+class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
+  constructor(props: NavigationBarProp) {
     super(props);
     this.state = {};
   }
@@ -21,7 +34,7 @@ class NavigationBar extends Component {
       </div>
 
     return (
-      <div>
+      <div data-test="nav-bar">
         <div className="navigation-bar">
           <div className="dropdown-container">
             <div className="dropdown">
@@ -73,7 +86,13 @@ class NavigationBar extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({
+// Note: Needed for UI testing - will be removed after
+// NavigationBar.propTypes = {
+//   globalClickedDashboardTable: PropTypes.string,
+//   clickedDashboardTableFunc: PropTypes.func,
+// };
+
+const mapStateToProps = (state: RootState) => ({
   globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 })
 
@@ -81,3 +100,5 @@ export default connect(
   mapStateToProps,
   { clickedDashboardTableFunc }
 )(NavigationBar)
+
+export { NavigationBar }

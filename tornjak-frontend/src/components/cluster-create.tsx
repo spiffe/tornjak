@@ -62,7 +62,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
   TornjakApi: TornjakApi;
   constructor(props: ClusterCreateProp) {
     super(props);
-    this.TornjakApi = new TornjakApi();
+    this.TornjakApi = new TornjakApi(props);
     this.onChangeClusterName = this.onChangeClusterName.bind(this);
     this.onChangeClusterType = this.onChangeClusterType.bind(this);
     this.onChangeManualClusterType = this.onChangeManualClusterType.bind(this);

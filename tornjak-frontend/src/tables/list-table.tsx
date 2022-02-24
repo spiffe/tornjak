@@ -15,8 +15,20 @@ const {
 // deleteEntity: delete row function for specified entity
 // banEntity: ban row function for specified entity if applicable
 // returns data inside a carbon component table with specified functions for entity
-class DataTableRender extends React.Component {
-    constructor(props) {
+
+type DataTableRenderProp = {
+    listTableData: any,
+    headerData: any,
+    deleteEntity: any,
+    banEntity: any,
+    entityType: any
+}
+
+type DataTableRenderState = {
+    
+}
+class DataTableRender extends React.Component<DataTableRenderProp, DataTableRenderState> {
+    constructor(props: DataTableRenderProp) {
         super(props);
         this.state = {};
     }
@@ -33,7 +45,7 @@ class DataTableRender extends React.Component {
                     getHeaderProps,
                     getSelectionProps,
                     onInputChange,
-                    getPaginationProps,
+                    //getPaginationProps,
                     getBatchActionProps,
                     getTableContainerProps,
                     selectedRows,

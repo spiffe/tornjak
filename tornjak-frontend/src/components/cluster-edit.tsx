@@ -67,7 +67,7 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
   TornjakApi: TornjakApi;
   constructor(props: ClusterEditProp) {
     super(props);
-    this.TornjakApi = new TornjakApi();
+    this.TornjakApi = new TornjakApi(props);
     this.onChangeClusterNameList = this.onChangeClusterNameList.bind(this);
     this.onChangeClusterName = this.onChangeClusterName.bind(this);
     this.onChangeClusterType = this.onChangeClusterType.bind(this);

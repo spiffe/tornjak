@@ -58,7 +58,7 @@ class ClusterList extends Component<ClusterListProp, ClusterListState> {
   TornjakApi: TornjakApi;
   constructor(props: ClusterListProp) {
     super(props);
-    this.TornjakApi = new TornjakApi();
+    this.TornjakApi = new TornjakApi(props);
     this.state = {
       message: "",
     };

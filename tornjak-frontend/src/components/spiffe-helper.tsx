@@ -1,7 +1,15 @@
 import { Component } from 'react';
+import { AgentsList, EntriesList } from './types';
 
-class SpiffeHelper extends Component {
-  constructor(props) {
+type SpiffeHelperProp = {
+
+}
+
+type SpiffeHelperState = {
+  
+}
+class SpiffeHelper extends Component<SpiffeHelperProp, SpiffeHelperState> {
+  constructor(props: SpiffeHelperProp) {
     super(props);
     this.state = {
     };
@@ -10,26 +18,26 @@ class SpiffeHelper extends Component {
     return new Date().getTime()
   }
 
-  getAgentExpiryMillisecondsFromEpoch(entry) {
+  getAgentExpiryMillisecondsFromEpoch(entry: AgentsList) {
     if (typeof entry !== 'undefined') {
-      return entry.x509svid_expires_at * 1000
+      return Number(entry.x509svid_expires_at) * 1000
     }
     return ""
   }
 
-  getEntryExpiryMillisecondsFromEpoch(entry) {
+  getEntryExpiryMillisecondsFromEpoch(entry: { expires_at: number; }) {
     if (typeof entry !== 'undefined' && typeof entry.expires_at !== 'undefined') {
       return entry.expires_at * 1000
     }
     return ""
   }
 
-  getEntryAdminFlag(entry) {
+  getEntryAdminFlag(entry: { admin: any; }) {
     return typeof entry !== 'undefined' && typeof entry.admin !== 'undefined' && entry.admin;
   }
 
   // check if format strictly adhered to
-  checkSpiffeidValidity(trust_domain, path) {
+  checkSpiffeidValidity(trust_domain: string, path: string) {
     if (typeof trust_domain === 'undefined' || typeof path === 'undefined') {
       return false
     } else if (trust_domain.length === 0 || path.length === 0) {
@@ -42,28 +50,28 @@ class SpiffeHelper extends Component {
     return (trust_domain.slice(-1) !== "/" && path.charAt(0) === "/")
   }
 
-  getAgentSpiffeid(entry) {
+  getAgentSpiffeid(entry: AgentsList) {
     if (typeof entry !== 'undefined' && this.checkSpiffeidValidity(entry.id.trust_domain, entry.id.path)) {
       return "spiffe://" + entry.id.trust_domain + entry.id.path
     }
     return ""
   }
 
-  getEntrySpiffeid(entry) {
+  getEntrySpiffeid(entry: EntriesList) {
     if (typeof entry !== 'undefined' && this.checkSpiffeidValidity(entry.spiffe_id.trust_domain, entry.spiffe_id.path)) {
       return "spiffe://" + entry.spiffe_id.trust_domain + entry.spiffe_id.path
     }
     return ""
   }
 
-  getEntryParentid(entry) {
+  getEntryParentid(entry: EntriesList) {
     if (typeof entry !== 'undefined' && this.checkSpiffeidValidity(entry.parent_id.trust_domain, entry.parent_id.path)) {
       return "spiffe://" + entry.parent_id.trust_domain + entry.parent_id.path
     }
     return ""
   }
 
-  getAgentStatusString(entry) {
+  getAgentStatusString(entry: AgentsList) {
     if (typeof entry !== 'undefined') {
       var banned = entry.banned
       var status = "Expired"
@@ -79,9 +87,9 @@ class SpiffeHelper extends Component {
     return ""
   }
 
-  getAgentMetadata(spiffeid, metadataList) {
+  getAgentMetadata(spiffeid: any, metadataList: any[]) {
     if (typeof metadataList !== 'undefined') {
-      var metadata = metadataList.filter(agent => (agent.spiffeid === spiffeid));
+      var metadata = metadataList.filter((agent: { spiffeid: any; }) => (agent.spiffeid === spiffeid));
       if (metadata.length !== 0) {
         return metadata[0]
       }
@@ -91,8 +99,8 @@ class SpiffeHelper extends Component {
 
   // getAgentEntries provides an agent and a list of entries and returns
   // the list of entries which are associated with this agent
-  getAgentEntries(agent, entries) {
-    let nodeEntries = entries.filter(e => e.parent_id.path === "/spire/server")
+  getAgentEntries(agent: { selectors: any[] | undefined; } | undefined, entries: any[]) {
+    let nodeEntries = entries.filter((e: { parent_id: { path: string; }; }) => e.parent_id.path === "/spire/server")
     if (agent === undefined) {
       return [];
     }
@@ -100,7 +108,7 @@ class SpiffeHelper extends Component {
       agent.selectors = [];
     }
     let agentSelectors = new Set(agent.selectors.map(formatSelectors))
-    let isAssocWithAgent = e => {
+    let isAssocWithAgent = (e: { selectors: any[] | undefined; }) => {
       if (e.selectors === undefined) {
         e.selectors = [];
       }
@@ -125,15 +133,17 @@ class SpiffeHelper extends Component {
   // since the association with entries and agent selectors are likely to be 
   // n:1, this would reduce the total cost. This may be useful when 
   // performance is impacted.
-  getAgentsEntries(agents, entries) {
+  getAgentsEntries(agents: AgentsList[] | undefined, entries: EntriesList[] | undefined) {
     let nodeEntries = [];
     if (entries === undefined) {
       return undefined
     }
-    nodeEntries = entries.filter(e => e.parent_id.path === "/spire/server");
+    nodeEntries = entries.filter((e: { parent_id: { path: string; }; }) => e.parent_id.path === "/spire/server");
     var lambdas = [];
-    var agentEntriesDict = {};
-
+    var agentEntriesDict: any = {};
+    if(agents === undefined) {
+      return
+    }
     for (let i = 0; i < agents.length; i++) {
       let agent = agents[i];
       let agentId = this.getAgentSpiffeid(agent);
@@ -142,7 +152,7 @@ class SpiffeHelper extends Component {
         agent.selectors = [];
       }
       let agentSelectors = new Set(agent.selectors.map(formatSelectors));
-      let isAssocWithAgent = e => {
+      let isAssocWithAgent = (e: { selectors: any[] | undefined; }) => {
         if (e.selectors === undefined) {
           e.selectors = [];
         }
@@ -165,12 +175,12 @@ class SpiffeHelper extends Component {
 
   // getCanonicalAgentSpiffeid takes in a agent entry, and returns the first 
   // agent ID that is found associated with it.
-  getCanonicalAgentSpiffeid(entry, agents) {
+  getCanonicalAgentSpiffeid(entry: EntriesList, agents: AgentsList[]) {
     if (entry.selectors === undefined) {
       entry.selectors = [];
     }
     let entrySelectors = new Set(entry.selectors.map(formatSelectors));
-    let isAssocWithEntry = a => {
+    let isAssocWithEntry = (a: { selectors: any[] | undefined; }) => {
       if (a.selectors === undefined) {
         a.selectors = [];
       }
@@ -187,7 +197,7 @@ class SpiffeHelper extends Component {
 
   // numberEntriesOfAgent takes in an agent and list of entries
   // returns number of entries in the agent
-  numberEntriesOfAgent(agent, globalEntries) {
+  numberEntriesOfAgent(agent: AgentsList, globalEntries: EntriesList[] | undefined) {
     if (globalEntries === undefined) {
       return undefined
     }
@@ -198,7 +208,7 @@ class SpiffeHelper extends Component {
       validIds.add(this.getEntrySpiffeid(agentEntries[j]));
     }
 
-    var entriesList = globalEntries.filter(entry => {
+    var entriesList = globalEntries.filter((entry: EntriesList) => {
       return (typeof entry !== 'undefined') && validIds.has(this.getEntryParentid(entry));
     });
 
@@ -243,22 +253,22 @@ class SpiffeHelper extends Component {
 
   // getChildEntries takes in spiffeid of agent, list of agents, and a list of entries
   // returns list of child entries
-  getChildEntries(spiffeid, globalAgents, globalEntries) {
+  getChildEntries(spiffeid: string, globalAgents: any[], globalEntries: EntriesList[]) {
     if (typeof globalEntries === 'undefined') {
       return NaN;
     }
-    var curAgent = globalAgents.filter(agent => {
+    var curAgent = globalAgents.filter((agent: AgentsList) => {
       return this.getAgentSpiffeid(agent) === spiffeid
     })
-    var entriesList = globalEntries.filter(entry => {
+    var entriesList = globalEntries.filter((entry: EntriesList) => {
       return spiffeid === (this.getEntryParentid(entry))
     })
     // Add entries associated with this agent
     let agentEntriesDict = this.getAgentEntries(curAgent[0], globalEntries)
-    let agentEntries = agentEntriesDict[spiffeid];
+    let agentEntries: any = agentEntriesDict[spiffeid];
     let entriesAgent = [];
     if (agentEntries !== undefined) {
-      entriesAgent = agentEntries.map(cur => {
+      entriesAgent = agentEntries.map((cur: EntriesList) => {
         return this.getEntrySpiffeid(cur)
       })
     }
@@ -268,7 +278,7 @@ class SpiffeHelper extends Component {
 
 }
 
-function isSuperset(set, subset) {
+function isSuperset(set: Set<unknown>, subset: Set<unknown>) {
   for (let elem of subset) {
     if (!set.has(elem)) {
       return false
@@ -277,7 +287,7 @@ function isSuperset(set, subset) {
   return true
 }
 
-function formatSelectors(s) {
+function formatSelectors(s: { type: string; value: string; }) {
   return s.type + ":" + s.value;
 }
 

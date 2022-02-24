@@ -19,8 +19,20 @@ const {
 // banEntity: ban row function for specified entity if applicable
 // selectedRows: selectedRows from DataTable
 // returns the toolbar of the table for the specified entity
-class TableToolBar extends React.Component {
-    constructor(props) {
+type TableToolBarProp = {
+    deleteEntity: any,
+    banEntity: any,
+    onInputChange: any,
+    getBatchActionProps: any,
+    selectedRows: any,
+}
+
+type TableToolBarState = {
+
+}
+
+class TableToolBar extends React.Component<TableToolBarProp, TableToolBarState> {
+    constructor(props: TableToolBarProp) {
         super(props);
         this.state = {};
     }

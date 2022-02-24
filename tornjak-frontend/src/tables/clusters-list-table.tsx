@@ -7,12 +7,30 @@ import {
     clustersListUpdateFunc
 } from 'redux/actions';
 import Table from './list-table';
+import { ClustersList } from "components/types";
 
 // ClusterListTable takes in 
 // listTableData: clusters data to be rendered on table
 // returns clusters data inside a carbon component table with specified functions
-class ClustersListTable extends React.Component {
-    constructor(props) {
+
+type ClustersListTableProp = {
+    // dispatches a payload for list of clusters with their metadata info as an array of ClustersList Type and has a return type of void
+    clustersListUpdateFunc: (globalClustersList: ClustersList[]) => void,
+    data: any,
+    id: string,
+    // list of clusters with their metadata info as an array of ClustersList Type or can be undefined if no array present
+    globalClustersList: ClustersList[] | undefined,
+    // the selected server for manager mode 
+    globalServerSelected: string,
+}
+
+type ClustersListTableState = {
+    listData: any,
+    listTableData: { [x: string]: string; }[]
+    
+}
+class ClustersListTable extends React.Component<ClustersListTableProp, ClustersListTableState> {
+    constructor(props: ClustersListTableProp) {
         super(props);
         this.state = {
             listData: props.data,
@@ -25,7 +43,7 @@ class ClustersListTable extends React.Component {
     componentDidMount() {
         this.prepareTableData();
     }
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(prevProps: ClustersListTableProp) {
         if (prevProps !== this.props) {
             this.setState({
                 listData: this.props.globalClustersList
@@ -37,9 +55,9 @@ class ClustersListTable extends React.Component {
     prepareTableData() {
         const { data } = this.props;
         let listData = [...data];
-        let listtabledata = [];
+        let listtabledata: { id: string; clusterName: string; clusterType: string; clusterManagedBy: string; clusterDomainName: string; clusterAssignedAgents: any}[] = [];
         for (let i = 0; i < listData.length; i++) {
-            listtabledata[i] = {};
+            listtabledata[i] = {"id": "", "clusterName": "", "clusterType": "", "clusterManagedBy": "", "clusterDomainName": "", "clusterAssignedAgents": []};
             listtabledata[i]["id"] = (i + 1).toString();
             listtabledata[i]["clusterName"] = listData[i].props.cluster.name;
             listtabledata[i]["clusterType"] = listData[i].props.cluster.platformType;
@@ -52,8 +70,8 @@ class ClustersListTable extends React.Component {
         })
     }
 
-    deleteCluster(selectedRows) {
-        var cluster = [], endpoint = "";
+    deleteCluster(selectedRows: string | any[]) {
+        var cluster: { name: string; }[] = [], endpoint = "";
         let promises = [];
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/tornjak/clusters/delete') + "/" + this.props.globalServerSelected;
@@ -62,7 +80,7 @@ class ClustersListTable extends React.Component {
         }
         if (selectedRows.length !== 0) {
             for (let i = 0; i < selectedRows.length; i++) {
-                cluster[i] = {}
+                cluster[i] = {name: ""}
                 cluster[i]["name"] = selectedRows[i].cells[1].value;
                 promises.push(axios.post(endpoint, {
                     "cluster": {
@@ -75,6 +93,9 @@ class ClustersListTable extends React.Component {
         }
         Promise.all(promises)
             .then(responses => {
+                if(this.props.globalClustersList === undefined) {
+                    return
+                }
                 for (let i = 0; i < responses.length; i++) {
                     this.props.clustersListUpdateFunc(this.props.globalClustersList.filter(el =>
                         el.name !== cluster[i].name));
@@ -116,16 +137,17 @@ class ClustersListTable extends React.Component {
         return (
             <div>
                 <Table
+                    entityType={"Cluster"}
                     listTableData={listTableData}
                     headerData={headerData}
-                    deleteEntity={this.deleteCluster}
-                />
+                    deleteEntity={this.deleteCluster} 
+                    banEntity={undefined} />
             </div>
         );
     }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: { servers: { globalServerSelected: any; }; clusters: { globalClustersList: any; }; }) => ({
     globalServerSelected: state.servers.globalServerSelected,
     globalClustersList: state.clusters.globalClustersList,
 })

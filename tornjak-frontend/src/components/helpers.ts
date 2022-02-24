@@ -6,7 +6,7 @@ var urljoin = require('url-join');
 //console.log(process.env.API_SERVER_URI);
 const ApiServerUri = process.env["REACT_APP_API_SERVER_URI"]
 
-function GetApiServerUri (uri) {
+export default function GetApiServerUri (uri: string): string {
     if (ApiServerUri) {
         return urljoin(ApiServerUri, uri)
     } else {
@@ -14,8 +14,6 @@ function GetApiServerUri (uri) {
     }
 }
 
-module.exports = GetApiServerUri;
-
-
+//module.exports = GetApiServerUri;
 // IS_MANAGER
 

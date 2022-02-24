@@ -1,5 +1,7 @@
 // agents
 
+import { Tracing } from "puppeteer";
+
 export interface SPIFFEID {
   // From https://github.com/spiffe/spire-api-sdk/blob/main/proto/spire/api/types/spiffeid.pb.go
   // Trust domain portion the SPIFFE ID (e.g. "example.org")
@@ -25,6 +27,7 @@ export interface AgentsList {
   x509svid_serial_number: string; // The X509-SVID serial number.
   x509svid_expires_at: bigint; //  The X509-SVID expiration (seconds since Unix epoch).
   selectors: Array<Selector>; // The selectors attributed to the agent during attestation.
+  banned: boolean;
 }
 
 export interface AgentsWorkLoadAttestorInfo {
@@ -94,4 +97,11 @@ export interface TornjakServerInfo {
 export interface ServerInfo {
   trustDomain: string; // Trust domain of server
   nodeAttestorPlugin: string; // Node Attestor Plugin of server
+}
+
+export interface ServerList {
+  name: string;
+  address: string;
+  mtls: boolean;
+  tls: boolean;
 }

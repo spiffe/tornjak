@@ -97,8 +97,8 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   SpiffeHelper: SpiffeHelper;
   constructor(props: CreateEntryProp) {
     super(props);
-    this.TornjakApi = new TornjakApi();
-    this.SpiffeHelper = new SpiffeHelper();
+    this.TornjakApi = new TornjakApi(props);
+    this.SpiffeHelper = new SpiffeHelper(props);
     this.onChangeSelectors = this.onChangeSelectors.bind(this);
     this.onChangeSpiffeId = this.onChangeSpiffeId.bind(this);
     this.onChangeParentId = this.onChangeParentId.bind(this);
@@ -236,7 +236,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
         return
       }
       // note: array of objects for now - will be specifically typed when spiffehelper file is typed
-      let agentEntries: Object[] = agentEntriesDict[agentSpiffeid];
+      let agentEntries: EntriesList[] = agentEntriesDict[agentSpiffeid];
       if (agentEntries !== undefined) {
         for (let j = 0; j < agentEntries.length; j++) {
           localAgentsIdList[idx] = this.SpiffeHelper.getEntrySpiffeid(agentEntries[j]);
