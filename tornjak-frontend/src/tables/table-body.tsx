@@ -1,6 +1,7 @@
 import React from "react";
-import { DataTable } from "carbon-components-react";
+import { DataTable, DataTableCell, DataTableCustomSelectionData, DataTableCustomSelectionProps, DataTableRow, DenormalizedRow } from "carbon-components-react";
 import WorkLoadAttestor from 'components/work-load-attestor-modal';
+import { ShapeOf } from "carbon-components-react/typings/shared";
 const {
     TableBody,
     TableRow,
@@ -15,14 +16,15 @@ const {
 // returns the body of the table for the specified entity
 
 type BodyProp = {
-    rows: any,
-    entityType: any,
-    getSelectionProps: any,
+    rows: readonly DenormalizedRow[],
+    entityType: string,
+    getSelectionProps: <E extends object = {}>(data?: ShapeOf<DataTableCustomSelectionData<DataTableRow<string>>, E> | undefined) => ShapeOf<DataTableCustomSelectionProps<DataTableRow<string>>, E> | ShapeOf<DataTableCustomSelectionProps<never>, E>,
 }
 
 type BodyState = {
     
 }
+
 class Body extends React.Component<BodyProp, BodyState> {
     constructor(props: BodyProp) {
         super(props);
@@ -32,10 +34,10 @@ class Body extends React.Component<BodyProp, BodyState> {
     render() {
         return (
             <TableBody>
-                {this.props.rows.map((row: { cells: any[]; }, key: React.Key | null | undefined) => (
+                {this.props.rows.map((row: { cells: DataTableCell[]; } & DataTableRow<string>, key: React.Key | null | undefined) => (
                     <TableRow key={key}>
                         <TableSelectRow {...this.props.getSelectionProps({ row })} />
-                        {row.cells.map((cell: { id: React.Key | null | undefined; info: { header: string; }; value: {} | null | undefined; }) => (
+                        {row.cells.map((cell) => (
                             <TableCell key={cell.id}>
                                 {cell.info.header === "info" ? (
                                     <div style={{ overflowX: 'auto', width: "400px" }}>

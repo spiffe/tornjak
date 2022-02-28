@@ -1,5 +1,5 @@
 import React from "react";
-import { DataTable } from "carbon-components-react";
+import { DataTable, DataTableHeader, DataTableRow, DenormalizedRow } from "carbon-components-react";
 import ToolBar from './table-toolbar';
 import Head from './table-head';
 import Body from './table-body';
@@ -17,16 +17,15 @@ const {
 // returns data inside a carbon component table with specified functions for entity
 
 type DataTableRenderProp = {
-    listTableData: any,
-    headerData: any,
-    deleteEntity: any,
-    banEntity: any,
-    entityType: any
+    listTableData: DataTableRow<string>[],
+    headerData: DataTableHeader<string>[],
+    deleteEntity: (selectedRows: readonly DenormalizedRow[]) => string | undefined | void,
+    banEntity: ((selectedRows: readonly DenormalizedRow[]) => string | undefined | void) | undefined,
+    entityType: string
 }
 
-type DataTableRenderState = {
-    
-}
+type DataTableRenderState = {}
+
 class DataTableRender extends React.Component<DataTableRenderProp, DataTableRenderState> {
     constructor(props: DataTableRenderProp) {
         super(props);

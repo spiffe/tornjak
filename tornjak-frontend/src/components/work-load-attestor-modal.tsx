@@ -1,5 +1,5 @@
 import React from "react";
-import { ModalWrapper, Dropdown, TextArea } from "carbon-components-react";
+import { ModalWrapper, Dropdown, TextArea, DataTableCell } from "carbon-components-react";
 import { connect } from 'react-redux';
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
@@ -16,14 +16,14 @@ type WorkLoadAttestorProp = {
     agentsListUpdateFunc: (globalAgentsList: AgentsList[]) => void,
     // dispatches a payload for the workload selector info for the agents and has a return type of void
     agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void,
-    spiffeid: any,
+    spiffeid: string,
      // the selected server for manager mode 
     globalServerSelected: string,
     // list of available agents as array of AgentsListType or can be undefined if no array present
     globalAgentsList: AgentsList[] | undefined,
     // the list of available workload selectors and their options
     globalWorkloadSelectorInfo: {[index:string]: {label: string}[]},
-    agentData: any,
+    agentData: { cells: DataTableCell[] } ,
 }
 
 type WorkLoadAttestorState = {

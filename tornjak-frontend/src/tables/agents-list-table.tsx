@@ -8,6 +8,8 @@ import {
 } from 'redux/actions';
 import Table from './list-table';
 import { AgentsList, AgentsWorkLoadAttestorInfo } from "components/types";
+import { DenormalizedRow } from "carbon-components-react";
+import { RootState } from "redux/reducers";
 
 // AgentListTable takes in 
 // listTableData: agents data to be rendered on table
@@ -23,13 +25,16 @@ type AgentsListTableProp = {
     // the selected server for manager mode 
     globalServerSelected: string,
     //
-    data: any,
+    data: {
+        key: string, 
+        props: {agent: AgentsList}
+    }[] | string | JSX.Element[],
     id: string
 }
 
 type AgentsListTableState = {
-    listData: any,
-    listTableData: { [x: string]: string; }[]
+    listData: {key: string, props: {agent: AgentsList}}[] | AgentsList[] | undefined | string | JSX.Element[],
+    listTableData: { id: string, [x: string]: string; }[]
 }
 class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTableState> {
     constructor(props: AgentsListTableProp) {
@@ -57,10 +62,13 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
 
     prepareTableData() {
         const { data } = this.props;
-        let listData = [...data];
-        let listtabledata: { [x: string]: string; }[] = [];
+        let listData: { props: { agent: AgentsList; }; }[] | ({ key: string; props: { agent: AgentsList; }; } | JSX.Element)[] = [];
+        if(typeof(data) === "string" || data === undefined)
+            return
+        data.forEach(val => listData.push(Object.assign({}, val)));
+        let listtabledata: { id: string, [x: string]: string; }[] = [];
         for (let i = 0; i < listData.length; i++) {
-            listtabledata[i] = {};
+            listtabledata[i] = {"id": ""};
             listtabledata[i]["id"] = (i + 1).toString();
             listtabledata[i]["trustdomain"] = listData[i].props.agent.id.trust_domain;
             listtabledata[i]["spiffeid"] = "spiffe://" + listData[i].props.agent.id.trust_domain + listData[i].props.agent.id.path;
@@ -82,7 +90,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
         })
     }
 
-    deleteAgent(selectedRows: string | any[] | undefined) {
+    deleteAgent(selectedRows: readonly DenormalizedRow[]) {
         var id: { path: string; trust_domain: string; }[] = [], endpoint = "", prefix = "spiffe://";
         let promises = [];
         if (IsManager) {
@@ -121,7 +129,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
             })
     }
 
-    banAgent(selectedRows: string | any[] | undefined) {
+    banAgent(selectedRows: readonly DenormalizedRow[]) {
         var id: { path: string; trust_domain: string; }[] = [], i = 0, endpoint = "", prefix = "spiffe://";
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/agent/ban') + "/" + this.props.globalServerSelected
@@ -189,7 +197,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
     }
 }
 
-const mapStateToProps = (state: { servers: { globalServerSelected: any; }; agents: { globalAgentsList: any; globalAgentsWorkLoadAttestorInfo: any; }; }) => ({
+const mapStateToProps = (state: RootState) => ({
     globalServerSelected: state.servers.globalServerSelected,
     globalAgentsList: state.agents.globalAgentsList,
     globalAgentsWorkLoadAttestorInfo: state.agents.globalAgentsWorkLoadAttestorInfo,

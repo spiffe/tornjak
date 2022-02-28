@@ -69,7 +69,7 @@ class TornjakServerInfo extends Component<TornjakServerInfoProp, TornjakServerIn
   TornjakApi: TornjakApi;
   constructor(props:TornjakServerInfoProp) {
     super(props);
-    this.TornjakApi = new TornjakApi();
+    this.TornjakApi = new TornjakApi(props);
     this.state = {};
   }
 
@@ -92,7 +92,7 @@ class TornjakServerInfo extends Component<TornjakServerInfoProp, TornjakServerIn
   }
 
   tornjakServerInfo() {
-    if (this.props.globalTornjakServerInfo && Object.keys(this.props.globalTornjakServerInfo).length) {
+    if (!this.props.globalTornjakServerInfo || Object.keys(this.props.globalTornjakServerInfo).length === 0) {
       return ""
     } else {
       return <TornjakServerInfoDisplay tornjakServerInfo={this.props.globalTornjakServerInfo} />

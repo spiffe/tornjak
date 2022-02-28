@@ -9,6 +9,7 @@ import {
 import Table from './list-table';
 import { EntriesList } from "components/types";
 import { RootState } from "redux/reducers";
+import { DenormalizedRow } from "carbon-components-react";
 
 // EntriesListTable takes in 
 // listTableData: entries data to be rendered on table
@@ -17,7 +18,11 @@ import { RootState } from "redux/reducers";
 type EntriesListTableProp = {
     // dispatches a payload for list of entries with their metadata info as an array of EntriesListType and has a return type of void
     entriesListUpdateFunc: (globalEntriesList: EntriesList[]) => void,
-    data: any,
+    // data provided to the entries table
+    data: {
+        key: string, 
+        props: {entry: EntriesList}
+    }[] | string | JSX.Element[],
     id: string,
     // list of available entries as array of EntriesListType or can be undefined if no array present
     globalEntriesList: EntriesList[] | undefined,
@@ -26,9 +31,10 @@ type EntriesListTableProp = {
 }
 
 type EntriesListTableState = {
-    listData: any,
-    listTableData: { [x: string]: string; }[]
+    listData: {key: string, props: {entry: EntriesList}}[] | EntriesList[] | undefined | string | JSX.Element[],
+    listTableData: { id: string, [x: string]: string; }[]
 }
+
 class EntriesListTable extends React.Component<EntriesListTableProp, EntriesListTableState> {
     constructor(props: EntriesListTableProp) {
         super(props);
@@ -54,8 +60,11 @@ class EntriesListTable extends React.Component<EntriesListTableProp, EntriesList
 
     prepareTableData() {
         const { data } = this.props;
-        let listData = [...data];
-        let listtabledata: { idx: string; id: string; spiffeid: string; parentid: string; selectors: any; info: string }[] = [];
+        let listData: { props: { entry: EntriesList; }; }[] | ({ key: string; props: { entry: EntriesList; }; } | JSX.Element)[] = [];
+        if(typeof(data) === "string" || data === undefined)
+            return
+        data.forEach(val => listData.push(Object.assign({}, val)));
+        let listtabledata: { idx: string; id: string; spiffeid: string; parentid: string; selectors: string; info: string }[] = [];
         let i = 0;
         for (i = 0; i < listData.length; i++) {
             listtabledata[i] = { "idx": "", "id": "", "spiffeid": "", "parentid": "", "selectors": "", "info": "" };
@@ -71,7 +80,7 @@ class EntriesListTable extends React.Component<EntriesListTableProp, EntriesList
         })
     }
 
-    deleteEntry(selectedRows: string | any[]) {
+    deleteEntry(selectedRows: readonly DenormalizedRow[]) {
         var id = [], endpoint = "";
         let promises = [];
         if (IsManager) {

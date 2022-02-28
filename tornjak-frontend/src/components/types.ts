@@ -1,7 +1,5 @@
 // agents
 
-import { Tracing } from "puppeteer";
-
 export interface SPIFFEID {
   // From https://github.com/spiffe/spire-api-sdk/blob/main/proto/spire/api/types/spiffeid.pb.go
   // Trust domain portion the SPIFFE ID (e.g. "example.org")
@@ -104,4 +102,16 @@ export interface ServerList {
   address: string;
   mtls: boolean;
   tls: boolean;
+}
+
+// tornjak
+
+export interface RowCells {
+  errors: null;
+  id: string;
+  info : { header: string };
+  isEditable: boolean
+  isEditing: boolean
+  isValid: boolean
+  value: string
 }

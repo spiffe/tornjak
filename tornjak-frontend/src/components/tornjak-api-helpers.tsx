@@ -1,6 +1,8 @@
 import { Component } from 'react';
 import axios from 'axios';
-import GetApiServerUri from './helpers';
+// eslint-disable-next-line
+import AxiosRequestConfig from '../../axios'
+import GetApiServerUri from './helpers'; 
 import {
   AgentsList,
   AgentsWorkLoadAttestorInfo,
@@ -10,13 +12,9 @@ import {
   ClustersList
 } from './types';
 
-type TornjakApiProp = {
+type TornjakApiProp = {}
+type TornjakApiState = {}
 
-}
-
-type TornjakApiState = {
-
-}
 class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   constructor(props: TornjakApiProp) {
     super(props);
@@ -35,7 +33,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 
   registerSelectors = (serverName: string, wLoadAttdata: { spiffeid: string; plugin: string; },
-    refreshSelectorsState: { (serverName: any, agentworkloadSelectorInfoFunc: any): void; },
+    refreshSelectorsState: { (serverName: string, agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void): void; },
     agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void) => {
     axios.post(GetApiServerUri('/manager-api/tornjak/selectors/register/') + serverName, wLoadAttdata)
       .then(res => {
@@ -49,7 +47,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 
   registerLocalSelectors = (wLoadAttdata: { spiffeid: string; plugin: string; },
-    refreshLocalSelectorsState: { (agentworkloadSelectorInfoFunc: any): void; },
+    refreshLocalSelectorsState: { (agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void): void; },
     agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void) => {
     axios.post(GetApiServerUri('/api/tornjak/selectors/register'), wLoadAttdata)
       .then(res => {

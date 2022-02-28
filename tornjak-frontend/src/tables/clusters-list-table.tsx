@@ -8,6 +8,8 @@ import {
 } from 'redux/actions';
 import Table from './list-table';
 import { ClustersList } from "components/types";
+import { DenormalizedRow } from "carbon-components-react";
+import { RootState } from "redux/reducers";
 
 // ClusterListTable takes in 
 // listTableData: clusters data to be rendered on table
@@ -16,7 +18,11 @@ import { ClustersList } from "components/types";
 type ClustersListTableProp = {
     // dispatches a payload for list of clusters with their metadata info as an array of ClustersList Type and has a return type of void
     clustersListUpdateFunc: (globalClustersList: ClustersList[]) => void,
-    data: any,
+    // data provided to the clusters table
+    data: {
+        key: string, 
+        props: {cluster: ClustersList}
+    }[] | string | JSX.Element[],
     id: string,
     // list of clusters with their metadata info as an array of ClustersList Type or can be undefined if no array present
     globalClustersList: ClustersList[] | undefined,
@@ -25,8 +31,15 @@ type ClustersListTableProp = {
 }
 
 type ClustersListTableState = {
-    listData: any,
-    listTableData: { [x: string]: string; }[]
+    listData: {key: string, props: {cluster: ClustersList}}[] | ClustersList[] | undefined | string | JSX.Element[],
+    listTableData: { 
+        id: string; 
+        clusterName: string; 
+        clusterType: string; 
+        clusterManagedBy: string; 
+        clusterDomainName: string; 
+        clusterAssignedAgents: {props: {children: string}}
+    }[]
     
 }
 class ClustersListTable extends React.Component<ClustersListTableProp, ClustersListTableState> {
@@ -34,7 +47,7 @@ class ClustersListTable extends React.Component<ClustersListTableProp, ClustersL
         super(props);
         this.state = {
             listData: props.data,
-            listTableData: [{ "id": "0" }],
+            listTableData: [],
         };
         this.prepareTableData = this.prepareTableData.bind(this);
         this.deleteCluster = this.deleteCluster.bind(this);
@@ -54,10 +67,13 @@ class ClustersListTable extends React.Component<ClustersListTableProp, ClustersL
 
     prepareTableData() {
         const { data } = this.props;
-        let listData = [...data];
-        let listtabledata: { id: string; clusterName: string; clusterType: string; clusterManagedBy: string; clusterDomainName: string; clusterAssignedAgents: any}[] = [];
+        let listData: { props: { cluster: ClustersList; }; }[] | ({ key: string; props: { cluster: ClustersList; }; } | JSX.Element)[] = [];
+        if(typeof(data) === "string" || data === undefined)
+            return
+        data.forEach(val => listData.push(Object.assign({}, val)));
+        let listtabledata: { id: string; clusterName: string; clusterType: string; clusterManagedBy: string; clusterDomainName: string; clusterAssignedAgents: {props: {children: string}}}[] = [];
         for (let i = 0; i < listData.length; i++) {
-            listtabledata[i] = {"id": "", "clusterName": "", "clusterType": "", "clusterManagedBy": "", "clusterDomainName": "", "clusterAssignedAgents": []};
+            listtabledata[i] = {id: "", clusterName: "", clusterType: "", clusterManagedBy: "", clusterDomainName: "", clusterAssignedAgents: {props: { children: ""}}};
             listtabledata[i]["id"] = (i + 1).toString();
             listtabledata[i]["clusterName"] = listData[i].props.cluster.name;
             listtabledata[i]["clusterType"] = listData[i].props.cluster.platformType;
@@ -65,12 +81,13 @@ class ClustersListTable extends React.Component<ClustersListTableProp, ClustersL
             listtabledata[i]["clusterDomainName"] = listData[i].props.cluster.domainName;
             listtabledata[i]["clusterAssignedAgents"] = <pre>{JSON.stringify(listData[i].props.cluster.agentsList, null, ' ')}</pre>
         }
+        console.log(listtabledata)
         this.setState({
             listTableData: listtabledata
         })
     }
 
-    deleteCluster(selectedRows: string | any[]) {
+    deleteCluster(selectedRows: readonly DenormalizedRow[]) {
         var cluster: { name: string; }[] = [], endpoint = "";
         let promises = [];
         if (IsManager) {
@@ -147,7 +164,7 @@ class ClustersListTable extends React.Component<ClustersListTableProp, ClustersL
     }
 }
 
-const mapStateToProps = (state: { servers: { globalServerSelected: any; }; clusters: { globalClustersList: any; }; }) => ({
+const mapStateToProps = (state: RootState) => ({
     globalServerSelected: state.servers.globalServerSelected,
     globalClustersList: state.clusters.globalClustersList,
 })

@@ -1,13 +1,9 @@
 import { Component } from 'react';
-import { AgentsList, EntriesList } from './types';
+import { AgentsList, AgentsWorkLoadAttestorInfo, EntriesList } from './types';
 
-type SpiffeHelperProp = {
+type SpiffeHelperProp = {}
+type SpiffeHelperState = {}
 
-}
-
-type SpiffeHelperState = {
-  
-}
 class SpiffeHelper extends Component<SpiffeHelperProp, SpiffeHelperState> {
   constructor(props: SpiffeHelperProp) {
     super(props);
@@ -25,14 +21,14 @@ class SpiffeHelper extends Component<SpiffeHelperProp, SpiffeHelperState> {
     return ""
   }
 
-  getEntryExpiryMillisecondsFromEpoch(entry: { expires_at: number; }) {
+  getEntryExpiryMillisecondsFromEpoch(entry: EntriesList) {
     if (typeof entry !== 'undefined' && typeof entry.expires_at !== 'undefined') {
       return entry.expires_at * 1000
     }
     return ""
   }
 
-  getEntryAdminFlag(entry: { admin: any; }) {
+  getEntryAdminFlag(entry: EntriesList) {
     return typeof entry !== 'undefined' && typeof entry.admin !== 'undefined' && entry.admin;
   }
 
@@ -87,7 +83,7 @@ class SpiffeHelper extends Component<SpiffeHelperProp, SpiffeHelperState> {
     return ""
   }
 
-  getAgentMetadata(spiffeid: any, metadataList: any[]) {
+  getAgentMetadata(spiffeid: string, metadataList: AgentsWorkLoadAttestorInfo[]) {
     if (typeof metadataList !== 'undefined') {
       var metadata = metadataList.filter((agent: { spiffeid: any; }) => (agent.spiffeid === spiffeid));
       if (metadata.length !== 0) {
@@ -99,7 +95,7 @@ class SpiffeHelper extends Component<SpiffeHelperProp, SpiffeHelperState> {
 
   // getAgentEntries provides an agent and a list of entries and returns
   // the list of entries which are associated with this agent
-  getAgentEntries(agent: { selectors: any[] | undefined; } | undefined, entries: any[]) {
+  getAgentEntries(agent: AgentsList, entries: EntriesList[]) {
     let nodeEntries = entries.filter((e: { parent_id: { path: string; }; }) => e.parent_id.path === "/spire/server")
     if (agent === undefined) {
       return [];
@@ -140,7 +136,7 @@ class SpiffeHelper extends Component<SpiffeHelperProp, SpiffeHelperState> {
     }
     nodeEntries = entries.filter((e: { parent_id: { path: string; }; }) => e.parent_id.path === "/spire/server");
     var lambdas = [];
-    var agentEntriesDict: any = {};
+    var agentEntriesDict: { [key: string]: EntriesList[]; } = {};
     if(agents === undefined) {
       return
     }
@@ -152,7 +148,7 @@ class SpiffeHelper extends Component<SpiffeHelperProp, SpiffeHelperState> {
         agent.selectors = [];
       }
       let agentSelectors = new Set(agent.selectors.map(formatSelectors));
-      let isAssocWithAgent = (e: { selectors: any[] | undefined; }) => {
+      let isAssocWithAgent = (e: EntriesList) => {
         if (e.selectors === undefined) {
           e.selectors = [];
         }
@@ -169,7 +165,6 @@ class SpiffeHelper extends Component<SpiffeHelperProp, SpiffeHelperState> {
         lambdas[j](nodeEntries[i])
       }
     }
-
     return agentEntriesDict
   }
 
@@ -253,7 +248,7 @@ class SpiffeHelper extends Component<SpiffeHelperProp, SpiffeHelperState> {
 
   // getChildEntries takes in spiffeid of agent, list of agents, and a list of entries
   // returns list of child entries
-  getChildEntries(spiffeid: string, globalAgents: any[], globalEntries: EntriesList[]) {
+  getChildEntries(spiffeid: string, globalAgents: AgentsList[], globalEntries: EntriesList[]) {
     if (typeof globalEntries === 'undefined') {
       return NaN;
     }
@@ -264,7 +259,8 @@ class SpiffeHelper extends Component<SpiffeHelperProp, SpiffeHelperState> {
       return spiffeid === (this.getEntryParentid(entry))
     })
     // Add entries associated with this agent
-    let agentEntriesDict = this.getAgentEntries(curAgent[0], globalEntries)
+    let agentEntriesDict: any = this.getAgentEntries(curAgent[0], globalEntries)
+    console.log("agentEntriesDict", agentEntriesDict)
     let agentEntries: any = agentEntriesDict[spiffeid];
     let entriesAgent = [];
     if (agentEntries !== undefined) {
