@@ -16,8 +16,11 @@ import (
 
 var (
 	jsonContentType string = "application/json"
-	keyShowLen      int    = 40
-	certShowLen     int    = 50
+)
+
+const (
+	keyShowLen  int = 40
+	certShowLen int = 50
 )
 
 type Server struct {
@@ -75,22 +78,32 @@ func (s *Server) apiServerProxyFunc(apiPath string) func(w http.ResponseWriter, 
 			return
 		}
 
-		// Show the end of certs and key for debugging
-		var certSub, caSub, keySub string
-		certStr := string(sinfo.CA)
-		if len(string(certStr)) > certShowLen {
-			certSub = "\n..." + certStr[len(certStr)-certShowLen:len(certStr)]
+		// Gather the certs and key into a map
+		cMap := make(map[string]string)
+		cMap["CA"] = string(sinfo.CA)
+		cMap["cert"] = string(sinfo.Cert)
+		cMap["key"] = string(sinfo.Key)
+
+		// Iterate through the map and trim the values for debugging.
+		// Show the endings only
+		for k, v := range cMap {
+			if k == "key" {
+				if len(v) > keyShowLen {
+					cMap[k] = "\n..." + v[len(v)-keyShowLen:]
+				}
+			} else {
+				if len(v) > certShowLen {
+					cMap[k] = "\n..." + v[len(v)-certShowLen:]
+				}
+			}
 		}
-		caStr := string(sinfo.Cert)
-		if len(string(caStr)) > certShowLen {
-			caSub = "\n..." + caStr[len(caStr)-certShowLen:len(caStr)]
+		fmt.Printf("Name:%s\n Address:%s\n TLS:%t, mTLS:%t\n", sinfo.Name, sinfo.Address, sinfo.TLS, sinfo.MTLS)
+		if sinfo.TLS {
+			fmt.Printf("CA:%s\n", cMap["CA"])
 		}
-		keyStr := string(sinfo.Key)
-		if len(string(keyStr)) > keyShowLen {
-			keySub = "\n..." + keyStr[len(keyStr)-keyShowLen:len(keyStr)]
+		if sinfo.MTLS {
+			fmt.Printf("Cert:%s\n Key:%s\n", cMap["cert"], cMap["key"])
 		}
-		fmt.Printf("Name:%s\n Address:%s\n TLS:%t, mTLS:%t\n CA:%s\n Cert:%s\n Key:%s\n", sinfo.Name, sinfo.Address, sinfo.TLS, sinfo.MTLS,
-			certSub, caSub, keySub)
 
 		client, err := sinfo.HttpClient()
 		if err != nil {
