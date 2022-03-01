@@ -21,6 +21,7 @@ type cliOptions struct {
 		listenAddr string
 		certPath   string
 		keyPath    string
+		mtlsCaPath string
 		tls        bool
 		mtls       bool
 	}
@@ -63,15 +64,22 @@ func main() {
 					&cli.StringFlag{
 						Name:        "cert",
 						Value:       "",
-						Usage:       "CA Cert path for TLS/mTLS",
+						Usage:       "CA Cert path for TLS",
 						Destination: &opt.httpOptions.certPath,
 						Required:    false,
 					},
 					&cli.StringFlag{
 						Name:        "key",
 						Value:       "",
-						Usage:       "Key path for TLS/mTLS",
+						Usage:       "Key path for TLS",
 						Destination: &opt.httpOptions.keyPath,
+						Required:    false,
+					},
+					&cli.StringFlag{
+						Name:        "mtls-ca",
+						Value:       "",
+						Usage:       "CA path for mTLS CA",
+						Destination: &opt.httpOptions.mtlsCaPath,
 						Required:    false,
 					},
 					&cli.BoolFlag{
@@ -140,6 +148,7 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 			ListenAddr:      opt.httpOptions.listenAddr,
 			CertPath:        opt.httpOptions.certPath,
 			KeyPath:         opt.httpOptions.keyPath,
+			MTlsCaPath:      opt.httpOptions.mtlsCaPath,
 			TlsEnabled:      opt.httpOptions.tls,
 			MTlsEnabled:     opt.httpOptions.mtls,
 			SpireServerInfo: serverInfo,

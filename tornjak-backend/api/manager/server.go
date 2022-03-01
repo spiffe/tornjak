@@ -18,6 +18,11 @@ var (
 	jsonContentType string = "application/json"
 )
 
+const (
+	keyShowLen  int = 40
+	certShowLen int = 50
+)
+
 type Server struct {
 	listenAddr string
 	db         managerdb.ManagerDB
@@ -72,7 +77,33 @@ func (s *Server) apiServerProxyFunc(apiPath string) func(w http.ResponseWriter, 
 			retError(w, emsg, http.StatusBadRequest)
 			return
 		}
-		fmt.Printf("%+v\n", sinfo)
+
+		// Gather the certs and key into a map
+		cMap := make(map[string]string)
+		cMap["CA"] = string(sinfo.CA)
+		cMap["cert"] = string(sinfo.Cert)
+		cMap["key"] = string(sinfo.Key)
+
+		// Iterate through the map and trim the values for debugging.
+		// Show the endings only
+		for k, v := range cMap {
+			if k == "key" {
+				if len(v) > keyShowLen {
+					cMap[k] = "\n..." + v[len(v)-keyShowLen:]
+				}
+			} else {
+				if len(v) > certShowLen {
+					cMap[k] = "\n..." + v[len(v)-certShowLen:]
+				}
+			}
+		}
+		fmt.Printf("Name:%s\n Address:%s\n TLS:%t, mTLS:%t\n", sinfo.Name, sinfo.Address, sinfo.TLS, sinfo.MTLS)
+		if sinfo.TLS {
+			fmt.Printf("CA:%s\n", cMap["CA"])
+		}
+		if sinfo.MTLS {
+			fmt.Printf("Cert:%s\n Key:%s\n", cMap["cert"], cMap["key"])
+		}
 
 		client, err := sinfo.HttpClient()
 		if err != nil {
