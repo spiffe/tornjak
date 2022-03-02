@@ -11,7 +11,7 @@ import {
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
 
-import { 
+import {
   TornjakServerInfo as TornjakServInfo,
 } from './types';
 
@@ -24,7 +24,7 @@ const pluginTagColorMapper: { [key: string]: TagTypeName | undefined; } = {
   "DataStore": "purple",
 }
 
-type TornjakServerInfoProp = { 
+type TornjakServerInfoProp = {
   // dispatches a payload for the tornjak server info of the selected server and has a return type of void
   tornjakServerInfoUpdateFunc: (globalTornjakServerInfo: TornjakServInfo) => void,
   // dispatches a payload for an Error Message/ Success Message of an executed function as a string and has a return type of void
@@ -39,10 +39,10 @@ type TornjakServerInfoProp = {
 
 type TornjakServerInfoState = {}
 
-const PluginTags = (props: {names: any, type: string}) => (
+const PluginTags = (props: { names: string[], type: string }) => (
   <p>{props.names.map((v: string) => <Tag type={pluginTagColorMapper[props.type]} >{props.type + ": " + v}</Tag>)}</p>
 )
-const TornjakServerInfoDisplay = (props: { tornjakServerInfo: any }) => (
+const TornjakServerInfoDisplay = (props: { tornjakServerInfo: TornjakServInfo }) => (
   <Accordion>
     <AccordionItem title="Trust Domain" open>
       <p>
@@ -67,7 +67,7 @@ const TornjakServerInfoDisplay = (props: { tornjakServerInfo: any }) => (
 
 class TornjakServerInfo extends Component<TornjakServerInfoProp, TornjakServerInfoState> {
   TornjakApi: TornjakApi;
-  constructor(props:TornjakServerInfoProp) {
+  constructor(props: TornjakServerInfoProp) {
     super(props);
     this.TornjakApi = new TornjakApi(props);
     this.state = {};
@@ -83,7 +83,7 @@ class TornjakServerInfo extends Component<TornjakServerInfoProp, TornjakServerIn
     }
   }
 
-  componentDidUpdate(prevProps:TornjakServerInfoProp) {
+  componentDidUpdate(prevProps: TornjakServerInfoProp) {
     if (IsManager) {
       if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
         this.TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc)
@@ -117,7 +117,7 @@ class TornjakServerInfo extends Component<TornjakServerInfoProp, TornjakServerIn
   }
 }
 
-const mapStateToProps = (state:RootState) => ({
+const mapStateToProps = (state: RootState) => ({
   globalServerSelected: state.servers.globalServerSelected,
   globalServerInfo: state.servers.globalServerInfo,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,

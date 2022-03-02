@@ -96,7 +96,7 @@ class SelectServer extends Component<SelectServerProp, SelectServerState> {
 
     serverDropdownList() {
         if (typeof this.props.globalServersList !== 'undefined') {
-            return this.props.globalServersList.map((server: any) => {
+            return this.props.globalServersList.map((server: any) => { // remove any when working on manager component
                 return <ServerDropdown key={server.name}
                     name={server.name} />
             })
@@ -117,7 +117,7 @@ class SelectServer extends Component<SelectServerProp, SelectServerState> {
 
     getServer(serverName: string) {
         var i;
-        const servers: any = this.props.globalServersList
+        const servers: any = this.props.globalServersList // remove any when working on manager component
         for (i = 0; i < servers.length; i++) {
             if (servers[i].name === serverName) {
                 return servers[i]

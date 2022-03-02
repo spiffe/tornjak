@@ -6,6 +6,13 @@ import { Component, ReactNode } from 'react';
 import SpiffeHelper from './spiffe-helper';
 import { AgentsList, AgentsWorkLoadAttestorInfo, ClustersList, EntriesList } from './types';
 
+interface DetailDataParseProp {
+  globalClustersList: ClustersList[], 
+  globalAgentsList: AgentsList[], 
+  globalEntriesList: EntriesList[], 
+  globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[],
+
+}
 type TornjakHelperProp = {
 
 }
@@ -21,10 +28,10 @@ class TornjakHelper extends Component<TornjakHelperProp, TornjakHelperState> {
     this.state = {
     };
   }
-  
+
   // detailsLink takes in selectedRows/ specified data and entity
   // returns a specfic routing link/ URL for an entity
-  detailsLink(selectedRows: any, entity: string) {
+  detailsLink(selectedRows: string, entity: string) {
     const dashboardDetailsLink = "/tornjak/dashboard/details/";
     var detailsLink = "", searchParams = new URLSearchParams(window.location.search);;
     if (selectedRows.length !== 0) {
@@ -37,10 +44,10 @@ class TornjakHelper extends Component<TornjakHelperProp, TornjakHelperState> {
   // detailsDataParse takes in url parameters for a specific url for details page and
   // properties of a class including clustersList, agentsList, entriesList and agentsWorkLoadAttestorInfo
   // returns a parsed and filtered data for the specifed entity from the url parameteres 
-  detailsDataParse(urlParams: { entity: string; }, props: Readonly<any> & Readonly<{ children?: ReactNode; }>) {
+  detailsDataParse(urlParams: { entity: string; }, props: DetailDataParseProp & Readonly<{ children?: ReactNode; }>) {
     const searchParams: URLSearchParams = new URLSearchParams(window.location.search);
     const parsed: string | null = searchParams.get("id")
-    let selectedData: any = [{}], id: string = "";
+    let selectedData: {} = [{}], id: string = "";
     if(parsed !== null) {
       id = decodeURIComponent(parsed);
     }
@@ -76,8 +83,10 @@ class TornjakHelper extends Component<TornjakHelperProp, TornjakHelperState> {
     var entriesPerAgent = agents.map((currentAgent: AgentsList) => {
       return this.SpiffeHelper.numberEntriesOfAgent(currentAgent, globalEntries)
     })
-    var sum = entriesPerAgent.reduce((acc: any, curVal: any) => {
-      return acc + curVal;
+    var sum = entriesPerAgent.reduce((acc: number | undefined, curVal: number | undefined) => {
+      if(acc !== undefined && curVal !== undefined)
+        return acc + curVal;
+      return 0;
     }, 0)
     return sum
   }
@@ -96,7 +105,7 @@ class TornjakHelper extends Component<TornjakHelperProp, TornjakHelperState> {
 
   // getDashboardAgentMetaData takes in an agent metadata, list of entries and workload attestor info for specified agents
   // returns agent metadata info for dashboard table
-  getDashboardAgentMetaData(agent: AgentsList, globalEntries: EntriesList[] | undefined, globalAgents: any, workLoadAttestorInfo: any[]) {
+  getDashboardAgentMetaData(agent: AgentsList, globalEntries: EntriesList[] | undefined, _globalAgents: AgentsList[], workLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) {
     var thisSpiffeid = this.SpiffeHelper.getAgentSpiffeid(agent);
     // get status
     var status = this.SpiffeHelper.getAgentStatusString(agent);

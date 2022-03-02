@@ -85,7 +85,7 @@ class SpiffeHelper extends Component<SpiffeHelperProp, SpiffeHelperState> {
 
   getAgentMetadata(spiffeid: string, metadataList: AgentsWorkLoadAttestorInfo[]) {
     if (typeof metadataList !== 'undefined') {
-      var metadata = metadataList.filter((agent: { spiffeid: any; }) => (agent.spiffeid === spiffeid));
+      var metadata = metadataList.filter((agent: { spiffeid: string; }) => (agent.spiffeid === spiffeid));
       if (metadata.length !== 0) {
         return metadata[0]
       }
@@ -105,6 +105,7 @@ class SpiffeHelper extends Component<SpiffeHelperProp, SpiffeHelperState> {
     }
     let agentSelectors = new Set(agent.selectors.map(formatSelectors))
     let isAssocWithAgent = (e: { selectors: any[] | undefined; }) => {
+      console.log(e.selectors)
       if (e.selectors === undefined) {
         e.selectors = [];
       }
@@ -260,8 +261,7 @@ class SpiffeHelper extends Component<SpiffeHelperProp, SpiffeHelperState> {
     })
     // Add entries associated with this agent
     let agentEntriesDict: any = this.getAgentEntries(curAgent[0], globalEntries)
-    console.log("agentEntriesDict", agentEntriesDict)
-    let agentEntries: any = agentEntriesDict[spiffeid];
+    let agentEntries = agentEntriesDict[spiffeid];
     let entriesAgent = [];
     if (agentEntries !== undefined) {
       entriesAgent = agentEntries.map((cur: EntriesList) => {

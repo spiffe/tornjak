@@ -219,8 +219,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     localAgentsIdList[1] = prefix + this.props.globalServerInfo.trustDomain + "/spire/server";
 
     //agents
-    // note: any for now - will be specifically typed when spiffehelper file is typed - gives error now since its not typed
-    let agentEntriesDict: any = this.SpiffeHelper.getAgentsEntries(this.props.globalAgentsList, this.props.globalEntriesList) //remove any after adding types to helpers
+    let agentEntriesDict: {[key: string]: EntriesList[]} | undefined = this.SpiffeHelper.getAgentsEntries(this.props.globalAgentsList, this.props.globalEntriesList)
     //let agentEntriesDict: {[key: string]: []} | undefined = this.SpiffeHelper.getAgentsEntries(this.props.globalAgentsList, this.props.globalEntriesList)
     idx = 2
     if (this.props.globalAgentsList === undefined) {
