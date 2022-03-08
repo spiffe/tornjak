@@ -81,7 +81,7 @@ class CreateEntryYaml extends Component {
     }
 
     render() {
-        const newEntryFormatLink = "https://github.com/mamy-CS/tornjak-public/blob/adding-typescript-entries-clusters-part2/docs/plan.md";
+        const newEntryFormatLink = "https://github.com/mamy-CS/tornjak-public/blob/create-entries-yaml/docs/newEntry-yaml-format.md";
         return (
             <div>
                 {this.state.parseError &&
