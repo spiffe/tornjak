@@ -60,12 +60,17 @@
   .entry-form {
     margin-left: auto;
     margin-right: auto;
-    width: 60%;
+    width: 1000px;
     border-width:1px;
     border-style:solid;
     border-color: rgb(180, 178, 178);
     padding: 30px 30px 30px 30px;
   }
+
+  .accordion-entry-form {
+    padding: 30px 30px 30px 30px;
+  }
+
   .parentId-drop-down {
     margin-bottom: 20px;
   }
@@ -161,4 +166,28 @@
   .no-data {
     margin-top: 120px;
     margin-left: 200px;
+  }
+
+  .toast-entry-creation-notification {
+    width: 850px;
+  }
+
+  .toast-messege {
+    width: 700px;
+    border-width:1px;
+    border-style:solid;
+    border-color: rgb(180, 178, 178);
+    padding: 30px 30px 30px 30px;
+  }
+
+  .toast-messege-color {
+    color:white;
+  }
+
+  .create-entry-button {
+    border-radius: 25px;
+  }
+
+  .custom-entry-form-title {
+    display: inline-block;
   }
