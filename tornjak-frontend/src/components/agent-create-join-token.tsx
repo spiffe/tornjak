@@ -7,7 +7,7 @@ import {
   serverSelectedFunc
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
-// import PropTypes from "prop-types";
+// import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type CreateJoinTokenProp = {
   globalServerSelected: string,
@@ -21,7 +21,6 @@ type CreateJoinTokenState = {
   trustDomain: string,
   path: string,
   message: string,
-  servers: [],
   selectedServer: string,
 }
 
@@ -41,7 +40,6 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
       trustDomain: "",
       path: "",
       message: "",
-      servers: [],
       selectedServer: "",
     }
   }

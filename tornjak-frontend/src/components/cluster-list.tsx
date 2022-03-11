@@ -34,8 +34,8 @@ type ClusterListProp = {
   globalErrorMessage: string,
   // tornjak server info of the selected server
   globalTornjakServerInfo: TornjakServerInfo,
-  // list of clusters with their metadata info as an array of ClustersList Type or can be undefined if no array present
-  globalClustersList: ClustersList[] | undefined,
+  // list of clusters with their metadata info as an array of ClustersList Type
+  globalClustersList: ClustersList[],
 }
 
 type ClusterListState = {

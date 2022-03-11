@@ -8,7 +8,7 @@ import {
   entriesListUpdateFunc,
   tornjakMessageFunc,
 } from 'redux/actions';
-// import PropTypes from "prop-types";
+// import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 import { RootState } from 'redux/reducers';
 import {
   EntriesList
@@ -25,8 +25,8 @@ type EntryListProp = {
   globalServerSelected: string,
   // tornjak error messege
   globalErrorMessage: string,
-  // list of available entries as array of EntriesListType or can be undefined if no array present
-  globalEntriesList: EntriesList[] | undefined,
+  // list of available entries as array of EntriesListType
+  globalEntriesList: EntriesList[],
 }
 
 type EntryListState = {

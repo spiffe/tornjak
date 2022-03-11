@@ -95,3 +95,12 @@ export interface ServerInfo {
   trustDomain: string; // Trust domain of server
   nodeAttestorPlugin: string; // Node Attestor Plugin of server
 }
+
+// tornjak 
+export interface StringLabels {
+  label: string;
+}
+
+export interface StringLabelsWithIndexStrings {
+  [index: string]: StringLabels[]
+}

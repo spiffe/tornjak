@@ -23,9 +23,11 @@ import {
   AgentsWorkLoadAttestorInfo,
   ServerInfo,
   TornjakServerInfo,
+  StringLabels,
+  StringLabelsWithIndexStrings,
 } from './types';
 import { RootState } from 'redux/reducers';
-// import PropTypes from "prop-types";
+// import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type CreateEntryProp = {
   // dispatches a payload for the server selected and has a return type of void
@@ -39,7 +41,7 @@ type CreateEntryProp = {
   // dispatches a payload for list of entries with their metadata info as an array of EntriesListType and has a return type of void
   entriesListUpdateFunc: (globalEntriesList: EntriesList[]) => void,
   // dispatches a payload for list of available selectors and their options as an object and has a return type of void
-  selectorInfoFunc: (globalSelectorInfo: { [index: string]: { label: string }[] }) => void,
+  selectorInfoFunc: (globalSelectorInfo: StringLabelsWithIndexStrings) => void,
   // dispatches a payload for the tornjak error messsege and has a return type of void
   tornjakMessageFunc: (globalErrorMessage: string) => void,
   // dispatches a payload for the workload selector info for the agents as an array of AgentsWorkLoadAttestorInfoType and has a return type of void
@@ -51,13 +53,13 @@ type CreateEntryProp = {
   // tornjak server info of the selected server
   globalTornjakServerInfo: TornjakServerInfo,
   // list of available selectors and their options
-  globalSelectorInfo: { [index: string]: { label: string }[] },
-  // list of available agents as array of AgentsListType or can be undefined if no array present
-  globalAgentsList: AgentsList[] | undefined,
-  // list of available entries as array of EntriesListType or can be undefined if no array present
-  globalEntriesList: EntriesList[] | undefined,
+  globalSelectorInfo: StringLabelsWithIndexStrings,
+  // list of available agents as array of AgentsListType
+  globalAgentsList: AgentsList[],
+  // list of available entries as array of EntriesListType
+  globalEntriesList: EntriesList[],
   // list of available workload selectors and their options
-  globalWorkloadSelectorInfo: { [index: string]: { label: string }[] },
+  globalWorkloadSelectorInfo: StringLabelsWithIndexStrings,
   // the workload selector info for the agents as an array of AgentsWorkLoadAttestorInfoType
   globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[],
   // the server trust domain and nodeAttestorPlugin as a ServerInfoType
@@ -88,7 +90,7 @@ type CreateEntryState = {
   spiffeIdPrefix: string,
   parentIdManualEntryOption: string,
   parentIDManualEntry: boolean,
-  selectorsList: { label: string; }[],
+  selectorsList: StringLabels[],
   selectorsListDisplay: string,
 }
 
@@ -219,7 +221,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     localAgentsIdList[1] = prefix + this.props.globalServerInfo.trustDomain + "/spire/server";
 
     //agents
-    // note: any for now - will be specifically typed when spiffehelper file is typed - gives error now since its not typed
+    // TODO(mamy-CS): any for now - will be specifically typed when spiffehelper file is typed - gives error now since its not typed
     let agentEntriesDict: any = this.SpiffeHelper.getAgentsEntries(this.props.globalAgentsList, this.props.globalEntriesList) //remove any after adding types to helpers
     //let agentEntriesDict: {[key: string]: []} | undefined = this.SpiffeHelper.getAgentsEntries(this.props.globalAgentsList, this.props.globalEntriesList)
     idx = 2
@@ -324,14 +326,14 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     }
   }
 
-  // e - any for now will be explicitly typed on currently open entry create PR
+  // TODO(mamy-CS): e - any for now will be explicitly typed on currently open entry create PR
   onChangeTtl(e: any): void {
     this.setState({
       ttl: Number(e.target.value)
     });
   }
 
-  // e - any for now will be explicitly typed on currently open entry create PR
+  // TODO(mamy-CS): e - any for now will be explicitly typed on currently open entry create PR
   onChangeExpiresAt(e: any): void {
     this.setState({
       expiresAt: Number(e.target.value)
@@ -365,7 +367,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     });
   }
 
-  onChangeSelectorsRecommended = (selected: { selectedItems: { label: string }[]; } | undefined): void => {
+  onChangeSelectorsRecommended = (selected: { selectedItems: StringLabels[]; } | undefined): void => {
     if (selected === undefined) {
       return;
     }
@@ -635,7 +637,6 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                 items={ParentIdList}
                 label="Select Parent ID"
                 titleText="Parent ID [*required]"
-                //value={this.state.parentId}
                 onChange={this.onChangeParentId}
               />
               <p className="parentId-helper">i.e. spiffe://example.org/agent/myagent1 - For node entries, select spiffe server as parent i.e. spiffe://example.org/spire/server</p>
@@ -649,8 +650,6 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                   invalidText="A valid value is required - refer to helper text below"
                   labelText="Parent ID - Manual Entry [*required]"
                   placeholder="Enter Parent ID"
-                  //value={this.state.spiffeId}
-                  //defaultValue={this.state.spiffeIdPrefix}
                   onChange={(e: { target: { value: string; }; }) => {
                     this.onChangeManualParentId(e);
                   }}
@@ -664,24 +663,20 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                 invalidText="A valid value is required - refer to helper text below"
                 labelText="SPIFFE ID [*required]"
                 placeholder="Enter SPIFFE ID"
-                //value={this.state.spiffeId}
                 defaultValue={this.state.spiffeIdPrefix}
                 onChange={(e: { target: { value: string; }; }) => {
                   const input = e.target.value
                   e.target.value = this.state.spiffeIdPrefix + input.substr(this.state.spiffeIdPrefix.length);
                   this.onChangeSpiffeId(e);
                 }}
-                //onChange={this.onChangeSpiffeId}
                 required />
             </div>
             <div className="selectors-multiselect" data-test="selectors-multiselect">
               <FilterableMultiSelect
                 aria-required="true"
-                //required
                 titleText="Selectors Recommendation [*required]"
                 helperText="i.e. k8s_sat:cluster,..."
                 placeholder={this.state.selectorsListDisplay}
-                //ariaLabel="selectors-multiselect"
                 id="selectors-multiselect"
                 items={this.state.selectorsList}
                 label={this.state.selectorsListDisplay}
@@ -710,7 +705,6 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                     id="ttl-input"
                     invalidText="Number is not valid"
                     label="Time to Leave (Ttl)"
-                    //max={100}
                     min={0}
                     step={1}
                     value={0}
@@ -723,7 +717,6 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                     id="expiresAt-input"
                     invalidText="Number is not valid"
                     label="Expires At"
-                    //max={100}
                     min={0}
                     step={1}
                     value={0}

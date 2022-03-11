@@ -20,7 +20,8 @@ import { RootState } from 'redux/reducers';
 import {
   AgentsList,
   ClustersList,
-  ServerInfo
+  ServerInfo,
+  StringLabels
 } from './types'
 
 type ClusterEditProp = {
@@ -34,14 +35,14 @@ type ClusterEditProp = {
   globalServerSelected: string,
   // tornjak error messege
   globalErrorMessage: string,
-  // list of clusters with their metadata info as an array of ClustersList Type or can be undefined if no array present
-  globalClustersList: ClustersList[] | undefined,
-  // list of available agents as array of AgentsListType or can be undefined if no array present
-  globalAgentsList: AgentsList[] | undefined,
+  // list of clusters with their metadata info as an array of ClustersList Type
+  globalClustersList: ClustersList[],
+  // list of available agents as array of AgentsListType
+  globalAgentsList: AgentsList[],
   // the server trust domain and nodeAttestorPlugin as a ServerInfoType
   globalServerInfo: ServerInfo,
   // list of agents' SPIFEE ID's as strings
-  agentsList: { label: string; }[]
+  agentsList: StringLabels[]
 }
 
 type ClusterEditState = {
@@ -59,7 +60,7 @@ type ClusterEditState = {
   statusOK: string,
   selectedServer: string,
   agentsListDisplay: string,
-  agentsListSelected: { label: string; }[],
+  agentsListSelected: StringLabels[],
   assignedAgentsListDisplay: string,
 }
 
@@ -150,7 +151,7 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
       cluster: ClustersList | undefined = undefined,
       assignedAgentsDisplay = "",
       agentsDisplay = "",
-      agentsListSelected: { label: string; }[] = [];
+      agentsListSelected: StringLabels[] = [];
     if (clusters === undefined) {
       return
     }
@@ -258,7 +259,7 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
     return
   }
 
-  onChangeAgentsList = (selected: { selectedItems: { label: string }[]; } | undefined): void => {
+  onChangeAgentsList = (selected: { selectedItems: StringLabels[]; } | undefined): void => {
     if (selected === undefined) {
       return;
     }

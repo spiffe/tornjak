@@ -19,9 +19,10 @@ import { RootState } from 'redux/reducers';
 import {
   AgentsList,
   ServerInfo,
+  StringLabels,
   TornjakServerInfo
 } from './types'
-// import PropTypes from "prop-types";
+// import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type ClusterManagementProp = {
   // dispatches a payload for list of agents with their metadata info as an array of AgentListType and has a return type of void
@@ -42,13 +43,13 @@ type ClusterManagementProp = {
   globalServerInfo: ServerInfo,
   // cluster types as array of strings
   globalClusterTypeInfo: string[],
-  // list of available agents as array of AgentsListType or can be undefined if no array present
-  globalAgentsList: AgentsList[] | undefined,
+  // list of available agents as array of AgentsListType
+  globalAgentsList: AgentsList[],
 }
 
 type ClusterManagementState = {
   clusterTypeList: string[],
-  agentsList: { label: string; }[],
+  agentsList: StringLabels[],
   agentsListDisplay: string,
   clusterTypeManualEntryOption: string,
   selectedServer: string,
@@ -117,7 +118,7 @@ class ClusterManagement extends Component<ClusterManagementProp, ClusterManageme
 
   prepareAgentsList(): void {
     var prefix = "spiffe://";
-    let localAgentsIdList: { label: string; }[] = [];
+    let localAgentsIdList: StringLabels[] = [];
     //agents
     if (this.props.globalAgentsList === undefined) {
       return

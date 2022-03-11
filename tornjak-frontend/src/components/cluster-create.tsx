@@ -17,7 +17,7 @@ import {
   serverInfoUpdateFunc
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
-import { AgentsList, ServerInfo, TornjakServerInfo } from './types';
+import { AgentsList, ServerInfo, StringLabels, TornjakServerInfo } from './types';
 
 type ClusterCreateProp = {
   // dispatches a payload for the server trust domain and nodeAttestorPlugin as a ServerInfoType and has a return type of void
@@ -31,7 +31,7 @@ type ClusterCreateProp = {
   // dispatches a payload for cluster types as array of strings and has a return type of void
   clusterTypeInfoFunc: (globalClusterTypeInfo: string[]) => void,
   // list of agents' SPIFEE ID's as strings
-  agentsList: { label: string; }[],
+  agentsList: StringLabels[],
   // cluster types as array of strings
   clusterTypeList: string[],
   // the selected server for manager mode 
@@ -111,7 +111,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
     }
   }
 
-  onChangeAgentsList = (selected: { selectedItems: { label: string }[]; } | undefined): void => {
+  onChangeAgentsList = (selected: { selectedItems: StringLabels[]; } | undefined): void => {
     if (selected === undefined) {
       return;
     }
@@ -290,7 +290,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
                   label="Select Cluster Type"
                   titleText="Cluster Type [*required]"
                   onChange={this.onChangeClusterType}
-                //required 
+                  //required // typescript throws an error when enabled - need to explore more to enable feature for now "aria-required" is enabled
                 />
                 <p className="cluster-helper">i.e. Kubernetes, VMs...</p>
               </div>
@@ -336,7 +336,6 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
                   titleText="Assign Agents To Cluster"
                   helperText="i.e. spiffe://example.org/agent/myagent1..."
                   placeholder={this.state.agentsListDisplay}
-                  //ariaLabel="selectors-multiselect"
                   id="selectors-multiselect"
                   items={this.props.agentsList}
                   label={this.state.agentsListDisplay}
