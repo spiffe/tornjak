@@ -17,9 +17,9 @@ import {
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
 import {
+  AgentLabels,
   AgentsList,
   ServerInfo,
-  StringLabels,
   TornjakServerInfo
 } from './types'
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
@@ -49,7 +49,7 @@ type ClusterManagementProp = {
 
 type ClusterManagementState = {
   clusterTypeList: string[],
-  agentsList: StringLabels[],
+  agentsList: AgentLabels[],
   agentsListDisplay: string,
   clusterTypeManualEntryOption: string,
   selectedServer: string,
@@ -118,7 +118,7 @@ class ClusterManagement extends Component<ClusterManagementProp, ClusterManageme
 
   prepareAgentsList(): void {
     var prefix = "spiffe://";
-    let localAgentsIdList: StringLabels[] = [];
+    let localAgentsIdList: AgentLabels[] = [];
     //agents
     if (this.props.globalAgentsList === undefined) {
       return

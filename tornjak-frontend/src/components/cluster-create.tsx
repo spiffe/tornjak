@@ -17,7 +17,11 @@ import {
   serverInfoUpdateFunc
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
-import { AgentsList, ServerInfo, StringLabels, TornjakServerInfo } from './types';
+import { 
+  AgentLabels,
+  AgentsList, 
+  ServerInfo,
+  TornjakServerInfo } from './types';
 
 type ClusterCreateProp = {
   // dispatches a payload for the server trust domain and nodeAttestorPlugin as a ServerInfoType and has a return type of void
@@ -31,7 +35,7 @@ type ClusterCreateProp = {
   // dispatches a payload for cluster types as array of strings and has a return type of void
   clusterTypeInfoFunc: (globalClusterTypeInfo: string[]) => void,
   // list of agents' SPIFEE ID's as strings
-  agentsList: StringLabels[],
+  agentsList: AgentLabels[],
   // cluster types as array of strings
   clusterTypeList: string[],
   // the selected server for manager mode 
@@ -111,7 +115,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
     }
   }
 
-  onChangeAgentsList = (selected: { selectedItems: StringLabels[]; } | undefined): void => {
+  onChangeAgentsList = (selected: { selectedItems: AgentLabels[]; } | undefined): void => {
     if (selected === undefined) {
       return;
     }

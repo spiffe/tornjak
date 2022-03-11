@@ -101,6 +101,12 @@ export interface StringLabels {
   label: string;
 }
 
+export type AgentLabels = StringLabels;
+export type SelectorLabels = StringLabels;
+
 export interface StringLabelsWithIndexStrings {
   [index: string]: StringLabels[]
 }
+
+export type SelectorInfoLabels = StringLabelsWithIndexStrings;
+export type WorkloadSelectorInfoLabels = StringLabelsWithIndexStrings;

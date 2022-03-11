@@ -18,10 +18,10 @@ import {
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
 import {
+  AgentLabels,
   AgentsList,
   ClustersList,
   ServerInfo,
-  StringLabels
 } from './types'
 
 type ClusterEditProp = {
@@ -42,7 +42,7 @@ type ClusterEditProp = {
   // the server trust domain and nodeAttestorPlugin as a ServerInfoType
   globalServerInfo: ServerInfo,
   // list of agents' SPIFEE ID's as strings
-  agentsList: StringLabels[]
+  agentsList: AgentLabels[]
 }
 
 type ClusterEditState = {
@@ -60,7 +60,7 @@ type ClusterEditState = {
   statusOK: string,
   selectedServer: string,
   agentsListDisplay: string,
-  agentsListSelected: StringLabels[],
+  agentsListSelected: AgentLabels[],
   assignedAgentsListDisplay: string,
 }
 
@@ -151,7 +151,7 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
       cluster: ClustersList | undefined = undefined,
       assignedAgentsDisplay = "",
       agentsDisplay = "",
-      agentsListSelected: StringLabels[] = [];
+      agentsListSelected: AgentLabels[] = [];
     if (clusters === undefined) {
       return
     }
@@ -259,7 +259,7 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
     return
   }
 
-  onChangeAgentsList = (selected: { selectedItems: StringLabels[]; } | undefined): void => {
+  onChangeAgentsList = (selected: { selectedItems: AgentLabels[]; } | undefined): void => {
     if (selected === undefined) {
       return;
     }

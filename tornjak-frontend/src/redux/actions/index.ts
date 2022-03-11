@@ -34,9 +34,10 @@ import {
     AgentsWorkLoadAttestorInfo, 
     ClustersList, 
     EntriesList, 
-    ServerInfo,
-    StringLabelsWithIndexStrings, 
-    TornjakServerInfo 
+    SelectorInfoLabels, 
+    ServerInfo, 
+    TornjakServerInfo, 
+    WorkloadSelectorInfoLabels
 } from 'components/types';
 
 // Expected input - List of clusters with their info
@@ -164,7 +165,7 @@ export function serversListUpdateFunc(globalServersList: Array<string>): ThunkAc
 //    ]
 // ]
 // selectorInfoFunc returns the list of available selectors and their options
-export function selectorInfoFunc(globalSelectorInfo: StringLabelsWithIndexStrings): ThunkAction<void, RootState, undefined, SelectorInfoAction> {
+export function selectorInfoFunc(globalSelectorInfo: SelectorInfoLabels): ThunkAction<void, RootState, undefined, SelectorInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_SELECTOR_INFO,
@@ -217,7 +218,7 @@ export function agentsListUpdateFunc(globalAgentsList: AgentsList[]): ThunkActio
 //   ]
 // ]
 // workloadSelectorInfoFunc returns the list of available workload selectors and their options
-export function workloadSelectorInfoFunc(globalWorkloadSelectorInfo: StringLabelsWithIndexStrings): ThunkAction<void, RootState, undefined, WorkloadSelectorInfoAction> {
+export function workloadSelectorInfoFunc(globalWorkloadSelectorInfo: WorkloadSelectorInfoLabels): ThunkAction<void, RootState, undefined, WorkloadSelectorInfoAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_WORKLOAD_SELECTOR_INFO,

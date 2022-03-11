@@ -23,8 +23,9 @@ import {
   AgentsWorkLoadAttestorInfo,
   ServerInfo,
   TornjakServerInfo,
-  StringLabels,
-  StringLabelsWithIndexStrings,
+  SelectorLabels,
+  SelectorInfoLabels,
+  WorkloadSelectorInfoLabels,
 } from './types';
 import { RootState } from 'redux/reducers';
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
@@ -41,7 +42,7 @@ type CreateEntryProp = {
   // dispatches a payload for list of entries with their metadata info as an array of EntriesListType and has a return type of void
   entriesListUpdateFunc: (globalEntriesList: EntriesList[]) => void,
   // dispatches a payload for list of available selectors and their options as an object and has a return type of void
-  selectorInfoFunc: (globalSelectorInfo: StringLabelsWithIndexStrings) => void,
+  selectorInfoFunc: (globalSelectorInfo: SelectorInfoLabels) => void,
   // dispatches a payload for the tornjak error messsege and has a return type of void
   tornjakMessageFunc: (globalErrorMessage: string) => void,
   // dispatches a payload for the workload selector info for the agents as an array of AgentsWorkLoadAttestorInfoType and has a return type of void
@@ -53,13 +54,13 @@ type CreateEntryProp = {
   // tornjak server info of the selected server
   globalTornjakServerInfo: TornjakServerInfo,
   // list of available selectors and their options
-  globalSelectorInfo: StringLabelsWithIndexStrings,
+  globalSelectorInfo: SelectorInfoLabels,
   // list of available agents as array of AgentsListType
   globalAgentsList: AgentsList[],
   // list of available entries as array of EntriesListType
   globalEntriesList: EntriesList[],
   // list of available workload selectors and their options
-  globalWorkloadSelectorInfo: StringLabelsWithIndexStrings,
+  globalWorkloadSelectorInfo: WorkloadSelectorInfoLabels,
   // the workload selector info for the agents as an array of AgentsWorkLoadAttestorInfoType
   globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[],
   // the server trust domain and nodeAttestorPlugin as a ServerInfoType
@@ -90,7 +91,7 @@ type CreateEntryState = {
   spiffeIdPrefix: string,
   parentIdManualEntryOption: string,
   parentIDManualEntry: boolean,
-  selectorsList: StringLabels[],
+  selectorsList: SelectorLabels[],
   selectorsListDisplay: string,
 }
 
@@ -367,7 +368,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     });
   }
 
-  onChangeSelectorsRecommended = (selected: { selectedItems: StringLabels[]; } | undefined): void => {
+  onChangeSelectorsRecommended = (selected: { selectedItems: SelectorLabels[]; } | undefined): void => {
     if (selected === undefined) {
       return;
     }
