@@ -19,18 +19,20 @@ import { RootState } from 'redux/reducers';
 import { 
   AgentsList, 
   AgentsWorkLoadAttestorInfo, 
-  ServerInfo, 
+  SelectorInfoLabels, 
+  ServerInfo,
   TornjakServerInfo,
+  WorkloadSelectorInfoLabels,
 } from './types';
-//import PropTypes from "prop-types";
+//import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type AgentListProp = {
   // dispatches a payload for list of available cluster types as array of strings and has a return type of void
   clusterTypeInfoFunc: (globalClusterTypeInfo: string[]) => void,  
   // dispatches a payload for list of available selectors and their options as an object and has a return type of void
-  selectorInfoFunc: (globalSelectorInfo: {[index: string]: {label: string}[]}) => void,  
+  selectorInfoFunc: (globalSelectorInfo: SelectorInfoLabels) => void,  
   // dispatches a payload for list of available workload selectors and their options as an object and has a return type of void
-  workloadSelectorInfoFunc: (globalWorkloadSelectorInfo: {[index: string]: {label: string}[]}) => void, 
+  workloadSelectorInfoFunc: (globalWorkloadSelectorInfo: WorkloadSelectorInfoLabels) => void, 
   // dispatches a payload for list of agents with their metadata info as an array of AgentListType and has a return type of void
   agentsListUpdateFunc: (globalAgentsList: AgentsList[]) => void,  
   // dispatches a payload for an Error Message/ Success Message of an executed function as a string and has a return type of void
@@ -47,8 +49,8 @@ type AgentListProp = {
   globalErrorMessage: string, 
   // tornjak server info of the selected server
   globalTornjakServerInfo: TornjakServerInfo,  
-  // list of available agents as array of AgentsListType or can be undefined if no array present
-  globalAgentsList: AgentsList[] | undefined, 
+  // list of available agents as array of AgentsListType
+  globalAgentsList: AgentsList[], 
 }
 
 type AgentListState = {

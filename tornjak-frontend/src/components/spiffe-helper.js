@@ -1,6 +1,11 @@
 import { Component } from 'react';
 
 class SpiffeHelper extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+    };
+  }
   getMillisecondsFromEpoch() {
     return new Date().getTime()
   }
@@ -88,15 +93,15 @@ class SpiffeHelper extends Component {
   // the list of entries which are associated with this agent
   getAgentEntries(agent, entries) {
     let nodeEntries = entries.filter(e => e.parent_id.path === "/spire/server")
-    if(agent === undefined) {
+    if (agent === undefined) {
       return [];
     }
-    if(agent.selectors === undefined) {
+    if (agent.selectors === undefined) {
       agent.selectors = [];
     }
     let agentSelectors = new Set(agent.selectors.map(formatSelectors))
     let isAssocWithAgent = e => {
-      if(e.selectors === undefined) {
+      if (e.selectors === undefined) {
         e.selectors = [];
       }
       let entrySelectors = new Set(e.selectors.map(formatSelectors))
@@ -133,12 +138,12 @@ class SpiffeHelper extends Component {
       let agent = agents[i];
       let agentId = this.getAgentSpiffeid(agent);
       agentEntriesDict[agentId] = [];
-      if(agent.selectors === undefined) {
+      if (agent.selectors === undefined) {
         agent.selectors = [];
       }
       let agentSelectors = new Set(agent.selectors.map(formatSelectors));
       let isAssocWithAgent = e => {
-        if(e.selectors === undefined) {
+        if (e.selectors === undefined) {
           e.selectors = [];
         }
         let entrySelectors = new Set(e.selectors.map(formatSelectors))
@@ -161,12 +166,12 @@ class SpiffeHelper extends Component {
   // getCanonicalAgentSpiffeid takes in a agent entry, and returns the first 
   // agent ID that is found associated with it.
   getCanonicalAgentSpiffeid(entry, agents) {
-    if(entry.selectors === undefined) {
+    if (entry.selectors === undefined) {
       entry.selectors = [];
     }
     let entrySelectors = new Set(entry.selectors.map(formatSelectors));
     let isAssocWithEntry = a => {
-      if(a.selectors === undefined) {
+      if (a.selectors === undefined) {
         a.selectors = [];
       }
       let agentSelectors = new Set(a.selectors.map(formatSelectors));
@@ -189,50 +194,50 @@ class SpiffeHelper extends Component {
     var agentEntries = this.getAgentEntries(agent, globalEntries)
     var validIds = new Set([this.getAgentSpiffeid(agent)]);
 
-    for (let j=0; j < agentEntries.length; j++) {
-        validIds.add(this.getEntrySpiffeid(agentEntries[j]));
+    for (let j = 0; j < agentEntries.length; j++) {
+      validIds.add(this.getEntrySpiffeid(agentEntries[j]));
     }
 
-    var entriesList = globalEntries.filter(entry=> {
+    var entriesList = globalEntries.filter(entry => {
       return (typeof entry !== 'undefined') && validIds.has(this.getEntryParentid(entry));
     });
 
     return entriesList.length
   }
 
-// 
-//  ********************************************************************
-//  KEEP THIS PIECE OF CODE THAT CAN BE USEFUL LATER ON FOR OPTIMIZATION
-//  WHEN HANDLING MULTIPLE AGENTS AT THE SAME TIME
-//  ********************************************************************
-// // numberEntriesOfAgent takes in spiffe id of an agent and list of entries
-// // returns number of entries in the agent
-// numberEntriesOfAgent(agent, globalEntries) {
-//   var agentEntriesDict = this.getAgentEntries(
-//   var validIds = new Set([spiffeid]);
-// 
-//   // Also check for parent IDs associated with the agent
-//   let agentEntries = agentEntriesDict[spiffeid];
-//   if (agentEntries !== undefined) {
-//     for (let j=0; j < agentEntries.length; j++) {
-//         validIds.add(this.SpiffeHelper.getEntrySpiffeid(agentEntries[j]));
-//     }
-//   }
-// 
-//   if (typeof this.props.globalEntries.globalEntriesList !== 'undefined') {
-//     var entriesList = this.props.globalEntries.globalEntriesList.filter(entry=> {
-//       return (typeof entry !== 'undefined') && validIds.has(this.SpiffeHelper.getEntryParentid(entry));
-//     });
-// 
-//     if (typeof entriesList === 'undefined') {
-//       return 0
-//     } else {
-//       return entriesList.length
-//     }
-//   } else {
-//     return 0
-//   }
-// }
+  // 
+  //  ********************************************************************
+  //  KEEP THIS PIECE OF CODE THAT CAN BE USEFUL LATER ON FOR OPTIMIZATION
+  //  WHEN HANDLING MULTIPLE AGENTS AT THE SAME TIME
+  //  ********************************************************************
+  // // numberEntriesOfAgent takes in spiffe id of an agent and list of entries
+  // // returns number of entries in the agent
+  // numberEntriesOfAgent(agent, globalEntries) {
+  //   var agentEntriesDict = this.getAgentEntries(
+  //   var validIds = new Set([spiffeid]);
+  // 
+  //   // Also check for parent IDs associated with the agent
+  //   let agentEntries = agentEntriesDict[spiffeid];
+  //   if (agentEntries !== undefined) {
+  //     for (let j=0; j < agentEntries.length; j++) {
+  //         validIds.add(this.SpiffeHelper.getEntrySpiffeid(agentEntries[j]));
+  //     }
+  //   }
+  // 
+  //   if (typeof this.props.globalEntries.globalEntriesList !== 'undefined') {
+  //     var entriesList = this.props.globalEntries.globalEntriesList.filter(entry=> {
+  //       return (typeof entry !== 'undefined') && validIds.has(this.SpiffeHelper.getEntryParentid(entry));
+  //     });
+  // 
+  //     if (typeof entriesList === 'undefined') {
+  //       return 0
+  //     } else {
+  //       return entriesList.length
+  //     }
+  //   } else {
+  //     return 0
+  //   }
+  // }
 
 
 

@@ -4,8 +4,10 @@ import {
     AgentsWorkLoadAttestorInfo, 
     ClustersList, 
     EntriesList, 
-    ServerInfo, 
-    TornjakServerInfo 
+    SelectorInfoLabels, 
+    ServerInfo,
+    TornjakServerInfo, 
+    WorkloadSelectorInfoLabels
 } from "components/types";
 
 // agents
@@ -13,7 +15,7 @@ export const GLOBAL_AGENTS_LIST = 'GLOBAL_AGENTS_LIST';
 export const GLOBAL_AGENTS_WORKLOADATTESTOR_INFO = 'GLOBAL_AGENTS_WORKLOADATTESTOR_INFO'
 
 export interface AgentsReducerState {
-    globalAgentsList: AgentsList[] | undefined,
+    globalAgentsList: AgentsList[],
     globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[],
 }
 
@@ -29,7 +31,7 @@ export const GLOBAL_CLUSTERS_LIST = 'GLOBAL_CLUSTERS_LIST';
 export const GLOBAL_CLUSTER_TYPE_INFO = 'GLOBAL_CLUSTER_TYPE_INFO';
 
 export interface ClustersReducerState {
-    globalClustersList: ClustersList[] | undefined,
+    globalClustersList: ClustersList[],
     globalClusterTypeInfo: string[],
 }
 
@@ -64,8 +66,8 @@ export interface ServersReducerState {
     globalServerInfo: ServerInfo,
     globalTornjakServerInfo: TornjakServerInfo,
     globalServersList: Array<string>,
-    globalSelectorInfo: {[index: string]: {label: string}[]},
-    globalWorkloadSelectorInfo: {[index: string]: {label: string}[]} ,
+    globalSelectorInfo: SelectorInfoLabels,
+    globalWorkloadSelectorInfo: WorkloadSelectorInfoLabels ,
 }
 
 export interface ServerSelectedAction extends Action<typeof GLOBAL_SERVER_SELECTED> {
@@ -84,10 +86,10 @@ export interface ServersListAction extends Action<typeof GLOBAL_SERVERS_LIST> {
     payload: Array<string>;
 }
 export interface SelectorInfoAction extends Action<typeof GLOBAL_SELECTOR_INFO> {
-    payload: {[index: string]: {label: string}[]};
+    payload: SelectorInfoLabels;
 }
 export interface WorkloadSelectorInfoAction extends Action<typeof GLOBAL_WORKLOAD_SELECTOR_INFO> {
-    payload: {[index: string]: {label: string}[]};
+    payload: WorkloadSelectorInfoLabels;
 }
 
 export type ServersAction =
