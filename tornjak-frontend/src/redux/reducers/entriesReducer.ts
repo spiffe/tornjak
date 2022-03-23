@@ -8,20 +8,8 @@ import {
 
 const initialState: EntriesReducerState = {
     globalEntriesList: [],
-    globalNewEntries: {
-        id: "", 
-        spiffe_id: { trust_domain: "", path: ""}, 
-        parent_id: { trust_domain: "", path: ""}, 
-        selectors: [], 
-        ttl: 1, 
-        federates_with: [], 
-        admin: false, 
-        downstream: false, 
-        expires_at: 1, 
-        dns_names: [], 
-        revision_number: 1, 
-        store_svid: false}
-};
+    globalNewEntries: []
+}
 
 export default function entriesReducer(state: EntriesReducerState = initialState, action: EntriesListAction | NewEntriesAction) {
     switch (action.type) {

@@ -61,7 +61,7 @@ type CreateEntryProp = {
   // list of available entries as array of EntriesListType or can be undefined if no array present
   globalEntriesList: EntriesList[] | undefined,
   // list of new entries to be created as array of EntriesListType or can be undefined if no array present
-  globalNewEntries: EntriesList | undefined,
+  globalNewEntries: EntriesList[] | undefined,
   // list of available workload selectors and their options
   globalWorkloadSelectorInfo: { [index: string]: { label: string }[] },
   // the workload selector info for the agents as an array of AgentsWorkLoadAttestorInfoType
@@ -87,7 +87,8 @@ type CreateEntryState = {
   federatesWith: string,
   downstream: boolean,
   message: string,
-  statusOK: string,
+  statusOK: string | any[],
+  sucessNumEntries: {"success": number, "fail": number},
   successJsonMessege: string,
   selectedServer: string,
   agentsIdList: string[],
@@ -143,6 +144,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       //token: "",
       message: "",
       statusOK: "",
+      sucessNumEntries: {"success": 0, "fail": 0},
       successJsonMessege: "",
       selectedServer: "",
       agentsIdList: [],
@@ -623,89 +625,41 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   }
 
   onYAMLEntryCreate(): void {
-    if(this.props.globalNewEntries === undefined) {
+    var entriesStatus: any[] = [], sucessEntriesCount = 0;
+    if (this.props.globalNewEntries === undefined) {
       return
     }
-    //{ [key: number]: EntriesList[] }[]
-    var newEntry = this.props.globalNewEntries;
-    console.log("newEntry", newEntry)
-    // let selectorStrings: string[] = [], federatedWithList: string[] = [], dnsNamesWithList: string[] = [];
-    // e.preventDefault();
-
-    // const validSpiffeId = (this.parseSpiffeId(this.state.spiffeId))[0];
-    // if (!validSpiffeId) {
-    //   this.setState({ message: "ERROR: invalid spiffe ID specified" });
-    //   return
-    // }
-
-    // const validParentId = (this.parseSpiffeId(this.state.parentId))[0];
-    // if (!validParentId) {
-    //   this.setState({ message: "ERROR: invalid parent ID specified" });
-    //   return
-    // }
-
-    // if (this.state.selectors.length !== 0) {
-    //   selectorStrings = this.state.selectors.split(',').map(x => x.trim())
-    // }
-    // if (selectorStrings.length === 0) {
-    //   this.setState({ message: "ERROR: Selectors cannot be empty" })
-    //   return
-    // }
-    // const selectorEntries = selectorStrings.map(x => x.indexOf(":") > 0 ?
-    //   {
-    //     "type": x.substr(0, x.indexOf(":")),
-    //     "value": x.substr(x.indexOf(":") + 1)
-    //   } : null)
-
-    // if (selectorEntries.some(x => x == null || x["value"].length === 0)) {
-    //   this.setState({ message: "ERROR: Selectors not in the correct format should be type:value" })
-    //   return
-    // }
-
-    // if (this.state.federatesWith.length !== 0) {
-    //   federatedWithList = this.state.federatesWith.split(',').map((x: string) => x.trim())
-    // }
-    // if (this.state.dnsNames.length !== 0) {
-    //   dnsNamesWithList = this.state.dnsNames.split(',').map((x: string) => x.trim())
-    // }
-
-    var cjtData = {
-      "entries": [{
-        "spiffe_id": {
-          "trust_domain": newEntry.spiffe_id.trust_domain,
-          "path": newEntry.spiffe_id.path,
-        },
-        "parent_id": {
-          "trust_domain": newEntry.parent_id.trust_domain,
-          "path": newEntry.parent_id.path,
-        },
-        "selectors": newEntry.selectors,
-        "admin": newEntry.admin,
-        "ttl": newEntry.ttl,
-        "expires_at": newEntry.expires_at,
-        "downstream": newEntry.downstream,
-        "federates_with": newEntry.federates_with,
-        "dns_names": newEntry.dns_names,
-      }]
-    }
-
     let endpoint = this.getApiEntryCreateEndpoint();
     if (endpoint === "") {
       return
     }
-    axios.post(endpoint, cjtData)
+    var entries = { "entries": this.props.globalNewEntries };
+
+    axios.post(endpoint, entries)
       .then(
-        res => this.setState({
-          message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
-          statusOK: "OK",
-          successJsonMessege: res.data.results[0].status.message
-        })
+        res => {
+          console.log(res.data)
+          for (var i = 0; i < res.data.results.length; i++) {
+            entriesStatus[i] = res.data.results[i].status.message;
+            if(res.data.results[i].status.message === "OK") {
+              sucessEntriesCount++;
+            }
+          }
+          console.log(entriesStatus)
+          this.setState({
+            message: "Request:" + JSON.stringify(entries, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
+            sucessNumEntries: {"success": sucessEntriesCount,"fail": entries.entries.length - sucessEntriesCount},
+            statusOK: "Multiple",
+          })
+        }
       )
       .catch(
-        err => this.setState({
-          message: "ERROR:" + err,
-          statusOK: "ERROR"
-        })
+        err => {
+          this.setState({
+            message: "ERROR:" + err,
+            statusOK: "ERROR"
+          })
+        }
       )
   }
 
@@ -714,7 +668,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     return (
       <div data-test="create-entry">
         <div className="create-entry-title" data-test="create-entry-title">
-          <h3>Create New Entry</h3>
+          <h3>Create New Entry/ Entries</h3>
         </div>
         <br /><br />
         {this.state.message !== "" &&
@@ -726,13 +680,22 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                 <span>
                   <br></br>
                   <div role="alert" data-test="success-message">
+                    {this.state.statusOK === "Multiple" &&
+                      <div>
+                        <p className="success-message">{"-- " + this.state.sucessNumEntries.success + " ENTRY/ ENTRIES SUCCESSFULLY CREATED--"}</p>
+                        {this.state.sucessNumEntries.fail !== 0 &&
+                          <p className="failed-message">{"-- " + this.state.sucessNumEntries.fail + " ENTRY/ ENTRIES FAILED TO BE CREATED--"}</p>
+                        }
+                      </div>
+                    }
                     {this.state.statusOK === "OK" && this.state.successJsonMessege === "OK" &&
                       <p className="success-message">--ENTRY SUCCESSFULLY CREATED--</p>
                     }
                     {(this.state.statusOK === "ERROR" || (this.state.successJsonMessege !== "OK" && this.state.successJsonMessege !== "")) &&
-                      <p className="failed-message">--ENTRY CREATION FAILED--</p>
+                      <p className="failed-message">--ALL ENTRIES CREATION FAILED--</p>
                     }
                   </div>
+                  <br></br>
                   <div className="toast-messege" data-test="alert-primary">
                     <pre className="toast-messege-color">
                       {this.state.message}
@@ -747,7 +710,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
         }
         <Accordion className="accordion-entry-form">
           <AccordionItem
-            title={<h5>Upload New Entry YAML</h5>} open>
+            title={<h5>Upload New Entry/ Entries YAML</h5>} open>
             <div className="entry-form">
               <CreateEntryYaml />
               <br></br>
@@ -758,7 +721,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                 onClick={() => {
                   this.onYAMLEntryCreate();
                 }}>
-                Create Entry
+                Create Entries
               </Button>
             </div>
           </AccordionItem>
@@ -766,7 +729,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
             title={
               <div>
                 <h5 className="custom-entry-form-title">
-                    Custom Entry Form
+                  Custom Entry Form
                 </h5>
                 <p>(click to expand)</p>
               </div>}>

@@ -46,7 +46,7 @@ export const GLOBAL_NEW_ENTRIES = 'GLOBAL_NEW_ENTRIES';
 
 export interface EntriesReducerState {
     globalEntriesList: EntriesList[],
-    globalNewEntries: EntriesList,
+    globalNewEntries: EntriesList[],
 }
 
 export interface EntriesListAction extends Action<typeof GLOBAL_ENTRIES_LIST> {
@@ -54,7 +54,7 @@ export interface EntriesListAction extends Action<typeof GLOBAL_ENTRIES_LIST> {
 }
 
 export interface NewEntriesAction extends Action<typeof GLOBAL_NEW_ENTRIES> {
-    payload: EntriesList;
+    payload: EntriesList[];
 }
 
 // servers

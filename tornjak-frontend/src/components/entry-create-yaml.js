@@ -1,7 +1,18 @@
 import React, { Component } from 'react';
-import { FileUploader, ToastNotification } from 'carbon-components-react';
+import {
+    FileUploader,
+    ToastNotification,
+    ModalWrapper,
+    Checkbox, TextInput,
+    TextArea,
+    NumberInput,
+    Link,
+} from 'carbon-components-react';
+import {
+    Button,
+} from '@material-ui/core';
 //import * as fs from 'fs';
-import { Launch16 } from '@carbon/icons-react';
+import { Launch16, NextOutline16 } from '@carbon/icons-react';
 import { connect } from 'react-redux';
 //import { safeLoadAll } from 'js-yaml'
 // import axios from 'axios';
@@ -43,8 +54,35 @@ class CreateEntryYaml extends Component {
         this.TornjakApi = new TornjakApi(props);
         this.SpiffeHelper = new SpiffeHelper(props);
         this.handleChange = this.handleChange.bind(this);
+        this.setSelectedEntriesIds = this.setSelectedEntriesIds.bind(this);
+        this.onChangeSelectors = this.onChangeSelectors.bind(this);
+        this.onChangeTtl = this.onChangeTtl.bind(this);
+        this.onChangeExpiresAt = this.onChangeExpiresAt.bind(this);
+        this.onChangeFederatesWith = this.onChangeFederatesWith.bind(this);
+        this.onChangeDnsNames = this.onChangeDnsNames.bind(this);
+        this.onChangeAdminFlag = this.onChangeAdminFlag.bind(this);
+        this.onChangeDownStream = this.onChangeDownStream.bind(this);
+        this.handleModalSubmit = this.handleModalSubmit.bind(this);
+
         this.state = {
-            parseError: false
+            parseError: false,
+            isEntriesLoaded: false,
+            newEntriesIds: [],
+            newEntrySelected: [],
+            selectedEntryId: 0,
+            uploadedEntries: [],
+            yamlFormSpiffeId: "",
+            spiffeIdTrustDomain: "",
+            spiffeIdPath: "",
+            parentIdTrustDomain: "",
+            parentIdPath: "",
+            selectorsList: "",
+            ttl: 0,
+            expiresAt: 0,
+            federatesWith: "",
+            dnsNames: "",
+            adminFlag: false,
+            downstream: false
         }
     }
 
@@ -53,10 +91,18 @@ class CreateEntryYaml extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
+        if (prevState.globalAgentsList !== this.state.globalAgentsList) {
+            this.props.newEntriesUpdateFunc(this.state.uploadedEntries);
+        }
     }
 
     handleChange(e) {
-        this.setState({ parseError: false }) // reset invalid notification toast
+        var idx = 0;
+        let localNewEntriesIds = [];
+        this.setState({
+            parseError: false, // reset invalid notification toast
+            isEntriesLoaded: true
+        })
         var yamlFile = e.target.files[0]; // yaml File List of objects
         var fileReader = new FileReader();
         fileReader.addEventListener("load", () => {
@@ -64,9 +110,19 @@ class CreateEntryYaml extends Component {
             console.log(result)
             try {
                 var parsedData = JSON.parse(result);
-                console.log(parsedData);
-                this.setState({ parseError: false })
-                this.props.newEntriesUpdateFunc(parsedData.entries[0]);
+                this.props.newEntriesUpdateFunc(parsedData.entries);
+                for (let i = 0; i < parsedData.entries.length; i++) {
+                    localNewEntriesIds[idx] = [];
+                    localNewEntriesIds[idx]["spiffeId"] = this.SpiffeHelper.getEntrySpiffeid(parsedData.entries[i]);
+                    idx++;
+                }
+                console.log(localNewEntriesIds)
+                this.setState({
+                    parseError: false,
+                    newEntriesIds: localNewEntriesIds,
+                    uploadedEntries: parsedData.entries,
+                })
+
             } catch (e) {
                 console.log(e)
                 this.setState({ parseError: true })
@@ -80,6 +136,152 @@ class CreateEntryYaml extends Component {
         }
     }
 
+    setSelectedEntriesIds(e, id) {
+        var localNewEntry = this.state.uploadedEntries[id], selectorsWithNewline = "";
+        var selectors = localNewEntry.selectors;
+        var selectorJoinedArray = selectors.map((x) => (x.type + ":" + x.value + "\n"))
+        selectorsWithNewline = selectorJoinedArray.join('');
+        this.setState({
+            selectedEntryId: id,
+            newEntrySelected: localNewEntry,
+            spiffeIdTrustDomain: localNewEntry.spiffe_id.trust_domain,
+            spiffeIdPath: localNewEntry.spiffe_id.path,
+            parentIdTrustDomain: localNewEntry.parent_id.trust_domain,
+            parentIdPath: localNewEntry.parent_id.path,
+            selectorsList: selectorsWithNewline,
+            ttl: localNewEntry.ttl,
+            expiresAt: localNewEntry.expires_at,
+            federatesWith: localNewEntry.federates_with.toString(),
+            dnsNames: localNewEntry.dns_names.toString(),
+            adminFlag: localNewEntry.admin,
+            downstream: localNewEntry.downstream
+        })
+    }
+
+    applyEditToEntry() {
+        var entriesToUpload = this.state.uploadedEntries,
+            selectedEntryId = this.state.selectedEntryId,
+            selectorStrings = [],
+            selectorEntries = [],
+            federatedWithList = [],
+            dnsNamesWithList = [];
+
+        if (this.state.selectorsList.length !== 0) {
+            selectorStrings = this.state.selectorsList.split('\n').map(x => x.trim())
+        }
+        selectorEntries = selectorStrings.filter(String).map(x => x.indexOf(":") > 0 ?
+            {
+                "type": x.substr(0, x.indexOf(":")),
+                "value": x.substr(x.indexOf(":") + 1)
+            } : null)
+        if (this.state.federatesWith.length !== 0) {
+            federatedWithList = this.state.federatesWith.split(',').map((x) => x.trim())
+        }
+        if (this.state.dnsNames.length !== 0) {
+            dnsNamesWithList = this.state.dnsNames.split(',').map((x) => x.trim())
+        }
+
+        entriesToUpload[selectedEntryId].spiffe_id.trust_domain = this.state.spiffeIdTrustDomain;
+        entriesToUpload[selectedEntryId].spiffe_id.path = this.state.spiffeIdPath;
+        entriesToUpload[selectedEntryId].parent_id.trust_domain = this.state.parentIdTrustDomain;
+        entriesToUpload[selectedEntryId].parent_id.path = this.state.parentIdPath;
+        entriesToUpload[selectedEntryId].selectors = selectorEntries;
+        entriesToUpload[selectedEntryId].ttl = this.state.ttl;
+        entriesToUpload[selectedEntryId].expires_at = this.state.expiresAt;
+        entriesToUpload[selectedEntryId].federates_with = federatedWithList;
+        entriesToUpload[selectedEntryId].dns_names = dnsNamesWithList;
+        entriesToUpload[selectedEntryId].admin = this.state.adminFlag;
+        entriesToUpload[selectedEntryId].downstream = this.state.downstream;
+
+        this.setState({
+            uploadedEntries: entriesToUpload
+        })
+        //this.props.newEntriesUpdateFunc(entriesToUpload);
+    }
+
+    onChangeSpiffeIdTrustDomain(e) {
+        var value = e.target.value;
+        this.setState({
+            spiffeIdTrustDomain: value,
+        });
+    }
+
+    onChangeSpiffeIdPath(e) {
+        var value = e.target.value;
+        this.setState({
+            spiffeIdPath: value,
+        });
+    }
+
+    onChangeParentIdTrustDomain(e) {
+        var value = e.target.value;
+        this.setState({
+            parentIdTrustDomain: value,
+        });
+    }
+
+    onChangeParentIdPath(e) {
+        var value = e.target.value;
+        this.setState({
+            parentIdPath: value,
+        });
+    }
+
+    onChangeSelectors(e) {
+        var value = e.target.value;
+        this.setState({
+            selectorsList: value,
+        });
+    }
+
+    onChangeTtl(e) {
+        this.setState({
+            ttl: Number(e.target.value)
+        });
+    }
+
+    onChangeExpiresAt(e) {
+        this.setState({
+            expiresAt: Number(e.target.value)
+        });
+    }
+
+    onChangeDnsNames(e) {
+        if (e === undefined) {
+            return;
+        }
+        var sid = e.target.value;
+        this.setState({
+            dnsNames: sid,
+        });
+    }
+
+    onChangeFederatesWith(e) {
+        if (e === undefined) {
+            return;
+        }
+        var sid = e.target.value;
+        this.setState({
+            federatesWith: sid,
+        });
+    }
+
+    onChangeAdminFlag = (selected) => {
+        var sid = selected;
+        this.setState({
+            adminFlag: sid,
+        });
+    }
+    onChangeDownStream = (selected) => {
+        var sid = selected;
+        this.setState({
+            downstream: sid,
+        });
+    }
+
+    handleModalSubmit = () => {
+        return true;
+    }
     render() {
         const newEntryFormatLink = "https://github.com/mamy-CS/tornjak-public/blob/create-entries-yaml/docs/newEntry-yaml-format.md";
         return (
@@ -114,6 +316,205 @@ class CreateEntryYaml extends Component {
                         onChange={this.handleChange}
                     />
                 </div>
+                {this.state.isEntriesLoaded && !this.state.parseError &&
+                    <div>
+                        <br></br>
+                        <h6
+                            style={{
+                                color: "green",
+                                marginLeft: "1rem",
+                            }}>[{this.state.newEntriesIds.length} Entries Loaded]</h6>
+                        <div className="view_entries_yaml_button">
+                            <ModalWrapper
+                                passiveModal={true}
+                                size='lg'
+                                triggerButtonKind="ghost"
+                                buttonTriggerText="View Entries Yaml"
+                                modalHeading="Entries Yaml"
+                                modalLabel="View Uploaded Entries"
+                            >
+                                <pre className="yaml_view_modal_json">{JSON.stringify(this.state.uploadedEntries, null, ' ')}</pre>
+                            </ModalWrapper>
+                        </div>
+                        <div className="edit_entries_button">
+                            <ModalWrapper
+                                size='lg'
+                                triggerButtonKind="ghost"
+                                buttonTriggerText="Edit Uploaded Entries"
+                                handleSubmit={this.handleModalSubmit}
+                                shouldCloseAfterSubmit={true}
+                                modalHeading="Entries Edit"
+                                modalLabel="Edit Uploaded Entries"
+                            >
+                                <div className='edit-entry-container'>
+                                    <div className="entries-list-container">
+                                        <fieldset>
+                                            <legend className="modal_Entry_list_title">UPLOADED ENTRIES</legend>
+                                            {this.state.newEntriesIds.map((entryId, index) => (
+                                                <div key={index}>
+                                                    {/* eslint-disable-next-line */}
+                                                    <Link
+                                                        id={entryId.spiffeId}
+                                                        href="#"
+                                                        renderIcon={NextOutline16}
+                                                        visited={false}
+                                                        onClick={(e) => {
+                                                            this.setSelectedEntriesIds(entryId, index);
+                                                            e.preventDefault();
+                                                        }}
+                                                    >
+                                                        {(index + 1).toString() + ". " + entryId.spiffeId}
+                                                    </Link>
+                                                </div>
+                                            ))}
+                                        </fieldset>
+                                        <br></br>
+                                        <legend className="additional_info_entries_list">[i.e. Select Entry to Populate Metadata to Free Form]</legend>
+                                    </div>
+                                    <div className="entries-edit-form">
+                                        <TextInput
+                                            //aria-required="true"
+                                            helperText="i.e. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent i.e. spiffe://example.org/spire/server"
+                                            id="trustdomain"
+                                            invalidText="A valid value is required - refer to helper text below"
+                                            labelText="SPIFFE ID Trust Domain"
+                                            placeholder="Enter SPIFFE ID Trust Domain"
+                                            value={this.state.spiffeIdTrustDomain}
+                                            onChange={(e) => {
+                                                this.onChangeSpiffeIdTrustDomain(e);
+                                            }}
+                                        />
+                                        <TextInput
+                                            helperText="i.e. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent i.e. spiffe://example.org/spire/server"
+                                            id="path"
+                                            invalidText="A valid value is required - refer to helper text below"
+                                            labelText="SPIFFE ID Path"
+                                            placeholder="Enter SPIFFE ID Path"
+                                            value={this.state.spiffeIdPath}
+                                            onChange={(e) => {
+                                                this.onChangeSpiffeIdPath(e);
+                                            }}
+                                        />
+                                        <TextInput
+                                            helperText="i.e. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent i.e. spiffe://example.org/spire/server"
+                                            id="path"
+                                            invalidText="A valid value is required - refer to helper text below"
+                                            labelText="Parent ID Trust Domain"
+                                            placeholder="Enter Parent ID Trust Domain"
+                                            value={this.state.parentIdTrustDomain}
+                                            onChange={(e) => {
+                                                this.onChangeParentIdTrustDomain(e);
+                                            }}
+                                        />
+                                        <TextInput
+                                            helperText="i.e. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent i.e. spiffe://example.org/spire/server"
+                                            id="path"
+                                            invalidText="A valid value is required - refer to helper text below"
+                                            labelText="Parent ID Path"
+                                            placeholder="Enter Parent ID Path"
+                                            value={this.state.parentIdPath}
+                                            onChange={(e) => {
+                                                this.onChangeParentIdPath(e);
+                                            }}
+                                        />
+                                        <TextArea
+                                            cols={50}
+                                            helperText="i.e. k8s_sat:cluster:demo-cluster,..."
+                                            id="selectors-textArea"
+                                            invalidText="A valid value is required"
+                                            labelText="Selectors"
+                                            placeholder="Enter Selectors"
+                                            value={this.state.selectorsList}
+                                            rows={8}
+                                            onChange={this.onChangeSelectors}
+                                        />
+                                        <br></br>
+                                        <div className="advanced">
+                                            <fieldset className="bx--fieldset">
+                                                <legend className="bx--label">Advanced</legend>
+                                                <div className="ttl-input" data-test="ttl-input">
+                                                    <NumberInput
+                                                        helperText="Ttl for identities issued for this entry (In seconds)"
+                                                        id="ttl-input"
+                                                        invalidText="Number is not valid"
+                                                        label="Time to Leave (Ttl)"
+                                                        //max={100}
+                                                        min={0}
+                                                        step={1}
+                                                        value={this.state.ttl}
+                                                        onChange={this.onChangeTtl}
+                                                    />
+                                                </div>
+                                                <div className="expiresAt-input" data-test="expiresAt-input">
+                                                    <NumberInput
+                                                        helperText="Entry expires at (seconds since Unix epoch)"
+                                                        id="expiresAt-input"
+                                                        invalidText="Number is not valid"
+                                                        label="Expires At"
+                                                        //max={100}
+                                                        min={0}
+                                                        step={1}
+                                                        value={this.state.expiresAt}
+                                                        onChange={this.onChangeExpiresAt}
+                                                    />
+                                                </div>
+                                                <div className="federates-with-input-field-yaml" data-test="federates-with-input-field">
+                                                    <TextInput
+                                                        helperText="i.e. example.org,abc.com (Separated By Commas)"
+                                                        id="federates-with-input-field"
+                                                        invalidText="A valid value is required - refer to helper text below"
+                                                        labelText="Federates With"
+                                                        placeholder="Enter Names of trust domains the identity described by this entry federates with"
+                                                        value={this.state.federatesWith}
+                                                        onChange={this.onChangeFederatesWith}
+                                                    />
+                                                </div>
+                                                <div className="dnsnames-input-field-yaml" data-test="dnsnames-input-field">
+                                                    <TextInput
+                                                        helperText="i.e. example.org,abc.com (Separated By Commas)"
+                                                        id="dnsnames-input-field"
+                                                        invalidText="A valid value is required - refer to helper text below"
+                                                        labelText="DNS Names"
+                                                        placeholder="Enter DNS Names associated with the identity described by this entry"
+                                                        value={this.state.dnsNames}
+                                                        onChange={this.onChangeDnsNames}
+                                                    />
+                                                </div>
+                                                <div className="admin-flag-checkbox" data-test="admin-flag-checkbox">
+                                                    <Checkbox
+                                                        labelText="Admin Flag"
+                                                        id="admin-flag"
+                                                        checked={this.state.adminFlag}
+                                                        onChange={this.onChangeAdminFlag}
+                                                    />
+                                                </div>
+                                                <div className="down-stream-checkbox" data-test="down-stream-checkbox">
+                                                    <Checkbox
+                                                        labelText="Down Stream"
+                                                        id="down-steam"
+                                                        checked={this.state.downstream}
+                                                        onChange={this.onChangeDownStream}
+                                                    />
+                                                </div>
+                                            </fieldset>
+                                        </div>
+                                        <Button
+                                            size="medium"
+                                            color="primary"
+                                            variant="contained"
+                                            onClick={() => {
+                                                this.applyEditToEntry();
+                                            }}
+                                        >
+                                            Apply Edit
+                                        </Button>
+                                        <p>i.e. Apply Change to Selected Entry/ Entries</p>
+                                    </div>
+                                </div>
+                            </ModalWrapper>
+                        </div>
+                    </div>
+                }
             </div>
         )
 
