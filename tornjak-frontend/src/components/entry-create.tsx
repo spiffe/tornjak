@@ -88,7 +88,7 @@ type CreateEntryState = {
   downstream: boolean,
   message: string,
   statusOK: string | any[],
-  sucessNumEntries: {"success": number, "fail": number},
+  successNumEntries: {"success": number, "fail": number},
   successJsonMessege: string,
   selectedServer: string,
   agentsIdList: string[],
@@ -144,7 +144,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       //token: "",
       message: "",
       statusOK: "",
-      sucessNumEntries: {"success": 0, "fail": 0},
+      successNumEntries: {"success": 0, "fail": 0},
       successJsonMessege: "",
       selectedServer: "",
       agentsIdList: [],
@@ -647,8 +647,8 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           }
           console.log(entriesStatus)
           this.setState({
-            message: "Request:" + JSON.stringify(entries, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
-            sucessNumEntries: {"success": sucessEntriesCount,"fail": entries.entries.length - sucessEntriesCount},
+            message: "REQUEST:" + JSON.stringify(entries, null, ' ') + "\n\nRESPONSE:" + JSON.stringify(res.data, null, ' '),
+            successNumEntries: {"success": sucessEntriesCount,"fail": entries.entries.length - sucessEntriesCount},
             statusOK: "Multiple",
           })
         }
@@ -682,9 +682,9 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                   <div role="alert" data-test="success-message">
                     {this.state.statusOK === "Multiple" &&
                       <div>
-                        <p className="success-message">{"-- " + this.state.sucessNumEntries.success + " ENTRY/ ENTRIES SUCCESSFULLY CREATED--"}</p>
-                        {this.state.sucessNumEntries.fail !== 0 &&
-                          <p className="failed-message">{"-- " + this.state.sucessNumEntries.fail + " ENTRY/ ENTRIES FAILED TO BE CREATED--"}</p>
+                        <p className="success-message">{"-- " + this.state.successNumEntries.success + " ENTRY/ ENTRIES SUCCESSFULLY CREATED--"}</p>
+                        {this.state.successNumEntries.fail !== 0 &&
+                          <p className="failed-message">{"-- " + this.state.successNumEntries.fail + " ENTRY/ ENTRIES FAILED TO BE CREATED--"}</p>
                         }
                       </div>
                     }
