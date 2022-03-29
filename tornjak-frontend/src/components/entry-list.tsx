@@ -48,7 +48,7 @@ class EntryList extends Component<EntryListProp, EntryListState> {
   TornjakApi: TornjakApi;
   constructor(props: EntryListProp) {
     super(props);
-    this.TornjakApi = new TornjakApi();
+    this.TornjakApi = new TornjakApi(props);
     this.state = {};
   }
 

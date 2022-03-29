@@ -25,6 +25,7 @@ export interface AgentsList {
   x509svid_serial_number: string; // The X509-SVID serial number.
   x509svid_expires_at: bigint; //  The X509-SVID expiration (seconds since Unix epoch).
   selectors: Array<Selector>; // The selectors attributed to the agent during attestation.
+  banned: boolean;
 }
 
 export interface AgentsWorkLoadAttestorInfo {

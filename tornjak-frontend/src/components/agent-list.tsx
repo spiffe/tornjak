@@ -71,7 +71,7 @@ class AgentList extends Component<AgentListProp, AgentListState> {
   TornjakApi: TornjakApi;
   constructor(props: AgentListProp) {
     super(props);
-    this.TornjakApi = new TornjakApi();
+    this.TornjakApi = new TornjakApi(props);
     this.state = {
       message: "",
     };

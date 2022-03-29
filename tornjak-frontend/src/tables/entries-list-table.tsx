@@ -7,12 +7,36 @@ import {
     entriesListUpdateFunc
 } from 'redux/actions';
 import Table from './list-table';
+import { EntriesList } from "components/types";
+import { RootState } from "redux/reducers";
+import { DenormalizedRow } from "carbon-components-react";
 
 // EntriesListTable takes in 
 // listTableData: entries data to be rendered on table
 // returns entries data inside a carbon component table with specified functions
-class EntriesListTable extends React.Component {
-    constructor(props) {
+
+type EntriesListTableProp = {
+    // dispatches a payload for list of entries with their metadata info as an array of EntriesListType and has a return type of void
+    entriesListUpdateFunc: (globalEntriesList: EntriesList[]) => void,
+    // data provided to the entries table
+    data: {
+        key: string,
+        props: { entry: EntriesList }
+    }[] | string | JSX.Element[],
+    id: string,
+    // list of available entries as array of EntriesListType or can be undefined if no array present
+    globalEntriesList: EntriesList[] | undefined,
+    // the selected server for manager mode 
+    globalServerSelected: string,
+}
+
+type EntriesListTableState = {
+    listData: { key: string, props: { entry: EntriesList } }[] | EntriesList[] | undefined | string | JSX.Element[],
+    listTableData: { id: string, [x: string]: string; }[]
+}
+
+class EntriesListTable extends React.Component<EntriesListTableProp, EntriesListTableState> {
+    constructor(props: EntriesListTableProp) {
         super(props);
         this.state = {
             listData: props.data,
@@ -25,7 +49,7 @@ class EntriesListTable extends React.Component {
     componentDidMount() {
         this.prepareTableData();
     }
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(prevProps: EntriesListTableProp) {
         if (prevProps !== this.props) {
             this.setState({
                 listData: this.props.globalEntriesList
@@ -36,16 +60,19 @@ class EntriesListTable extends React.Component {
 
     prepareTableData() {
         const { data } = this.props;
-        let listData = [...data];
-        let listtabledata = [];
+        let listData: { props: { entry: EntriesList; }; }[] | ({ key: string; props: { entry: EntriesList; }; } | JSX.Element)[] = [];
+        if (typeof (data) === "string" || data === undefined)
+            return
+        data.forEach(val => listData.push(Object.assign({}, val)));
+        let listtabledata: { idx: string; id: string; spiffeid: string; parentid: string; selectors: string; info: string }[] = [];
         let i = 0;
         for (i = 0; i < listData.length; i++) {
-            listtabledata[i] = {};
+            listtabledata[i] = { "idx": "", "id": "", "spiffeid": "", "parentid": "", "selectors": "", "info": "" };
             listtabledata[i]["idx"] = (i + 1).toString();
             listtabledata[i]["id"] = listData[i].props.entry.id;
             listtabledata[i]["spiffeid"] = "spiffe://" + listData[i].props.entry.spiffe_id.trust_domain + listData[i].props.entry.spiffe_id.path;
             listtabledata[i]["parentid"] = "spiffe://" + listData[i].props.entry.parent_id.trust_domain + listData[i].props.entry.parent_id.path;
-            listtabledata[i]["selectors"] = listData[i].props.entry.selectors.map(s => s.type + ":" + s.value).join(', ');
+            listtabledata[i]["selectors"] = listData[i].props.entry.selectors.map((s: { type: string; value: string; }) => s.type + ":" + s.value).join(', ');
             listtabledata[i]["info"] = JSON.stringify(listData[i].props.entry, null, ' ');
         }
         this.setState({
@@ -53,7 +80,7 @@ class EntriesListTable extends React.Component {
         })
     }
 
-    deleteEntry(selectedRows) {
+    deleteEntry(selectedRows: readonly DenormalizedRow[]) {
         var id = [], endpoint = "";
         let promises = [];
         if (IsManager) {
@@ -73,6 +100,9 @@ class EntriesListTable extends React.Component {
         }
         Promise.all(promises)
             .then(responses => {
+                if (this.props.globalEntriesList === undefined) {
+                    return
+                }
                 for (let i = 0; i < responses.length; i++) {
                     console.log("Status: ", responses[i].statusText)
                     this.props.entriesListUpdateFunc(this.props.globalEntriesList.filter(el => el.id !== responses[i].data.results[0].id))
@@ -114,16 +144,17 @@ class EntriesListTable extends React.Component {
         return (
             <div>
                 <Table
+                    entityType={"Entry"}
                     listTableData={listTableData}
                     headerData={headerData}
                     deleteEntity={this.deleteEntry}
-                />
+                    banEntity={undefined} />
             </div>
         );
     }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: RootState) => ({
     globalServerSelected: state.servers.globalServerSelected,
     globalEntriesList: state.entries.globalEntriesList
 })

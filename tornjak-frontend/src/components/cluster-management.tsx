@@ -58,7 +58,7 @@ class ClusterManagement extends Component<ClusterManagementProp, ClusterManageme
   TornjakApi: TornjakApi;
   constructor(props: ClusterManagementProp) {
     super(props);
-    this.TornjakApi = new TornjakApi();
+    this.TornjakApi = new TornjakApi(props);
     this.prepareClusterTypeList = this.prepareClusterTypeList.bind(this);
     this.prepareAgentsList = this.prepareAgentsList.bind(this);
     this.state = {
