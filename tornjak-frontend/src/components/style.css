@@ -74,6 +74,14 @@
   .parentId-drop-down {
     margin-bottom: 20px;
   }
+
+  .parentId-drop-down-yaml {
+    margin-bottom: 20px;
+    border-width:1px;
+    border-style:solid;
+    border-color: rgb(180, 178, 178);
+    padding: 10px 10px 10px 10px;
+  }
   
   .clustertype-drop-down {
     margin-bottom: 20px;

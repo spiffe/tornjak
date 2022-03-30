@@ -7,6 +7,7 @@ import {
     TextArea,
     NumberInput,
     Link,
+    Dropdown
 } from 'carbon-components-react';
 import {
     Button,
@@ -63,13 +64,15 @@ class CreateEntryYaml extends Component {
         this.onChangeAdminFlag = this.onChangeAdminFlag.bind(this);
         this.onChangeDownStream = this.onChangeDownStream.bind(this);
         this.handleModalSubmit = this.handleModalSubmit.bind(this);
+        // this.onChangeSpiffeId = this.onChangeSpiffeId.bind(this);
+        this.onChangeParentId = this.onChangeParentId.bind(this);
 
         this.state = {
             parseError: false,
             isEntriesLoaded: false,
             newEntriesIds: [],
             newEntrySelected: [],
-            selectedEntryId: 0,
+            selectedEntryId: -1,
             uploadedEntries: [],
             yamlFormSpiffeId: "",
             spiffeIdTrustDomain: "",
@@ -82,7 +85,8 @@ class CreateEntryYaml extends Component {
             federatesWith: "",
             dnsNames: "",
             adminFlag: false,
-            downstream: false
+            downstream: false,
+            // spiffeIdPrefix: "",
         }
     }
 
@@ -137,32 +141,32 @@ class CreateEntryYaml extends Component {
     }
 
     setSelectedEntriesIds(e, id) {
-        var localNewEntry = this.state.uploadedEntries[id], 
+        var localNewEntry = this.state.uploadedEntries[id],
             spiffeId_trustDomain = "",
             spiffeId_path = "",
             parentId_trustDomain = "",
             parentId_path = "",
-            selectorsWithNewline = "", 
-            federates_with = "", 
+            selectorsWithNewline = "",
+            federates_with = "",
             dns_names = "";
-        
-        if(localNewEntry.spiffe_id !== undefined) {
+
+        if (localNewEntry.spiffe_id !== undefined) {
             spiffeId_trustDomain = localNewEntry.spiffe_id.trust_domain;
             spiffeId_path = localNewEntry.spiffe_id.path;
         }
-        if(localNewEntry.parent_id !== undefined) {
+        if (localNewEntry.parent_id !== undefined) {
             parentId_trustDomain = localNewEntry.parent_id.trust_domain;
             parentId_path = localNewEntry.parent_id.path;
         }
-        if(localNewEntry.selectors !== undefined) {
+        if (localNewEntry.selectors !== undefined) {
             var selectors = localNewEntry.selectors;
             var selectorJoinedArray = selectors.map((x) => (x.type + ":" + x.value + "\n"));
             selectorsWithNewline = selectorJoinedArray.join('');
         }
-        if(localNewEntry.federates_with !== undefined) {
+        if (localNewEntry.federates_with !== undefined) {
             federates_with = localNewEntry.federates_with.toString();
         }
-        if(localNewEntry.dns_names !== undefined) {
+        if (localNewEntry.dns_names !== undefined) {
             dns_names = localNewEntry.dns_names.toString();
         }
         this.setState({
@@ -183,6 +187,10 @@ class CreateEntryYaml extends Component {
     }
 
     applyEditToEntry() {
+        if (this.state.selectedEntryId === -1) {
+            alert("Please Select an Entry From the List, and make Necessary Changes!");
+            return
+        }
         var entriesToUpload = this.state.uploadedEntries,
             selectedEntryId = this.state.selectedEntryId,
             selectorStrings = [],
@@ -204,20 +212,39 @@ class CreateEntryYaml extends Component {
         if (this.state.dnsNames.length !== 0) {
             dnsNamesWithList = this.state.dnsNames.split(',').map((x) => x.trim())
         }
-
-        entriesToUpload[selectedEntryId].spiffe_id.trust_domain = this.state.spiffeIdTrustDomain;
-        entriesToUpload[selectedEntryId].spiffe_id.path = this.state.spiffeIdPath;
-        entriesToUpload[selectedEntryId].parent_id.trust_domain = this.state.parentIdTrustDomain;
-        entriesToUpload[selectedEntryId].parent_id.path = this.state.parentIdPath;
-        entriesToUpload[selectedEntryId].selectors = selectorEntries;
-        entriesToUpload[selectedEntryId].ttl = this.state.ttl;
-        entriesToUpload[selectedEntryId].expires_at = this.state.expiresAt;
-        entriesToUpload[selectedEntryId].federates_with = federatedWithList;
-        entriesToUpload[selectedEntryId].dns_names = dnsNamesWithList;
-        entriesToUpload[selectedEntryId].admin = this.state.adminFlag;
-        entriesToUpload[selectedEntryId].downstream = this.state.downstream;
-
+        if(entriesToUpload[selectedEntryId].spiffe_id === undefined) {
+            entriesToUpload[selectedEntryId]["spiffe_id"] = {};
+        }
+        entriesToUpload[selectedEntryId]["spiffe_id"]["trust_domain"] = this.state.spiffeIdTrustDomain;
+        entriesToUpload[selectedEntryId]["spiffe_id"]["path"] = this.state.spiffeIdPath;
+        if(entriesToUpload[selectedEntryId].parent_id === undefined) {
+            entriesToUpload[selectedEntryId]["parent_id"] = {};
+        }
+        entriesToUpload[selectedEntryId]["parent_id"]["trust_domain"] = this.state.parentIdTrustDomain;
+        entriesToUpload[selectedEntryId]["parent_id"]["path"] = this.state.parentIdPath;
+        entriesToUpload[selectedEntryId]["selectors"] = selectorEntries;
+        if(this.state.ttl !== undefined) {
+            entriesToUpload[selectedEntryId]["ttl"] = this.state.ttl;
+        }
+        if(this.state.ttl !== undefined) {
+            entriesToUpload[selectedEntryId]["expires_at"] = this.state.expiresAt;
+        }
+        if(this.state.expiresAt !== undefined) {
+            entriesToUpload[selectedEntryId]["federates_with"] = federatedWithList;
+        }
+        if(this.state.dnsNames.length !== 0) {
+            entriesToUpload[selectedEntryId]["dns_names"] = dnsNamesWithList;
+        }
+        if(this.state.adminFlag !== undefined) {
+            entriesToUpload[selectedEntryId]["admin"] = this.state.adminFlag;
+        }
+        if(this.state.downstream !== undefined) {
+            entriesToUpload[selectedEntryId]["downstream"] = this.state.downstream;
+        }
+        var updatedIds = this.state.newEntriesIds;
+        updatedIds[selectedEntryId]["spiffeId"] = this.SpiffeHelper.getEntrySpiffeid(entriesToUpload[selectedEntryId]);
         this.setState({
+            newEntriesIds: updatedIds,
             uploadedEntries: entriesToUpload
         })
         //this.props.newEntriesUpdateFunc(entriesToUpload);
@@ -306,8 +333,70 @@ class CreateEntryYaml extends Component {
     handleModalSubmit = () => {
         return true;
     }
+
+    parseSpiffeId(sid) {
+        if (sid.startsWith('spiffe://')) {
+            var sub = sid.substr("spiffe://".length)
+            var sp = sub.indexOf("/")
+            if (sp > 0 && sp !== sub.length - 1) {
+                var trustDomain = sub.substr(0, sp);
+                var path = sub.substr(sp);
+                return [true, trustDomain, path];
+            }
+        }
+        return [false, "", ""];
+    }
+
+    onChangeParentId = (selected) => {
+        //var prefix = "spiffe://", 
+        var sid = selected.selectedItem;
+        const [validSpiffeId, trustDomain, path] = this.parseSpiffeId(sid)
+        //var spiffeIdPrefix = prefix + trustDomain + "/";
+        if (validSpiffeId) {
+            this.setState({
+                parentIdTrustDomain: trustDomain,
+                parentIdPath: path,
+                // spiffeIdPrefix: spiffeIdPrefix,
+                spiffeIdTrustDomain: trustDomain,
+            });
+            return
+        }
+        // else invalid spiffe ID
+        this.setState({
+            parentIdTrustDomain: "",
+            parentIdPath: "",
+        });
+        return
+    }
+
+    // onChangeSpiffeId(e) {
+    //     var sid = e.target.value;
+    //     if (sid.length === 0) {
+    //         this.setState({
+    //             spiffeIdTrustDomain: "",
+    //             spiffeIdPath: "",
+    //         });
+    //         return
+    //     }
+
+    //     const [validSpiffeId, trustDomain, path] = this.parseSpiffeId(sid)
+    //     if (validSpiffeId) {
+    //         this.setState({
+    //             spiffeIdTrustDomain: trustDomain,
+    //             spiffeIdPath: path,
+    //         });
+    //         return
+    //     }
+    //     // else invalid spiffe ID
+    //     this.setState({
+    //         spiffeIdTrustDomain: "",
+    //         spiffeIdPath: "",
+    //     });
+    //     return
+    // }
     render() {
         const newEntryFormatLink = "https://github.com/mamy-CS/tornjak-public/blob/create-entries-yaml/docs/newEntry-yaml-format.md";
+        const ParentIdList = this.props.ParentIdList;
         return (
             <div>
                 {this.state.parseError &&
@@ -396,6 +485,36 @@ class CreateEntryYaml extends Component {
                                         <legend className="additional_info_entries_list">[i.e. Select Entry to Populate Metadata to Free Form]</legend>
                                     </div>
                                     <div className="entries-edit-form">
+                                        <div className="parentId-drop-down-yaml" data-test="parentId-drop-down-yaml">
+                                            <Dropdown
+                                                aria-required="true"
+                                                ariaLabel="parentId-drop-down"
+                                                id="parentId-drop-down"
+                                                items={ParentIdList}
+                                                label="Select Parent ID"
+                                                titleText="Parent ID - [*optional Selection]"
+                                                onChange={this.onChangeParentId}
+                                            />
+                                            <p className="parentId-helper">i.e. select if no Parent ID provided/ to Edit</p>
+                                        </div>
+                                        {/* <div className="spiffeId-input-field" data-test="spiffeId-input-field">
+                                            <TextInput
+                                                aria-required="true"
+                                                helperText="i.e. spiffe://example.org/sample/spiffe/id"
+                                                id="spiffeIdInputField"
+                                                invalidText="A valid value is required - refer to helper text below"
+                                                labelText="SPIFFE ID [*required]"
+                                                placeholder="Enter SPIFFE ID"
+                                                //value={this.state.spiffeId}
+                                                defaultValue={this.state.spiffeIdPrefix}
+                                                onChange={(e) => {
+                                                    const input = e.target.value
+                                                    e.target.value = this.state.spiffeIdPrefix + input.substr(this.state.spiffeIdPrefix.length);
+                                                    this.onChangeSpiffeId(e);
+                                                }}
+                                                //onChange={this.onChangeSpiffeId}
+                                                required />
+                                        </div> */}
                                         <TextInput
                                             //aria-required="true"
                                             helperText="i.e. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent i.e. spiffe://example.org/spire/server"

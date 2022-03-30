@@ -92,6 +92,7 @@ type CreateEntryState = {
   successJsonMessege: string,
   selectedServer: string,
   agentsIdList: string[],
+  agentsIdList_noManualOption: string[],
   spiffeIdPrefix: string,
   parentIdManualEntryOption: string,
   parentIDManualEntry: boolean,
@@ -148,6 +149,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       successJsonMessege: "",
       selectedServer: "",
       agentsIdList: [],
+      agentsIdList_noManualOption: [],
       spiffeIdPrefix: "",
       parentIdManualEntryOption: "----Select this option and Enter Custom Parent ID Below----",
       parentIDManualEntry: false,
@@ -220,7 +222,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
 
   prepareParentIdAgentsList(): void {
     var idx = 0, prefix = "spiffe://";
-    let localAgentsIdList: string[] = [];
+    let localAgentsIdList: string[] = [], localAgentsIdList_noManualOption: string[] = [] ;
     if (Object.keys(this.props.globalServerInfo).length === 0) { return }
     //user prefered option
     localAgentsIdList[0] = this.state.parentIdManualEntryOption;
@@ -252,8 +254,11 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
         }
       }
     }
+    localAgentsIdList_noManualOption = [...localAgentsIdList];
+    localAgentsIdList_noManualOption.shift();
     this.setState({
-      agentsIdList: localAgentsIdList
+      agentsIdList: localAgentsIdList,
+      agentsIdList_noManualOption: localAgentsIdList_noManualOption
     });
   }
 
@@ -634,7 +639,6 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       return
     }
     var entries = { "entries": this.props.globalNewEntries };
-
     axios.post(endpoint, entries)
       .then(
         res => {
@@ -664,7 +668,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   }
 
   render() {
-    const ParentIdList = this.state.agentsIdList;
+    const ParentIdList = this.state.agentsIdList, ParentIdList_noManualOption = this.state.agentsIdList_noManualOption;
     return (
       <div data-test="create-entry">
         <div className="create-entry-title" data-test="create-entry-title">
@@ -712,7 +716,8 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           <AccordionItem
             title={<h5>Upload New Entry/ Entries YAML</h5>} open>
             <div className="entry-form">
-              <CreateEntryYaml />
+              <CreateEntryYaml 
+                ParentIdList={ParentIdList_noManualOption}/>
               <br></br>
               <Button
                 size="medium"
