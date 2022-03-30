@@ -137,22 +137,46 @@ class CreateEntryYaml extends Component {
     }
 
     setSelectedEntriesIds(e, id) {
-        var localNewEntry = this.state.uploadedEntries[id], selectorsWithNewline = "";
-        var selectors = localNewEntry.selectors;
-        var selectorJoinedArray = selectors.map((x) => (x.type + ":" + x.value + "\n"))
-        selectorsWithNewline = selectorJoinedArray.join('');
+        var localNewEntry = this.state.uploadedEntries[id], 
+            spiffeId_trustDomain = "",
+            spiffeId_path = "",
+            parentId_trustDomain = "",
+            parentId_path = "",
+            selectorsWithNewline = "", 
+            federates_with = "", 
+            dns_names = "";
+        
+        if(localNewEntry.spiffe_id !== undefined) {
+            spiffeId_trustDomain = localNewEntry.spiffe_id.trust_domain;
+            spiffeId_path = localNewEntry.spiffe_id.path;
+        }
+        if(localNewEntry.parent_id !== undefined) {
+            parentId_trustDomain = localNewEntry.parent_id.trust_domain;
+            parentId_path = localNewEntry.parent_id.path;
+        }
+        if(localNewEntry.selectors !== undefined) {
+            var selectors = localNewEntry.selectors;
+            var selectorJoinedArray = selectors.map((x) => (x.type + ":" + x.value + "\n"));
+            selectorsWithNewline = selectorJoinedArray.join('');
+        }
+        if(localNewEntry.federates_with !== undefined) {
+            federates_with = localNewEntry.federates_with.toString();
+        }
+        if(localNewEntry.dns_names !== undefined) {
+            dns_names = localNewEntry.dns_names.toString();
+        }
         this.setState({
             selectedEntryId: id,
             newEntrySelected: localNewEntry,
-            spiffeIdTrustDomain: localNewEntry.spiffe_id.trust_domain,
-            spiffeIdPath: localNewEntry.spiffe_id.path,
-            parentIdTrustDomain: localNewEntry.parent_id.trust_domain,
-            parentIdPath: localNewEntry.parent_id.path,
+            spiffeIdTrustDomain: spiffeId_trustDomain,
+            spiffeIdPath: spiffeId_path,
+            parentIdTrustDomain: parentId_trustDomain,
+            parentIdPath: parentId_path,
             selectorsList: selectorsWithNewline,
             ttl: localNewEntry.ttl,
             expiresAt: localNewEntry.expires_at,
-            federatesWith: localNewEntry.federates_with.toString(),
-            dnsNames: localNewEntry.dns_names.toString(),
+            federatesWith: federates_with,
+            dnsNames: dns_names,
             adminFlag: localNewEntry.admin,
             downstream: localNewEntry.downstream
         })
