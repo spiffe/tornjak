@@ -68,6 +68,7 @@ class CreateEntryYaml extends Component {
         this.onChangeParentId = this.onChangeParentId.bind(this);
 
         this.state = {
+            prefix: "spiffe://",
             parseError: false,
             isEntriesLoaded: false,
             newEntriesIds: [],
@@ -77,8 +78,10 @@ class CreateEntryYaml extends Component {
             yamlFormSpiffeId: "",
             spiffeIdTrustDomain: "",
             spiffeIdPath: "",
+            spiffeId: "",
             parentIdTrustDomain: "",
             parentIdPath: "",
+            parentId: "",
             selectorsList: "",
             ttl: 0,
             expiresAt: 0,
@@ -86,7 +89,8 @@ class CreateEntryYaml extends Component {
             dnsNames: "",
             adminFlag: false,
             downstream: false,
-            // spiffeIdPrefix: "",
+            entrySelected: false,
+            spiffeIdPrefix: "",
         }
     }
 
@@ -141,24 +145,41 @@ class CreateEntryYaml extends Component {
     }
 
     setSelectedEntriesIds(e, id) {
-        var localNewEntry = this.state.uploadedEntries[id],
+        var prefix = this.state.prefix, localNewEntry = this.state.uploadedEntries[id],
             spiffeId_trustDomain = "",
             spiffeId_path = "",
+            spiffeId = "",
             parentId_trustDomain = "",
             parentId_path = "",
+            parentId = "",
             selectorsWithNewline = "",
             federates_with = "",
             dns_names = "";
+            
 
         if (localNewEntry.spiffe_id !== undefined) {
             spiffeId_trustDomain = localNewEntry.spiffe_id.trust_domain;
             spiffeId_path = localNewEntry.spiffe_id.path;
+            if(localNewEntry.spiffe_id.trust_domain !== undefined && localNewEntry.spiffe_id.path !== undefined) {
+                spiffeId = prefix + localNewEntry.spiffe_id.trust_domain + localNewEntry.spiffe_id.path;
+            } else if (localNewEntry.spiffe_id.trust_domain !== undefined) {
+                spiffeId = prefix + localNewEntry.spiffe_id.trust_domain;
+            } else if (localNewEntry.spiffe_id.path !== undefined) {
+                spiffeId = localNewEntry.spiffe_id.path;
+            }
         }
         if (localNewEntry.parent_id !== undefined) {
             parentId_trustDomain = localNewEntry.parent_id.trust_domain;
             parentId_path = localNewEntry.parent_id.path;
+            if(localNewEntry.parent_id.trust_domain !== undefined && localNewEntry.parent_id.path !== undefined) {
+                parentId = prefix + localNewEntry.parent_id.trust_domain + localNewEntry.parent_id.path;
+            } else if (localNewEntry.parent_id.trust_domain !== undefined) {
+                parentId = prefix + localNewEntry.parent_id.trust_domain;
+            } else if (localNewEntry.parent_id.path !== undefined) {
+                parentId = localNewEntry.parent_id.path;
+            }
         }
-        if (localNewEntry.selectors !== undefined) {
+        if (localNewEntry.selectors !== undefined && localNewEntry.selectors !== "" && localNewEntry.selectors[0] !== null) {
             var selectors = localNewEntry.selectors;
             var selectorJoinedArray = selectors.map((x) => (x.type + ":" + x.value + "\n"));
             selectorsWithNewline = selectorJoinedArray.join('');
@@ -174,6 +195,8 @@ class CreateEntryYaml extends Component {
             newEntrySelected: localNewEntry,
             spiffeIdTrustDomain: spiffeId_trustDomain,
             spiffeIdPath: spiffeId_path,
+            spiffeId: spiffeId,
+            parentId: parentId,
             parentIdTrustDomain: parentId_trustDomain,
             parentIdPath: parentId_path,
             selectorsList: selectorsWithNewline,
@@ -182,13 +205,38 @@ class CreateEntryYaml extends Component {
             federatesWith: federates_with,
             dnsNames: dns_names,
             adminFlag: localNewEntry.admin,
-            downstream: localNewEntry.downstream
+            downstream: localNewEntry.downstream,
+            entrySelected: true,
+            spiffeIdPrefix: prefix + spiffeId_trustDomain
         })
     }
 
     applyEditToEntry() {
         if (this.state.selectedEntryId === -1) {
             alert("Please Select an Entry From the List, and make Necessary Changes!");
+            return
+        }
+        if(this.state.spiffeIdTrustDomain === undefined || this.state.spiffeIdTrustDomain === "") {
+            alert("SPIFFE ID Trust Domain Empty/ Invalid, Please Input Trust Domain!");
+            return
+        }
+            
+        if(this.state.spiffeIdPath === undefined || this.state.spiffeIdPath === "") {
+            alert("SPIFFE ID Path Empty/ Invalid, Please Input Path!");
+            return
+        }
+        console.log(this.state.parentIdTrustDomain)
+        if(this.state.parentIdTrustDomain === undefined || this.state.parentIdTrustDomain === "") {
+            alert("Parent ID Trust Domain Empty/ Invalid, Please Input Trust Domain!");
+            return
+        }
+            
+        if(this.state.parentIdPath === undefined || this.state.parentIdPath === "") {
+            alert("Parent ID Path Empty/ Invalid, Please Input Path!");
+            return
+        }
+        if (this.state.selectorsList.length === 0) {
+            alert("Selectors List Empty/ Invalid, Please Input Selectors!");
             return
         }
         var entriesToUpload = this.state.uploadedEntries,
@@ -247,6 +295,7 @@ class CreateEntryYaml extends Component {
             newEntriesIds: updatedIds,
             uploadedEntries: entriesToUpload
         })
+        alert("Entry " + (selectedEntryId+1).toString() + " Updated!");
         //this.props.newEntriesUpdateFunc(entriesToUpload);
     }
 
@@ -331,6 +380,18 @@ class CreateEntryYaml extends Component {
     }
 
     handleModalSubmit = () => {
+        this.setState({
+            parentId: "",
+            spiffeId: "",
+            selectorsList: "",
+            ttl: 0,
+            expiresAt: 0,
+            federatesWith: "",
+            dnsNames: "",
+            adminFlag: false,
+            downstream: false,
+            entrySelected: false,
+        })
         return true;
     }
 
@@ -348,15 +409,17 @@ class CreateEntryYaml extends Component {
     }
 
     onChangeParentId = (selected) => {
-        //var prefix = "spiffe://", 
-        var sid = selected.selectedItem;
+        var prefix = this.state.prefix, 
+            sid = selected.selectedItem;
         const [validSpiffeId, trustDomain, path] = this.parseSpiffeId(sid)
-        //var spiffeIdPrefix = prefix + trustDomain + "/";
+        var spiffeIdPrefix = prefix + trustDomain;
         if (validSpiffeId) {
             this.setState({
                 parentIdTrustDomain: trustDomain,
                 parentIdPath: path,
-                // spiffeIdPrefix: spiffeIdPrefix,
+                spiffeId: spiffeIdPrefix + this.state.spiffeIdPath,
+                parentId: sid,
+                spiffeIdPrefix: spiffeIdPrefix,
                 spiffeIdTrustDomain: trustDomain,
             });
             return
@@ -369,31 +432,63 @@ class CreateEntryYaml extends Component {
         return
     }
 
-    // onChangeSpiffeId(e) {
-    //     var sid = e.target.value;
-    //     if (sid.length === 0) {
-    //         this.setState({
-    //             spiffeIdTrustDomain: "",
-    //             spiffeIdPath: "",
-    //         });
-    //         return
-    //     }
+    onChangeParentIdInput(e) {
+        var sid = e.target.value;
+        this.setState({
+            parentId: sid
+        })
+        if (sid.length === 0) {
+            this.setState({
+                parentIdTrustDomain: "",
+                parentIdPath: "",
+            });
+            return
+        }
+        const [validParentId, trustDomain, path] = this.parseSpiffeId(sid)
+        if (validParentId) {
+            this.setState({
+                parentIdTrustDomain: trustDomain,
+                parentIdPath: path,
+            });
+            return
+        }
+        // else invalid parent ID
+        this.setState({
+            parentIdTrustDomain: "",
+            parentIdPath: "",
+        });
+        return
+    }
 
-    //     const [validSpiffeId, trustDomain, path] = this.parseSpiffeId(sid)
-    //     if (validSpiffeId) {
-    //         this.setState({
-    //             spiffeIdTrustDomain: trustDomain,
-    //             spiffeIdPath: path,
-    //         });
-    //         return
-    //     }
-    //     // else invalid spiffe ID
-    //     this.setState({
-    //         spiffeIdTrustDomain: "",
-    //         spiffeIdPath: "",
-    //     });
-    //     return
-    // }
+    onChangeSpiffeId(e) {
+        var sid = e.target.value;
+        this.setState({
+            spiffeId: sid
+        })
+        if (sid.length === 0) {
+            this.setState({
+                spiffeIdTrustDomain: "",
+                spiffeIdPath: "",
+            });
+            return
+        }
+
+        const [validSpiffeId, trustDomain, path] = this.parseSpiffeId(sid)
+        if (validSpiffeId) {
+            this.setState({
+                spiffeIdTrustDomain: trustDomain,
+                spiffeIdPath: path,
+            });
+            return
+        }
+        // else invalid spiffe ID
+        this.setState({
+            spiffeIdTrustDomain: "",
+            spiffeIdPath: "",
+        });
+        return
+    }
+
     render() {
         const newEntryFormatLink = "https://github.com/mamy-CS/tornjak-public/blob/create-entries-yaml/docs/newEntry-yaml-format.md";
         const ParentIdList = this.props.ParentIdList;
@@ -486,18 +581,50 @@ class CreateEntryYaml extends Component {
                                     </div>
                                     <div className="entries-edit-form">
                                         <div className="parentId-drop-down-yaml" data-test="parentId-drop-down-yaml">
-                                            <Dropdown
-                                                aria-required="true"
-                                                ariaLabel="parentId-drop-down"
-                                                id="parentId-drop-down"
-                                                items={ParentIdList}
-                                                label="Select Parent ID"
-                                                titleText="Parent ID - [*optional Selection]"
-                                                onChange={this.onChangeParentId}
-                                            />
-                                            <p className="parentId-helper">i.e. select if no Parent ID provided/ to Edit</p>
+                                            {!this.state.entrySelected &&
+                                                <div>
+                                                    <Dropdown
+                                                        disabled="true"
+                                                        aria-required="true"
+                                                        ariaLabel="parentId-drop-down"
+                                                        id="parentId-drop-down"
+                                                        items={ParentIdList}
+                                                        label="Select Entry to Enable Dropdown"
+                                                        titleText="Parent ID - [*optional Selection]"
+                                                        onChange={this.onChangeParentId}
+                                                    />
+                                                </div>
+                                            }  
+                                            {this.state.entrySelected &&
+                                                <div>
+                                                    <Dropdown
+                                                        aria-required="true"
+                                                        ariaLabel="parentId-drop-down"
+                                                        id="parentId-drop-down"
+                                                        items={ParentIdList}
+                                                        label="Select Parent ID"
+                                                        titleText="Parent ID - [*optional Selection]"
+                                                        onChange={this.onChangeParentId}
+                                                    />
+                                                    <p className="parentId-helper">i.e. select if no Parent ID provided/ to Edit</p>
+                                                </div>
+                                            }
                                         </div>
-                                        {/* <div className="spiffeId-input-field" data-test="spiffeId-input-field">
+                                        <div className="parentId-input-field" data-test="parentId-input-field">
+                                            <TextInput
+                                                aria-required="true"
+                                                helperText="i.e. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent i.e. spiffe://example.org/spire/server"
+                                                id="parentIdInputField"
+                                                invalidText="A valid value is required - refer to helper text below"
+                                                labelText="PARENT ID [*required]"
+                                                placeholder="Enter PARENT ID"
+                                                value={this.state.parentId}
+                                                onChange={(e) => {
+                                                    this.onChangeParentIdInput(e);
+                                                }}
+                                                required />
+                                        </div>
+                                        <div className="spiffeId-input-field" data-test="spiffeId-input-field">
                                             <TextInput
                                                 aria-required="true"
                                                 helperText="i.e. spiffe://example.org/sample/spiffe/id"
@@ -505,61 +632,14 @@ class CreateEntryYaml extends Component {
                                                 invalidText="A valid value is required - refer to helper text below"
                                                 labelText="SPIFFE ID [*required]"
                                                 placeholder="Enter SPIFFE ID"
-                                                //value={this.state.spiffeId}
-                                                defaultValue={this.state.spiffeIdPrefix}
+                                                value={this.state.spiffeId}
                                                 onChange={(e) => {
                                                     const input = e.target.value
                                                     e.target.value = this.state.spiffeIdPrefix + input.substr(this.state.spiffeIdPrefix.length);
                                                     this.onChangeSpiffeId(e);
                                                 }}
-                                                //onChange={this.onChangeSpiffeId}
                                                 required />
-                                        </div> */}
-                                        <TextInput
-                                            //aria-required="true"
-                                            helperText="i.e. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent i.e. spiffe://example.org/spire/server"
-                                            id="trustdomain"
-                                            invalidText="A valid value is required - refer to helper text below"
-                                            labelText="SPIFFE ID Trust Domain"
-                                            placeholder="Enter SPIFFE ID Trust Domain"
-                                            value={this.state.spiffeIdTrustDomain}
-                                            onChange={(e) => {
-                                                this.onChangeSpiffeIdTrustDomain(e);
-                                            }}
-                                        />
-                                        <TextInput
-                                            helperText="i.e. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent i.e. spiffe://example.org/spire/server"
-                                            id="path"
-                                            invalidText="A valid value is required - refer to helper text below"
-                                            labelText="SPIFFE ID Path"
-                                            placeholder="Enter SPIFFE ID Path"
-                                            value={this.state.spiffeIdPath}
-                                            onChange={(e) => {
-                                                this.onChangeSpiffeIdPath(e);
-                                            }}
-                                        />
-                                        <TextInput
-                                            helperText="i.e. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent i.e. spiffe://example.org/spire/server"
-                                            id="path"
-                                            invalidText="A valid value is required - refer to helper text below"
-                                            labelText="Parent ID Trust Domain"
-                                            placeholder="Enter Parent ID Trust Domain"
-                                            value={this.state.parentIdTrustDomain}
-                                            onChange={(e) => {
-                                                this.onChangeParentIdTrustDomain(e);
-                                            }}
-                                        />
-                                        <TextInput
-                                            helperText="i.e. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent i.e. spiffe://example.org/spire/server"
-                                            id="path"
-                                            invalidText="A valid value is required - refer to helper text below"
-                                            labelText="Parent ID Path"
-                                            placeholder="Enter Parent ID Path"
-                                            value={this.state.parentIdPath}
-                                            onChange={(e) => {
-                                                this.onChangeParentIdPath(e);
-                                            }}
-                                        />
+                                        </div>
                                         <TextArea
                                             cols={50}
                                             helperText="i.e. k8s_sat:cluster:demo-cluster,..."

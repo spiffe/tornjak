@@ -75,6 +75,10 @@
     margin-bottom: 20px;
   }
 
+  .parentId-input-field {
+    margin-bottom: 20px;
+  }
+  
   .parentId-drop-down-yaml {
     margin-bottom: 20px;
     border-width:1px;
