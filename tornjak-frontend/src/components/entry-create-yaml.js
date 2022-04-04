@@ -490,7 +490,7 @@ class CreateEntryYaml extends Component {
     }
 
     render() {
-        const newEntryFormatLink = "https://github.com/mamy-CS/tornjak-public/blob/create-entries-yaml/docs/newEntry-yaml-format.md";
+        const newEntryFormatLink = "https://github.com/mamy-CS/tornjak-public/blob/create-entries-yaml/docs/newEntry-json-format.md";
         const ParentIdList = this.props.ParentIdList;
         return (
             <div>
