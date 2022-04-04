@@ -24,14 +24,14 @@ type EntriesListTableProp = {
         props: { entry: EntriesList }
     }[] | string | JSX.Element[],
     id: string,
-    // list of available entries as array of EntriesListType or can be undefined if no array present
-    globalEntriesList: EntriesList[] | undefined,
+    // list of available entries as array of EntriesListType
+    globalEntriesList: EntriesList[],
     // the selected server for manager mode 
     globalServerSelected: string,
 }
 
 type EntriesListTableState = {
-    listData: { key: string, props: { entry: EntriesList } }[] | EntriesList[] | undefined | string | JSX.Element[],
+    listData: { key: string, props: { entry: EntriesList } }[] | EntriesList[] | string | JSX.Element[],
     listTableData: { id: string, [x: string]: string; }[]
 }
 

@@ -21,10 +21,12 @@ const {
 // selectedRows: selectedRows from DataTable
 // returns the toolbar of the table for the specified entity
 type TableToolBarProp = {
-    deleteEntity: (selectedRows: readonly DenormalizedRow[]) => string | undefined | void,
-    banEntity: ((selectedRows: readonly DenormalizedRow[]) => string | undefined | void) | undefined,
+    deleteEntity: (selectedRows: readonly DenormalizedRow[]) => string | void,
+    banEntity: ((selectedRows: readonly DenormalizedRow[]) => string | void) | undefined,
     onInputChange: (event: React.SyntheticEvent<HTMLInputElement, Event>) => void,
-    getBatchActionProps: <E extends object = ReactDivAttr>(data?: ShapeOf<DataTableCustomBatchActionsData, E> | undefined) => ShapeOf<DataTableCustomBatchActionsProps, E>,
+    getBatchActionProps: <E extends object = 
+                        ReactDivAttr>(data?: ShapeOf<DataTableCustomBatchActionsData, E>) => 
+                        ShapeOf<DataTableCustomBatchActionsProps, E>,
     selectedRows: readonly DenormalizedRow[],
 }
 

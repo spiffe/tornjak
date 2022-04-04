@@ -24,14 +24,14 @@ type ClustersListTableProp = {
         props: { cluster: ClustersList }
     }[] | string | JSX.Element[],
     id: string,
-    // list of clusters with their metadata info as an array of ClustersList Type or can be undefined if no array present
-    globalClustersList: ClustersList[] | undefined,
+    // list of clusters with their metadata info as an array of ClustersList Type
+    globalClustersList: ClustersList[],
     // the selected server for manager mode 
     globalServerSelected: string,
 }
 
 type ClustersListTableState = {
-    listData: { key: string, props: { cluster: ClustersList } }[] | ClustersList[] | undefined | string | JSX.Element[],
+    listData: { key: string, props: { cluster: ClustersList } }[] | ClustersList[] | string | JSX.Element[],
     listTableData: {
         id: string;
         clusterName: string;

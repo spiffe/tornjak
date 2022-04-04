@@ -15,8 +15,13 @@ const {
 // returns header of the table for the specified entity
 type HeadProp = {
     headers: DataTableHeader<string>[],
-    getSelectionProps: <E extends object = {}>(data?: ShapeOf<DataTableCustomSelectionData<DataTableRow<string>>, E> | undefined) => ShapeOf<DataTableCustomSelectionProps<DataTableRow<string>>, E> | ShapeOf<DataTableCustomSelectionProps<never>, E>,
-    getHeaderProps: <E extends object = ReactAttr<HTMLElement>>(data: ShapeOf<DataTableCustomHeaderData<DataTableHeader<string>>, E>) => ShapeOf<DataTableCustomHeaderProps<DataTableHeader<string>>, E>,
+    getSelectionProps: <E extends object = {}>(data?: 
+                        ShapeOf<DataTableCustomSelectionData<DataTableRow<string>>, E> | undefined) => 
+                        ShapeOf<DataTableCustomSelectionProps<DataTableRow<string>>, E> | 
+                        ShapeOf<DataTableCustomSelectionProps<never>, E>,
+    getHeaderProps: <E extends object = 
+                    ReactAttr<HTMLElement>>(data: ShapeOf<DataTableCustomHeaderData<DataTableHeader<string>>, E>) => 
+                    ShapeOf<DataTableCustomHeaderProps<DataTableHeader<string>>, E>,
 }
 
 type HeadState = {

@@ -18,7 +18,10 @@ const {
 type BodyProp = {
     rows: readonly DenormalizedRow[],
     entityType: string,
-    getSelectionProps: <E extends object = {}>(data?: ShapeOf<DataTableCustomSelectionData<DataTableRow<string>>, E> | undefined) => ShapeOf<DataTableCustomSelectionProps<DataTableRow<string>>, E> | ShapeOf<DataTableCustomSelectionProps<never>, E>,
+    getSelectionProps: <E extends object = {}>(data?: 
+                        ShapeOf<DataTableCustomSelectionData<DataTableRow<string>>, E> | undefined) => 
+                        ShapeOf<DataTableCustomSelectionProps<DataTableRow<string>>, E> | 
+                        ShapeOf<DataTableCustomSelectionProps<never>, E>,
 }
 
 type BodyState = {

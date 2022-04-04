@@ -18,8 +18,8 @@ import { RootState } from "redux/reducers";
 type AgentsListTableProp = {
     // dispatches a payload for list of agents with their metadata info as an array of AgentListType and has a return type of void
     agentsListUpdateFunc: (globalAgentsList: AgentsList[]) => void,
-    // list of available agents as array of AgentsListType or can be undefined if no array present
-    globalAgentsList: AgentsList[] | undefined,
+    // list of available agents as array of AgentsListType
+    globalAgentsList: AgentsList[],
     // 
     globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[],
     // the selected server for manager mode 
@@ -33,7 +33,7 @@ type AgentsListTableProp = {
 }
 
 type AgentsListTableState = {
-    listData: { key: string, props: { agent: AgentsList } }[] | AgentsList[] | undefined | string | JSX.Element[],
+    listData: { key: string, props: { agent: AgentsList } }[] | AgentsList[] | string | JSX.Element[],
     listTableData: { id: string, [x: string]: string; }[]
 }
 class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTableState> {
