@@ -16,7 +16,9 @@ import ServerManagement from "./components/server-management";
 import TornjakServerInfo from "./components/tornjak-server-info";
 import TornjakDashBoard from "./components/dashboard/tornjak-dashboard";
 import DashboardDetailsRender from 'components/dashboard/dashboard-details-render';
+import { ToastContainer } from 'react-toastify';
 import './App.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
     return (
@@ -26,6 +28,11 @@ function App() {
                     <div className="nav-comp">
                         <NavigationBar />
                     </div>
+                    <ToastContainer
+                        className="carbon-toast"
+                        containerId="notifications"
+                        draggable={false}
+                    />
                     <div className="rest-body">
                         <SelectServer />
                         <br />

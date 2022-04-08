@@ -20,7 +20,8 @@ const GridCellExpand = React.memo(function GridCellExpand(props) {
     const [showPopper, setShowPopper] = React.useState(false);
 
     const handleMouseEnter = () => {
-        const isCurrentlyOverflown = isOverflown(cellValue.current);
+        // const isCurrentlyOverflown = isOverflown(cellValue.current);
+        const isCurrentlyOverflown = cellValue.current.scrollHeight > cellValue.current.clientHeight || cellValue.current.scrollWidth > cellValue.current.clientWidht;
         setShowPopper(isCurrentlyOverflown);
         setAnchorEl(cellDiv.current);
         setShowFullCell(true);
@@ -72,9 +73,9 @@ const GridCellExpand = React.memo(function GridCellExpand(props) {
                     top: 0,
                 }}
             />
-            <Box 
-                ref={cellValue} 
-                sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} 
+            <Box
+                ref={cellValue}
+                sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
             >
                 {value}
             </Box>

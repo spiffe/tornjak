@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import axios from 'axios';
 import GetApiServerUri from './helpers';
+import {logError, logDebug} from './helpers';
 
 class TornjakApi extends Component {
   constructor(props) {
@@ -27,7 +28,7 @@ class TornjakApi extends Component {
       }
       )
       .catch((error) => {
-        console.log(error);
+        logError(error);
       })
   }
 
@@ -40,7 +41,7 @@ class TornjakApi extends Component {
       }
       )
       .catch((error) => {
-        console.log(error);
+        logError(error);
       })
   }
   // refreshSelectorsState returns the list agent's with their workload plugin info for the selected server in manager mode
@@ -67,7 +68,7 @@ class TornjakApi extends Component {
         agentworkloadSelectorInfoFunc(response.data["agents"]);
       })
       .catch((error) => {
-        console.log(error);
+        logError(error);
       })
   }
   // refreshLocalSelectorsState returns the list agent's with their workload plugin info for the local server
@@ -94,7 +95,7 @@ class TornjakApi extends Component {
         agentworkloadSelectorInfoFunc(response.data["agents"]);
       })
       .catch((error) => {
-        console.log(error);
+        logError(error);
       })
   }
 
@@ -107,7 +108,7 @@ class TornjakApi extends Component {
         agentworkloadSelectorInfoFunc(response.data["agents"]);
       })
       .catch((error) => {
-        console.log(error);
+        logError(error);
       })
   }
 
@@ -120,7 +121,7 @@ class TornjakApi extends Component {
         agentworkloadSelectorInfoFunc(response.data["agents"])
       })
       .catch((error) => {
-        console.log(error);
+        logError(error);
       })
   }
 
@@ -131,6 +132,7 @@ class TornjakApi extends Component {
         tornjakServerInfoUpdateFunc(response.data);
         tornjakMessageFunc(response.statusText);
       }).catch(error => {
+        logError(error);
         tornjakServerInfoUpdateFunc([]);
         tornjakMessageFunc("Error retrieving " + serverName + " : " + error.message);
       });
@@ -144,6 +146,7 @@ class TornjakApi extends Component {
         tornjakMessageFunc(response.statusText);
       })
       .catch((error) => {
+        logError(error);
         tornjakMessageFunc("Error retrieving: " + error.message);
       })
   }
@@ -188,7 +191,7 @@ class TornjakApi extends Component {
       } else {entriesListUpdateFunc(response.data["entries"]);}
       tornjakMessageFunc(response.statusText);
     }).catch(error => {
-      console.log(error);
+      logError(error);
       entriesListUpdateFunc([]);
       tornjakMessageFunc(error.message);
     })
@@ -203,6 +206,7 @@ class TornjakApi extends Component {
         } else {agentsListUpdateFunc(response.data["agents"]);}
         tornjakMessageFunc(response.statusText);
       }).catch(error => {
+        logError(error);
         agentsListUpdateFunc([]);
         tornjakMessageFunc("Error retrieving " + serverName + " : " + error.message);
       });
@@ -219,6 +223,7 @@ class TornjakApi extends Component {
         tornjakMessageFunc(response.statusText);
       })
       .catch((error) => {
+        logError(error);
         agentsListUpdateFunc([]);
         tornjakMessageFunc("Error retrieving: " + error.message);
       })
@@ -231,6 +236,7 @@ class TornjakApi extends Component {
         clustersListUpdateFunc(response.data["clusters"]);
         tornjakMessageFunc(response.statusText);
       }).catch(error => {
+        logError(error);
         clustersListUpdateFunc([]);
         tornjakMessageFunc("Error retrieving " + serverName + " : " + error.message);
       });
@@ -244,6 +250,7 @@ class TornjakApi extends Component {
         tornjakMessageFunc(response.statusText);
       })
       .catch((error) => {
+        logError(error);
         clustersListUpdateFunc([]);
         tornjakMessageFunc("Error retrieving: " + error.message);
       })
