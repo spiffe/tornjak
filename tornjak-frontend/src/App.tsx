@@ -56,8 +56,8 @@ function App() {
                             </svg>
                         </div>
                     </div>
-                    <ToastContainer 
-                        xclassName="carbon-toast"
+                    <ToastContainer
+                        className="carbon-toast"
                         containerId="notifications"
                         draggable={false}
                     />
