@@ -191,6 +191,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
                     headerData={headerData}
                     deleteEntity={this.deleteAgent}
                     banEntity={this.banAgent}
+                    downloadEntity={undefined}
                 />
             </div>
         );

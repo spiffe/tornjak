@@ -14,13 +14,15 @@ const {
 // headerData: headerData of table, 
 // deleteEntity: delete row function for specified entity
 // banEntity: ban row function for specified entity if applicable
+// downloadEntity: returns the list of selected rows in a yaml document
 // returns data inside a carbon component table with specified functions for entity
 
 type DataTableRenderProp = {
     listTableData: DataTableRow<string>[],
     headerData: DataTableHeader<string>[],
     deleteEntity: (selectedRows: readonly DenormalizedRow[]) => string | undefined | void,
-    banEntity: ((selectedRows: readonly DenormalizedRow[]) => string | undefined | void) | undefined,
+    banEntity: ((selectedRows: readonly DenormalizedRow[]) => void) | undefined,
+    downloadEntity: ((selectedRows: readonly DenormalizedRow[]) => string | undefined | void) | undefined,
     entityType: string
 }
 
@@ -57,6 +59,7 @@ class DataTableRender extends React.Component<DataTableRenderProp, DataTableRend
                             getBatchActionProps={getBatchActionProps}
                             deleteEntity={this.props.deleteEntity}
                             banEntity={this.props.banEntity}
+                            downloadEntity={this.props.downloadEntity}
                             selectedRows={selectedRows}
                         />
                         <Table size="short" useZebraStyles>

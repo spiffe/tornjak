@@ -122,9 +122,11 @@ class CreateEntryYaml extends Component {
                 for (let i = 0; i < parsedData.entries.length; i++) {
                     localNewEntriesIds[idx] = [];
                     localNewEntriesIds[idx]["spiffeId"] = this.SpiffeHelper.getEntrySpiffeid(parsedData.entries[i]);
+                    if(localNewEntriesIds[idx]["spiffeId"] === "") {
+                        localNewEntriesIds[idx]["spiffeId"] = parsedData.entries[i].spiffe_id.path
+                    }
                     idx++;
                 }
-                console.log(localNewEntriesIds)
                 this.setState({
                     parseError: false,
                     newEntriesIds: localNewEntriesIds,
