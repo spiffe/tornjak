@@ -60,16 +60,33 @@
   .entry-form {
     margin-left: auto;
     margin-right: auto;
-    width: 60%;
+    width: 1000px;
     border-width:1px;
     border-style:solid;
     border-color: rgb(180, 178, 178);
     padding: 30px 30px 30px 30px;
   }
+
+  .accordion-entry-form {
+    padding: 30px 30px 30px 30px;
+  }
+
   .parentId-drop-down {
     margin-bottom: 20px;
   }
   
+  .parentId-input-field {
+    margin-bottom: 20px;
+  }
+
+  .parentId-drop-down-yaml {
+    margin-bottom: 20px;
+    border-width:1px;
+    border-style:solid;
+    border-color: rgb(180, 178, 178);
+    padding: 10px 10px 10px 10px;
+  }
+
   .clustertype-drop-down {
     margin-bottom: 20px;
   }
@@ -162,3 +179,87 @@
     margin-top: 120px;
     margin-left: 200px;
   }
+
+  .toast-entry-creation-notification {
+    width: 850px;
+  }
+
+  .toast-messege {
+    width: 700px;
+    border-width:1px;
+    border-style:solid;
+    border-color: rgb(180, 178, 178);
+    padding: 30px 30px 30px 30px;
+  }
+
+  .toast-messege-color {
+    color:white;
+  }
+
+  .create-entry-button {
+    border-radius: 25px;
+  }
+
+  .custom-entry-form-title {
+    display: inline-block;
+  }
+
+  .edit-entry-container {
+    display: flex;
+    flex-direction: row;
+  }
+  .entries-list-container {
+    height:500px;
+    float:left;
+    display: block;
+    width: 50%;
+    overflow-y: scroll;
+    background-color: rgb(215, 215, 215);
+    padding: 40px 30px 30px 30px;
+  }
+
+  .entries-edit-form {
+    height:500px;
+    display: block;
+    width: 50%;
+    overflow-y: scroll;
+    margin-left: 20px;
+  }
+
+  .federates-with-input-field-yaml {
+    margin-bottom: 20px;
+  }
+  .dnsnames-input-field-yaml {
+    margin-bottom: 20px;
+  }
+
+  .modal_Entry_list_title {
+    text-transform: capitalize;
+    text-decoration: underline;
+    font-weight: bold;
+    margin-left: 15px;
+    margin-bottom: 5px;
+    font-size: 15px;
+  }
+
+  .additional_info_entries_list {
+    font-size: 13px;
+    color:rgb(101, 99, 99);
+  }
+
+  .yaml_view_modal_json {
+    padding: 5px 30px 30px 30px;
+    font-weight: bold;
+    background-color: rgb(213, 213, 213);
+    border-width:1px;
+    border-style:solid;
+    border-color: rgb(180, 178, 178);
+  }
+
+  .view_entries_yaml_button {
+    display:inline-block;
+  }
+
+  .edit_entries_button {
+    display:inline-block;
+  } 
