@@ -10,6 +10,7 @@ import Table from './list-table';
 import { EntriesList } from "components/types";
 import { RootState } from "redux/reducers";
 import { DenormalizedRow } from "carbon-components-react";
+import { saveAs } from "file-saver";
 
 // EntriesListTable takes in 
 // listTableData: entries data to be rendered on table
@@ -113,6 +114,26 @@ class EntriesListTable extends React.Component<EntriesListTableProp, EntriesList
             })
     }
 
+    downloadEntries(selectedRows: readonly DenormalizedRow[]) {
+        var selectedEntriesInfo = [], infoCell = 5, jsonInit = "{\n  \"entries\": [\n";
+        if (selectedRows.length !== 0) {
+            selectedEntriesInfo[0] = jsonInit;
+            for (let i = 0; i < selectedRows.length; i++) {
+                if( i < selectedRows.length-1) {
+                    selectedEntriesInfo[i+1] = selectedRows[i].cells[infoCell].value + ",\n" ;
+                } else {
+                    selectedEntriesInfo[i+1] = selectedRows[i].cells[infoCell].value + "\n]\n}" ;
+                }
+            }
+        }
+        var blob = new Blob(selectedEntriesInfo, {type: "application/json"});
+        saveAs(
+            blob,
+            "selectedEntries.yaml"
+        );
+    }
+
+
     render() {
         const { listTableData } = this.state;
         const headerData = [
@@ -148,7 +169,8 @@ class EntriesListTable extends React.Component<EntriesListTableProp, EntriesList
                     listTableData={listTableData}
                     headerData={headerData}
                     deleteEntity={this.deleteEntry}
-                    banEntity={undefined} />
+                    banEntity={undefined}
+                    downloadEntity={this.downloadEntries} />
             </div>
         );
     }
