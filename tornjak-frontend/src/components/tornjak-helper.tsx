@@ -13,13 +13,9 @@ interface DetailDataParseProp {
   globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[],
 }
 
-type TornjakHelperProp = {
+type TornjakHelperProp = {}
 
-}
-
-type TornjakHelperState = {
-
-}
+type TornjakHelperState = {}
 
 class TornjakHelper extends Component<TornjakHelperProp, TornjakHelperState> {
   SpiffeHelper: SpiffeHelper;
@@ -78,7 +74,7 @@ class TornjakHelper extends Component<TornjakHelperProp, TornjakHelperState> {
 
   // numberEntriesOfCluster takes in an clusterEntry and list of entries
   // returns number of workload/child entries for a cluster
-  numberEntriesOfCluster(clusterEntry: { agentsList: string | string[]; }, globalEntries: EntriesList[] | undefined, globalAgents: AgentsList[]) {
+  numberEntriesOfCluster(clusterEntry: { agentsList: string | string[]; }, globalEntries: EntriesList[], globalAgents: AgentsList[]) {
     var agents = globalAgents.filter((a: AgentsList) =>
       clusterEntry.agentsList.includes(this.SpiffeHelper.getAgentSpiffeid(a)))
     var entriesPerAgent = agents.map((currentAgent: AgentsList) => {
@@ -106,7 +102,7 @@ class TornjakHelper extends Component<TornjakHelperProp, TornjakHelperState> {
 
   // getDashboardAgentMetaData takes in an agent metadata, list of entries and workload attestor info for specified agents
   // returns agent metadata info for dashboard table
-  getDashboardAgentMetaData(agent: AgentsList, globalEntries: EntriesList[] | undefined, _globalAgents: AgentsList[], workLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) {
+  getDashboardAgentMetaData(agent: AgentsList, globalEntries: EntriesList[], _globalAgents: AgentsList[], workLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) {
     var thisSpiffeid = this.SpiffeHelper.getAgentSpiffeid(agent);
     // get status
     var status = this.SpiffeHelper.getAgentStatusString(agent);

@@ -24,9 +24,7 @@ type BodyProp = {
                         ShapeOf<DataTableCustomSelectionProps<never>, E>,
 }
 
-type BodyState = {
-
-}
+type BodyState = {}
 
 class Body extends React.Component<BodyProp, BodyState> {
     constructor(props: BodyProp) {

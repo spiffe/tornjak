@@ -19,8 +19,8 @@ type WorkLoadAttestorProp = {
     spiffeid: string,
     // the selected server for manager mode 
     globalServerSelected: string,
-    // list of available agents as array of AgentsListType or can be undefined if no array present
-    globalAgentsList: AgentsList[] | undefined,
+    // list of available agents as array of AgentsListType
+    globalAgentsList: AgentsList[],
     // the list of available workload selectors and their options
     globalWorkloadSelectorInfo: { [index: string]: { label: string }[] },
     agentData: { cells: DataTableCell[] },

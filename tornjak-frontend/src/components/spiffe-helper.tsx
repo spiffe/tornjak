@@ -195,10 +195,7 @@ class SpiffeHelper extends Component<SpiffeHelperProp, SpiffeHelperState> {
 
   // numberEntriesOfAgent takes in an agent and list of entries
   // returns number of entries in the agent
-  numberEntriesOfAgent(agent: AgentsList, globalEntries: EntriesList[] | undefined) {
-    if (globalEntries === undefined) {
-      return undefined
-    }
+  numberEntriesOfAgent(agent: AgentsList, globalEntries: EntriesList[]) {
     var agentEntries = this.getAgentEntries(agent, globalEntries)
     var validIds = new Set([this.getAgentSpiffeid(agent)]);
 

@@ -40,9 +40,7 @@ type SelectServerProp = {
     globalErrorMessage: string,
 }
 
-type SelectServerState = {
-
-}
+type SelectServerState = {}
 
 const ServerDropdown = (props: { name: string }) => (
     <option value={props.name}>{props.name}</option>

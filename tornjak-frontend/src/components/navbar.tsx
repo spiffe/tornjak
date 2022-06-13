@@ -16,9 +16,7 @@ type NavigationBarProp = {
   globalClickedDashboardTable: string,
 }
 
-type NavigationBarState = {
-
-}
+type NavigationBarState = {}
 
 
 class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {

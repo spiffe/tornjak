@@ -29,8 +29,7 @@ type EntryListProp = {
   globalEntriesList: EntriesList[],
 }
 
-type EntryListState = {
-}
+type EntryListState = {}
 
 const Entry = (props: { entry: EntriesList }) => (
   <tr>

@@ -24,9 +24,7 @@ type HeadProp = {
                     ShapeOf<DataTableCustomHeaderProps<DataTableHeader<string>>, E>,
 }
 
-type HeadState = {
-
-}
+type HeadState = {}
 class Head extends React.Component<HeadProp, HeadState> {
     constructor(props: HeadProp) {
         super(props);
