@@ -1,9 +1,10 @@
 import React from "react";
-import { DataTable } from "carbon-components-react";
+import { DataTable, DataTableCustomBatchActionsData, DataTableCustomBatchActionsProps, DenormalizedRow } from "carbon-components-react";
 import {
     Delete16 as Delete,
 } from '@carbon/icons-react';
 import { IoBan } from "react-icons/io5";
+import { ReactDivAttr, ShapeOf } from "carbon-components-react/typings/shared";
 const {
     TableToolbar,
     TableToolbarSearch,
@@ -19,8 +20,20 @@ const {
 // banEntity: ban row function for specified entity if applicable
 // selectedRows: selectedRows from DataTable
 // returns the toolbar of the table for the specified entity
-class TableToolBar extends React.Component {
-    constructor(props) {
+type TableToolBarProp = {
+    deleteEntity: (selectedRows: readonly DenormalizedRow[]) => string | void,
+    banEntity: ((selectedRows: readonly DenormalizedRow[]) => string | void) | undefined,
+    onInputChange: (event: React.SyntheticEvent<HTMLInputElement, Event>) => void,
+    getBatchActionProps: <E extends object = 
+                        ReactDivAttr>(data?: ShapeOf<DataTableCustomBatchActionsData, E>) => 
+                        ShapeOf<DataTableCustomBatchActionsProps, E>,
+    selectedRows: readonly DenormalizedRow[],
+}
+
+type TableToolBarState = {}
+
+class TableToolBar extends React.Component<TableToolBarProp, TableToolBarState> {
+    constructor(props: TableToolBarProp) {
         super(props);
         this.state = {};
     }
@@ -49,7 +62,8 @@ class TableToolBar extends React.Component {
                             renderIcon={IoBan}
                             iconDescription="Ban"
                             onClick={() => {
-                                this.props.banEntity(this.props.selectedRows);
+                                if (this.props.banEntity !== undefined)
+                                    this.props.banEntity(this.props.selectedRows);
                                 this.props.getBatchActionProps().onCancel();
                             }}
                         >

@@ -1,9 +1,22 @@
 import { Component } from 'react';
 import axios from 'axios';
+// eslint-disable-next-line
+import AxiosRequestConfig from '../../axios'
 import GetApiServerUri from './helpers';
+import {
+  AgentsList,
+  AgentsWorkLoadAttestorInfo,
+  TornjakServerInfo,
+  ServerInfo,
+  EntriesList,
+  ClustersList
+} from './types';
 
-class TornjakApi extends Component {
-  constructor(props) {
+type TornjakApiProp = {}
+type TornjakApiState = {}
+
+class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
+  constructor(props: TornjakApiProp) {
     super(props);
     this.state = {};
     this.registerSelectors = this.registerSelectors.bind(this);
@@ -19,7 +32,9 @@ class TornjakApi extends Component {
     this.populateLocalClustersUpdate = this.populateLocalClustersUpdate.bind(this);
   }
 
-  registerSelectors = (serverName, wLoadAttdata, refreshSelectorsState, agentworkloadSelectorInfoFunc) => {
+  registerSelectors = (serverName: string, wLoadAttdata: { spiffeid: string; plugin: string; },
+    refreshSelectorsState: { (serverName: string, agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void): void; },
+    agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void) => {
     axios.post(GetApiServerUri('/manager-api/tornjak/selectors/register/') + serverName, wLoadAttdata)
       .then(res => {
         //console.log(JSON.stringify(wLoadAttdata, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '));
@@ -31,11 +46,11 @@ class TornjakApi extends Component {
       })
   }
 
-  registerLocalSelectors = (wLoadAttdata, refreshLocalSelectorsState, agentworkloadSelectorInfoFunc) => {
-    //console.log(wLoadAttdata)
+  registerLocalSelectors = (wLoadAttdata: { spiffeid: string; plugin: string; },
+    refreshLocalSelectorsState: { (agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void): void; },
+    agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void) => {
     axios.post(GetApiServerUri('/api/tornjak/selectors/register'), wLoadAttdata)
       .then(res => {
-        //console.log(JSON.stringify(wLoadAttdata, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '));
         refreshLocalSelectorsState(agentworkloadSelectorInfoFunc);
       }
       )
@@ -60,7 +75,11 @@ class TornjakApi extends Component {
   //      }
   //    ]
   // ]
-  refreshSelectorsState = (serverName, agentworkloadSelectorInfoFunc) => {
+  refreshSelectorsState = (serverName: string,
+    agentworkloadSelectorInfoFunc: {
+      (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]): void;
+      (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]): void;
+    }) => {
     axios.get(GetApiServerUri("/manager-api/tornjak/selectors/list/") + serverName, { crossdomain: true })
       .then(response => {
         //console.log(response.data);
@@ -87,7 +106,9 @@ class TornjakApi extends Component {
   //      }
   //    ]
   // ]
-  refreshLocalSelectorsState = (agentworkloadSelectorInfoFunc) => {
+  refreshLocalSelectorsState = (agentworkloadSelectorInfoFunc: {
+    (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]): void;
+  }) => {
     axios.get(GetApiServerUri("/api/tornjak/selectors/list"), { crossdomain: true })
       .then(response => {
         //console.log(response.data);
@@ -99,10 +120,13 @@ class TornjakApi extends Component {
   }
 
   // populateTornjakAgentInfo returns tornjak info of requested agents including cluster name and selector
-  populateTornjakAgentInfo = (serverName, agentworkloadSelectorInfoFunc, inputData) => {
+  populateTornjakAgentInfo = (serverName: string,
+    agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void,
+    inputData: string) => {
     axios.post(GetApiServerUri("/manager-api/tornjak/agents/list/") + serverName, inputData,
-              { crossdomain: true,
-              })
+      {
+        crossdomain: true,
+      })
       .then(response => {
         agentworkloadSelectorInfoFunc(response.data["agents"]);
       })
@@ -112,10 +136,13 @@ class TornjakApi extends Component {
   }
 
   // populateLocalTornjakAgentInfo returns tornjak info of requested agents including cluster name and selector
-  populateLocalTornjakAgentInfo = (agentworkloadSelectorInfoFunc, inputData) => {
+  populateLocalTornjakAgentInfo = (agentworkloadSelectorInfoFunc:
+    (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void,
+    inputData: string) => {
     axios.post(GetApiServerUri("/api/tornjak/agents/list"), inputData,
-              { crossdomain: true,
-              })
+      {
+        crossdomain: true,
+      })
       .then(response => {
         agentworkloadSelectorInfoFunc(response.data["agents"])
       })
@@ -125,19 +152,24 @@ class TornjakApi extends Component {
   }
 
   // populateTornjakServerInfo returns the tornjak server info of the selected server in manager mode
-  populateTornjakServerInfo = (serverName, tornjakServerInfoUpdateFunc, tornjakMessageFunc) => {
+  populateTornjakServerInfo = (serverName: string,
+    tornjakServerInfoUpdateFunc: { (globalTornjakServerInfo: TornjakServerInfo): void; },
+    tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
     axios.get(GetApiServerUri('/manager-api/tornjak/serverinfo/') + serverName, { crossdomain: true })
       .then(response => {
         tornjakServerInfoUpdateFunc(response.data);
         tornjakMessageFunc(response.statusText);
       }).catch(error => {
-        tornjakServerInfoUpdateFunc([]);
+        tornjakServerInfoUpdateFunc({ "plugins": { "DataStore": [], "KeyManager": [], "NodeAttestor": [], "NodeResolver": [], "Notifier": [] }, "trustDomain": "", "verboseConfig": "" });
         tornjakMessageFunc("Error retrieving " + serverName + " : " + error.message);
       });
   }
 
   // populateLocalTornjakServerInfo returns the torjak server info of the server in local mode
-  populateLocalTornjakServerInfo = (tornjakServerInfoUpdateFunc, tornjakMessageFunc) => {
+  populateLocalTornjakServerInfo = (tornjakServerInfoUpdateFunc: {
+    (globalTornjakServerInfo: TornjakServerInfo): void;
+  },
+    tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
     axios.get(GetApiServerUri('/api/tornjak/serverinfo'), { crossdomain: true })
       .then(response => {
         tornjakServerInfoUpdateFunc(response.data);
@@ -149,9 +181,10 @@ class TornjakApi extends Component {
   }
 
   // populateServerInfo returns the server trust domain and nodeAttestorPlugin
-  populateServerInfo = (serverInfo, serverInfoUpdateFunc) => {
+  populateServerInfo = (serverInfo: TornjakServerInfo | undefined,
+    serverInfoUpdateFunc: { (globalServerInfo: ServerInfo): void; }) => {
     //node attestor plugin
-    if (serverInfo === "" || serverInfo === undefined || JSON.stringify(serverInfo) === '{}') {
+    if (serverInfo === undefined || JSON.stringify(serverInfo) === '{}') {
       return
     }
     if (serverInfo.plugins["NodeAttestor"].length === 0) {
@@ -167,40 +200,45 @@ class TornjakApi extends Component {
     serverInfoUpdateFunc(reqInfo);
   }
 
-  populateEntriesUpdate = (serverName, entriesListUpdateFunc, tornjakMessageFunc) => {
-    axios.get(GetApiServerUri('/manager-api/entry/list/') + serverName, {crossdomain: true})
-    .then(response => {
-      if(!response.data["entries"]) {
+  populateEntriesUpdate = (serverName: string,
+    entriesListUpdateFunc: { (globalEntriesList: EntriesList[]): void; },
+    tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
+    axios.get(GetApiServerUri('/manager-api/entry/list/') + serverName, { crossdomain: true })
+      .then(response => {
+        if (!response.data["entries"]) {
+          entriesListUpdateFunc([]);
+        } else { entriesListUpdateFunc(response.data["entries"]); }
+        tornjakMessageFunc(response.statusText);
+      }).catch(error => {
         entriesListUpdateFunc([]);
-      } else {entriesListUpdateFunc(response.data["entries"]);}
-      tornjakMessageFunc(response.statusText);
-    }).catch(error => {
-      entriesListUpdateFunc([]);
-      tornjakMessageFunc("Error retrieving " + serverName + " : " + error + (typeof (error.response) !== "undefined" ? ":" + error.response.data : ""));
-    })
+        tornjakMessageFunc("Error retrieving " + serverName + " : " + error + (typeof (error.response) !== "undefined" ? ":" + error.response.data : ""));
+      })
   }
 
-  populateLocalEntriesUpdate = (entriesListUpdateFunc, tornjakMessageFunc) => {
-    axios.get(GetApiServerUri('/api/entry/list'), {crossdomain: true})
-    .then(response => {
-      if(!response.data["entries"]) {
+  populateLocalEntriesUpdate = (entriesListUpdateFunc: { (globalEntriesList: EntriesList[]): void; },
+    tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
+    axios.get(GetApiServerUri('/api/entry/list'), { crossdomain: true })
+      .then(response => {
+        if (!response.data["entries"]) {
+          entriesListUpdateFunc([]);
+        } else { entriesListUpdateFunc(response.data["entries"]); }
+        tornjakMessageFunc(response.statusText);
+      }).catch(error => {
+        console.log(error);
         entriesListUpdateFunc([]);
-      } else {entriesListUpdateFunc(response.data["entries"]);}
-      tornjakMessageFunc(response.statusText);
-    }).catch(error => {
-      console.log(error);
-      entriesListUpdateFunc([]);
-      tornjakMessageFunc(error.message);
-    })
+        tornjakMessageFunc(error.message);
+      })
   }
 
   // populateAgentsUpdate returns the list of agents with their info in manager mode for the selected server
-  populateAgentsUpdate = (serverName, agentsListUpdateFunc, tornjakMessageFunc) => {
+  populateAgentsUpdate = (serverName: string,
+    agentsListUpdateFunc: { (globalAgentsList: AgentsList[]): void; },
+    tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
     axios.get(GetApiServerUri('/manager-api/agent/list/') + serverName, { crossdomain: true })
       .then(response => {
-        if(!response.data["agents"]) {
+        if (!response.data["agents"]) {
           agentsListUpdateFunc([]);
-        } else {agentsListUpdateFunc(response.data["agents"]);}
+        } else { agentsListUpdateFunc(response.data["agents"]); }
         tornjakMessageFunc(response.statusText);
       }).catch(error => {
         agentsListUpdateFunc([]);
@@ -210,12 +248,15 @@ class TornjakApi extends Component {
   }
 
   // populateLocalAgentsUpdate - returns the list of agents with their info in Local mode for the server
-  populateLocalAgentsUpdate = (agentsListUpdateFunc, tornjakMessageFunc) => {
+  populateLocalAgentsUpdate = (agentsListUpdateFunc: {
+    (globalAgentsList: AgentsList[]): void;
+  },
+    tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
     axios.get(GetApiServerUri('/api/agent/list'), { crossdomain: true })
       .then(response => {
-        if(!response.data["agents"]) {
+        if (!response.data["agents"]) {
           agentsListUpdateFunc([]);
-        } else {agentsListUpdateFunc(response.data["agents"]);}
+        } else { agentsListUpdateFunc(response.data["agents"]); }
         tornjakMessageFunc(response.statusText);
       })
       .catch((error) => {
@@ -225,7 +266,9 @@ class TornjakApi extends Component {
   }
 
   // populateClustersUpdate returns the list of clusters with their info in manager mode for the selected server
-  populateClustersUpdate = (serverName, clustersListUpdateFunc, tornjakMessageFunc) => {
+  populateClustersUpdate = (serverName: string,
+    clustersListUpdateFunc: { (globalClustersList: ClustersList[]): void; },
+    tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
     axios.get(GetApiServerUri('/manager-api/tornjak/clusters/list/') + serverName, { crossdomain: true })
       .then(response => {
         clustersListUpdateFunc(response.data["clusters"]);
@@ -237,7 +280,10 @@ class TornjakApi extends Component {
   }
 
   // populateLocalClustersUpdate - returns the list of clusters with their info in Local mode for the server
-  populateLocalClustersUpdate = (clustersListUpdateFunc, tornjakMessageFunc) => {
+  populateLocalClustersUpdate = (clustersListUpdateFunc: {
+    (globalClustersList: ClustersList[]): void;
+  },
+    tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
     axios.get(GetApiServerUri('/api/tornjak/clusters/list'), { crossdomain: true })
       .then(response => {
         clustersListUpdateFunc(response.data["clusters"]);

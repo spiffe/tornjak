@@ -1,5 +1,5 @@
 import React from "react";
-import { DataTable } from "carbon-components-react";
+import { DataTable, DataTableHeader, DataTableRow, DenormalizedRow } from "carbon-components-react";
 import ToolBar from './table-toolbar';
 import Head from './table-head';
 import Body from './table-body';
@@ -15,8 +15,19 @@ const {
 // deleteEntity: delete row function for specified entity
 // banEntity: ban row function for specified entity if applicable
 // returns data inside a carbon component table with specified functions for entity
-class DataTableRender extends React.Component {
-    constructor(props) {
+
+type DataTableRenderProp = {
+    listTableData: DataTableRow<string>[],
+    headerData: DataTableHeader<string>[],
+    deleteEntity: (selectedRows: readonly DenormalizedRow[]) => string | void,
+    banEntity: ((selectedRows: readonly DenormalizedRow[]) => string | void) | undefined,
+    entityType: string
+}
+
+type DataTableRenderState = {}
+
+class DataTableRender extends React.Component<DataTableRenderProp, DataTableRenderState> {
+    constructor(props: DataTableRenderProp) {
         super(props);
         this.state = {};
     }
@@ -33,7 +44,7 @@ class DataTableRender extends React.Component {
                     getHeaderProps,
                     getSelectionProps,
                     onInputChange,
-                    getPaginationProps,
+                    //getPaginationProps,
                     getBatchActionProps,
                     getTableContainerProps,
                     selectedRows,

@@ -7,16 +7,47 @@ import {
     clustersListUpdateFunc
 } from 'redux/actions';
 import Table from './list-table';
+import { ClustersList } from "components/types";
+import { DenormalizedRow } from "carbon-components-react";
+import { RootState } from "redux/reducers";
 
 // ClusterListTable takes in 
 // listTableData: clusters data to be rendered on table
 // returns clusters data inside a carbon component table with specified functions
-class ClustersListTable extends React.Component {
-    constructor(props) {
+
+type ClustersListTableProp = {
+    // dispatches a payload for list of clusters with their metadata info as an array of ClustersList Type and has a return type of void
+    clustersListUpdateFunc: (globalClustersList: ClustersList[]) => void,
+    // data provided to the clusters table
+    data: {
+        key: string,
+        props: { cluster: ClustersList }
+    }[] | string | JSX.Element[],
+    id: string,
+    // list of clusters with their metadata info as an array of ClustersList Type
+    globalClustersList: ClustersList[],
+    // the selected server for manager mode 
+    globalServerSelected: string,
+}
+
+type ClustersListTableState = {
+    listData: { key: string, props: { cluster: ClustersList } }[] | ClustersList[] | string | JSX.Element[],
+    listTableData: {
+        id: string;
+        clusterName: string;
+        clusterType: string;
+        clusterManagedBy: string;
+        clusterDomainName: string;
+        clusterAssignedAgents: { props: { children: string } }
+    }[]
+
+}
+class ClustersListTable extends React.Component<ClustersListTableProp, ClustersListTableState> {
+    constructor(props: ClustersListTableProp) {
         super(props);
         this.state = {
             listData: props.data,
-            listTableData: [{ "id": "0" }],
+            listTableData: [],
         };
         this.prepareTableData = this.prepareTableData.bind(this);
         this.deleteCluster = this.deleteCluster.bind(this);
@@ -25,7 +56,7 @@ class ClustersListTable extends React.Component {
     componentDidMount() {
         this.prepareTableData();
     }
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(prevProps: ClustersListTableProp) {
         if (prevProps !== this.props) {
             this.setState({
                 listData: this.props.globalClustersList
@@ -36,10 +67,13 @@ class ClustersListTable extends React.Component {
 
     prepareTableData() {
         const { data } = this.props;
-        let listData = [...data];
-        let listtabledata = [];
+        let listData: { props: { cluster: ClustersList; }; }[] | ({ key: string; props: { cluster: ClustersList; }; } | JSX.Element)[] = [];
+        if (typeof (data) === "string" || data === undefined)
+            return
+        data.forEach(val => listData.push(Object.assign({}, val)));
+        let listtabledata: { id: string; clusterName: string; clusterType: string; clusterManagedBy: string; clusterDomainName: string; clusterAssignedAgents: { props: { children: string } } }[] = [];
         for (let i = 0; i < listData.length; i++) {
-            listtabledata[i] = {};
+            listtabledata[i] = { id: "", clusterName: "", clusterType: "", clusterManagedBy: "", clusterDomainName: "", clusterAssignedAgents: { props: { children: "" } } };
             listtabledata[i]["id"] = (i + 1).toString();
             listtabledata[i]["clusterName"] = listData[i].props.cluster.name;
             listtabledata[i]["clusterType"] = listData[i].props.cluster.platformType;
@@ -47,13 +81,14 @@ class ClustersListTable extends React.Component {
             listtabledata[i]["clusterDomainName"] = listData[i].props.cluster.domainName;
             listtabledata[i]["clusterAssignedAgents"] = <pre>{JSON.stringify(listData[i].props.cluster.agentsList, null, ' ')}</pre>
         }
+        console.log(listtabledata)
         this.setState({
             listTableData: listtabledata
         })
     }
 
-    deleteCluster(selectedRows) {
-        var cluster = [], endpoint = "";
+    deleteCluster(selectedRows: readonly DenormalizedRow[]) {
+        var cluster: { name: string; }[] = [], endpoint = "";
         let promises = [];
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/tornjak/clusters/delete') + "/" + this.props.globalServerSelected;
@@ -62,7 +97,7 @@ class ClustersListTable extends React.Component {
         }
         if (selectedRows.length !== 0) {
             for (let i = 0; i < selectedRows.length; i++) {
-                cluster[i] = {}
+                cluster[i] = { name: "" }
                 cluster[i]["name"] = selectedRows[i].cells[1].value;
                 promises.push(axios.post(endpoint, {
                     "cluster": {
@@ -75,6 +110,9 @@ class ClustersListTable extends React.Component {
         }
         Promise.all(promises)
             .then(responses => {
+                if (this.props.globalClustersList === undefined) {
+                    return
+                }
                 for (let i = 0; i < responses.length; i++) {
                     this.props.clustersListUpdateFunc(this.props.globalClustersList.filter(el =>
                         el.name !== cluster[i].name));
@@ -116,16 +154,17 @@ class ClustersListTable extends React.Component {
         return (
             <div>
                 <Table
+                    entityType={"Cluster"}
                     listTableData={listTableData}
                     headerData={headerData}
                     deleteEntity={this.deleteCluster}
-                />
+                    banEntity={undefined} />
             </div>
         );
     }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: RootState) => ({
     globalServerSelected: state.servers.globalServerSelected,
     globalClustersList: state.clusters.globalClustersList,
 })

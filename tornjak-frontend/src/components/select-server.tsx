@@ -14,14 +14,43 @@ import {
     tornjakMessageFunc
 } from 'redux/actions';
 
-const ServerDropdown = props => (
-    <option value={props.value}>{props.name}</option>
+import { RootState } from 'redux/reducers';
+import { AgentsList, ServerInfo, TornjakServerInfo } from './types';
+
+type SelectServerProp = {
+    // dispatches a payload for the list of available servers and their basic info as array of strings and has a return type of void
+    serversListUpdateFunc: (globalServersList: Array<string>) => void,
+    // dispatches a payload for the server selected in the redux state as a string and has a return type of void
+    serverSelectedFunc: (globalServerSelected: string) => void,
+    // dispatches a payload for the server trust domain and nodeAttestorPlugin and has a return type of void
+    serverInfoUpdateFunc: (globalServerInfo: ServerInfo) => void,
+    // dispatches a payload for the tornjak server info of the selected server and has a return type of void
+    tornjakServerInfoUpdateFunc: (globalTornjakServerInfo: TornjakServerInfo) => void,
+    // dispatches a payload for list of agents with their metadata info as an array of AgentListType and has a return type of void
+    agentsListUpdateFunc: (globalAgentsList: AgentsList[]) => void,
+    // dispatches a payload for an Error Message/ Success Message of an executed function as a string and has a return type of void
+    tornjakMessageFunc: (globalErrorMessage: string) => void,
+    // the selected server for manager mode 
+    globalServerSelected: string,
+    // tornjak server info of the selected server
+    globalTornjakServerInfo: TornjakServerInfo,
+    // list of avialable servers
+    globalServersList: Array<string>,
+    // error/ success messege returned for a specific function
+    globalErrorMessage: string,
+}
+
+type SelectServerState = {}
+
+const ServerDropdown = (props: { name: string }) => (
+    <option value={props.name}>{props.name}</option>
 )
 
-class SelectServer extends Component {
-    constructor(props) {
+class SelectServer extends Component<SelectServerProp, SelectServerState> {
+    TornjakApi: TornjakApi;
+    constructor(props: SelectServerProp) {
         super(props);
-        this.TornjakApi = new TornjakApi();
+        this.TornjakApi = new TornjakApi(props);
         this.serverDropdownList = this.serverDropdownList.bind(this);
         this.onServerSelect = this.onServerSelect.bind(this);
 
@@ -35,16 +64,16 @@ class SelectServer extends Component {
             if ((this.props.globalServerSelected !== "") && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
                 this.TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
             }
-            if ((this.props.globalTornjakServerInfo !== "") && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
+            if ((this.props.globalTornjakServerInfo && Object.keys(this.props.globalTornjakServerInfo).length) && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
                 this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
                 this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc)
             }
         }
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: SelectServerProp) {
         if (IsManager) {
-            if (prevProps.globalServerSelected !== this.props.globalServerSelected ) {
+            if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
                 this.TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
                 this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
                 this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
@@ -53,7 +82,8 @@ class SelectServer extends Component {
     }
 
     populateServers() {
-        axios.get(GetApiServerUri("/manager-api/server/list"), { crossdomain: true })
+        //axios.get(GetApiServerUri("/manager-api/server/list"), { crossdomain: true })
+        axios.get(GetApiServerUri("/manager-api/server/list"))
             .then(response => {
                 this.props.serversListUpdateFunc(response.data["servers"]);
             })
@@ -64,9 +94,9 @@ class SelectServer extends Component {
 
     serverDropdownList() {
         if (typeof this.props.globalServersList !== 'undefined') {
-            return this.props.globalServersList.map(server => {
+            // TODO(mamy-CS): any for now - will be specifically typed when working on manager component
+            return this.props.globalServersList.map((server: any) => { // remove any when working on manager component
                 return <ServerDropdown key={server.name}
-                    value={server.name}
                     name={server.name} />
             })
         } else {
@@ -74,16 +104,20 @@ class SelectServer extends Component {
         }
     }
 
-    onServerSelect(e) {
+    onServerSelect(e: { target: { value: string; }; } | undefined) {
+        if (e === undefined) {
+            return;
+        }
         const serverName = e.target.value;
         if (serverName !== "") {
             this.props.serverSelectedFunc(serverName);
         }
     }
 
-    getServer(serverName) {
+    getServer(serverName: string) {
         var i;
-        const servers = this.props.globalServersList
+        // TODO(mamy-CS): any for now - will be specifically typed when working on manager component
+        const servers: any = this.props.globalServersList // remove any when working on manager component
         for (i = 0; i < servers.length; i++) {
             if (servers[i].name === serverName) {
                 return servers[i]
@@ -115,7 +149,7 @@ class SelectServer extends Component {
     }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: RootState) => ({
     globalServerSelected: state.servers.globalServerSelected,
     globalServersList: state.servers.globalServersList,
     globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
