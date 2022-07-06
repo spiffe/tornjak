@@ -31,7 +31,7 @@ import {
   WorkloadSelectorInfoLabels,
 } from './types';
 import { RootState } from 'redux/reducers';
-import CreateEntryYaml from './entry-create-yaml';
+import CreateEntryYaml from './entry-create-json';
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type CreateEntryProp = {
@@ -718,7 +718,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
         }
         <Accordion className="accordion-entry-form">
           <AccordionItem
-            title={<h5>Upload New Entry/ Entries YAML</h5>} open>
+            title={<h5>Upload New Entry/ Entries</h5>} open>
             <div className="entry-form">
               <CreateEntryYaml
                 ParentIdList={ParentIdList_noManualOption} />

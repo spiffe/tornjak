@@ -41,13 +41,13 @@ import {
 // } from './types';
 //import { RootState } from 'redux/reducers';
 
-const NewEntryYamlFormatLink = (props) => (
+const NewEntryJsonFormatLink = (props) => (
     <div>
-        <a rel="noopener noreferrer" href={props.link} target="_blank">(Click to see new entry yaml format)</a>
+        <a rel="noopener noreferrer" href={props.link} target="_blank">(Click to see new entry JSON format)</a>
         <a rel="noopener noreferrer" href={props.link} target="_blank">{<Launch16 />}</a>
     </div>
 )
-class CreateEntryYaml extends Component {
+class CreateEntryJson extends Component {
     constructor(props) {
         super(props);
         this.TornjakApi = new TornjakApi(props);
@@ -109,7 +109,7 @@ class CreateEntryYaml extends Component {
             parseError: false, // reset invalid notification toast
             isEntriesLoaded: true
         })
-        var yamlFile = e.target.files[0]; // yaml File List of objects
+        var yamlFile = e.target.files[0]; // json File List of objects
         var fileReader = new FileReader();
         fileReader.addEventListener("load", () => {
             var result = fileReader.result;
@@ -499,16 +499,16 @@ class CreateEntryYaml extends Component {
                         <ToastNotification className="toast-entry-creation-notification"
                             kind="error"
                             iconDescription="close notification"
-                            subtitle={<span>Invalid yaml Format/ yaml File Empty. <NewEntryYamlFormatLink link={newEntryFormatLink} /></span>}
+                            subtitle={<span>Invalid JSON Format/ JSON File Empty. <NewEntryJsonFormatLink link={newEntryFormatLink} /></span>}
                             timeout={0}
-                            title="New Entry yaml Format Notification"
+                            title="New Entry JSON Format Notification"
                         />
                     </div>
                 }
                 <div>
                     <FileUploader
                         accept={[
-                            '.yaml'
+                            '.json'
                         ]}
                         size="small"
                         buttonKind="tertiary"
@@ -517,8 +517,8 @@ class CreateEntryYaml extends Component {
                         iconDescription="Clear file"
                         labelDescription={
                             <div>
-                                <p style={{ fontSize: 15 }}>only .yaml files </p>
-                                <NewEntryYamlFormatLink link={newEntryFormatLink} />
+                                <p style={{ fontSize: 15 }}>only .json files </p>
+                                <NewEntryJsonFormatLink link={newEntryFormatLink} />
                             </div>}
                         labelTitle="Choose your local file:"
                         onChange={this.handleChange}
@@ -537,8 +537,8 @@ class CreateEntryYaml extends Component {
                                 passiveModal={true}
                                 size='lg'
                                 triggerButtonKind="ghost"
-                                buttonTriggerText="View Entries Yaml"
-                                modalHeading="Entries Yaml"
+                                buttonTriggerText="View Entries JSON"
+                                modalHeading="Entries JSON"
                                 modalLabel="View Uploaded Entries"
                             >
                                 <pre className="yaml_view_modal_json">{JSON.stringify(this.state.uploadedEntries, null, ' ')}</pre>
@@ -752,6 +752,6 @@ const mapStateToProps = (state) => ({
 export default connect(
     mapStateToProps,
     { newEntriesUpdateFunc }
-)(CreateEntryYaml)
+)(CreateEntryJson)
 
-//export { CreateEntryYaml };
+//export { CreateEntryJson };
