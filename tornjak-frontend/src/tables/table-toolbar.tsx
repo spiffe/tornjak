@@ -69,7 +69,7 @@ class TableToolBar extends React.Component<TableToolBarProp, TableToolBarState> 
                                 this.props.getBatchActionProps().onCancel();
                             }}
                         >
-                            Export to Yaml
+                            Export to Json
                         </TableBatchAction>
                     }
                     {this.props.banEntity !== undefined &&

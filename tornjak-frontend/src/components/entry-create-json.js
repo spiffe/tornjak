@@ -120,7 +120,7 @@ class CreateEntryJson extends Component {
                 for (let i = 0; i < parsedData.entries.length; i++) {
                     localNewEntriesIds[idx] = [];
                     localNewEntriesIds[idx]["spiffeId"] = this.SpiffeHelper.getEntrySpiffeid(parsedData.entries[i]);
-                    if(localNewEntriesIds[idx]["spiffeId"] === "") {
+                    if (localNewEntriesIds[idx]["spiffeId"] === "") {
                         localNewEntriesIds[idx]["spiffeId"] = parsedData.entries[i].spiffe_id.path
                     }
                     idx++;
@@ -155,12 +155,12 @@ class CreateEntryJson extends Component {
             selectorsWithNewline = "",
             federates_with = "",
             dns_names = "";
-            
+
 
         if (localNewEntry.spiffe_id !== undefined) {
             spiffeId_trustDomain = localNewEntry.spiffe_id.trust_domain;
             spiffeId_path = localNewEntry.spiffe_id.path;
-            if(localNewEntry.spiffe_id.trust_domain !== undefined && localNewEntry.spiffe_id.path !== undefined) {
+            if (localNewEntry.spiffe_id.trust_domain !== undefined && localNewEntry.spiffe_id.path !== undefined) {
                 spiffeId = prefix + localNewEntry.spiffe_id.trust_domain + localNewEntry.spiffe_id.path;
             } else if (localNewEntry.spiffe_id.trust_domain !== undefined) {
                 spiffeId = prefix + localNewEntry.spiffe_id.trust_domain;
@@ -171,7 +171,7 @@ class CreateEntryJson extends Component {
         if (localNewEntry.parent_id !== undefined) {
             parentId_trustDomain = localNewEntry.parent_id.trust_domain;
             parentId_path = localNewEntry.parent_id.path;
-            if(localNewEntry.parent_id.trust_domain !== undefined && localNewEntry.parent_id.path !== undefined) {
+            if (localNewEntry.parent_id.trust_domain !== undefined && localNewEntry.parent_id.path !== undefined) {
                 parentId = prefix + localNewEntry.parent_id.trust_domain + localNewEntry.parent_id.path;
             } else if (localNewEntry.parent_id.trust_domain !== undefined) {
                 parentId = prefix + localNewEntry.parent_id.trust_domain;
@@ -216,22 +216,22 @@ class CreateEntryJson extends Component {
             alert("Please Select an Entry From the List, and make Necessary Changes!");
             return
         }
-        if(this.state.spiffeIdTrustDomain === undefined || this.state.spiffeIdTrustDomain === "") {
+        if (this.state.spiffeIdTrustDomain === undefined || this.state.spiffeIdTrustDomain === "") {
             alert("SPIFFE ID Trust Domain Empty/ Invalid, Please Input Trust Domain!");
             return
         }
-            
-        if(this.state.spiffeIdPath === undefined || this.state.spiffeIdPath === "") {
+
+        if (this.state.spiffeIdPath === undefined || this.state.spiffeIdPath === "") {
             alert("SPIFFE ID Path Empty/ Invalid, Please Input Path!");
             return
         }
         console.log(this.state.parentIdTrustDomain)
-        if(this.state.parentIdTrustDomain === undefined || this.state.parentIdTrustDomain === "") {
+        if (this.state.parentIdTrustDomain === undefined || this.state.parentIdTrustDomain === "") {
             alert("Parent ID Trust Domain Empty/ Invalid, Please Input Trust Domain!");
             return
         }
-            
-        if(this.state.parentIdPath === undefined || this.state.parentIdPath === "") {
+
+        if (this.state.parentIdPath === undefined || this.state.parentIdPath === "") {
             alert("Parent ID Path Empty/ Invalid, Please Input Path!");
             return
         }
@@ -260,42 +260,52 @@ class CreateEntryJson extends Component {
         if (this.state.dnsNames.length !== 0) {
             dnsNamesWithList = this.state.dnsNames.split(',').map((x) => x.trim())
         }
-        if(entriesToUpload[selectedEntryId].spiffe_id === undefined) {
+        if (entriesToUpload[selectedEntryId].spiffe_id === undefined) {
             entriesToUpload[selectedEntryId]["spiffe_id"] = {};
         }
         entriesToUpload[selectedEntryId]["spiffe_id"]["trust_domain"] = this.state.spiffeIdTrustDomain;
         entriesToUpload[selectedEntryId]["spiffe_id"]["path"] = this.state.spiffeIdPath;
-        if(entriesToUpload[selectedEntryId].parent_id === undefined) {
+        if (entriesToUpload[selectedEntryId].parent_id === undefined) {
             entriesToUpload[selectedEntryId]["parent_id"] = {};
         }
         entriesToUpload[selectedEntryId]["parent_id"]["trust_domain"] = this.state.parentIdTrustDomain;
         entriesToUpload[selectedEntryId]["parent_id"]["path"] = this.state.parentIdPath;
         entriesToUpload[selectedEntryId]["selectors"] = selectorEntries;
-        if(this.state.ttl !== undefined) {
+        if (this.state.ttl !== undefined) {
             entriesToUpload[selectedEntryId]["ttl"] = this.state.ttl;
         }
-        if(this.state.ttl !== undefined) {
+        if (this.state.ttl !== undefined) {
             entriesToUpload[selectedEntryId]["expires_at"] = this.state.expiresAt;
         }
-        if(this.state.expiresAt !== undefined) {
+        if (this.state.expiresAt !== undefined) {
             entriesToUpload[selectedEntryId]["federates_with"] = federatedWithList;
         }
-        if(this.state.dnsNames.length !== 0) {
+        if (this.state.dnsNames.length !== 0) {
             entriesToUpload[selectedEntryId]["dns_names"] = dnsNamesWithList;
         }
-        if(this.state.adminFlag !== undefined) {
+        if (this.state.adminFlag !== undefined) {
             entriesToUpload[selectedEntryId]["admin"] = this.state.adminFlag;
         }
-        if(this.state.downstream !== undefined) {
+        if (this.state.downstream !== undefined) {
             entriesToUpload[selectedEntryId]["downstream"] = this.state.downstream;
         }
         var updatedIds = this.state.newEntriesIds;
         updatedIds[selectedEntryId]["spiffeId"] = this.SpiffeHelper.getEntrySpiffeid(entriesToUpload[selectedEntryId]);
         this.setState({
             newEntriesIds: updatedIds,
-            uploadedEntries: entriesToUpload
+            uploadedEntries: entriesToUpload,
+            entrySelected: false,
+            parentId: "",
+            spiffeId: "",
+            selectorsList: "",
+            ttl: 0,
+            expiresAt: 0,
+            federatesWith: "",
+            dnsNames: "",
+            adminFlag: false,
+            downstream: false,
         })
-        alert("Entry " + (selectedEntryId+1).toString() + " Updated!");
+        alert("Entry " + (selectedEntryId + 1).toString() + " Updated!");
         //this.props.newEntriesUpdateFunc(entriesToUpload);
     }
 
@@ -409,7 +419,7 @@ class CreateEntryJson extends Component {
     }
 
     onChangeParentId = (selected) => {
-        var prefix = this.state.prefix, 
+        var prefix = this.state.prefix,
             sid = selected.selectedItem;
         const [validSpiffeId, trustDomain, path] = this.parseSpiffeId(sid)
         var spiffeIdPrefix = prefix + trustDomain;
@@ -594,7 +604,7 @@ class CreateEntryJson extends Component {
                                                         onChange={this.onChangeParentId}
                                                     />
                                                 </div>
-                                            }  
+                                            }
                                             {this.state.entrySelected &&
                                                 <div>
                                                     <Dropdown
@@ -721,6 +731,8 @@ class CreateEntryJson extends Component {
                                                 </div>
                                             </fieldset>
                                         </div>
+                                    </div>
+                                    <div className='apply-edit-button'>
                                         <Button
                                             size="medium"
                                             color="primary"

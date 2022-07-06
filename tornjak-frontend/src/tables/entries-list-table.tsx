@@ -129,7 +129,7 @@ class EntriesListTable extends React.Component<EntriesListTableProp, EntriesList
         var blob = new Blob(selectedEntriesInfo, {type: "application/json"});
         saveAs(
             blob,
-            "selectedEntries.yaml"
+            "selectedEntries.json"
         );
     }
 

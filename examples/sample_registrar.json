@@ -2,7 +2,7 @@
   "entries": [
     {
     "spiffe_id": {
-      "path": "/sample_path1"
+      "path": "/registrar1"
     },
     "selectors": [
         {
@@ -11,13 +11,14 @@
         },
         {
           "type": "k8s",
-          "value": "aspire-k8s-registrar"
+          "value": "sa:spire-k8s-registrar"
         },
         {
           "type": "k8s",
           "value": "container-name:k8s-workload-registrar"
         }
-      ]
+      ],
+      "admin": true
     }
   ]
 }
