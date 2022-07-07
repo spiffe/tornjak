@@ -18,7 +18,8 @@ import {
   tornjakMessageFunc,
   tornjakServerInfoUpdateFunc,
   serverInfoUpdateFunc,
-  agentworkloadSelectorInfoFunc
+  agentworkloadSelectorInfoFunc,
+  newEntriesUpdateFunc
 } from 'redux/actions';
 import {
   EntriesList,
@@ -45,6 +46,8 @@ type CreateEntryProp = {
   serverInfoUpdateFunc: (globalServerInfo: ServerInfo) => void,
   // dispatches a payload for list of entries with their metadata info as an array of EntriesListType and has a return type of void
   entriesListUpdateFunc: (globalEntriesList: EntriesList[]) => void,
+  // dispatches a payload for list of new entries uploaded with their metadata info as an array of EntriesListType and has a return type of void
+  newEntriesUpdateFunc: (globalNewEntries: EntriesList[]) => void,
   // dispatches a payload for list of available selectors and their options as an object and has a return type of void
   selectorInfoFunc: (globalSelectorInfo: SelectorInfoLabels) => void,
   // dispatches a payload for the tornjak error messsege and has a return type of void
@@ -63,8 +66,8 @@ type CreateEntryProp = {
   globalAgentsList: AgentsList[],
   // list of available entries as array of EntriesListType
   globalEntriesList: EntriesList[],
-  // list of new entries to be created as array of EntriesListType or can be undefined if no array present
-  globalNewEntries: EntriesList[] | undefined,
+  // list of new entries to be created as array of EntriesListType
+  globalNewEntries: EntriesList[],
   // list of available workload selectors and their options
   globalWorkloadSelectorInfo: WorkloadSelectorInfoLabels,
   // the workload selector info for the agents as an array of AgentsWorkLoadAttestorInfoType
@@ -175,6 +178,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       this.TornjakApi.populateLocalEntriesUpdate(this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
       this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
       this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
+      this.props.newEntriesUpdateFunc([]);
       this.setState({})
     }
   }
@@ -723,15 +727,30 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
               <CreateEntryYaml
                 ParentIdList={ParentIdList_noManualOption} />
               <br></br>
-              <Button
-                size="medium"
-                color="primary"
-                variant="contained"
-                onClick={() => {
-                  this.onYAMLEntryCreate();
-                }}>
-                Create Entries
-              </Button>
+              {this.props.globalNewEntries.length === 0 &&
+                <div>
+                  <Button
+                    size="medium"
+                    color="primary"
+                    variant="contained"
+                    disabled
+                    >
+                    Create Entries
+                  </Button>
+                  <p style={{ fontSize: 13 }}>i.e. Upload File to Enable</p>
+                </div>
+              }
+              {this.props.globalNewEntries.length !== 0 &&
+                <Button
+                  size="medium"
+                  color="primary"
+                  variant="contained"
+                  onClick={() => {
+                    this.onYAMLEntryCreate();
+                  }}>
+                  Create Entries
+                </Button>
+              }
             </div>
           </AccordionItem>
           <AccordionItem
@@ -933,7 +952,7 @@ const mapStateToProps = (state: RootState) => ({
 
 export default connect(
   mapStateToProps,
-  { serverSelectedFunc, agentworkloadSelectorInfoFunc, selectorInfoFunc, agentsListUpdateFunc, entriesListUpdateFunc, tornjakMessageFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc }
+  { serverSelectedFunc, agentworkloadSelectorInfoFunc, selectorInfoFunc, agentsListUpdateFunc, entriesListUpdateFunc, tornjakMessageFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, newEntriesUpdateFunc }
 )(CreateEntry)
 
 export { CreateEntry };
