@@ -207,13 +207,13 @@
   .edit-entry-container {
     display: flex;
     flex-direction: row;
-    width: 1500px
+    width: 1100px
   }
   .entries-list-container {
     height:500px;
     float:left;
     display: block;
-    width: 400px;
+    width: 50%;
     overflow-y: scroll;
     background-color: rgb(215, 215, 215);
     padding: 40px 30px 30px 30px;
@@ -222,16 +222,9 @@
   .entries-edit-form {
     height:500px;
     display: block;
-    width: 600px;
+    width: 50%;
     overflow-y: scroll;
     margin-left: 20px;
-  }
-
-  .apply-edit-button {
-    display: block;
-    width: 200px;
-    margin-left: 40px;
-    margin-top: 425px;
   }
 
   .federates-with-input-field-yaml {

@@ -9,29 +9,14 @@ import {
     Link,
     Dropdown
 } from 'carbon-components-react';
-import {
-    Button,
-} from '@material-ui/core';
 import { Launch16, NextOutline16 } from '@carbon/icons-react';
 import { connect } from 'react-redux';
-// import axios from 'axios';
-// import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
 import './style.css';
 import SpiffeHelper from './spiffe-helper';
 import {
     newEntriesUpdateFunc
 } from 'redux/actions';
-// import {
-//     serverSelectedFunc,
-//     selectorInfoFunc,
-//     agentsListUpdateFunc,
-//     entriesListUpdateFunc,
-//     tornjakMessageFunc,
-//     tornjakServerInfoUpdateFunc,
-//     serverInfoUpdateFunc,
-//     agentworkloadSelectorInfoFunc
-// } from 'redux/actions';
 // import {
 //     EntriesList,
 //     AgentsList,
@@ -64,6 +49,8 @@ class CreateEntryJson extends Component {
         this.handleModalSubmit = this.handleModalSubmit.bind(this);
         // this.onChangeSpiffeId = this.onChangeSpiffeId.bind(this);
         this.onChangeParentId = this.onChangeParentId.bind(this);
+        this.applyEditToEntry = this.applyEditToEntry.bind(this);
+        
 
         this.state = {
             prefix: "spiffe://",
@@ -92,9 +79,7 @@ class CreateEntryJson extends Component {
         }
     }
 
-    componentDidMount() {
-
-    }
+    componentDidMount() {}
 
     componentDidUpdate(prevProps, prevState) {
         if (prevState.globalAgentsList !== this.state.globalAgentsList) {
@@ -213,7 +198,7 @@ class CreateEntryJson extends Component {
 
     applyEditToEntry() {
         if (this.state.selectedEntryId === -1) {
-            alert("Please Select an Entry From the List, and make Necessary Changes!");
+            alert("Please Select an Entry From the List, and make Necessary Changes to Apply Edit!");
             return
         }
         if (this.state.spiffeIdTrustDomain === undefined || this.state.spiffeIdTrustDomain === "") {
@@ -292,6 +277,7 @@ class CreateEntryJson extends Component {
         var updatedIds = this.state.newEntriesIds;
         updatedIds[selectedEntryId]["spiffeId"] = this.SpiffeHelper.getEntrySpiffeid(entriesToUpload[selectedEntryId]);
         this.setState({
+            selectedEntryId: -1,
             newEntriesIds: updatedIds,
             uploadedEntries: entriesToUpload,
             entrySelected: false,
@@ -306,6 +292,7 @@ class CreateEntryJson extends Component {
             downstream: false,
         })
         alert("Entry " + (selectedEntryId + 1).toString() + " Updated!");
+        return true;
         //this.props.newEntriesUpdateFunc(entriesToUpload);
     }
 
@@ -559,10 +546,12 @@ class CreateEntryJson extends Component {
                                 size='lg'
                                 triggerButtonKind="ghost"
                                 buttonTriggerText="Edit Uploaded Entries"
-                                handleSubmit={this.handleModalSubmit}
-                                shouldCloseAfterSubmit={true}
+                                handleSubmit={this.applyEditToEntry}
+                                //shouldCloseAfterSubmit={true}
                                 modalHeading="Entries Edit"
                                 modalLabel="Edit Uploaded Entries"
+                                primaryButtonText="Apply"
+                                secondaryButtonText="Exit"
                             >
                                 <div className='edit-entry-container'>
                                     <div className="entries-list-container">
@@ -731,19 +720,6 @@ class CreateEntryJson extends Component {
                                                 </div>
                                             </fieldset>
                                         </div>
-                                    </div>
-                                    <div className='apply-edit-button'>
-                                        <Button
-                                            size="medium"
-                                            color="primary"
-                                            variant="contained"
-                                            onClick={() => {
-                                                this.applyEditToEntry();
-                                            }}
-                                        >
-                                            Apply Edit
-                                        </Button>
-                                        <p>i.e. Apply Change to Selected Entry/ Entries</p>
                                     </div>
                                 </div>
                             </ModalWrapper>
