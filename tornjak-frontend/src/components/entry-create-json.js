@@ -50,7 +50,7 @@ class CreateEntryJson extends Component {
         // this.onChangeSpiffeId = this.onChangeSpiffeId.bind(this);
         this.onChangeParentId = this.onChangeParentId.bind(this);
         this.applyEditToEntry = this.applyEditToEntry.bind(this);
-        
+
 
         this.state = {
             prefix: "spiffe://",
@@ -76,6 +76,7 @@ class CreateEntryJson extends Component {
             downstream: false,
             entrySelected: false,
             spiffeIdPrefix: "",
+            newEntriesLoaded: false,
         }
     }
 
@@ -92,7 +93,8 @@ class CreateEntryJson extends Component {
         let localNewEntriesIds = [];
         this.setState({
             parseError: false, // reset invalid notification toast
-            isEntriesLoaded: true
+            isEntriesLoaded: true,
+            newEntriesLoaded: false, //reset new entries loaded toast
         })
         var yamlFile = e.target.files[0]; // json File List of objects
         var fileReader = new FileReader();
@@ -114,11 +116,12 @@ class CreateEntryJson extends Component {
                     parseError: false,
                     newEntriesIds: localNewEntriesIds,
                     uploadedEntries: parsedData.entries,
+                    newEntriesLoaded: true,
                 })
 
             } catch (e) {
                 console.log(e)
-                this.setState({ parseError: true })
+                this.setState({ parseError: true, newFileUploaded: false })
                 return false;
             }
             return true;
@@ -524,17 +527,45 @@ class CreateEntryJson extends Component {
                 {this.state.isEntriesLoaded && !this.state.parseError &&
                     <div>
                         <br></br>
-                        <h6
-                            style={{
-                                color: "green",
-                                marginLeft: "1rem",
-                            }}>[{this.state.newEntriesIds.length} Entries Loaded]</h6>
+                        <div>
+                            {this.state.isEntriesLoaded && this.state.newEntriesLoaded &&
+                                <div>
+                                    <ToastNotification className="toast-entry-creation-notification"
+                                        kind="info"
+                                        iconDescription="close notification"
+                                        subtitle={
+                                            <span>
+                                                <br></br>
+                                                <div>
+                                                    {this.state.newEntriesIds.length === 0 &&
+                                                        <div>
+                                                            {this.state.newEntriesIds.length} Entries Loaded/ No Entries Found in File
+                                                        </div>
+                                                    }
+                                                    {this.state.newEntriesIds.length === 1 &&
+                                                        <div>
+                                                            {this.state.newEntriesIds.length} Entry Loaded from File
+                                                        </div>
+                                                    }
+                                                    {this.state.newEntriesIds.length > 1 &&
+                                                        <div>
+                                                            {this.state.newEntriesIds.length} Entries Loaded from File
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </span>}
+                                        timeout={60000}
+                                        title="Entries Upload Notification"
+                                    />
+                                </div>
+                            }
+                        </div>
                         <div className="view_entries_yaml_button">
                             <ModalWrapper
                                 passiveModal={true}
                                 size='lg'
                                 triggerButtonKind="ghost"
-                                buttonTriggerText="View Entries JSON"
+                                buttonTriggerText="View Uploaded Entries"
                                 modalHeading="Entries JSON"
                                 modalLabel="View Uploaded Entries"
                             >
@@ -556,29 +587,56 @@ class CreateEntryJson extends Component {
                                 <div className='edit-entry-container'>
                                     <div className="entries-list-container">
                                         <fieldset>
-                                            <legend className="modal_Entry_list_title">UPLOADED ENTRIES</legend>
+                                            <legend className="modal_Entry_list_title">1. SELECT ENTRY</legend>
                                             {this.state.newEntriesIds.map((entryId, index) => (
                                                 <div key={index}>
                                                     {/* eslint-disable-next-line */}
-                                                    <Link
-                                                        id={entryId.spiffeId}
-                                                        href="#"
-                                                        renderIcon={NextOutline16}
-                                                        visited={false}
-                                                        onClick={(e) => {
-                                                            this.setSelectedEntriesIds(entryId, index);
-                                                            e.preventDefault();
-                                                        }}
-                                                    >
-                                                        {(index + 1).toString() + ". " + entryId.spiffeId}
-                                                    </Link>
+                                                    {index === 0 &&
+                                                        <div>
+                                                            <Link
+                                                                id="firstEntry"
+                                                                href="#"
+                                                                renderIcon={NextOutline16}
+                                                                visited={false}
+                                                                onClick={(e) => {
+                                                                    this.setSelectedEntriesIds(entryId, index);
+                                                                    e.preventDefault();
+                                                                }}
+                                                            >
+                                                                {(index + 1).toString() + ". " + entryId.spiffeId}
+                                                            </Link>
+                                                        </div>
+
+                                                    }
+                                                    {index > 0 &&
+                                                        <div>
+                                                            <Link
+                                                                id={entryId.spiffeId}
+                                                                href="#"
+                                                                renderIcon={NextOutline16}
+                                                                visited={false}
+                                                                onClick={(e) => {
+                                                                    this.setSelectedEntriesIds(entryId, index);
+                                                                    e.preventDefault();
+                                                                }}
+                                                            >
+                                                                {(index + 1).toString() + ". " + entryId.spiffeId}
+                                                            </Link>
+                                                        </div>
+                                                    }
                                                 </div>
                                             ))}
                                         </fieldset>
                                         <br></br>
-                                        <legend className="additional_info_entries_list">[i.e. Select Entry to Populate Metadata to Free Form]</legend>
+                                        <legend className="additional_info_entries_list">[Select Entry to Populate Metadata to Free Form]</legend>
                                     </div>
                                     <div className="entries-edit-form">
+                                        <p style={{
+                                            fontSize: 15,
+                                            fontWeight: "bold",
+                                            textDecoration: "underline",
+                                            marginBottom: 10
+                                        }}>2. EDIT ENTRY</p>
                                         <div className="parentId-drop-down-yaml" data-test="parentId-drop-down-yaml">
                                             {!this.state.entrySelected &&
                                                 <div>
@@ -589,7 +647,7 @@ class CreateEntryJson extends Component {
                                                         id="parentId-drop-down"
                                                         items={ParentIdList}
                                                         label="Select Entry to Enable Dropdown"
-                                                        titleText="Parent ID - [*optional Selection]"
+                                                        titleText="Parent ID"
                                                         onChange={this.onChangeParentId}
                                                     />
                                                 </div>
@@ -605,7 +663,7 @@ class CreateEntryJson extends Component {
                                                         titleText="Parent ID - [*optional Selection]"
                                                         onChange={this.onChangeParentId}
                                                     />
-                                                    <p className="parentId-helper">i.e. select if no Parent ID provided/ to Edit</p>
+                                                    <p className="parentId-helper">i.e. select if no Parent ID provided</p>
                                                 </div>
                                             }
                                         </div>

@@ -737,7 +737,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                     >
                     Create Entries
                   </Button>
-                  <p style={{ fontSize: 13 }}>i.e. Upload File to Enable</p>
+                  <p style={{ fontSize: 13}}>(Upload JSON File to Enable)</p>
                 </div>
               }
               {this.props.globalNewEntries.length !== 0 &&

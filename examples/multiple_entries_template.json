@@ -1,0 +1,39 @@
+{
+  "entries": [
+    {
+    "spiffe_id": {
+      "path": "/sample_path1"
+    },
+    "selectors": [
+        {
+          "type": "k8s",
+          "value": "ns:default"
+        },
+        {
+          "type": "k8s",
+          "value": "container-image:ubuntu"
+        }
+      ],
+      "admin": false 
+    },
+
+    {
+    "spiffe_id": {
+      "path": "/sample_path2"
+    },
+    "selectors": [
+        {
+          "type": "k8s",
+          "value": "sa:operator"
+        },
+        {
+          "type": "k8s",
+          "value": "container-name:my-operator"
+        }
+      ],
+      "admin": true,
+      "ttl": 600,
+      "downstream": true
+    }
+  ]
+}
