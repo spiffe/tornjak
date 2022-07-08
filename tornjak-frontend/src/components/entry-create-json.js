@@ -80,7 +80,7 @@ class CreateEntryJson extends Component {
         }
     }
 
-    componentDidMount() {}
+    componentDidMount() { }
 
     componentDidUpdate(prevProps, prevState) {
         if (prevState.globalAgentsList !== this.state.globalAgentsList) {
@@ -118,7 +118,8 @@ class CreateEntryJson extends Component {
                     uploadedEntries: parsedData.entries,
                     newEntriesLoaded: true,
                 })
-
+                // populate first entry
+                this.setSelectedEntriesIds(0, 0, parsedData.entries[0])
             } catch (e) {
                 console.log(e)
                 this.setState({ parseError: true, newFileUploaded: false })
@@ -132,8 +133,8 @@ class CreateEntryJson extends Component {
         }
     }
 
-    setSelectedEntriesIds(e, id) {
-        var prefix = this.state.prefix, localNewEntry = this.state.uploadedEntries[id],
+    setSelectedEntriesIds(e, id, _uploadedEntries) {
+        var prefix = this.state.prefix,
             spiffeId_trustDomain = "",
             spiffeId_path = "",
             spiffeId = "",
@@ -144,6 +145,9 @@ class CreateEntryJson extends Component {
             federates_with = "",
             dns_names = "";
 
+        if(_uploadedEntries !== undefined) {
+            var localNewEntry = _uploadedEntries;
+        } else (localNewEntry = this.state.uploadedEntries[id])
 
         if (localNewEntry.spiffe_id !== undefined) {
             spiffeId_trustDomain = localNewEntry.spiffe_id.trust_domain;
@@ -591,7 +595,25 @@ class CreateEntryJson extends Component {
                                             {this.state.newEntriesIds.map((entryId, index) => (
                                                 <div key={index}>
                                                     {/* eslint-disable-next-line */}
-                                                    {index === 0 &&
+                                                    {index === 0 && this.state.selectedEntryId === 0 &&
+                                                        <div>
+                                                            <Link
+                                                                id="firstEntry"
+                                                                href="#"
+                                                                renderIcon={NextOutline16}
+                                                                visited={true}
+                                                                inline
+                                                                onClick={(e) => {
+                                                                    this.setSelectedEntriesIds(entryId, index);
+                                                                    e.preventDefault();
+                                                                }}
+                                                            >
+                                                                {(index + 1).toString() + ". " + entryId.spiffeId}
+                                                            </Link>
+                                                        </div>
+
+                                                    }
+                                                    {index === 0 && this.state.selectedEntryId !== 0 &&
                                                         <div>
                                                             <Link
                                                                 id="firstEntry"
