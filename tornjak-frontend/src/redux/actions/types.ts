@@ -44,12 +44,18 @@ export interface ClusterTypeInfoAction extends Action<typeof GLOBAL_CLUSTER_TYPE
 
 // entries
 export const GLOBAL_ENTRIES_LIST = 'GLOBAL_ENTRIES_LIST';
+export const GLOBAL_NEW_ENTRIES = 'GLOBAL_NEW_ENTRIES';
 
 export interface EntriesReducerState {
-    globalEntriesList: EntriesList[]
+    globalEntriesList: EntriesList[],
+    globalNewEntries: EntriesList[],
 }
 
 export interface EntriesListAction extends Action<typeof GLOBAL_ENTRIES_LIST> {
+    payload: EntriesList[];
+}
+
+export interface NewEntriesAction extends Action<typeof GLOBAL_NEW_ENTRIES> {
     payload: EntriesList[];
 }
 

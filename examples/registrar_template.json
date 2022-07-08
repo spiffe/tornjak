@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+    "spiffe_id": {
+      "path": "/registrar1"
+    },
+    "selectors": [
+        {
+          "type": "k8s",
+          "value": "ns:spire"
+        },
+        {
+          "type": "k8s",
+          "value": "sa:spire-k8s-registrar"
+        },
+        {
+          "type": "k8s",
+          "value": "container-name:k8s-workload-registrar"
+        }
+      ],
+      "admin": true
+    }
+  ]
+}

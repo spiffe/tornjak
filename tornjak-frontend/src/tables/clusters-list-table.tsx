@@ -158,7 +158,8 @@ class ClustersListTable extends React.Component<ClustersListTableProp, ClustersL
                     listTableData={listTableData}
                     headerData={headerData}
                     deleteEntity={this.deleteCluster}
-                    banEntity={undefined} />
+                    banEntity={undefined}
+                    downloadEntity={undefined} />
             </div>
         );
     }
