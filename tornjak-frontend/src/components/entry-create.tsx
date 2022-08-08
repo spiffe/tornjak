@@ -775,13 +775,13 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                     //value={this.state.parentId}
                     onChange={this.onChangeParentId}
                   />
-                  <p className="parentId-helper">i.e. spiffe://example.org/agent/myagent1 - For node entries, select spiffe server as parent i.e. spiffe://example.org/spire/server</p>
+                  <p className="parentId-helper">e.g. spiffe://example.org/agent/myagent1 - For node entries, select spiffe server as parent e.g. spiffe://example.org/spire/server</p>
                 </div>
                 {this.state.parentIDManualEntry === true &&
                   <div className="parentId-manual-input-field" data-test="parentId-manual-input-field">
                     <TextInput
                       aria-required="true"
-                      helperText="i.e. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent i.e. spiffe://example.org/spire/server"
+                      helperText="e.g. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent e.g. spiffe://example.org/spire/server"
                       id="parentIdManualInputField"
                       invalidText="A valid value is required - refer to helper text below"
                       labelText="Parent ID - Manual Entry [*required]"
@@ -796,7 +796,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                 <div className="spiffeId-input-field" data-test="spiffeId-input-field">
                   <TextInput
                     aria-required="true"
-                    helperText="i.e. spiffe://example.org/sample/spiffe/id"
+                    helperText="e.g. spiffe://example.org/sample/spiffe/id"
                     id="spiffeIdInputField"
                     invalidText="A valid value is required - refer to helper text below"
                     labelText="SPIFFE ID [*required]"
@@ -816,7 +816,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                     aria-required="true"
                     //required
                     titleText="Selectors Recommendation [*required]"
-                    helperText="i.e. k8s_sat:cluster,..."
+                    helperText="e.g. k8s_sat:cluster,..."
                     placeholder={this.state.selectorsListDisplay}
                     //ariaLabel="selectors-multiselect"
                     id="selectors-multiselect"
@@ -828,7 +828,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                 <div className="selectors-textArea" data-test="selectors-textArea">
                   <TextArea
                     cols={50}
-                    helperText="i.e. k8s_sat:cluster:demo-cluster,..."
+                    helperText="e.g. k8s_sat:cluster:demo-cluster,..."
                     id="selectors-textArea"
                     invalidText="A valid value is required"
                     labelText="Selectors"
@@ -869,7 +869,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                     </div>
                     <div className="federates-with-input-field" data-test="federates-with-input-field">
                       <TextInput
-                        helperText="i.e. example.org,abc.com (Separated By Commas)"
+                        helperText="e.g. example.org,abc.com (Separated By Commas)"
                         id="federates-with-input-field"
                         invalidText="A valid value is required - refer to helper text below"
                         labelText="Federates With"
@@ -879,7 +879,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                     </div>
                     <div className="dnsnames-input-field" data-test="dnsnames-input-field">
                       <TextInput
-                        helperText="i.e. example.org,abc.com (Separated By Commas)"
+                        helperText="e.g. example.org,abc.com (Separated By Commas)"
                         id="dnsnames-input-field"
                         invalidText="A valid value is required - refer to helper text below"
                         labelText="DNS Names"

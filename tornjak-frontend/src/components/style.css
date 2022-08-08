@@ -216,7 +216,7 @@
     width: 50%;
     overflow-y: scroll;
     background-color: rgb(215, 215, 215);
-    padding: 40px 30px 30px 30px;
+    padding: 10px 30px 30px 30px;
   }
 
   .entries-edit-form {
@@ -225,6 +225,7 @@
     width: 50%;
     overflow-y: scroll;
     margin-left: 20px;
+    margin-top: 10px;
   }
 
   .federates-with-input-field-yaml {
@@ -238,7 +239,6 @@
     text-transform: capitalize;
     text-decoration: underline;
     font-weight: bold;
-    margin-left: 15px;
     margin-bottom: 5px;
     font-size: 15px;
   }
@@ -263,3 +263,7 @@
 
   .edit_entries_button {
   } 
+
+  .selected-entry {
+    background-color: rgb(175, 175, 184);
+  }

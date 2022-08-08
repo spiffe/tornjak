@@ -134,6 +134,11 @@ class CreateEntryJson extends Component {
     }
 
     setSelectedEntriesIds(e, id, _uploadedEntries) {
+        if(this.state.entrySelected) {
+            if(window.confirm("All changes will be lost! Press 'Step 3. APPLY' to save or 'Cancel' to continue without saving.")) {
+                return;
+            }
+        }
         var prefix = this.state.prefix,
             spiffeId_trustDomain = "",
             spiffeId_path = "",
@@ -583,25 +588,26 @@ class CreateEntryJson extends Component {
                                 buttonTriggerText="Edit Uploaded Entries"
                                 handleSubmit={this.applyEditToEntry}
                                 //shouldCloseAfterSubmit={true}
-                                modalHeading="Entries Edit"
+                                modalHeading="Entries Editor"
                                 modalLabel="Edit Uploaded Entries"
-                                primaryButtonText="Apply"
+                                primaryButtonText="Step 3. Apply"
                                 secondaryButtonText="Exit"
                             >
                                 <div className='edit-entry-container'>
                                     <div className="entries-list-container">
                                         <fieldset>
-                                            <legend className="modal_Entry_list_title">1. SELECT ENTRY</legend>
+                                            <legend className="modal_Entry_list_title">Step 1. SELECT ENTRY</legend>
                                             {this.state.newEntriesIds.map((entryId, index) => (
                                                 <div key={index}>
                                                     {/* eslint-disable-next-line */}
-                                                    {index === 0 && this.state.selectedEntryId === 0 &&
+                                                    {index === this.state.selectedEntryId &&
                                                         <div>
                                                             <Link
-                                                                id="firstEntry"
+                                                                className='selected-entry'
+                                                                id={entryId.spiffeId}
                                                                 href="#"
                                                                 renderIcon={NextOutline16}
-                                                                visited={true}
+                                                                visited={false}
                                                                 inline
                                                                 onClick={(e) => {
                                                                     this.setSelectedEntriesIds(entryId, index);
@@ -611,32 +617,13 @@ class CreateEntryJson extends Component {
                                                                 {(index + 1).toString() + ". " + entryId.spiffeId}
                                                             </Link>
                                                         </div>
-
                                                     }
-                                                    {index === 0 && this.state.selectedEntryId !== 0 &&
-                                                        <div>
-                                                            <Link
-                                                                id="firstEntry"
-                                                                href="#"
-                                                                renderIcon={NextOutline16}
-                                                                visited={false}
-                                                                onClick={(e) => {
-                                                                    this.setSelectedEntriesIds(entryId, index);
-                                                                    e.preventDefault();
-                                                                }}
-                                                            >
-                                                                {(index + 1).toString() + ". " + entryId.spiffeId}
-                                                            </Link>
-                                                        </div>
-
-                                                    }
-                                                    {index > 0 &&
+                                                    {index !== this.state.selectedEntryId &&
                                                         <div>
                                                             <Link
                                                                 id={entryId.spiffeId}
                                                                 href="#"
                                                                 renderIcon={NextOutline16}
-                                                                visited={false}
                                                                 onClick={(e) => {
                                                                     this.setSelectedEntriesIds(entryId, index);
                                                                     e.preventDefault();
@@ -650,7 +637,7 @@ class CreateEntryJson extends Component {
                                             ))}
                                         </fieldset>
                                         <br></br>
-                                        <legend className="additional_info_entries_list">[Select Entry to Populate Metadata to Free Form]</legend>
+                                        <legend className="additional_info_entries_list">[Select Entry to Edit]</legend>
                                     </div>
                                     <div className="entries-edit-form">
                                         <p style={{
@@ -658,7 +645,7 @@ class CreateEntryJson extends Component {
                                             fontWeight: "bold",
                                             textDecoration: "underline",
                                             marginBottom: 10
-                                        }}>2. EDIT ENTRY</p>
+                                        }}>Step 2. EDIT ENTRY</p>
                                         <div className="parentId-drop-down-yaml" data-test="parentId-drop-down-yaml">
                                             {!this.state.entrySelected &&
                                                 <div>
