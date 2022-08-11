@@ -91,7 +91,6 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
         this.applyEditToEntry = this.applyEditToEntry.bind(this);
         this.passiveModal = this.passiveModal.bind(this);
 
-
         this.state = {
             prefix: "spiffe://",
             parseError: false,
@@ -142,6 +141,7 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
         }
     }
 
+    // TODO(mamy-CS): e - any for now will be explicitly typed
     handleChange(e: any): void {
         var idx = 0;
         let localNewEntriesIds: { spiffeId: string, [x: string]: string; }[] = [];
@@ -368,7 +368,6 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
         })
         alert("Entry " + (selectedEntryId + 1).toString() + " Updated!");
         return true;
-        //this.props.newEntriesUpdateFunc(entriesToUpload);
     }
 
     passiveModal() {
@@ -410,14 +409,14 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
         });
     }
 
-    // TODO(mamy-CS): e - any for now will be explicitly typed on currently open entry create PR
+    // TODO(mamy-CS): e - any for now will be explicitly typed
     onChangeTtl(e: any): void {
         this.setState({
             ttl: Number(e.target.value)
         });
     }
 
-    // TODO(mamy-CS): e - any for now will be explicitly typed on currently open entry create PR
+    // TODO(mamy-CS): e - any for now will be explicitly typed
     onChangeExpiresAt(e: any): void {
         this.setState({
             expiresAt: Number(e.target.value)
