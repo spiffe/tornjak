@@ -78,6 +78,8 @@ export interface EntriesList {
   store_svid: boolean; // Determines if the issued identity is exportable to a store
 }
 
+export type link = string;
+
 // servers
 export interface TornjakServerInfo {
   // Plugins for tornjak server info
@@ -111,3 +113,4 @@ export interface StringLabelsWithIndexStrings {
 
 export type SelectorInfoLabels = StringLabelsWithIndexStrings;
 export type WorkloadSelectorInfoLabels = StringLabelsWithIndexStrings;
+

@@ -17,23 +17,62 @@ import SpiffeHelper from './spiffe-helper';
 import {
     newEntriesUpdateFunc
 } from 'redux/actions';
-// import {
-//     EntriesList,
-//     AgentsList,
-//     AgentsWorkLoadAttestorInfo,
-//     ServerInfo,
-//     TornjakServerInfo,
-// } from './types';
-//import { RootState } from 'redux/reducers';
+import {
+    EntriesList,
+    link,
+    AgentsList,
+} from './types';
+import { RootState } from 'redux/reducers';
 
-const NewEntryJsonFormatLink = (props) => (
+type CreateEntryJsonProp = {
+    // dispatches a payload for list of new entries uploaded with their metadata info as an array of EntriesListType and has a return type of void
+    newEntriesUpdateFunc: (globalNewEntries: EntriesList[]) => void,
+    // list of new entries to be created as array of EntriesListType
+    globalNewEntries: EntriesList[],
+    // list of available agents as array of AgentsListType
+    globalAgentsList: AgentsList[],
+    // list of available parent ids
+    ParentIdList: string[],
+}
+
+type CreateEntryJsonState = {
+    prefix: string,
+    parseError: boolean,
+    isEntriesLoaded: boolean,
+    newEntriesIds: { spiffeId: string, [x: string]: string; }[],
+    newEntrySelected: EntriesList,
+    selectedEntryId: number,
+    uploadedEntries: EntriesList[],
+    yamlFormSpiffeId: string,
+    spiffeIdTrustDomain: string,
+    spiffeIdPath: string,
+    spiffeId: string,
+    parentIdTrustDomain: string,
+    parentIdPath: string,
+    parentId: string,
+    selectorsList: string,
+    ttl: number,
+    expiresAt: number,
+    federatesWith: string,
+    dnsNames: string,
+    adminFlag: boolean,
+    downstream: boolean,
+    entrySelected: boolean,
+    spiffeIdPrefix: string,
+    newEntriesLoaded: boolean,
+    newFileUploaded: boolean,
+}
+
+const NewEntryJsonFormatLink = (props: { link: link }) => (
     <div>
         <a rel="noopener noreferrer" href={props.link} target="_blank">(Click to see new entry JSON format)</a>
         <a rel="noopener noreferrer" href={props.link} target="_blank">{<Launch16 />}</a>
     </div>
 )
-class CreateEntryJson extends Component {
-    constructor(props) {
+class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonState>  {
+    TornjakApi: TornjakApi;
+    SpiffeHelper: SpiffeHelper;
+    constructor(props: CreateEntryJsonProp) {
         super(props);
         this.TornjakApi = new TornjakApi(props);
         this.SpiffeHelper = new SpiffeHelper(props);
@@ -50,6 +89,7 @@ class CreateEntryJson extends Component {
         // this.onChangeSpiffeId = this.onChangeSpiffeId.bind(this);
         this.onChangeParentId = this.onChangeParentId.bind(this);
         this.applyEditToEntry = this.applyEditToEntry.bind(this);
+        this.passiveModal = this.passiveModal.bind(this);
 
 
         this.state = {
@@ -57,7 +97,20 @@ class CreateEntryJson extends Component {
             parseError: false,
             isEntriesLoaded: false,
             newEntriesIds: [],
-            newEntrySelected: [],
+            newEntrySelected: {
+                id: "",
+                spiffe_id: { trust_domain: "", path: "" },
+                parent_id: { trust_domain: "", path: "" },
+                selectors: [],
+                ttl: 0,
+                federates_with: [],
+                admin: false,
+                downstream: false,
+                expires_at: 0,
+                dns_names: [],
+                revision_number: 0,
+                store_svid: false,
+            },
             selectedEntryId: -1,
             uploadedEntries: [],
             yamlFormSpiffeId: "",
@@ -77,20 +130,21 @@ class CreateEntryJson extends Component {
             entrySelected: false,
             spiffeIdPrefix: "",
             newEntriesLoaded: false,
+            newFileUploaded: false,
         }
     }
 
     componentDidMount() { }
 
-    componentDidUpdate(prevProps, prevState) {
-        if (prevState.globalAgentsList !== this.state.globalAgentsList) {
+    componentDidUpdate(prevProps: CreateEntryJsonProp, prevState: CreateEntryJsonState) {
+        if (prevProps.globalAgentsList !== this.props.globalAgentsList) {
             this.props.newEntriesUpdateFunc(this.state.uploadedEntries);
         }
     }
 
-    handleChange(e) {
+    handleChange(e: any): void {
         var idx = 0;
-        let localNewEntriesIds = [];
+        let localNewEntriesIds: { spiffeId: string, [x: string]: string; }[] = [];
         this.setState({
             parseError: false, // reset invalid notification toast
             isEntriesLoaded: true,
@@ -100,12 +154,14 @@ class CreateEntryJson extends Component {
         var fileReader = new FileReader();
         fileReader.addEventListener("load", () => {
             var result = fileReader.result;
-            console.log(result)
+            if (typeof result !== "string") {
+                return
+            }
             try {
                 var parsedData = JSON.parse(result);
                 this.props.newEntriesUpdateFunc(parsedData.entries);
                 for (let i = 0; i < parsedData.entries.length; i++) {
-                    localNewEntriesIds[idx] = [];
+                    localNewEntriesIds[idx] = { "spiffeId": "" };
                     localNewEntriesIds[idx]["spiffeId"] = this.SpiffeHelper.getEntrySpiffeid(parsedData.entries[i]);
                     if (localNewEntriesIds[idx]["spiffeId"] === "") {
                         localNewEntriesIds[idx]["spiffeId"] = parsedData.entries[i].spiffe_id.path
@@ -122,7 +178,10 @@ class CreateEntryJson extends Component {
                 this.setSelectedEntriesIds(0, 0, parsedData.entries[0])
             } catch (e) {
                 console.log(e)
-                this.setState({ parseError: true, newFileUploaded: false })
+                this.setState({
+                    parseError: true,
+                    newFileUploaded: false
+                })
                 return false;
             }
             return true;
@@ -133,9 +192,9 @@ class CreateEntryJson extends Component {
         }
     }
 
-    setSelectedEntriesIds(e, id, _uploadedEntries) {
-        if(this.state.entrySelected) {
-            if(window.confirm("All changes will be lost! Press 'Step 3. APPLY' to save or 'Cancel' to continue without saving.")) {
+    setSelectedEntriesIds(_e: number, id: number, _uploadedEntries: EntriesList | undefined) {
+        if (this.state.entrySelected) {
+            if (window.confirm("All changes will be lost! Press 'Step 3. APPLY' to save or 'Cancel' to continue without saving.")) {
                 return;
             }
         }
@@ -150,8 +209,8 @@ class CreateEntryJson extends Component {
             federates_with = "",
             dns_names = "";
 
-        if(_uploadedEntries !== undefined) {
-            var localNewEntry = _uploadedEntries;
+        if (_uploadedEntries !== undefined) {
+            var localNewEntry: EntriesList = _uploadedEntries;
         } else (localNewEntry = this.state.uploadedEntries[id])
 
         if (localNewEntry.spiffe_id !== undefined) {
@@ -176,7 +235,7 @@ class CreateEntryJson extends Component {
                 parentId = localNewEntry.parent_id.path;
             }
         }
-        if (localNewEntry.selectors !== undefined && localNewEntry.selectors !== "" && localNewEntry.selectors[0] !== null) {
+        if (localNewEntry.selectors !== undefined && localNewEntry.selectors !== [] && localNewEntry.selectors[0] !== null) {
             var selectors = localNewEntry.selectors;
             var selectorJoinedArray = selectors.map((x) => (x.type + ":" + x.value + "\n"));
             selectorsWithNewline = selectorJoinedArray.join('');
@@ -211,37 +270,37 @@ class CreateEntryJson extends Component {
     applyEditToEntry() {
         if (this.state.selectedEntryId === -1) {
             alert("Please Select an Entry From the List, and make Necessary Changes to Apply Edit!");
-            return
+            return false;
         }
         if (this.state.spiffeIdTrustDomain === undefined || this.state.spiffeIdTrustDomain === "") {
             alert("SPIFFE ID Trust Domain Empty/ Invalid, Please Input Trust Domain!");
-            return
+            return false;
         }
 
         if (this.state.spiffeIdPath === undefined || this.state.spiffeIdPath === "") {
             alert("SPIFFE ID Path Empty/ Invalid, Please Input Path!");
-            return
+            return false;
         }
         console.log(this.state.parentIdTrustDomain)
         if (this.state.parentIdTrustDomain === undefined || this.state.parentIdTrustDomain === "") {
             alert("Parent ID Trust Domain Empty/ Invalid, Please Input Trust Domain!");
-            return
+            return false;
         }
 
         if (this.state.parentIdPath === undefined || this.state.parentIdPath === "") {
             alert("Parent ID Path Empty/ Invalid, Please Input Path!");
-            return
+            return false;
         }
         if (this.state.selectorsList.length === 0) {
             alert("Selectors List Empty/ Invalid, Please Input Selectors!");
-            return
+            return false;
         }
-        var entriesToUpload = this.state.uploadedEntries,
+        var entriesToUpload: EntriesList[] = this.state.uploadedEntries,
             selectedEntryId = this.state.selectedEntryId,
-            selectorStrings = [],
+            selectorStrings: string[] = [],
             selectorEntries = [],
-            federatedWithList = [],
-            dnsNamesWithList = [];
+            federatedWithList: string[] = [],
+            dnsNamesWithList: string[] = [];
 
         if (this.state.selectorsList.length !== 0) {
             selectorStrings = this.state.selectorsList.split('\n').map(x => x.trim())
@@ -250,7 +309,11 @@ class CreateEntryJson extends Component {
             {
                 "type": x.substr(0, x.indexOf(":")),
                 "value": x.substr(x.indexOf(":") + 1)
-            } : null)
+            } :
+            {
+                "type": "",
+                "value": ""
+            })
         if (this.state.federatesWith.length !== 0) {
             federatedWithList = this.state.federatesWith.split(',').map((x) => x.trim())
         }
@@ -258,12 +321,12 @@ class CreateEntryJson extends Component {
             dnsNamesWithList = this.state.dnsNames.split(',').map((x) => x.trim())
         }
         if (entriesToUpload[selectedEntryId].spiffe_id === undefined) {
-            entriesToUpload[selectedEntryId]["spiffe_id"] = {};
+            entriesToUpload[selectedEntryId]["spiffe_id"] = { trust_domain: "", path: "" };
         }
         entriesToUpload[selectedEntryId]["spiffe_id"]["trust_domain"] = this.state.spiffeIdTrustDomain;
         entriesToUpload[selectedEntryId]["spiffe_id"]["path"] = this.state.spiffeIdPath;
         if (entriesToUpload[selectedEntryId].parent_id === undefined) {
-            entriesToUpload[selectedEntryId]["parent_id"] = {};
+            entriesToUpload[selectedEntryId]["parent_id"] = { trust_domain: "", path: "" };
         }
         entriesToUpload[selectedEntryId]["parent_id"]["trust_domain"] = this.state.parentIdTrustDomain;
         entriesToUpload[selectedEntryId]["parent_id"]["path"] = this.state.parentIdPath;
@@ -308,54 +371,60 @@ class CreateEntryJson extends Component {
         //this.props.newEntriesUpdateFunc(entriesToUpload);
     }
 
-    onChangeSpiffeIdTrustDomain(e) {
+    passiveModal() {
+        return true;
+    }
+
+    onChangeSpiffeIdTrustDomain(e: { target: { value: string; }; }) {
         var value = e.target.value;
         this.setState({
             spiffeIdTrustDomain: value,
         });
     }
 
-    onChangeSpiffeIdPath(e) {
+    onChangeSpiffeIdPath(e: { target: { value: string; }; }) {
         var value = e.target.value;
         this.setState({
             spiffeIdPath: value,
         });
     }
 
-    onChangeParentIdTrustDomain(e) {
+    onChangeParentIdTrustDomain(e: { target: { value: string; }; }) {
         var value = e.target.value;
         this.setState({
             parentIdTrustDomain: value,
         });
     }
 
-    onChangeParentIdPath(e) {
+    onChangeParentIdPath(e: { target: { value: string; }; }) {
         var value = e.target.value;
         this.setState({
             parentIdPath: value,
         });
     }
 
-    onChangeSelectors(e) {
+    onChangeSelectors(e: { target: { value: string; }; }) {
         var value = e.target.value;
         this.setState({
             selectorsList: value,
         });
     }
 
-    onChangeTtl(e) {
+    // TODO(mamy-CS): e - any for now will be explicitly typed on currently open entry create PR
+    onChangeTtl(e: any): void {
         this.setState({
             ttl: Number(e.target.value)
         });
     }
 
-    onChangeExpiresAt(e) {
+    // TODO(mamy-CS): e - any for now will be explicitly typed on currently open entry create PR
+    onChangeExpiresAt(e: any): void {
         this.setState({
             expiresAt: Number(e.target.value)
         });
     }
 
-    onChangeDnsNames(e) {
+    onChangeDnsNames(e: { target: { value: string; }; } | undefined) {
         if (e === undefined) {
             return;
         }
@@ -365,7 +434,7 @@ class CreateEntryJson extends Component {
         });
     }
 
-    onChangeFederatesWith(e) {
+    onChangeFederatesWith(e: { target: { value: string; }; } | undefined) {
         if (e === undefined) {
             return;
         }
@@ -375,13 +444,13 @@ class CreateEntryJson extends Component {
         });
     }
 
-    onChangeAdminFlag = (selected) => {
+    onChangeAdminFlag = (selected: boolean) => {
         var sid = selected;
         this.setState({
             adminFlag: sid,
         });
     }
-    onChangeDownStream = (selected) => {
+    onChangeDownStream = (selected: boolean) => {
         var sid = selected;
         this.setState({
             downstream: sid,
@@ -404,7 +473,7 @@ class CreateEntryJson extends Component {
         return true;
     }
 
-    parseSpiffeId(sid) {
+    parseSpiffeId(sid: string): [boolean, string, string] {
         if (sid.startsWith('spiffe://')) {
             var sub = sid.substr("spiffe://".length)
             var sp = sub.indexOf("/")
@@ -417,7 +486,7 @@ class CreateEntryJson extends Component {
         return [false, "", ""];
     }
 
-    onChangeParentId = (selected) => {
+    onChangeParentId = (selected: { selectedItem: string; }): void => {
         var prefix = this.state.prefix,
             sid = selected.selectedItem;
         const [validSpiffeId, trustDomain, path] = this.parseSpiffeId(sid)
@@ -441,7 +510,7 @@ class CreateEntryJson extends Component {
         return
     }
 
-    onChangeParentIdInput(e) {
+    onChangeParentIdInput(e: React.ChangeEvent<HTMLInputElement>) {
         var sid = e.target.value;
         this.setState({
             parentId: sid
@@ -469,7 +538,7 @@ class CreateEntryJson extends Component {
         return
     }
 
-    onChangeSpiffeId(e) {
+    onChangeSpiffeId(e: { target: { value: string; }; }): void {
         var sid = e.target.value;
         this.setState({
             spiffeId: sid
@@ -515,6 +584,12 @@ class CreateEntryJson extends Component {
                     </div>
                 }
                 <div>
+                    <h6>Choose your local file:</h6>
+                    <br></br>
+                    <p style={{ fontSize: 15 }}>only .json files </p>
+                    <NewEntryJsonFormatLink link={newEntryFormatLink} />
+                </div>
+                <div>
                     <FileUploader
                         accept={[
                             '.json'
@@ -524,12 +599,6 @@ class CreateEntryJson extends Component {
                         buttonLabel="Upload file"
                         filenameStatus="edit"
                         iconDescription="Clear file"
-                        labelDescription={
-                            <div>
-                                <p style={{ fontSize: 15 }}>only .json files </p>
-                                <NewEntryJsonFormatLink link={newEntryFormatLink} />
-                            </div>}
-                        labelTitle="Choose your local file:"
                         onChange={this.handleChange}
                     />
                 </div>
@@ -577,6 +646,7 @@ class CreateEntryJson extends Component {
                                 buttonTriggerText="View Uploaded Entries"
                                 modalHeading="Entries JSON"
                                 modalLabel="View Uploaded Entries"
+                                handleSubmit={this.passiveModal}
                             >
                                 <pre className="yaml_view_modal_json">{JSON.stringify(this.state.uploadedEntries, null, ' ')}</pre>
                             </ModalWrapper>
@@ -610,7 +680,7 @@ class CreateEntryJson extends Component {
                                                                 visited={false}
                                                                 inline
                                                                 onClick={(e) => {
-                                                                    this.setSelectedEntriesIds(entryId, index);
+                                                                    this.setSelectedEntriesIds(index, index, undefined);
                                                                     e.preventDefault();
                                                                 }}
                                                             >
@@ -625,7 +695,7 @@ class CreateEntryJson extends Component {
                                                                 href="#"
                                                                 renderIcon={NextOutline16}
                                                                 onClick={(e) => {
-                                                                    this.setSelectedEntriesIds(entryId, index);
+                                                                    this.setSelectedEntriesIds(index, index, undefined);
                                                                     e.preventDefault();
                                                                 }}
                                                             >
@@ -650,7 +720,7 @@ class CreateEntryJson extends Component {
                                             {!this.state.entrySelected &&
                                                 <div>
                                                     <Dropdown
-                                                        disabled="true"
+                                                        disabled={true}
                                                         aria-required="true"
                                                         ariaLabel="parentId-drop-down"
                                                         id="parentId-drop-down"
@@ -800,8 +870,9 @@ class CreateEntryJson extends Component {
 
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: RootState) => ({
     globalNewEntries: state.entries.globalNewEntries,
+    globalAgentsList: state.agents.globalAgentsList,
 })
 
 export default connect(
