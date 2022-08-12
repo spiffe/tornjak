@@ -38,9 +38,9 @@ This makes the tornjak agent + spire 1.1.3 server container:
 CONTAINER_TAG=tsidentity/tornjak-spire-server:latest make container-agent
 ```
 
-The container is run with the same arguments as the SPIRE server image, and usage is transparent. It runs a server hosted on port 10000 accessed via http. A different spire version may be specified within the Dockerfile.add-frontend file. Currently, SPIRE versions <= 1.4.0 are compatible with Tornjak. 
+The container is run with the same arguments as the SPIRE server image, and usage is transparent. It runs a server hosted on port 10000 accessed via http. A different spire version may be specified within the first line of the [Dockerfile.add-frontend](./Dockerfile.add-frontend) file. Currently, SPIRE versions <= 1.4.0 are compatible with Tornjak. 
 
-Alternatively, pre-built Tornjak images can be found at gcr.io/spiffe-io/spire-server:{version}, where the specified tag denotes the SPIRE server version. 
+Alternatively, pre-built Tornjak images can be found at `gcr.io/spiffe-io/spire-server:{version}`, where the specified tag denotes the supported SPIRE server version, as listed in the [SPIRE_BUILD_VERSIONS](./SPIRE_BUILD_VERSIONS) document. 
 
 ### Testing and validating the Tornjak front-end
 To start a local version of the Tornjak front-end server 
