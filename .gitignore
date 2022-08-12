@@ -38,5 +38,3 @@ ui-agent/
 agent
 node_modules/
 ui-manager/
-package-lock.json
-package.json
