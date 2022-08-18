@@ -40,7 +40,7 @@ CONTAINER_TAG=tsidentity/tornjak-spire-server:latest make container-agent
 
 The container is run with the same arguments as the SPIRE server image, and usage is transparent. It runs a server hosted on port 10000 accessed via http. A different spire version may be specified within the first line of the [Dockerfile.add-frontend](./Dockerfile.add-frontend#L1) file. Currently, SPIRE versions <= 1.4.0 are compatible with Tornjak. 
 
-Alternatively, pre-built Tornjak images can be found at `gcr.io/spiffe-io/spire-server:{version}`, where the specified tag denotes the supported SPIRE server version, as listed in the [SPIRE_BUILD_VERSIONS](./SPIRE_BUILD_VERSIONS) document. 
+Alternatively, pre-built Tornjak images can be found at `gcr.io/spiffe-io/tornjak-spire-server:{version}`, where the specified tag denotes the supported SPIRE server version, as listed in the [SPIRE_BUILD_VERSIONS](./SPIRE_BUILD_VERSIONS) document. 
 
 ### Testing and validating the Tornjak front-end
 To start a local version of the Tornjak front-end server 
@@ -53,3 +53,17 @@ REACT_APP_API_SERVER_URI=http://<tornjak_API>/  npm start
 
 Assuming `npm` is installed, this will start a server on `http://localhost:3000`
 Please be patient, as it might take a few minutes to compile and start the server.
+
+### Running the Tornjak Manager
+Once you have a Tornjak agent running, you may run the Tornjak manager by locally running 
+
+```go run tornjak-backend/cmd/manager/manager.go```
+
+which starts listening on port 50000. To start the manager UI, run:
+
+```
+REACT_APP_API_SERVER_URI=http://localhost:50000/
+REACT_APP_TORNJAK_MANAGER=true npm start
+```
+
+In this view, there is an additional navigation bar tab titled "Manage Servers" where you may register Tornjak agents.  
