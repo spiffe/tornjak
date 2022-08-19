@@ -14,11 +14,10 @@ type KeycloakVerifier struct {
 
 func NewKeycloakVerifier() (*KeycloakVerifier) {
 	// SetAuth functions called until gocloak fixes links
-	gocloak_client := gocloak.NewClient("http://localhost:8080", gocloak.SetAuthAdminRealms("admin/realms"), gocloak.SetAuthRealms("realms"))
+	gocloak_client := gocloak.NewClient("http://host.minikube.internal:8080", gocloak.SetAuthAdminRealms("admin/realms"), gocloak.SetAuthRealms("realms"))
 	return &KeycloakVerifier {
 		gocloak:      gocloak_client,
 		clientId:     "tornjak",
- 		clientSecret: "insert",
 		realm:        "testrealm",
 	}
 }
