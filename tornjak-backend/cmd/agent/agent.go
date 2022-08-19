@@ -28,6 +28,9 @@ type cliOptions struct {
 	dbOptions struct {
 		dbString string
 	}
+	authOptions struct {
+		authString string
+	}
 }
 
 func main() {
@@ -120,6 +123,7 @@ func main() {
 
 func runTornjakCmd(cmd string, opt cliOptions) error {
 	agentdb, err := agentapi.NewAgentsDB(opt.dbOptions.dbString)
+	auth, err := agentapi.NewAuth(opt.authOptions.authString)
 	if err != nil {
 		log.Fatalf("err: %v", err)
 	}
@@ -153,6 +157,7 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 			MTlsEnabled:     opt.httpOptions.mtls,
 			SpireServerInfo: serverInfo,
 			Db:              agentdb,
+			Auth:            auth,
 		}
 		apiServer.HandleRequests()
 	default:

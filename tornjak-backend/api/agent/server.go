@@ -18,6 +18,7 @@ import (
 	"github.com/gorilla/mux"
 
 	agentdb "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/db"
+	auth "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/auth"
 )
 
 type Server struct {
@@ -34,6 +35,7 @@ type Server struct {
 
 	// AgentDB for storing Workload Attestor Plugin Info of agents
 	Db agentdb.AgentDB
+	Auth auth.Auth
 }
 
 func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
@@ -355,6 +357,20 @@ func corsHandler(f func(w http.ResponseWriter, r *http.Request)) http.HandlerFun
 	}
 }
 
+func (s *Server) verificationMiddleware(next http.Handler) (http.Handler) {
+	f := func(w http.ResponseWriter, r *http.Request) {
+		err := s.Auth.Verify(r)
+		if err != nil {
+			emsg := fmt.Sprintf("Error authorizing request: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		} else {
+			next.ServeHTTP(w, r)
+		}
+	}
+	return http.HandlerFunc(f)
+}
+
 func (s *Server) tornjakGetServerInfo(w http.ResponseWriter, r *http.Request) {
 	var input GetTornjakServerInfoRequest
 	buf := new(strings.Builder)
@@ -469,6 +485,9 @@ func (s *Server) HandleRequests() {
 	spa := spaHandler{staticPath: "ui-agent", indexPath: "index.html"}
 	rtr.PathPrefix("/").Handler(spa)
 
+	// Middleware
+	rtr.Use(s.verificationMiddleware)
+
 	// TLS Stack handling
 	if s.TlsEnabled || s.MTlsEnabled {
 
@@ -536,6 +555,12 @@ func NewAgentsDB(dbString string) (agentdb.AgentDB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+// NewAuth returns a new Auth
+func NewAuth(authString string) (auth.Auth, error) {
+	auth := auth.NewKeycloakVerifier()
+	return auth, nil
 }
 
 func (s *Server) tornjakSelectorsList(w http.ResponseWriter, r *http.Request) {
