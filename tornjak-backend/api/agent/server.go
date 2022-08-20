@@ -362,9 +362,11 @@ func (s *Server) verificationMiddleware(next http.Handler) (http.Handler) {
 		err := s.Auth.Verify(r)
 		if err != nil {
 			emsg := fmt.Sprintf("Error authorizing request: %v", err.Error())
-			retError(w, emsg, http.StatusBadRequest)
+			// error should be written already
+			retError(w, emsg, http.StatusUnauthorized)
 			return
 		} else {
+			// TODO retError(w, "Authorized", http.StatusUnauthorized)
 			next.ServeHTTP(w, r)
 		}
 	}
@@ -481,12 +483,12 @@ func (s *Server) HandleRequests() {
 	rtr.HandleFunc("/api/tornjak/clusters/edit", corsHandler(s.clusterEdit))
 	rtr.HandleFunc("/api/tornjak/clusters/delete", corsHandler(s.clusterDelete))
 
+	// Middleware
+	rtr.Use(s.verificationMiddleware)
+
 	// UI
 	spa := spaHandler{staticPath: "ui-agent", indexPath: "index.html"}
 	rtr.PathPrefix("/").Handler(spa)
-
-	// Middleware
-	rtr.Use(s.verificationMiddleware)
 
 	// TLS Stack handling
 	if s.TlsEnabled || s.MTlsEnabled {
