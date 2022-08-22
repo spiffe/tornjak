@@ -26,6 +26,7 @@
     "carbon-components-react": "^7.30.0",
     "carbon-icons": "^7.0.7",
     "chart.js": "^3.5.1",
+    "circular-json": "^0.5.9",
     "d3": "^7.0.1",
     "d3-selection": "^3.0.0",
     "dotenv": "^8.2.0",
@@ -44,6 +45,7 @@
     "redux": "^4.1.1",
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.3.0",
+    "stringify-object": "^4.0.1",
     "url-join": "^4.0.1",
     "web-vitals": "^0.2.4",
     "xlsx": "^0.18.5"
