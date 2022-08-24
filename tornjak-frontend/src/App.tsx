@@ -1,7 +1,7 @@
 import React from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
-import { ReactKeycloakProvider } from "@react-keycloak/web";
-import keycloak from "./KeyCloak";
+//import { ReactKeycloakProvider } from "@react-keycloak/web";
+//import keycloak from "./KeyCloak";
 import store from 'redux/store';
 import IsManager from './components/is_manager';
 import { BrowserRouter as Router, Route } from "react-router-dom";
@@ -23,7 +23,7 @@ import './App.css';
 function App() {
     return (
         <div>
-            <ReactKeycloakProvider authClient={keycloak}>
+            {/* <ReactKeycloakProvider authClient={keycloak}> */}
                 <Provider store={store}>
                     <Router>
                         <div>
@@ -56,7 +56,7 @@ function App() {
                         </div>
                     </Router>
                 </Provider>
-            </ReactKeycloakProvider>
+            {/* </ReactKeycloakProvider> */}
         </div>
     );
 }

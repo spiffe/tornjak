@@ -252,6 +252,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
     (globalAgentsList: AgentsList[]): void;
   },
     tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
+      console.log(GetApiServerUri('/api/agent/list'))
     axios.get(GetApiServerUri('/api/agent/list'), { crossdomain: true })
       .then(response => {
         if (!response.data["agents"]) {

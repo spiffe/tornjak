@@ -1,9 +1,6 @@
 import React from "react";
 import { DataTable, DataTableCustomBatchActionsData, DataTableCustomBatchActionsProps, DenormalizedRow } from "carbon-components-react";
-import {
-    Delete16 as Delete,
-} from '@carbon/icons-react';
-import { IoBan, IoDownloadOutline } from "react-icons/io5";
+import { IoBan, IoDownloadOutline, IoTrashOutline } from "react-icons/io5";
 import { ReactDivAttr, ShapeOf } from "carbon-components-react/typings/shared";
 const {
     TableToolbar,
@@ -49,7 +46,7 @@ class TableToolBar extends React.Component<TableToolBarProp, TableToolBarState> 
                 <TableBatchActions {...this.props.getBatchActionProps()}>
                     {this.props.deleteEntity !== undefined &&
                         <TableBatchAction
-                            renderIcon={Delete}
+                            renderIcon={IoTrashOutline}
                             iconDescription="Delete"
                             onClick={() => {
                                 this.props.deleteEntity(this.props.selectedRows);

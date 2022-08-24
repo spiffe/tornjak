@@ -295,6 +295,13 @@
   }
 
   .header-toolbar {
+    position: relative;
     display: inline;
     float: right;
+  }
+
+  .user-name {
+    position: relative;
+    display: inline-block;
+    color: aliceblue;
   }

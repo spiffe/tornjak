@@ -7,14 +7,15 @@ import tornjak_logo from "res/tornjak_logo.png";
 import {
   clickedDashboardTableFunc,
 } from 'redux/actions';
-import { useKeycloak } from "@react-keycloak/web";
+//import { useKeycloak } from "@react-keycloak/web";
 import {
   HeaderGlobalAction,
 } from "carbon-components-react/lib/components/UIShell";
 import { UserAvatar20, Notification20, Search20 } from "@carbon/icons-react";
+import KeycloakService from "services/KeycloakService";
 
 const NavigationBar = () => {
-  const { keycloak } = useKeycloak();
+  // const { keycloak } = useKeycloak();
   let managerNavs;
   managerNavs =
     <div className="dropdown">
@@ -60,6 +61,9 @@ const NavigationBar = () => {
               }}
             >Tornjak Dashboard</a>
           </div>
+          {/* <div className="user-name">
+            <h6>{KeycloakService.getFirstName()}</h6>
+          </div> */}
           <div className='header-toolbar'>
             <div className="user-dropdown">
               <HeaderGlobalAction
@@ -67,24 +71,30 @@ const NavigationBar = () => {
                 <UserAvatar20 />
               </HeaderGlobalAction>
               <div className="user-dropdown-content">
-                {console.log("keycloak.authenticated", keycloak.authenticated)}
-                {!keycloak.authenticated && (
+                {/* {console.log("keycloak.authenticated", keycloak.authenticated)} */}
+                {/* {!keycloak.authenticated && ( */}
+                {!KeycloakService.isLoggedIn && (
                   // eslint-disable-next-line
                   <a
                     href="#"
                     className="nav-link"
-                    onClick={() => keycloak.login()}>
+                    //onClick={() => keycloak.login()}>
+                    onClick={() => KeycloakService.doLogin()}>
                     Login
                   </a>
                 )}
 
-                {keycloak.authenticated && (
+                {/* {keycloak.authenticated && ( */}
+                {KeycloakService.isLoggedIn && (
                   // eslint-disable-next-line
                   <a
                     href="#"
                     className="nav-link"
-                    onClick={() => keycloak.logout()}>
-                    Logout ({keycloak.tokenParsed.preferred_username})
+                    //onClick={() => keycloak.logout()}>
+                    // onClick={() => KeycloakService.doLogout()}>
+                    // Logout ({keycloak.tokenParsed.preferred_username})
+                    onClick={() => KeycloakService.doLogout()}>
+                    Logout ({KeycloakService.getFirstName()})
                   </a>
                 )}
               </div>
