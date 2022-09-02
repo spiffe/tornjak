@@ -366,7 +366,6 @@ func (s *Server) verificationMiddleware(next http.Handler) (http.Handler) {
 			retError(w, emsg, http.StatusUnauthorized)
 			return
 		} else {
-			// TODO retError(w, "Authorized", http.StatusUnauthorized)
 			next.ServeHTTP(w, r)
 		}
 	}
@@ -561,7 +560,7 @@ func NewAgentsDB(dbString string) (agentdb.AgentDB, error) {
 
 // NewAuth returns a new Auth
 func NewAuth(authString string) (auth.Auth, error) {
-	auth := auth.NewKeycloakVerifier()
+	auth := auth.NewKeycloakVerifier(authString)
 	return auth, nil
 }
 

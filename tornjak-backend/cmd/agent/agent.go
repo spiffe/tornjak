@@ -29,7 +29,7 @@ type cliOptions struct {
 		dbString string
 	}
 	authOptions struct {
-		authString string
+		jwksLink string
 	}
 }
 
@@ -50,6 +50,12 @@ func main() {
 				Value:       "./agentlocaldb",
 				Usage:       "Db string for agents",
 				Destination: &opt.dbOptions.dbString,
+			},
+			&cli.StringFlag{
+				Name:        "json-web-key-service",
+				Value:       "http://host.minikube.internal:8080/realms/tornjak/protocol/openid-connect/certs",
+				Usage:       "Link to Keycloak JWKS for tornjak realm",
+				Destination: &opt.authOptions.jwksLink,
 			},
 		},
 		Commands: []*cli.Command{
@@ -123,7 +129,7 @@ func main() {
 
 func runTornjakCmd(cmd string, opt cliOptions) error {
 	agentdb, err := agentapi.NewAgentsDB(opt.dbOptions.dbString)
-	auth, err := agentapi.NewAuth(opt.authOptions.authString)
+	auth, err := agentapi.NewAuth(opt.authOptions.jwksLink)
 	if err != nil {
 		log.Fatalf("err: %v", err)
 	}
