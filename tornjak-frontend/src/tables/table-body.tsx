@@ -1,7 +1,10 @@
 import React from "react";
+import { connect } from 'react-redux';
+import { RootState } from 'redux/reducers';
 import { DataTable, DataTableCell, DataTableCustomSelectionData, DataTableCustomSelectionProps, DataTableRow, DenormalizedRow } from "carbon-components-react";
 import WorkLoadAttestor from 'components/work-load-attestor-modal';
 import { ShapeOf } from "carbon-components-react/typings/shared";
+import TornjakHelper from 'components/tornjak-helper';
 const {
     TableBody,
     TableRow,
@@ -22,13 +25,17 @@ type BodyProp = {
                         ShapeOf<DataTableCustomSelectionData<DataTableRow<string>>, E> | undefined) => 
                         ShapeOf<DataTableCustomSelectionProps<DataTableRow<string>>, E> | 
                         ShapeOf<DataTableCustomSelectionProps<never>, E>,
+    // updated user roles
+    globalUserRoles: string[],
 }
 
 type BodyState = {}
 
 class Body extends React.Component<BodyProp, BodyState> {
+    TornjakHelper: TornjakHelper;
     constructor(props: BodyProp) {
         super(props);
+        this.TornjakHelper = new TornjakHelper(props);
         this.state = {};
     }
 
@@ -48,7 +55,7 @@ class Body extends React.Component<BodyProp, BodyState> {
                                     cell.value)}
                             </TableCell>
                         ))}
-                        {this.props.entityType === "Agent" &&
+                        {this.props.entityType === "Agent" && this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) &&
                             <TableCell>
                                 <div>
                                     <WorkLoadAttestor
@@ -65,4 +72,15 @@ class Body extends React.Component<BodyProp, BodyState> {
     }
 };
 
-export default (Body)
+const mapStateToProps = (state: RootState) => ({
+    globalUserRoles: state.auth.globalUserRoles,
+  })
+  
+  export default connect(
+    mapStateToProps,
+    {}
+  )(Body)
+  
+  export { Body }
+  
+//export default (Body)

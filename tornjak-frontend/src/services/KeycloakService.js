@@ -39,4 +39,5 @@ const KeycloakService = {
     hasRole,
 };
 
+
 export default KeycloakService;

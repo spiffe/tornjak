@@ -114,3 +114,28 @@ export interface StringLabelsWithIndexStrings {
 export type SelectorInfoLabels = StringLabelsWithIndexStrings;
 export type WorkloadSelectorInfoLabels = StringLabelsWithIndexStrings;
 
+// token
+export interface AccessToken {
+  // From https://www.keycloak.org/docs-api/11.0/javadocs/org/keycloak/representations/AccessToken.html
+  acr: string; // 
+  "allowed-origins": string[]; // 
+  auth_time: bigint; // 
+  azp: string; //  
+  email: string; // 
+  email_verified: boolean; // 
+  exp: bigint; // 
+  family_name: string; // 
+  given_name: string; // 
+  iat: bigint; // 
+  iss: string; // 
+  jti: string; // 
+  name: string; // 
+  nonce: string; // 
+  preferred_username: string; // 
+  realm_access: {"roles": string[]}; // 
+  scope: string; // 
+  session_state: string; // 
+  sid: string; // 
+  sub: string; // 
+  typ: string; // 
+}

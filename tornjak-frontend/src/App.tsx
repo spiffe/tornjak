@@ -1,7 +1,5 @@
 import React from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
-//import { ReactKeycloakProvider } from "@react-keycloak/web";
-//import keycloak from "./KeyCloak";
 import store from 'redux/store';
 import IsManager from './components/is_manager';
 import { BrowserRouter as Router, Route } from "react-router-dom";
@@ -23,40 +21,38 @@ import './App.css';
 function App() {
     return (
         <div>
-            {/* <ReactKeycloakProvider authClient={keycloak}> */}
-                <Provider store={store}>
-                    <Router>
-                        <div>
-                            <div className="nav-comp">
-                                <NavigationBar />
-                            </div>
-                            <div className="rest-body">
-                                <SelectServer />
-                                <br />
-                                {IsManager && <br />}
-                                <Route path="/" exact component={AgentList} />
-                                <Route path="/clusters" exact component={ClusterList} />
-                                <Route path="/agents" exact component={AgentList} />
-                                <Route path="/entries" exact component={EntryList} />
-                                <Route path="/entry/create" exact component={EntryCreate} />
-                                <Route path="/agent/createjointoken" exact component={CreateJoinToken} />
-                                <Route path="/cluster/clustermanagement" exact component={ClusterManagement} />
-                                <Route path="/tornjak/serverinfo" exact component={TornjakServerInfo} />
-                                <Route path="/tornjak/dashboard" exact component={TornjakDashBoard} />
-                                <Route
-                                    path="/tornjak/dashboard/details/:entity"
-                                    render={(props) => (<DashboardDetailsRender {...props} params={props.match.params} />)}
-                                />
-                                <Route path="/server/manage" exact component={ServerManagement} />
-                                <br /><br /><br />
-                                <svg className="endbanneroutput">
-                                    <rect className="endbanneroutput"></rect>
-                                </svg>
-                            </div>
+            <Provider store={store}>
+                <Router>
+                    <div>
+                        <div className="nav-comp">
+                            <NavigationBar />
                         </div>
-                    </Router>
-                </Provider>
-            {/* </ReactKeycloakProvider> */}
+                        <div className="rest-body">
+                            <SelectServer />
+                            <br />
+                            {IsManager && <br />}
+                            <Route path="/" exact component={AgentList} />
+                            <Route path="/clusters" exact component={ClusterList} />
+                            <Route path="/agents" exact component={AgentList} />
+                            <Route path="/entries" exact component={EntryList} />
+                            <Route path="/entry/create" exact component={EntryCreate} />
+                            <Route path="/agent/createjointoken" exact component={CreateJoinToken} />
+                            <Route path="/cluster/clustermanagement" exact component={ClusterManagement} />
+                            <Route path="/tornjak/serverinfo" exact component={TornjakServerInfo} />
+                            <Route path="/tornjak/dashboard" exact component={TornjakDashBoard} />
+                            <Route
+                                path="/tornjak/dashboard/details/:entity"
+                                render={(props) => (<DashboardDetailsRender {...props} params={props.match.params} />)}
+                            />
+                            <Route path="/server/manage" exact component={ServerManagement} />
+                            <br /><br /><br />
+                            <svg className="endbanneroutput">
+                                <rect className="endbanneroutput"></rect>
+                            </svg>
+                        </div>
+                    </div>
+                </Router>
+            </Provider>
         </div>
     );
 }
