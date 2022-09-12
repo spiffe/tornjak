@@ -332,16 +332,20 @@ func (s *Server) entryDelete(w http.ResponseWriter, r *http.Request) {
 }
 
 func cors(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=ascii")
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, access-control-allow-origin, access-control-allow-headers, access-control-allow-credentials, Authorization, access-control-allow-methods")
+	w.Header().Set("Access-Control-Expose-Headers", "*, Authorization")
 	w.WriteHeader(http.StatusOK)
 }
 
 func retError(w http.ResponseWriter, emsg string, status int) {
-	w.Header().Set("Content-Type", "text/html; charset=ascii")
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, access-control-allow-origin, access-control-allow-headers, access-control-allow-credentials, Authorization, access-control-allow-methods")
+	w.Header().Set("Access-Control-Expose-Headers", "*, Authorization")
 	http.Error(w, emsg, status)
 }
 
@@ -359,6 +363,9 @@ func corsHandler(f func(w http.ResponseWriter, r *http.Request)) http.HandlerFun
 
 func (s *Server) verificationMiddleware(next http.Handler) (http.Handler) {
 	f := func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "OPTIONS" {
+			next.ServeHTTP(w,r)
+		}
 		err := s.Auth.Verify(r)
 		if err != nil {
 			emsg := fmt.Sprintf("Error authorizing request: %v", err.Error())

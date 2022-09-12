@@ -50,11 +50,55 @@ func get_token(r *http.Request) (string, error) {
 	return token, nil
 }
 
+func getPermissions(roles []string) map[string]bool {
+	permissions := make(map[string]bool)
+	permissions["admin"] = false
+	permissions["viewer"] = false
+
+	for _, r := range roles {
+		permissions["admin"] = permissions["admin"] || r == "tornjak-admin-realm-role"
+		permissions["viewer"] = permissions["viewer"] || r == "tornjak-viewer-realm-role"
+		permissions["viewer"] = permissions["viewer"] || r == "tornjak-admin-realm-role"
+	}
+
+	return permissions
+}
+
+func requestPermissible(r *http.Request, permissions map[string]bool) bool {
+	// TODO make this evaluate once
+	// api call matches to list of strings, representing disjunction of requirements
+	api_permissions := make(map[string][]string)
+	api_permissions["/api/agent/list"] = []string{"admin", "viewer"}
+	api_permissions["/api/entry/list"] = []string{"admin", "viewer"}
+	api_permissions["/api/tornjak/serverinfo"] = []string{"admin", "viewer"}
+	api_permissions["/api/tornjak/selectors/list"] = []string{"admin", "viewer"}
+	api_permissions["/api/tornjak/agents/list"] = []string{"admin", "viewer"}
+	api_permissions["/api/tornjak/clusters/list"] = []string{"admin", "viewer"}
+	api_permissions["/api/agent/ban"] = []string{"admin"}
+	api_permissions["/api/agent/delete"] = []string{"admin"}
+	api_permissions["/api/agent/createjointoken"] = []string{"admin"}
+	api_permissions["/api/entry/create"] = []string{"admin"}
+	api_permissions["/api/entry/delete"] = []string{"admin"}
+	api_permissions["/api/tornjak/selectors/register"] = []string{"admin"}
+	api_permissions["/api/tornjak/clusters/create"] = []string{"admin"}
+	api_permissions["/api/tornjak/clusters/edit"] = []string{"admin"}
+	api_permissions["/api/tornjak/clusters/delete"] = []string{"admin"}
+
+	requires := api_permissions[r.URL.Path]
+	for _, req := range requires {
+		if permissions[req] {
+			return true
+		}
+	}
+	return false
+	
+}
+
 func isGoodRequest(r *http.Request, claims *KeycloakClaim) bool {
-	//claims := jwt_token.Claims.(jwt.MapClaims)
-	//realm := claims["realm_access"].(map[string]interface{})
-	//roles := realm["roles"].([]string)
-	return len(claims.RealmAccess.Roles) > 0
+	roles := claims.RealmAccess.Roles
+	
+	permissions := getPermissions(roles)
+	return requestPermissible(r, permissions)
 }
 
 func (v *KeycloakVerifier) Verify(r *http.Request) error {
