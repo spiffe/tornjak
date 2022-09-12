@@ -350,21 +350,11 @@ func retError(w http.ResponseWriter, emsg string, status int) {
 }
 
 // Handle preflight checks
-func corsHandler(f func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "OPTIONS" {
-			cors(w, r)
-			return
-		} else {
-			f(w, r)
-		}
-	}
-}
-
 func (s *Server) verificationMiddleware(next http.Handler) (http.Handler) {
 	f := func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "OPTIONS" {
-			next.ServeHTTP(w,r)
+			cors(w, r)
+			return
 		}
 		err := s.Auth.Verify(r)
 		if err != nil {
@@ -467,27 +457,27 @@ func (s *Server) HandleRequests() {
 	rtr := mux.NewRouter()
 
 	// Agents
-	rtr.HandleFunc("/api/agent/list", corsHandler(s.agentList))
-	rtr.HandleFunc("/api/agent/ban", corsHandler(s.agentBan))
-	rtr.HandleFunc("/api/agent/delete", corsHandler(s.agentDelete))
-	rtr.HandleFunc("/api/agent/createjointoken", corsHandler(s.agentCreateJoinToken))
+	rtr.HandleFunc("/api/agent/list", s.agentList)
+	rtr.HandleFunc("/api/agent/ban", s.agentBan)
+	rtr.HandleFunc("/api/agent/delete", s.agentDelete)
+	rtr.HandleFunc("/api/agent/createjointoken", s.agentCreateJoinToken)
 
 	// Entries
-	rtr.HandleFunc("/api/entry/list", corsHandler(s.entryList))
-	rtr.HandleFunc("/api/entry/create", corsHandler(s.entryCreate))
-	rtr.HandleFunc("/api/entry/delete", corsHandler(s.entryDelete))
+	rtr.HandleFunc("/api/entry/list", s.entryList)
+	rtr.HandleFunc("/api/entry/create", s.entryCreate)
+	rtr.HandleFunc("/api/entry/delete", s.entryDelete)
 
 	// Tornjak specific
-	rtr.HandleFunc("/api/tornjak/serverinfo", corsHandler(s.tornjakGetServerInfo))
+	rtr.HandleFunc("/api/tornjak/serverinfo", s.tornjakGetServerInfo)
 	// Agents Selectors
-	rtr.HandleFunc("/api/tornjak/selectors/register", corsHandler(s.tornjakPluginDefine))
-	rtr.HandleFunc("/api/tornjak/selectors/list", corsHandler(s.tornjakSelectorsList))
-	rtr.HandleFunc("/api/tornjak/agents/list", corsHandler(s.tornjakAgentsList))
+	rtr.HandleFunc("/api/tornjak/selectors/register", s.tornjakPluginDefine)
+	rtr.HandleFunc("/api/tornjak/selectors/list", s.tornjakSelectorsList)
+	rtr.HandleFunc("/api/tornjak/agents/list", s.tornjakAgentsList)
 	// Clusters
-	rtr.HandleFunc("/api/tornjak/clusters/list", corsHandler(s.clusterList))
-	rtr.HandleFunc("/api/tornjak/clusters/create", corsHandler(s.clusterCreate))
-	rtr.HandleFunc("/api/tornjak/clusters/edit", corsHandler(s.clusterEdit))
-	rtr.HandleFunc("/api/tornjak/clusters/delete", corsHandler(s.clusterDelete))
+	rtr.HandleFunc("/api/tornjak/clusters/list", s.clusterList)
+	rtr.HandleFunc("/api/tornjak/clusters/create", s.clusterCreate)
+	rtr.HandleFunc("/api/tornjak/clusters/edit", s.clusterEdit)
+	rtr.HandleFunc("/api/tornjak/clusters/delete", s.clusterDelete)
 
 	// Middleware
 	rtr.Use(s.verificationMiddleware)
