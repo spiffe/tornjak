@@ -51,6 +51,7 @@
     min-width: 130px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 3;
+    font-weight: bold;
   }
 
   .user-dropdown-content a {
@@ -305,4 +306,10 @@
     position: relative;
     display: inline-block;
     color: aliceblue;
+  }
+
+  .not-allowed {
+    color: rgb(6, 165, 165);
+    position: absolute;
+    left: 40%;
   }

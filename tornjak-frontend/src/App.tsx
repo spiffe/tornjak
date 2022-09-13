@@ -16,6 +16,7 @@ import ServerManagement from "./components/server-management";
 import TornjakServerInfo from "./components/tornjak-server-info";
 import TornjakDashBoard from "./components/dashboard/tornjak-dashboard";
 import DashboardDetailsRender from 'components/dashboard/dashboard-details-render';
+import RenderOnAdminRole from 'components/RenderOnAdminRole'
 import './App.css';
 
 function App() {
@@ -35,9 +36,11 @@ function App() {
                             <Route path="/clusters" exact component={ClusterList} />
                             <Route path="/agents" exact component={AgentList} />
                             <Route path="/entries" exact component={EntryList} />
-                            <Route path="/entry/create" exact component={EntryCreate} />
-                            <Route path="/agent/createjointoken" exact component={CreateJoinToken} />
-                            <Route path="/cluster/clustermanagement" exact component={ClusterManagement} />
+                            <RenderOnAdminRole>
+                                <Route path="/entry/create" exact component={EntryCreate} />
+                                <Route path="/agent/createjointoken" exact component={CreateJoinToken} />
+                                <Route path="/cluster/clustermanagement" exact component={ClusterManagement} />
+                            </RenderOnAdminRole>
                             <Route path="/tornjak/serverinfo" exact component={TornjakServerInfo} />
                             <Route path="/tornjak/dashboard" exact component={TornjakDashBoard} />
                             <Route

@@ -11,9 +11,26 @@ import {
   EntriesList,
   ClustersList
 } from './types';
+import KeycloakService from "services/KeycloakService";
+const Auth_Server_Uri = process.env.REACT_APP_AUTH_SERVER_URI;
 
 type TornjakApiProp = {}
 type TornjakApiState = {}
+
+if(Auth_Server_Uri) {
+  axios.interceptors.request.use(
+    async config => {
+      console.log("Checking token status...")
+      if (KeycloakService.isLoggedIn()) {
+        const setAuthorization = () => {
+          config.headers.Authorization = `Bearer ${KeycloakService.getToken()}`;
+          return Promise.resolve(config);
+        };
+        return KeycloakService.updateToken(setAuthorization);
+      }
+    }
+  )
+}
 
 class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   constructor(props: TornjakApiProp) {

@@ -13,7 +13,12 @@ const renderApp = () =>
     document.getElementById('root')
   );
 
-KeycloakService.initKeycloak(renderApp);
+if(process.env.REACT_APP_AUTH_SERVER_URI) {
+  KeycloakService.initKeycloak(renderApp);
+} else {
+  renderApp();
+}
+
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals

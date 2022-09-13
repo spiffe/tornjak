@@ -1,6 +1,15 @@
 import Keycloak from "keycloak-js";
-
-const keycloak = new Keycloak('/keycloak.json');
+const keycloakConfig = {
+    "realm": "tornjak",
+    "url": process.env.REACT_APP_AUTH_SERVER_URI,
+    "ssl-required": "external",
+    "clientId": "Tornjak-React-auth",
+    "public-client": true,
+    "verify-token-audience": true,
+    "use-resource-role-mappings": true,
+    "confidential-port": 0
+};
+const keycloak = new Keycloak(keycloakConfig);
 const initKeycloak = (renderApp) => {
     keycloak.init({ onLoad: 'login-required' })
         .then((authenticated) => {
@@ -15,6 +24,7 @@ const initKeycloak = (renderApp) => {
         .catch(console.error);
 };
 
+const getFirstName = () => keycloak.tokenParsed?.given_name;
 const doLogin = keycloak.login;
 const doLogout = keycloak.logout;
 const getToken = () => keycloak.token;
@@ -23,9 +33,6 @@ const updateToken = (successCallback) =>
     keycloak.updateToken(5)
         .then(successCallback)
         .catch(doLogin);
-const getUsername = () => keycloak.tokenParsed?.preferred_username;
-const getFirstName = () => keycloak.tokenParsed?.given_name;
-const hasRole = (roles) => roles.some((role) => keycloak.hasRealmRole(role));
 
 const KeycloakService = {
     initKeycloak,
@@ -34,10 +41,7 @@ const KeycloakService = {
     isLoggedIn,
     getToken,
     updateToken,
-    getUsername,
     getFirstName,
-    hasRole,
 };
-
 
 export default KeycloakService;

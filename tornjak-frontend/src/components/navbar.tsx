@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
 import jwt_decode from "jwt-decode";
 import { connect } from 'react-redux';
 import IsManager from './is_manager';
@@ -15,14 +15,15 @@ import {
 } from 'redux/actions';
 import {
   AccessToken
-} from './types'
-//import { useKeycloak } from "@react-keycloak/web";
+} from './types';
 import {
   HeaderGlobalAction,
 } from "carbon-components-react/lib/components/UIShell";
 import { UserAvatar20, Notification20, Search20 } from "@carbon/icons-react";
 import KeycloakService from "services/KeycloakService";
 import { RootState } from 'redux/reducers';
+
+const Auth_Server_Uri = process.env.REACT_APP_AUTH_SERVER_URI;
 
 type NavigationBarProp = {
   // dispatches a payload if user is authenticated or not return type of void
@@ -54,28 +55,15 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
   }
 
   componentDidMount() {
-    this.props.isAuthenticatedUpdateFunc(KeycloakService.isLoggedIn());
-    if (KeycloakService.isLoggedIn()) {
-      this.props.accessTokenUpdateFunc(KeycloakService.getToken());
-      var decodedToken: AccessToken = jwt_decode(KeycloakService.getToken()!);
-      this.props.UserRolesUpdateFunc(decodedToken.realm_access.roles);
-      console.log(decodedToken)
-      console.log(decodedToken.realm_access.roles)
-      console.log("Access Token: ", KeycloakService.getToken())
-    }
-    //this.setAuthToken(KeycloakService.getToken())
-  }
-
-  setAuthToken(token: string | undefined) {
-    //axios.defaults.headers.common["content-type"] = "application/json";
-    axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
-    //axios.defaults.headers.common["Access-Control-Allow-Headers"] = "*";
-    //axios.defaults.headers.common["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
-    //axios.defaults.crossdomain = true;
-    axios.defaults.headers.common['Authorization'] = '';
-    delete axios.defaults.headers.common['Authorization'];
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    if(Auth_Server_Uri) {
+      this.props.isAuthenticatedUpdateFunc(KeycloakService.isLoggedIn());
+      if (KeycloakService.isLoggedIn()) {
+        this.props.accessTokenUpdateFunc(KeycloakService.getToken());
+        var decodedToken: AccessToken = jwt_decode(KeycloakService.getToken()!);
+        this.props.UserRolesUpdateFunc(decodedToken.realm_access.roles);
+        console.log(decodedToken)
+        console.log(decodedToken.realm_access.roles)
+      }
     }
   }
 
@@ -135,51 +123,36 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
             <h6>{KeycloakService.getFirstName()}</h6>
           </div> */}
             <div className='header-toolbar'>
-              <div className="user-dropdown">
-                <HeaderGlobalAction
-                  aria-label="User">
-                  <UserAvatar20 />
-                </HeaderGlobalAction>
-                <div className="user-dropdown-content">
-                  {/* {console.log("keycloak.authenticated", keycloak.authenticated)} */}
-                  {/* {!keycloak.authenticated && ( */}
-                  {!KeycloakService.isLoggedIn() && (
-                    // eslint-disable-next-line
-                    <a
-                      href="#"
-                      className="nav-link"
-                      //onClick={() => keycloak.login()}>
-                      onClick={() => KeycloakService.doLogin()}>
-                      Login
-                    </a>
-                  )}
-
-                  {/* {keycloak.authenticated && ( */}
-                  {KeycloakService.isLoggedIn() && (
-                    // eslint-disable-next-line
-                    <a
-                      href="#"
-                      className="nav-link"
-                      //onClick={() => keycloak.logout()}>
-                      // onClick={() => KeycloakService.doLogout()}>
-                      // Logout ({keycloak.tokenParsed.preferred_username})
-                      onClick={() => KeycloakService.doLogout()}>
-                      Logout [{KeycloakService.getFirstName()}]
-                    </a>
-                  )}
+              {Auth_Server_Uri &&
+                <div className="user-dropdown">
+                  <HeaderGlobalAction
+                    aria-label="User">
+                    <UserAvatar20 />
+                  </HeaderGlobalAction>
+                  <div className="user-dropdown-content">
+                    {KeycloakService.isLoggedIn() && (
+                      // eslint-disable-next-line
+                      <a
+                        href="#"
+                        className="nav-link"
+                        onClick={() => KeycloakService.doLogout()}>
+                        Logout {KeycloakService.getFirstName()}
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <HeaderGlobalAction 
-                aria-label="Notifications" 
-                onClick={() => {alert("This is a place holder, functionality to be implemented on future work!")}}>
+             }
+              <HeaderGlobalAction
+                aria-label="Notifications"
+                onClick={() => { alert("This is a place holder, functionality to be implemented on future work!") }}>
                 <Notification20 />
               </HeaderGlobalAction>
-              <HeaderGlobalAction 
-                aria-label="Search" 
-                onClick={() => {alert("This is a place holder, functionality to be implemented on future work!")}}>
+              <HeaderGlobalAction
+                aria-label="Search"
+                onClick={() => { alert("This is a place holder, functionality to be implemented on future work!") }}>
                 <Search20 />
               </HeaderGlobalAction>
-              
+
             </div>
             {IsManager && managerNavs}
           </div>
