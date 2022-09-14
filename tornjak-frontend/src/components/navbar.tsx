@@ -119,9 +119,6 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
                 }}
               >Tornjak Dashboard</a>
             </div>
-            {/* <div className="user-name">
-            <h6>{KeycloakService.getFirstName()}</h6>
-          </div> */}
             <div className='header-toolbar'>
               {Auth_Server_Uri &&
                 <div className="user-dropdown">
@@ -154,6 +151,11 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
               </HeaderGlobalAction>
 
             </div>
+            {Auth_Server_Uri && this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) &&
+              <div className="admin-toolbar-header">
+                <h5>ADMIN PORTAL</h5>
+              </div>
+            }
             {IsManager && managerNavs}
           </div>
         </div>
