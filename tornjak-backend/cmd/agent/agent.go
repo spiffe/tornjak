@@ -51,9 +51,9 @@ func main() {
 				Usage:       "Db string for agents",
 				Destination: &opt.dbOptions.dbString,
 			},
-			&cli.StringFlag{
+			&cli.StringFlag{ //TODO temporary bug for testing
 				Name:        "json-web-key-service",
-				Value:       "http://host.minikube.internal:8080/realms/tornjak/protocol/openid-connect/certs",
+				Value:       "",
 				Usage:       "Link to Keycloak JWKS for tornjak realm",
 				Destination: &opt.authOptions.jwksLink,
 			},
