@@ -51,7 +51,7 @@ func main() {
 				Usage:       "Db string for agents",
 				Destination: &opt.dbOptions.dbString,
 			},
-			&cli.StringFlag{ //TODO temporary bug for testing
+			&cli.StringFlag{
 				Name:        "json-web-key-service",
 				Value:       "",
 				Usage:       "Link to Keycloak JWKS for tornjak realm",
