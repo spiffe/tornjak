@@ -12,13 +12,3 @@ type KeycloakClaim struct {
 	RealmAccess RealmAccessSubclaim `json:"realm_access"`
 	jwt.StandardClaims
 }
-
-func IsViewer() bool {
-	return true
-}
-
-func IsAdmin() bool {
-	return false
-}
-
-
