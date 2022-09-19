@@ -48,8 +48,8 @@ import {
     WorkloadSelectorInfoLabels
 } from 'components/types';
 
-// Expected input - is user authenticated
-// isAuthenticatedUpdateFunc returns the is current user is authenticated or not
+// Expected input - whether user authenticated or not
+// isAuthenticatedUpdateFunc returns true if current user is authenticated
 export function isAuthenticatedUpdateFunc(globalIsAuthenticated: boolean): ThunkAction<void, RootState, undefined, IsAuthenticatedAction> {
     return dispatch => {
         dispatch({
@@ -60,7 +60,7 @@ export function isAuthenticatedUpdateFunc(globalIsAuthenticated: boolean): Thunk
 }
 
 // Expected input - access token
-// accessTokenUpdateFunc returns the updated valid access token
+// accessTokenUpdateFunc returns the updated and valid access token
 export function accessTokenUpdateFunc(globalAccessToken: string | undefined): ThunkAction<void, RootState, undefined, AccessTokenAction> {
     return dispatch => {
         dispatch({
@@ -70,7 +70,7 @@ export function accessTokenUpdateFunc(globalAccessToken: string | undefined): Th
     }
 }
 
-// Expected input - user roles
+// Expected input - user assigned roles
 // UserRolesAction returns the updated user roles
 export function UserRolesUpdateFunc(globalUserRoles: string[]): ThunkAction<void, RootState, undefined, UserRolesAction> {
     return dispatch => {

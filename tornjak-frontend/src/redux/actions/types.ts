@@ -15,7 +15,6 @@ export const GLOBAL_IS_AUTHENTICATED = 'GLOBAL_IS_AUTHENTICATED';
 export const GLOBAL_ACCESS_TOKEN = 'GLOBAL_ACCESS_TOKEN';
 export const GLOBAL_USER_ROLES = 'GLOBAL_USER_ROLES';
 
-
 export interface AuthReducerState {
     globalIsAuthenticated: boolean,
     globalAccessToken: string | undefined,

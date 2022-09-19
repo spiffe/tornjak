@@ -11,13 +11,13 @@ import {
   EntriesList,
   ClustersList
 } from './types';
-import KeycloakService from "services/KeycloakService";
+import KeycloakService from "auth/KeycloakAuth";
 const Auth_Server_Uri = process.env.REACT_APP_AUTH_SERVER_URI;
 
 type TornjakApiProp = {}
 type TornjakApiState = {}
 
-if(Auth_Server_Uri) {
+if(Auth_Server_Uri) { // inject token if app is in auth mode and check token status/ refresh as needed
   axios.interceptors.request.use(
     async config => {
       console.log("Checking token status...")

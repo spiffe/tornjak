@@ -24,11 +24,18 @@ const initKeycloak = (renderApp) => {
         .catch(console.error);
 };
 
+// get user attributes
 const getFirstName = () => keycloak.tokenParsed?.given_name;
-const doLogin = keycloak.login;
-const doLogout = keycloak.logout;
-const getToken = () => keycloak.token;
+
+// login
 const isLoggedIn = () => !!keycloak.token;
+const doLogin = keycloak.login;
+
+// logout
+const doLogout = keycloak.logout;
+
+// token
+const getToken = () => keycloak.token;
 const updateToken = (successCallback) =>
     keycloak.updateToken(5)
         .then(successCallback)
@@ -36,12 +43,12 @@ const updateToken = (successCallback) =>
 
 const KeycloakService = {
     initKeycloak,
+    getFirstName,
+    isLoggedIn,
     doLogin,
     doLogout,
-    isLoggedIn,
     getToken,
     updateToken,
-    getFirstName,
 };
 
 export default KeycloakService;

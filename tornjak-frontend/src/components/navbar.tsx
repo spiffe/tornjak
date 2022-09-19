@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-//import axios from 'axios';
 import jwt_decode from "jwt-decode";
 import { connect } from 'react-redux';
 import IsManager from './is_manager';
@@ -7,6 +6,12 @@ import 'carbon-components/css/carbon-components.min.css';
 import './style.css';
 import tornjak_logo from "res/tornjak_logo.png";
 import TornjakHelper from 'components/tornjak-helper';
+import { UserAvatar20, Notification20, Search20 } from "@carbon/icons-react";
+import KeycloakService from "auth/KeycloakAuth";
+import { RootState } from 'redux/reducers';
+import {
+  HeaderGlobalAction,
+} from "carbon-components-react/lib/components/UIShell";
 import {
   clickedDashboardTableFunc,
   isAuthenticatedUpdateFunc,
@@ -16,12 +21,8 @@ import {
 import {
   AccessToken
 } from './types';
-import {
-  HeaderGlobalAction,
-} from "carbon-components-react/lib/components/UIShell";
-import { UserAvatar20, Notification20, Search20 } from "@carbon/icons-react";
-import KeycloakService from "services/KeycloakService";
-import { RootState } from 'redux/reducers';
+
+
 
 const Auth_Server_Uri = process.env.REACT_APP_AUTH_SERVER_URI;
 
@@ -55,14 +56,12 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
   }
 
   componentDidMount() {
-    if(Auth_Server_Uri) {
+    if (Auth_Server_Uri) {
       this.props.isAuthenticatedUpdateFunc(KeycloakService.isLoggedIn());
       if (KeycloakService.isLoggedIn()) {
         this.props.accessTokenUpdateFunc(KeycloakService.getToken());
         var decodedToken: AccessToken = jwt_decode(KeycloakService.getToken()!);
         this.props.UserRolesUpdateFunc(decodedToken.realm_access.roles);
-        console.log(decodedToken)
-        console.log(decodedToken.realm_access.roles)
       }
     }
   }
@@ -138,7 +137,7 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
                     )}
                   </div>
                 </div>
-             }
+              }
               <HeaderGlobalAction
                 aria-label="Notifications"
                 onClick={() => { alert("This is a place holder, functionality to be implemented on future work!") }}>

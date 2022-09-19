@@ -117,25 +117,25 @@ export type WorkloadSelectorInfoLabels = StringLabelsWithIndexStrings;
 // token
 export interface AccessToken {
   // From https://www.keycloak.org/docs-api/11.0/javadocs/org/keycloak/representations/AccessToken.html
-  acr: string; // 
-  "allowed-origins": string[]; // 
-  auth_time: bigint; // 
-  azp: string; //  
-  email: string; // 
-  email_verified: boolean; // 
-  exp: bigint; // 
-  family_name: string; // 
-  given_name: string; // 
-  iat: bigint; // 
-  iss: string; // 
+  acr: string; // Authentication Context Class Reference
+  "allowed-origins": string[]; // allowed origins
+  auth_time: bigint; // authentication time
+  azp: string; // authorized party - to whom this token is issued
+  email: string; // email of user
+  email_verified: boolean; // wheather email is verified or not
+  exp: bigint; // expiration time
+  family_name: string; // family name of user
+  given_name: string; // given name of user
+  iat: bigint; // time issued
+  iss: string; // entity that created and signed the token
   jti: string; // 
-  name: string; // 
-  nonce: string; // 
+  name: string; // name of user
+  nonce: string; // string value used to associate a Client session with an ID Token
   preferred_username: string; // 
-  realm_access: {"roles": string[]}; // 
-  scope: string; // 
-  session_state: string; // 
-  sid: string; // 
-  sub: string; // 
-  typ: string; // 
+  realm_access: {"roles": string[]}; // realm attributes
+  scope: string; // scope
+  session_state: string; // session state
+  sid: string; // unique session identifier of a user on a browser or a device
+  sub: string; // to whom this entity refers to
+  typ: string; // type of token
 }

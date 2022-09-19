@@ -8,9 +8,9 @@ type RenderOnAdminRoleProp = {
     // updated user roles
     globalUserRoles: string[],
     children: React.ReactNode
-  }
-  
-  type RenderOnAdminRoleState = {}
+}
+
+type RenderOnAdminRoleState = {}
 
 class RenderOnAdminRole extends Component<RenderOnAdminRoleProp, RenderOnAdminRoleState> {
     TornjakHelper: TornjakHelper;
@@ -20,14 +20,28 @@ class RenderOnAdminRole extends Component<RenderOnAdminRoleProp, RenderOnAdminRo
         this.state = {};
     }
 
+    checkPath() {
+        const pathsWithAdminRestr = [
+            "/entry/create",
+            "/agent/createjointoken",
+            "/cluster/clustermanagement"];
+        const isPath = pathsWithAdminRestr.find(element => {
+            if(element.includes(window.location.pathname)) {
+                return true;
+            }
+            return false;
+        });
+        return isPath;
+    }
+
     render() {
         return (
             <div>
                 {this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) &&
-                    this.props.children
+                    this.props.children // if admin role return children
                 }
-                {!this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) &&
-                    <AccessNotAllowed />
+                {!this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) && this.checkPath() &&
+                    <AccessNotAllowed /> // if no admin role return access not allowed
                 }
             </div>
         );
@@ -36,9 +50,9 @@ class RenderOnAdminRole extends Component<RenderOnAdminRoleProp, RenderOnAdminRo
 
 const mapStateToProps = (state: RootState) => ({
     globalUserRoles: state.auth.globalUserRoles,
-  })
-  
-  export default connect(
+})
+
+export default connect(
     mapStateToProps,
     {}
-  )(RenderOnAdminRole)
+)(RenderOnAdminRole)
