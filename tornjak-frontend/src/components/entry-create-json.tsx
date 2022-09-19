@@ -741,14 +741,14 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                                                         titleText="Parent ID - [*optional Selection]"
                                                         onChange={this.onChangeParentId}
                                                     />
-                                                    <p className="parentId-helper">i.e. select if no Parent ID provided</p>
+                                                    <p className="parentId-helper">e.g. select if no Parent ID provided</p>
                                                 </div>
                                             }
                                         </div>
                                         <div className="parentId-input-field" data-test="parentId-input-field">
                                             <TextInput
                                                 aria-required="true"
-                                                helperText="i.e. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent i.e. spiffe://example.org/spire/server"
+                                                helperText="e.g. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent - spiffe://example.org/spire/server"
                                                 id="parentIdInputField"
                                                 invalidText="A valid value is required - refer to helper text below"
                                                 labelText="PARENT ID [*required]"
@@ -762,7 +762,7 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                                         <div className="spiffeId-input-field" data-test="spiffeId-input-field">
                                             <TextInput
                                                 aria-required="true"
-                                                helperText="i.e. spiffe://example.org/sample/spiffe/id"
+                                                helperText="e.g. spiffe://example.org/sample/spiffe/id"
                                                 id="spiffeIdInputField"
                                                 invalidText="A valid value is required - refer to helper text below"
                                                 labelText="SPIFFE ID [*required]"
@@ -777,7 +777,7 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                                         </div>
                                         <TextArea
                                             cols={50}
-                                            helperText="i.e. k8s_sat:cluster:demo-cluster,..."
+                                            helperText="e.g. k8s_sat:cluster:demo-cluster,..."
                                             id="selectors-textArea"
                                             invalidText="A valid value is required"
                                             labelText="Selectors"
@@ -818,7 +818,7 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                                                 </div>
                                                 <div className="federates-with-input-field-yaml" data-test="federates-with-input-field">
                                                     <TextInput
-                                                        helperText="i.e. example.org,abc.com (Separated By Commas)"
+                                                        helperText="e.g. example.org,abc.com (Separated By Commas)"
                                                         id="federates-with-input-field"
                                                         invalidText="A valid value is required - refer to helper text below"
                                                         labelText="Federates With"
@@ -829,7 +829,7 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                                                 </div>
                                                 <div className="dnsnames-input-field-yaml" data-test="dnsnames-input-field">
                                                     <TextInput
-                                                        helperText="i.e. example.org,abc.com (Separated By Commas)"
+                                                        helperText="e.g. example.org,abc.com (Separated By Commas)"
                                                         id="dnsnames-input-field"
                                                         invalidText="A valid value is required - refer to helper text below"
                                                         labelText="DNS Names"
