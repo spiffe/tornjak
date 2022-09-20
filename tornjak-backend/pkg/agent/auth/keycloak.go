@@ -108,8 +108,11 @@ func (v *KeycloakVerifier) Verify(r *http.Request) error {
 	}
 	
 	// parse token
-	claims := KeycloakClaim{}
-	jwt_token, err := jwt.ParseWithClaims(token, &claims, v.jwks.Keyfunc)
+	var claims *KeycloakClaim = new(KeycloakClaim)
+	//fmt.Printf(token)
+	//fmt.Printf("address of claims %p ", claims)
+	//fmt.Printf("address of Keyfunc %p", v.jwks.Keyfunc)
+	jwt_token, err := jwt.ParseWithClaims(token, claims, v.jwks.Keyfunc)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Error parsing token: %s", err.Error()))
 	}
@@ -120,7 +123,7 @@ func (v *KeycloakVerifier) Verify(r *http.Request) error {
 	}
 
 	// check roles
-	if !isGoodRequest(r, &claims) {
+	if !isGoodRequest(r, claims) {
 		return errors.New("Unauthorized request")
 	}
 	

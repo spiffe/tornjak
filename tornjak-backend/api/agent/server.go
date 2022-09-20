@@ -14,9 +14,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/cenkalti/backoff/v4"
 	"github.com/gorilla/mux"
+	"github.com/hashicorp/hcl"
+	"github.com/hashicorp/hcl/hcl/ast"
 
+	"github.com/spiffe/spire/pkg/common/catalog"
 	agentdb "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/db"
 	auth "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/auth"
 )
@@ -31,9 +35,10 @@ type Server struct {
 	MTlsEnabled     bool
 
 	// SpireServerInfo provides config info for the spire server
-	SpireServerInfo TornjakServerInfo
+	SpireServerInfo TornjakSpireServerInfo
 
 	// AgentDB for storing Workload Attestor Plugin Info of agents
+	TornjakConfigs *TornjakConfig
 	Db agentdb.AgentDB
 	Auth auth.Auth
 }
@@ -454,6 +459,10 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // HandleRequests connects api links with respective functions
 // Functions currently handle the api calls all as post-requests
 func (s *Server) HandleRequests() {
+	err := s.Configure()
+	if err != nil {
+		log.Fatal("Cannot Configure")
+	}
 	rtr := mux.NewRouter()
 
 	// Agents
@@ -556,9 +565,43 @@ func NewAgentsDB(dbString string) (agentdb.AgentDB, error) {
 }
 
 // NewAuth returns a new Auth
-func NewAuth(authString string) (auth.Auth, error) {
-	auth := auth.NewKeycloakVerifier(authString)
-	return auth, nil
+func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
+	var key string
+	var data ast.Node
+	for k, d := range authPlugin {
+		key = k
+		data = d.PluginData
+	}
+	if key == "NoAuth" {
+		verifier := auth.NewNullVerifier()
+		return verifier, nil
+	} else if key == "KeycloakAuth" {
+		var config map[string]interface{}
+		if err := hcl.DecodeObject(&config, data); err != nil {
+			fmt.Fprintf(os.Stdout, "\n error: %v\n ", err)
+			return nil, errors.Errorf("couldn't parse config: %v", err)
+		} 
+		fmt.Fprintf(os.Stdout, "\n can parse... %#v \n", config)
+		verifier := auth.NewKeycloakVerifier(config["jwksURL"].(string))
+		return verifier, nil
+	}
+	return nil, errors.Errorf("No option for UserManagement named %s", key)
+}
+
+func (s *Server) Configure() (error) {
+	// configure datastore
+	var err error
+	configs := map[string]map[string]catalog.HCLPluginConfig(*s.TornjakConfigs.Plugins)
+	s.Db, err = NewAgentsDB("./agentlocaldb")
+	if err != nil {
+		return errors.Errorf("Cannot configure datastore plugin: %v", err)
+	}
+	// configure auth
+	s.Auth, err = NewAuth(configs["UserManagement"])
+	if err != nil {
+		return errors.Errorf("Cannot configure auth plugin: %v", err)
+	}
+	return nil
 }
 
 func (s *Server) tornjakSelectorsList(w http.ResponseWriter, r *http.Request) {

@@ -1,6 +1,6 @@
 package auth
 
-import "http"
+import "net/http"
 
 type NullVerifier struct {}
 

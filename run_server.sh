@@ -1,7 +1,9 @@
 #!/bin/sh
 echo "${@}"
-/opt/spire/tornjak-agent -c $2 http &
-/opt/spire/tornjak-agent -c /run/spire/config/server.conf http --tls --cert sample-keys/tls.pem --key sample-keys/key.pem  --listen-addr :20000 &
-/opt/spire/tornjak-agent -c /run/spire/config/server.conf http --mtls --cert sample-keys/tls.pem --key sample-keys/key.pem  --mtls-ca sample-keys/rootCA.pem --listen-addr :30000 &
+echo $1
+echo $2
+/opt/spire/tornjak-agent "${@}" --json-web-key-service http://host.minikube.internal:8080/realms/tornjak/protocol/openid-connect/certs http &
+/opt/spire/tornjak-agent "${@}" http --tls --cert sample-keys/tls.pem --key sample-keys/key.pem  --listen-addr :20000 &
+/opt/spire/tornjak-agent "${@}" http --mtls --cert sample-keys/tls.pem --key sample-keys/key.pem  --mtls-ca sample-keys/rootCA.pem --listen-addr :30000 &
 # PORT=3000 npm start --prefix ./tornjak-frontend &
-/usr/bin/dumb-init /opt/spire/bin/spire-server run "${@}" 
+/usr/bin/dumb-init /opt/spire/bin/spire-server run $1 $2 # TODO need better arg parsing

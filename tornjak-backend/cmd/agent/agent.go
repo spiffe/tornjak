@@ -5,17 +5,20 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/pkg/errors"
 	"github.com/spiffe/spire/cmd/spire-server/cli/run"
 	"github.com/spiffe/spire/pkg/common/catalog"
 	agentapi "github.com/spiffe/tornjak/tornjak-backend/api/agent"
 	"github.com/urfave/cli/v2"
+	"github.com/hashicorp/hcl"
 )
 
 type cliOptions struct {
 	genericOptions struct {
-		configFile string
+		configFile  string // TODO change name
+		tornjakFile string
 	}
 	httpOptions struct {
 		listenAddr string
@@ -39,10 +42,18 @@ func main() {
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "spire-config-file",
-				Aliases:     []string{"c"},
+				Aliases:     []string{"config", "c"},
 				Value:       "",
 				Usage:       "Config file path for spire server",
 				Destination: &opt.genericOptions.configFile,
+				Required:    true,
+			},
+			&cli.StringFlag {
+				Name:        "tornjak-config-file",
+				Aliases:     []string{"t"},
+				Value:       "",
+				Usage:       "Config file path for tornjak server",
+				Destination: &opt.genericOptions.tornjakFile,
 				Required:    true,
 			},
 			&cli.StringFlag{
@@ -128,8 +139,11 @@ func main() {
 }
 
 func runTornjakCmd(cmd string, opt cliOptions) error {
+	// create defaults
 	agentdb, err := agentapi.NewAgentsDB(opt.dbOptions.dbString)
-	auth, err := agentapi.NewAuth(opt.authOptions.jwksLink)
+	auth_default := map[string]catalog.HCLPluginConfig{"NoAuth": catalog.HCLPluginConfig{}}
+	auth, err := agentapi.NewAuth(auth_default)
+
 	if err != nil {
 		log.Fatalf("err: %v", err)
 	}
@@ -138,6 +152,10 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 		// Hide internal error since it is specific to arguments of originating library
 		// i.e. asks to set -config which is a different flag in tornjak
 		return errors.New("Unable to parse the config file provided")
+	}
+	tornjakConfigs, err := parseTornjakConfig(opt.genericOptions.tornjakFile)
+	if err != nil {
+		return errors.Errorf("Unable to parse the tornjak config file provided %v", err)
 	}
 
 	switch cmd {
@@ -162,6 +180,7 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 			TlsEnabled:      opt.httpOptions.tls,
 			MTlsEnabled:     opt.httpOptions.mtls,
 			SpireServerInfo: serverInfo,
+			TornjakConfigs:  tornjakConfigs,
 			Db:              agentdb,
 			Auth:            auth,
 		}
@@ -173,14 +192,14 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 
 }
 
-func GetServerInfo(config *run.Config) (agentapi.TornjakServerInfo, error) {
+func GetServerInfo(config *run.Config) (agentapi.TornjakSpireServerInfo, error) {
 	if config.Plugins == nil {
-		return agentapi.TornjakServerInfo{}, errors.New("config plugins map should not be nil")
+		return agentapi.TornjakSpireServerInfo{}, errors.New("config plugins map should not be nil")
 	}
 
 	pluginConfigs, err := catalog.PluginConfigsFromHCL(*config.Plugins)
 	if err != nil {
-		return agentapi.TornjakServerInfo{}, errors.Errorf("Unable to parse plugin HCL: %v", err)
+		return agentapi.TornjakSpireServerInfo{}, errors.Errorf("Unable to parse plugin HCL: %v", err)
 	}
 
 	serverInfo := ""
@@ -197,7 +216,7 @@ func GetServerInfo(config *run.Config) (agentapi.TornjakServerInfo, error) {
 	s, _ := json.MarshalIndent(config.Server, "", "\t")
 	serverInfo += string(s)
 
-	return agentapi.TornjakServerInfo{
+	return agentapi.TornjakSpireServerInfo{
 		Plugins:       pluginMap,
 		TrustDomain:   config.Server.TrustDomain,
 		VerboseConfig: serverInfo,
@@ -215,4 +234,35 @@ func getSocketPath(config *run.Config) string {
 	}
 
 	return "unix://" + socketPath
+}
+
+// below copied from spire/cmd/spire-server/cli/run/run.go, but with TornjakConfig
+func parseTornjakConfig(path string) (*agentapi.TornjakConfig, error) {
+	c := &agentapi.TornjakConfig{}
+
+	if path == "" {
+		return nil, errors.New("Bad TornjakConfigFile")
+	}
+
+	// friendly error if file is missing
+	byteData, err := os.ReadFile(path)
+	if os.IsNotExist(err) {
+		absPath, err := filepath.Abs(path)
+		if err != nil {
+			msg := "could not determin CWD; tornjak config file not found at %s: use -config"
+			return nil, fmt.Errorf(msg, path)
+		}
+		msg := "could not find tornjak config file %s: please use the -config flag"
+		return nil, fmt.Errorf(msg, absPath)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("unable to read tornjak configuration at %q: %w", path, err)
+	}
+	data := string(byteData)
+
+	if err := hcl.Decode(&c, data); err != nil {
+		return nil, fmt.Errorf("unable to decode tornjak configuration at %q: %w", path, err)
+	}
+
+	return c, nil
 }
