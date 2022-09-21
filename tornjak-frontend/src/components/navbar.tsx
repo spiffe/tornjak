@@ -61,7 +61,11 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
       if (KeycloakService.isLoggedIn()) {
         this.props.accessTokenUpdateFunc(KeycloakService.getToken());
         var decodedToken: AccessToken = jwt_decode(KeycloakService.getToken()!);
-        this.props.UserRolesUpdateFunc(decodedToken.realm_access.roles);
+        if(decodedToken.realm_access !== undefined) {
+          if(decodedToken.realm_access.roles !== undefined) {
+            this.props.UserRolesUpdateFunc(decodedToken.realm_access.roles);
+          }
+        }
       }
     }
   }
