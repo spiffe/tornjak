@@ -572,10 +572,10 @@ func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
 		key = k
 		data = d.PluginData
 	}
-	if key == "NoAuth" {
-		verifier := auth.NewNullVerifier()
-		return verifier, nil
-	} else if key == "KeycloakAuth" {
+	//if key == "NoAuth" {
+	//	verifier := auth.NewNullVerifier()
+	//	return verifier, nil
+	if key == "KeycloakAuth" {
 		var config map[string]interface{}
 		if err := hcl.DecodeObject(&config, data); err != nil {
 			fmt.Fprintf(os.Stdout, "\n error: %v\n ", err)
@@ -585,7 +585,9 @@ func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
 		verifier := auth.NewKeycloakVerifier(config["jwksURL"].(string))
 		return verifier, nil
 	}
-	return nil, errors.Errorf("No option for UserManagement named %s", key)
+        verifier := auth.NewNullVerifier()
+        return verifier, nil
+	//return nil, errors.Errorf("No option for UserManagement named %s", key)
 }
 
 func (s *Server) Configure() (error) {
