@@ -1,13 +1,13 @@
 package auth
 
 import (
-	"errors"
-	"log"
+	"os"
 	"fmt"
 	"strings"
 	"net/http"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/MicahParks/keyfunc"
 )
@@ -19,7 +19,7 @@ type KeycloakVerifier struct {
 func NewKeycloakVerifier(jwksURL string) (*KeycloakVerifier) {
 	opts := keyfunc.Options{
 		RefreshErrorHandler: func(err error) {
-			log.Printf("error with jwt.Keyfunc: %s", err.Error)
+			fmt.Fprintf(os.Stdout, "error with jwt.Keyfunc: %v", err)
 		},
 		RefreshInterval:   time.Hour,
 		RefreshRateLimit:  time.Minute * 5,
@@ -114,7 +114,7 @@ func (v *KeycloakVerifier) Verify(r *http.Request) error {
 	//fmt.Printf("address of Keyfunc %p", v.jwks.Keyfunc)
 	jwt_token, err := jwt.ParseWithClaims(token, claims, v.jwks.Keyfunc)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Error parsing token: %s", err.Error()))
+		return errors.Errorf("Error parsing token: %s", err.Error())
 	}
 
 	// check token validity

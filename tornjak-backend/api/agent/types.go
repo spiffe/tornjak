@@ -21,5 +21,5 @@ type TornjakConfig struct {
 }
 
 type serverConfig struct {
-	test int `hcl:"test"`
+	//test int `hcl:"test"`
 }

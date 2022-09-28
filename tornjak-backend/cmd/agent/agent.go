@@ -141,6 +141,9 @@ func main() {
 func runTornjakCmd(cmd string, opt cliOptions) error {
 	// create defaults
 	agentdb, err := agentapi.NewAgentsDB(opt.dbOptions.dbString)
+        if err != nil {
+		log.Fatalf("err: %v", err)
+	}
 	auth_default := map[string]catalog.HCLPluginConfig{"NoAuth": catalog.HCLPluginConfig{}}
 	auth, err := agentapi.NewAuth(auth_default)
 
