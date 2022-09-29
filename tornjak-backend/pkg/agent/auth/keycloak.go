@@ -17,7 +17,7 @@ type KeycloakVerifier struct {
 }
 
 func NewKeycloakVerifier(jwksURL string) (*KeycloakVerifier) {
-	opts := keyfunc.Options{
+	opts := keyfunc.Options{ // TODO add options to config file
 		RefreshErrorHandler: func(err error) {
 			fmt.Fprintf(os.Stdout, "error with jwt.Keyfunc: %v", err)
 		},
@@ -32,7 +32,7 @@ func NewKeycloakVerifier(jwksURL string) (*KeycloakVerifier) {
 	}
 	return &KeycloakVerifier {
 		jwks: jwks,
-	} // TODO cleanup?
+	}
 }
 
 func get_token(r *http.Request) (string, error) {

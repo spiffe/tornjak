@@ -160,7 +160,6 @@ func (s *Server) BatchDeleteEntry(inp BatchDeleteEntryRequest) (*BatchDeleteEntr
 	return (*BatchDeleteEntryResponse)(resp), nil
 }
 
-// TODO probably rename this
 type GetTornjakServerInfoRequest struct{}
 type GetTornjakServerInfoResponse TornjakSpireServerInfo
 
