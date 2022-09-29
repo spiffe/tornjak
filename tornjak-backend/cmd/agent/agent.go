@@ -28,12 +28,6 @@ type cliOptions struct {
 		tls        bool
 		mtls       bool
 	}
-	dbOptions struct {
-		dbString string
-	}
-	authOptions struct {
-		jwksLink string
-	}
 }
 
 func main() {
