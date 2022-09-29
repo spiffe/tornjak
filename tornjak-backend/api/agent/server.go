@@ -566,34 +566,30 @@ func NewAgentsDB(dbString string) (agentdb.AgentDB, error) {
 
 // NewAuth returns a new Auth
 func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
-	var key string
+	key := ""
 	var data ast.Node
 	for k, d := range authPlugin {
 		key = k
 		data = d.PluginData
 	}
-	//if key == "NoAuth" {
-	//	verifier := auth.NewNullVerifier()
-	//	return verifier, nil
-	if key == "KeycloakAuth" {
+	if key == "" {
+		verifier := auth.NewNullVerifier()
+		return verifier, nil
+	} else if key == "KeycloakAuth" {
 		var config map[string]interface{}
 		if err := hcl.DecodeObject(&config, data); err != nil {
-			fmt.Fprintf(os.Stdout, "\n error: %v\n ", err)
-			return nil, errors.Errorf("couldn't parse config: %v", err)
+			return nil, errors.Errorf("Couldn't parse Auth config: %v", err)
 		} 
-		fmt.Fprintf(os.Stdout, "\n can parse... %#v \n", config)
 		verifier := auth.NewKeycloakVerifier(config["jwksURL"].(string))
 		return verifier, nil
 	}
-        verifier := auth.NewNullVerifier()
-        return verifier, nil
-	//return nil, errors.Errorf("No option for UserManagement named %s", key)
+	return nil, errors.Errorf("No option for UserManagement named %s", key)
 }
 
 func (s *Server) Configure() (error) {
-	// configure datastore
 	var err error
 	configs := map[string]map[string]catalog.HCLPluginConfig(*s.TornjakConfigs.Plugins)
+	// configure datastore
 	s.Db, err = NewAgentsDB("./agentlocaldb")
 	if err != nil {
 		return errors.Errorf("Cannot configure datastore plugin: %v", err)

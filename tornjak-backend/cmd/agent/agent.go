@@ -62,12 +62,6 @@ func main() {
 				Usage:       "Db string for agents",
 				Destination: &opt.dbOptions.dbString,
 			},
-			&cli.StringFlag{
-				Name:        "json-web-key-service",
-				Value:       "",
-				Usage:       "Link to Keycloak JWKS for tornjak realm",
-				Destination: &opt.authOptions.jwksLink,
-			},
 		},
 		Commands: []*cli.Command{
 			{
@@ -139,17 +133,7 @@ func main() {
 }
 
 func runTornjakCmd(cmd string, opt cliOptions) error {
-	// create defaults
-	agentdb, err := agentapi.NewAgentsDB(opt.dbOptions.dbString)
-        if err != nil {
-		log.Fatalf("err: %v", err)
-	}
-	auth_default := map[string]catalog.HCLPluginConfig{"NoAuth": catalog.HCLPluginConfig{}}
-	auth, err := agentapi.NewAuth(auth_default)
-
-	if err != nil {
-		log.Fatalf("err: %v", err)
-	}
+	// parse configs
 	config, err := run.ParseFile(opt.genericOptions.configFile, false)
 	if err != nil {
 		// Hide internal error since it is specific to arguments of originating library
@@ -184,8 +168,6 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 			MTlsEnabled:     opt.httpOptions.mtls,
 			SpireServerInfo: serverInfo,
 			TornjakConfigs:  tornjakConfigs,
-			Db:              agentdb,
-			Auth:            auth,
 		}
 		apiServer.HandleRequests()
 	default:
