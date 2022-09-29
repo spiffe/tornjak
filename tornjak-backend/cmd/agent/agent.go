@@ -56,12 +56,6 @@ func main() {
 				Destination: &opt.genericOptions.tornjakFile,
 				Required:    true,
 			},
-			&cli.StringFlag{
-				Name:        "agents-db-string",
-				Value:       "./agentlocaldb",
-				Usage:       "Db string for agents",
-				Destination: &opt.dbOptions.dbString,
-			},
 		},
 		Commands: []*cli.Command{
 			{

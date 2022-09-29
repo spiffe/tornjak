@@ -553,15 +553,32 @@ func (s *Server) HandleRequests() {
 }
 
 // NewAgentsDB returns a new agents DB, given a DB connection string
-func NewAgentsDB(dbString string) (agentdb.AgentDB, error) {
-	expBackoff := backoff.NewExponentialBackOff()
-	expBackoff.MaxElapsedTime = time.Second
-
-	db, err := agentdb.NewLocalSqliteDB(dbString, expBackoff)
-	if err != nil {
-		return nil, err
+func NewAgentsDB(dbPlugin map[string]catalog.HCLPluginConfig) (agentdb.AgentDB, error) {
+	//dbString = "./agentlocaldb"
+	key := "sql"
+	var data ast.Node
+	for k, d := range dbPlugin {
+		key = k
+		data = d.PluginData
 	}
-	return db, nil
+
+	if key == "sql" {
+		expBackoff := backoff.NewExponentialBackOff()
+		expBackoff.MaxElapsedTime = time.Second
+
+		var config map[string]interface{}
+		if err := hcl.DecodeObject(&config, data); err != nil {
+			return nil, errors.Errorf("Couldn't parse DB config: %v", err)
+		}
+
+		db, err := agentdb.NewLocalSqliteDB(config["databaseDrivername"].(string), config["dbString"].(string), expBackoff)
+		if err != nil {
+			return nil, err
+		}
+		return db, nil
+	}
+	
+	return nil, errors.Errorf("Couldn't create datastore")
 }
 
 // NewAuth returns a new Auth
@@ -590,7 +607,7 @@ func (s *Server) Configure() (error) {
 	var err error
 	configs := map[string]map[string]catalog.HCLPluginConfig(*s.TornjakConfigs.Plugins)
 	// configure datastore
-	s.Db, err = NewAgentsDB("./agentlocaldb")
+	s.Db, err = NewAgentsDB(configs["DataStore"])
 	if err != nil {
 		return errors.Errorf("Cannot configure datastore plugin: %v", err)
 	}
