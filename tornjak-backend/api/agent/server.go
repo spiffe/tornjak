@@ -555,23 +555,31 @@ func (s *Server) HandleRequests() {
 // NewAgentsDB returns a new agents DB, given a DB connection string
 func NewAgentsDB(dbPlugin map[string]catalog.HCLPluginConfig) (agentdb.AgentDB, error) {
 	//dbString = "./agentlocaldb"
-	key := "sql"
+	key := ""
 	var data ast.Node
 	for k, d := range dbPlugin {
 		key = k
 		data = d.PluginData
 	}
 
-	if key == "sql" {
+	if key == "sql" || key == "" {
 		expBackoff := backoff.NewExponentialBackOff()
 		expBackoff.MaxElapsedTime = time.Second
 
-		var config map[string]interface{}
-		if err := hcl.DecodeObject(&config, data); err != nil {
-			return nil, errors.Errorf("Couldn't parse DB config: %v", err)
+		// defaults
+		drivername := "sqlite3"
+		dbfile := "./agentlocaldb"
+
+		if key == "sql" {
+			var config map[string]interface{}
+			if err := hcl.DecodeObject(&config, data); err != nil {
+				return nil, errors.Errorf("Couldn't parse DB config: %v", err)
+			}
+			drivername = config["databaseDrivername"].(string)
+			dbfile = config["dbString"].(string)
 		}
 
-		db, err := agentdb.NewLocalSqliteDB(config["databaseDrivername"].(string), config["dbString"].(string), expBackoff)
+		db, err := agentdb.NewLocalSqliteDB(drivername, dbfile, expBackoff)
 		if err != nil {
 			return nil, err
 		}
@@ -589,7 +597,7 @@ func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
 		key = k
 		data = d.PluginData
 	}
-	if key == "" {
+	if key == "" { // default
 		verifier := auth.NewNullVerifier()
 		return verifier, nil
 	} else if key == "KeycloakAuth" {
