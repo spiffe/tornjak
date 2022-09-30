@@ -461,7 +461,7 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *Server) HandleRequests() {
 	err := s.Configure()
 	if err != nil {
-		log.Fatal("Cannot Configure")
+		log.Fatal("Cannot Configure: ", err)
 	}
 	rtr := mux.NewRouter()
 
@@ -562,22 +562,18 @@ func NewAgentsDB(dbPlugin map[string]catalog.HCLPluginConfig) (agentdb.AgentDB, 
 		data = d.PluginData
 	}
 
-	if key == "sql" || key == "" {
+	if key == "" { // error if no config
+		return nil, errors.Errorf("No Datastore plugin config provided")
+	} else if key == "sql" {
 		expBackoff := backoff.NewExponentialBackOff()
 		expBackoff.MaxElapsedTime = time.Second
 
-		// defaults
-		drivername := "sqlite3"
-		dbfile := "./agentlocaldb"
-
-		if key == "sql" {
-			var config map[string]interface{}
-			if err := hcl.DecodeObject(&config, data); err != nil {
-				return nil, errors.Errorf("Couldn't parse DB config: %v", err)
-			}
-			drivername = config["databaseDrivername"].(string)
-			dbfile = config["dbString"].(string)
+		var config map[string]interface{}
+		if err := hcl.DecodeObject(&config, data); err != nil {
+			return nil, errors.Errorf("Couldn't parse DB config: %v", err)
 		}
+		drivername := config["databaseDrivername"].(string)
+		dbfile := config["dbString"].(string)
 
 		db, err := agentdb.NewLocalSqliteDB(drivername, dbfile, expBackoff)
 		if err != nil {
@@ -597,7 +593,7 @@ func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
 		key = k
 		data = d.PluginData
 	}
-	if key == "" { // default
+	if key == "" { // default is null verifier
 		verifier := auth.NewNullVerifier()
 		return verifier, nil
 	} else if key == "KeycloakAuth" {

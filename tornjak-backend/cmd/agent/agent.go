@@ -214,7 +214,7 @@ func parseTornjakConfig(path string) (*agentapi.TornjakConfig, error) {
 	c := &agentapi.TornjakConfig{}
 
 	if path == "" {
-		return nil, errors.New("Bad TornjakConfigFile")
+		return nil, errors.New("Bad Tornjak config file: path given is empty")
 	}
 
 	// friendly error if file is missing
