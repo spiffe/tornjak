@@ -36,7 +36,7 @@ func main() {
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "spire-config-file",
-				Aliases:     []string{"config", "c"},
+				Aliases:     []string{"spire-config", "c"},
 				Value:       "",
 				Usage:       "Config file path for spire server",
 				Destination: &opt.genericOptions.configFile,
@@ -44,7 +44,7 @@ func main() {
 			},
 			&cli.StringFlag {
 				Name:        "tornjak-config-file",
-				Aliases:     []string{"t"},
+				Aliases:     []string{"tornjak-config", "t"},
 				Value:       "",
 				Usage:       "Config file path for tornjak server",
 				Destination: &opt.genericOptions.tornjakFile,
@@ -219,16 +219,16 @@ func parseTornjakConfig(path string) (*agentapi.TornjakConfig, error) {
 
 	// friendly error if file is missing
 	byteData, err := os.ReadFile(path)
-	if os.IsNotExist(err) {
-		absPath, err := filepath.Abs(path)
-		if err != nil {
-			msg := "could not determin CWD; tornjak config file not found at %s: use -config"
-			return nil, fmt.Errorf(msg, path)
-		}
-		msg := "could not find tornjak config file %s: please use the -config flag"
-		return nil, fmt.Errorf(msg, absPath)
-	}
 	if err != nil {
+		if os.IsNotExist(err) {
+			absPath, err := filepath.Abs(path)
+			if err != nil {
+				msg := "could not determine CWD; tornjak config file not found at %s: use -tornjak-config"
+				return nil, fmt.Errorf(msg, path)
+			}
+			msg := "could not find tornjak config file %s: please use the -tornjak-config flag"
+			return nil, fmt.Errorf(msg, absPath)
+		}
 		return nil, fmt.Errorf("unable to read tornjak configuration at %q: %w", path, err)
 	}
 	data := string(byteData)

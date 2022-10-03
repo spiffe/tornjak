@@ -43,11 +43,13 @@ func get_token(r *http.Request) (string, error) {
 	}
 
 	// get bearer token
-	token := strings.Replace(auth_header, "Bearer ", "", 1)
-	if token == "" {
-		return "", errors.New("Bearer token missing")
+	auth_fields := strings.Fields(auth_header)
+	if len(auth_fields) != 2 || auth_fields[0] != "Bearer" {
+		return "", errors.Errorf("Expected bearer token, got %s", auth_header)
+	} else {
+		return auth_fields[1], nil
 	}
-	return token, nil
+
 }
 
 func getPermissions(roles []string) map[string]bool {
@@ -108,10 +110,7 @@ func (v *KeycloakVerifier) Verify(r *http.Request) error {
 	}
 	
 	// parse token
-	var claims *KeycloakClaim = new(KeycloakClaim)
-	//fmt.Printf(token)
-	//fmt.Printf("address of claims %p ", claims)
-	//fmt.Printf("address of Keyfunc %p", v.jwks.Keyfunc)
+	claims := &KeycloakClaim{}
 	jwt_token, err := jwt.ParseWithClaims(token, claims, v.jwks.Keyfunc)
 	if err != nil {
 		return errors.Errorf("Error parsing token: %s", err.Error())
