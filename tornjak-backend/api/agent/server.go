@@ -580,12 +580,12 @@ func NewAgentsDB(dbPlugin map[string]catalog.HCLPluginConfig) (agentdb.AgentDB, 
 		}
 
 		// create db
-		drivername := config.drivername
-		dbfile := config.filename
+		drivername := config.Drivername
+		dbfile := config.Filename
 
 		db, err := agentdb.NewLocalSqliteDB(drivername, dbfile, expBackoff)
 		if err != nil {
-			return nil, err
+			return nil, errors.Errorf("Could not start DB driver %s, filename: %s: %v", drivername, dbfile, err)
 		}
 		return db, nil
 	default:
@@ -610,7 +610,7 @@ func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
 		}
 
 		// create verifier
-		verifier := auth.NewKeycloakVerifier(config.jwksURL, config.redirectURL)
+		verifier := auth.NewKeycloakVerifier(config.JwksURL, config.RedirectURL)
 		return verifier, nil
 	default:
 		return nil, errors.Errorf("Invalid option for UserManagement named %s", key)

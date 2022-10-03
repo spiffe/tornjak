@@ -15,6 +15,32 @@ import (
 type KeycloakVerifier struct {
 	jwks *keyfunc.JWKS
 	redirect string
+	api_permissions map[string][]string
+}
+
+func getApiPermissions() map[string][]string {
+	// api call matches to list of strings, representing disjunction of requirements
+	api_permissions := map[string][]string {
+		// viewer
+		"/api/agent/list": []string{"admin", "viewer"},
+		"/api/entry/list": []string{"admin", "viewer"},
+		"/api/tornjak/serverinfo": []string{"admin", "viewer"},
+		"/api/tornjak/selectors/list": []string{"admin", "viewer"},
+		"/api/tornjak/agents/list": []string{"admin", "viewer"},
+		"/api/tornjak/clusters/list": []string{"admin", "viewer"},
+		// admin
+		"/api/agent/ban": []string{"admin"},
+		"/api/agent/delete": []string{"admin"},
+		"/api/agent/createjointoken": []string{"admin"},
+		"/api/entry/create": []string{"admin"},
+		"/api/entry/delete": []string{"admin"},
+		"/api/tornjak/selectors/register": []string{"admin"},
+		"/api/tornjak/clusters/create": []string{"admin"},
+		"/api/tornjak/clusters/edit": []string{"admin"},
+		"/api/tornjak/clusters/delete": []string{"admin"},
+
+	}
+	return api_permissions
 }
 
 func NewKeycloakVerifier(jwksURL string, redirectURL string) (*KeycloakVerifier) {
@@ -32,8 +58,9 @@ func NewKeycloakVerifier(jwksURL string, redirectURL string) (*KeycloakVerifier)
 		return nil
 	}
 	return &KeycloakVerifier {
-		jwks:     jwks,
-		redirect: redirectURL,
+		jwks:            jwks,
+		redirect:        redirectURL,
+		api_permissions: getApiPermissions(),
 	}
 }
 
@@ -68,27 +95,10 @@ func getPermissions(roles []string) map[string]bool {
 	return permissions
 }
 
-func requestPermissible(r *http.Request, permissions map[string]bool) bool {
-	// TODO make this evaluate once
-	// api call matches to list of strings, representing disjunction of requirements
-	api_permissions := make(map[string][]string)
-	api_permissions["/api/agent/list"] = []string{"admin", "viewer"}
-	api_permissions["/api/entry/list"] = []string{"admin", "viewer"}
-	api_permissions["/api/tornjak/serverinfo"] = []string{"admin", "viewer"}
-	api_permissions["/api/tornjak/selectors/list"] = []string{"admin", "viewer"}
-	api_permissions["/api/tornjak/agents/list"] = []string{"admin", "viewer"}
-	api_permissions["/api/tornjak/clusters/list"] = []string{"admin", "viewer"}
-	api_permissions["/api/agent/ban"] = []string{"admin"}
-	api_permissions["/api/agent/delete"] = []string{"admin"}
-	api_permissions["/api/agent/createjointoken"] = []string{"admin"}
-	api_permissions["/api/entry/create"] = []string{"admin"}
-	api_permissions["/api/entry/delete"] = []string{"admin"}
-	api_permissions["/api/tornjak/selectors/register"] = []string{"admin"}
-	api_permissions["/api/tornjak/clusters/create"] = []string{"admin"}
-	api_permissions["/api/tornjak/clusters/edit"] = []string{"admin"}
-	api_permissions["/api/tornjak/clusters/delete"] = []string{"admin"}
 
-	requires := api_permissions[r.URL.Path]
+
+func (v *KeycloakVerifier) requestPermissible(r *http.Request, permissions map[string]bool) bool {
+	requires := v.api_permissions[r.URL.Path]
 	for _, req := range requires {
 		if permissions[req] {
 			return true
@@ -98,11 +108,11 @@ func requestPermissible(r *http.Request, permissions map[string]bool) bool {
 	
 }
 
-func isGoodRequest(r *http.Request, claims *KeycloakClaim) bool {
+func (v *KeycloakVerifier) isGoodRequest(r *http.Request, claims *KeycloakClaim) bool {
 	roles := claims.RealmAccess.Roles
 	
 	permissions := getPermissions(roles)
-	return requestPermissible(r, permissions)
+	return v.requestPermissible(r, permissions)
 }
 
 func (v *KeycloakVerifier) Verify(r *http.Request) error {
@@ -124,7 +134,7 @@ func (v *KeycloakVerifier) Verify(r *http.Request) error {
 	}
 
 	// check roles
-	if !isGoodRequest(r, claims) {
+	if !v.isGoodRequest(r, claims) {
 		return errors.New("Unauthorized request")
 	}
 	
