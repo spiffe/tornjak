@@ -38,7 +38,7 @@ type Server struct {
 	SpireServerInfo TornjakSpireServerInfo
 
 	// AgentDB for storing Workload Attestor Plugin Info of agents
-	TornjakConfigs *TornjakConfig
+	TornjakConfig *TornjakConfig
 	Db agentdb.AgentDB
 	Auth auth.Auth
 }
@@ -554,9 +554,11 @@ func (s *Server) HandleRequests() {
 
 // NewAgentsDB returns a new agents DB, given a DB connection string
 func NewAgentsDB(dbPlugin map[string]catalog.HCLPluginConfig) (agentdb.AgentDB, error) {
-	//dbString = "./agentlocaldb"
-	key := ""
-	var data ast.Node
+	var (
+		key string
+		data ast.Node
+	)
+
 	for k, d := range dbPlugin {
 		key = k
 		data = d.PluginData
@@ -609,7 +611,7 @@ func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
 
 func (s *Server) Configure() (error) {
 	var err error
-	configs := map[string]map[string]catalog.HCLPluginConfig(*s.TornjakConfigs.Plugins)
+	configs := map[string]map[string]catalog.HCLPluginConfig(*s.TornjakConfig.Plugins)
 	// configure datastore
 	s.Db, err = NewAgentsDB(configs["DataStore"])
 	if err != nil {

@@ -155,7 +155,7 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 			TlsEnabled:      opt.httpOptions.tls,
 			MTlsEnabled:     opt.httpOptions.mtls,
 			SpireServerInfo: serverInfo,
-			TornjakConfigs:  tornjakConfigs,
+			TornjakConfig:  tornjakConfigs,
 		}
 		apiServer.HandleRequests()
 	default:

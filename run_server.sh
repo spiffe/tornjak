@@ -45,7 +45,7 @@ if [[ "$SPIRE_CONFIG" == "" ]] ; then
 	exit 1
 elif [[ "$TORNJAK_CONFIG" == "" ]] ; then
 	echo "-t TORNJAK_CONFIG must be provided"
-	exit
+	exit 1
 fi
 
 
