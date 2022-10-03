@@ -24,8 +24,13 @@ type serverConfig struct {
 }
 
 /* Plugin types */
-type pluginAuth struct {
-	jwksURL string     `hcl:"jwksURL"`
+type pluginDataStoreSQL struct {
+	drivername string `hcl:"drivername"`
+	filename   string `hcl:"filename"`
+}
+
+type pluginAuthKeycloak struct {
+	jwksURL     string `hcl:"jwksURL"`
 	redirectURL string `hcl:"redirectURL"`
 }
 

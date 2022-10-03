@@ -14,9 +14,10 @@ import (
 
 type KeycloakVerifier struct {
 	jwks *keyfunc.JWKS
+	redirect string
 }
 
-func NewKeycloakVerifier(jwksURL string) (*KeycloakVerifier) {
+func NewKeycloakVerifier(jwksURL string, redirectURL string) (*KeycloakVerifier) {
 	opts := keyfunc.Options{ // TODO add options to config file
 		RefreshErrorHandler: func(err error) {
 			fmt.Fprintf(os.Stdout, "error with jwt.Keyfunc: %v", err)
@@ -31,15 +32,16 @@ func NewKeycloakVerifier(jwksURL string) (*KeycloakVerifier) {
 		return nil
 	}
 	return &KeycloakVerifier {
-		jwks: jwks,
+		jwks:     jwks,
+		redirect: redirectURL,
 	}
 }
 
-func get_token(r *http.Request) (string, error) {
+func get_token(r *http.Request, redirectURL string) (string, error) {
 	// Authorization paramter from HTTP header
 	auth_header := r.Header.Get("Authorization")
 	if auth_header == "" {
-		return "", errors.New("Authorization header missing")
+		return "", errors.Errorf("Authorization header missing. Please obtain access token here: %s", redirectURL)
 	}
 
 	// get bearer token
@@ -104,7 +106,7 @@ func isGoodRequest(r *http.Request, claims *KeycloakClaim) bool {
 }
 
 func (v *KeycloakVerifier) Verify(r *http.Request) error {
-	token, err := get_token(r)
+	token, err := get_token(r, v.redirect)
 	if err != nil {
 		return err
 	}

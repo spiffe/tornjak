@@ -552,31 +552,36 @@ func (s *Server) HandleRequests() {
 	}
 }
 
+//TODO map[string]catalog. type
+func getPluginConfig(plugin map[string]catalog.HCLPluginConfig) (string, ast.Node, error) {
+	for k, d := range plugin {
+		return k, d.PluginData, nil
+	}
+	return "", nil, errors.New("No plugin data found")
+}
+
 // NewAgentsDB returns a new agents DB, given a DB connection string
 func NewAgentsDB(dbPlugin map[string]catalog.HCLPluginConfig) (agentdb.AgentDB, error) {
-	var (
-		key string
-		data ast.Node
-	)
-
-	for k, d := range dbPlugin { // take the last config set
-		key = k
-		data = d.PluginData
+	key, data, err := getPluginConfig(dbPlugin)
+	if err != nil { // error if no config
+		return nil, errors.Errorf("No DataStore plugin found")
 	}
 
 	switch key {
-	case "" : // error if no config
-		return nil, errors.Errorf("No Datastore plugin config provided")
 	case "sql":
+		// TODO can probably add this to config
 		expBackoff := backoff.NewExponentialBackOff()
 		expBackoff.MaxElapsedTime = time.Second
 
-		var config map[string]interface{}
+		// decode config to struct
+		var config pluginDataStoreSQL
 		if err := hcl.DecodeObject(&config, data); err != nil {
 			return nil, errors.Errorf("Couldn't parse DB config: %v", err)
 		}
-		drivername := config["databaseDrivername"].(string)
-		dbfile := config["dbString"].(string)
+
+		// create db
+		drivername := config.drivername
+		dbfile := config.filename
 
 		db, err := agentdb.NewLocalSqliteDB(drivername, dbfile, expBackoff)
 		if err != nil {
@@ -590,22 +595,22 @@ func NewAgentsDB(dbPlugin map[string]catalog.HCLPluginConfig) (agentdb.AgentDB, 
 
 // NewAuth returns a new Auth
 func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
-	key := ""
-	var data ast.Node
-	for k, d := range authPlugin {
-		key = k
-		data = d.PluginData
-	}
-	switch key {
-	case "" : // default is null verifier
+	key, data, err := getPluginConfig(authPlugin)
+	if err != nil { // default used, no error
 		verifier := auth.NewNullVerifier()
 		return verifier, nil
+	}
+
+	switch key {
 	case "KeycloakAuth":
-		var config pluginAuth
+		// decode config to struct
+		var config pluginAuthKeycloak
 		if err := hcl.DecodeObject(&config, data); err != nil {
 			return nil, errors.Errorf("Couldn't parse Auth config: %v", err)
-		} 
-		verifier := auth.NewKeycloakVerifier(config.jwksURL)
+		}
+
+		// create verifier
+		verifier := auth.NewKeycloakVerifier(config.jwksURL, config.redirectURL)
 		return verifier, nil
 	default:
 		return nil, errors.Errorf("Invalid option for UserManagement named %s", key)
