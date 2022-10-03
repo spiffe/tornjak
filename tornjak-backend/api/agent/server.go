@@ -601,14 +601,14 @@ func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
 		verifier := auth.NewNullVerifier()
 		return verifier, nil
 	case "KeycloakAuth":
-		var config map[string]interface{}
+		var config pluginAuth
 		if err := hcl.DecodeObject(&config, data); err != nil {
 			return nil, errors.Errorf("Couldn't parse Auth config: %v", err)
 		} 
-		verifier := auth.NewKeycloakVerifier(config["jwksURL"].(string))
+		verifier := auth.NewKeycloakVerifier(config.jwksURL)
 		return verifier, nil
 	default:
-		return nil, errors.Errorf("No option for UserManagement named %s", key)
+		return nil, errors.Errorf("Invalid option for UserManagement named %s", key)
 	}
 }
 

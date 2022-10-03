@@ -22,3 +22,10 @@ type TornjakConfig struct {
 
 type serverConfig struct {
 }
+
+/* Plugin types */
+type pluginAuth struct {
+	jwksURL string     `hcl:"jwksURL"`
+	redirectURL string `hcl:"redirectURL"`
+}
+
