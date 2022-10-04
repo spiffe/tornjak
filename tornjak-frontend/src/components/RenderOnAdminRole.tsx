@@ -26,10 +26,10 @@ class RenderOnAdminRole extends Component<RenderOnAdminRoleProp, RenderOnAdminRo
             "/agent/createjointoken",
             "/cluster/clustermanagement"];
         const isPath = pathsWithAdminRestr.find(element => {
-            if(element.includes(window.location.pathname)) {
-                return true;
+            if(window.location.pathname !== "/") {
+                return element.includes(window.location.pathname)
             }
-            return false;
+            return undefined;
         });
         return isPath;
     }

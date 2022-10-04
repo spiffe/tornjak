@@ -6,12 +6,8 @@ import 'carbon-components/css/carbon-components.min.css';
 import './style.css';
 import tornjak_logo from "res/tornjak_logo.png";
 import TornjakHelper from 'components/tornjak-helper';
-import { UserAvatar20, Notification20, Search20 } from "@carbon/icons-react";
 import KeycloakService from "auth/KeycloakAuth";
 import { RootState } from 'redux/reducers';
-import {
-  HeaderGlobalAction,
-} from "carbon-components-react/lib/components/UIShell";
 import {
   clickedDashboardTableFunc,
   isAuthenticatedUpdateFunc,
@@ -21,8 +17,7 @@ import {
 import {
   AccessToken
 } from './types';
-
-
+import HeaderToolBar from './navbar-header-toolbar';
 
 const Auth_Server_Uri = process.env.REACT_APP_AUTH_SERVER_URI;
 
@@ -61,8 +56,8 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
       if (KeycloakService.isLoggedIn()) {
         this.props.accessTokenUpdateFunc(KeycloakService.getToken());
         var decodedToken: AccessToken = jwt_decode(KeycloakService.getToken()!);
-        if(decodedToken.realm_access !== undefined) {
-          if(decodedToken.realm_access.roles !== undefined) {
+        if (decodedToken.realm_access !== undefined) {
+          if (decodedToken.realm_access.roles !== undefined) {
             this.props.UserRolesUpdateFunc(decodedToken.realm_access.roles);
           }
         }
@@ -71,6 +66,7 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
   }
 
   render() {
+    const isAdmin = this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles);
     let managerNavs;
     managerNavs =
       <div className="dropdown">
@@ -85,7 +81,7 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
               <a href="/clusters" className="dropbtn">Clusters </a>
               <div className="dropdown-content">
                 <a href="/clusters" className="nav-link">Clusters List</a>
-                {this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) &&
+                {isAdmin &&
                   <a href="/cluster/clustermanagement" className="nav-link">Cluster Management</a>
                 }
               </div>
@@ -94,7 +90,7 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
               <a href="/agents" className="dropbtn">Agents </a>
               <div className="dropdown-content">
                 <a href="/agents" className="nav-link">Agents List</a>
-                {this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) &&
+                {isAdmin &&
                   <a href="/agent/createjointoken" className="nav-link">Create Token</a>
                 }
               </div>
@@ -103,7 +99,7 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
               <a href="/entries" className="dropbtn">Entries</a>
               <div className="dropdown-content">
                 <a href="/entries" className="nav-link">Entries List</a>
-                {this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) &&
+                {isAdmin &&
                   <a href="/entry/create" className="nav-link">Create Entries</a>
                 }
               </div>
@@ -122,39 +118,8 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
                 }}
               >Tornjak Dashboard</a>
             </div>
-            <div className='header-toolbar'>
-              {Auth_Server_Uri &&
-                <div className="user-dropdown">
-                  <HeaderGlobalAction
-                    aria-label="User">
-                    <UserAvatar20 />
-                  </HeaderGlobalAction>
-                  <div className="user-dropdown-content">
-                    {KeycloakService.isLoggedIn() && (
-                      // eslint-disable-next-line
-                      <a
-                        href="#"
-                        className="nav-link"
-                        onClick={() => KeycloakService.doLogout()}>
-                        Logout {KeycloakService.getFirstName()}
-                      </a>
-                    )}
-                  </div>
-                </div>
-              }
-              <HeaderGlobalAction
-                aria-label="Notifications"
-                onClick={() => { alert("This is a place holder, functionality to be implemented on future work!") }}>
-                <Notification20 />
-              </HeaderGlobalAction>
-              <HeaderGlobalAction
-                aria-label="Search"
-                onClick={() => { alert("This is a place holder, functionality to be implemented on future work!") }}>
-                <Search20 />
-              </HeaderGlobalAction>
-
-            </div>
-            {Auth_Server_Uri && this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) &&
+            <HeaderToolBar />
+            {Auth_Server_Uri && isAdmin &&
               <div className="admin-toolbar-header">
                 <h5>ADMIN PORTAL</h5>
               </div>

@@ -17,9 +17,9 @@ const Auth_Server_Uri = process.env.REACT_APP_AUTH_SERVER_URI;
 type TornjakApiProp = {}
 type TornjakApiState = {}
 
-if(Auth_Server_Uri) { // inject token if app is in auth mode and check token status/ refresh as needed
+if (Auth_Server_Uri) { // inject token if app is in auth mode and check token status/ refresh as needed
   axios.interceptors.request.use(
-    async config => {
+    config => {
       console.log("Checking token status...")
       if (KeycloakService.isLoggedIn()) {
         const setAuthorization = () => {
@@ -269,11 +269,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
     (globalAgentsList: AgentsList[]): void;
   },
     tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
-    console.log(GetApiServerUri('/api/agent/list'))
-    axios.get(GetApiServerUri('/api/agent/list'),
-      { 
-        crossdomain: true
-      })
+    axios.get(GetApiServerUri('/api/agent/list'), { crossdomain: true })
       .then(response => {
         if (!response.data["agents"]) {
           agentsListUpdateFunc([]);

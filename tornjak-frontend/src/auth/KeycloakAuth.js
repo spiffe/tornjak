@@ -37,7 +37,7 @@ const doLogout = keycloak.logout;
 // token
 const getToken = () => keycloak.token;
 const updateToken = (successCallback) =>
-    keycloak.updateToken(5)
+    keycloak.updateToken()
         .then(successCallback)
         .catch(doLogin);
 
