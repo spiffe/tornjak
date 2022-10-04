@@ -6,6 +6,7 @@ import (
 	"strings"
 	"net/http"
 	"time"
+	"encoding/json"
 
 	"github.com/pkg/errors"
 	"github.com/golang-jwt/jwt/v4"
@@ -16,9 +17,10 @@ type KeycloakVerifier struct {
 	jwks *keyfunc.JWKS
 	redirect string
 	api_permissions map[string][]string
+	role_mappings map[string][]string
 }
 
-func getApiPermissions() map[string][]string {
+func getAuthLogic() (map[string][]string, map[string][]string) {
 	// api call matches to list of strings, representing disjunction of requirements
 	api_permissions := map[string][]string {
 		// viewer
@@ -38,30 +40,58 @@ func getApiPermissions() map[string][]string {
 		"/api/tornjak/clusters/create": []string{"admin"},
 		"/api/tornjak/clusters/edit": []string{"admin"},
 		"/api/tornjak/clusters/delete": []string{"admin"},
-
 	}
-	return api_permissions
+	role_mappings := map[string][]string {
+		"tornjak-viewer-realm-role": []string{"viewer"},
+		"tornjak-admin-realm-role": []string{"admin"},
+	}
+	return api_permissions, role_mappings
 }
 
-func NewKeycloakVerifier(jwksURL string, redirectURL string) (*KeycloakVerifier) {
-	opts := keyfunc.Options{ // TODO add options to config file
-		RefreshErrorHandler: func(err error) {
-			fmt.Fprintf(os.Stdout, "error with jwt.Keyfunc: %v", err)
-		},
-		RefreshInterval:   time.Hour,
-		RefreshRateLimit:  time.Minute * 5,
-		RefreshTimeout:    time.Second * 10,
-		RefreshUnknownKID: true,
+// newKeycloakVerifier (https bool, jwks string, redirect string)
+//   get keyfunc based on https
+
+func getKeyFunc(httpjwks bool, jwksInfo string) (*keyfunc.JWKS, error) {
+	if httpjwks {
+		opts := keyfunc.Options{ // TODO add options to config file
+			RefreshErrorHandler: func(err error) {
+				fmt.Fprintf(os.Stdout, "error with jwt.Keyfunc: %v", err)
+			},
+			RefreshInterval:   time.Hour,
+			RefreshRateLimit:  time.Minute * 5,
+			RefreshTimeout:    time.Second * 10,
+			RefreshUnknownKID: true,
+		}
+		jwks, err := keyfunc.Get(jwksInfo, opts)
+		if err != nil {
+			return nil, errors.Errorf("Could not create Keyfunc for url %s: %v", jwksInfo, err)
+		}
+		return jwks, nil
+	} else {
+		bytes, err := json.Marshal(jwksInfo)
+		if err != nil {
+			return nil, errors.Errorf("Could not marshal string into json %s: %v", jwksInfo, err)
+		}
+		jwks, err := keyfunc.NewJSON(bytes)
+		if err != nil {
+			return nil, errors.Errorf("Could not create Keyfunc for json %s: %v", jwksInfo, err)
+		}
+		return jwks, nil
 	}
-	jwks, err := keyfunc.Get(jwksURL, opts)
+}
+
+func NewKeycloakVerifier(httpjwks bool, jwksURL string, redirectURL string) (*KeycloakVerifier, error) {
+	jwks, err := getKeyFunc(httpjwks, jwksURL)
 	if err != nil {
-		return nil
+		return nil, err
 	}
+	api_permissions, role_mappings := getAuthLogic()
 	return &KeycloakVerifier {
 		jwks:            jwks,
 		redirect:        redirectURL,
-		api_permissions: getApiPermissions(),
-	}
+		api_permissions: api_permissions,
+		role_mappings:   role_mappings,
+	}, nil
 }
 
 func get_token(r *http.Request, redirectURL string) (string, error) {
@@ -81,15 +111,13 @@ func get_token(r *http.Request, redirectURL string) (string, error) {
 
 }
 
-func getPermissions(roles []string) map[string]bool {
+func (v *KeycloakVerifier) getPermissions(jwt_roles []string) map[string]bool {
 	permissions := make(map[string]bool)
-	permissions["admin"] = false
-	permissions["viewer"] = false
 
-	for _, r := range roles {
-		permissions["admin"] = permissions["admin"] || r == "tornjak-admin-realm-role"
-		permissions["viewer"] = permissions["viewer"] || r == "tornjak-viewer-realm-role"
-		permissions["viewer"] = permissions["viewer"] || r == "tornjak-admin-realm-role"
+	for _, r := range jwt_roles {
+		for _, m := range v.role_mappings[r] {
+			permissions[m] = true
+		}
 	}
 
 	return permissions
@@ -100,7 +128,7 @@ func getPermissions(roles []string) map[string]bool {
 func (v *KeycloakVerifier) requestPermissible(r *http.Request, permissions map[string]bool) bool {
 	requires := v.api_permissions[r.URL.Path]
 	for _, req := range requires {
-		if permissions[req] {
+		if _, ok := permissions[req]; ok {
 			return true
 		}
 	}
@@ -111,7 +139,7 @@ func (v *KeycloakVerifier) requestPermissible(r *http.Request, permissions map[s
 func (v *KeycloakVerifier) isGoodRequest(r *http.Request, claims *KeycloakClaim) bool {
 	roles := claims.RealmAccess.Roles
 	
-	permissions := getPermissions(roles)
+	permissions := v.getPermissions(roles)
 	return v.requestPermissible(r, permissions)
 }
 

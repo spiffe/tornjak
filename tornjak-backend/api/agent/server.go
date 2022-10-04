@@ -609,8 +609,11 @@ func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
 			return nil, errors.Errorf("Couldn't parse Auth config: %v", err)
 		}
 
-		// create verifier
-		verifier := auth.NewKeycloakVerifier(config.JwksURL, config.RedirectURL)
+		// create verifier TODO make json an option?
+		verifier, err := auth.NewKeycloakVerifier(true, config.JwksURL, config.RedirectURL)
+		if err != nil {
+			return nil, errors.Errorf("Couldn't configure Auth: %v", err)
+		}
 		return verifier, nil
 	default:
 		return nil, errors.Errorf("Invalid option for UserManagement named %s", key)
