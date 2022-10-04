@@ -64,6 +64,9 @@ func TestGetToken(t *testing.T) {
 
 	// test with no Authorization header
 	request, err := http.NewRequest("GET", "some/url", bytes.NewBuffer(request_body))
+	if err != nil {
+		t.Fatalf("ERROR: could not create request")
+	}
 	token, err := get_token(request, "redirecturl")
 	if err == nil {
 		t.Fatalf("ERROR: successfully obtained access token from request with no auth header: %s", token)
