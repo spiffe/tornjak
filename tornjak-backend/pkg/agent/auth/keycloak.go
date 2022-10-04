@@ -6,7 +6,7 @@ import (
 	"strings"
 	"net/http"
 	"time"
-	"encoding/json"
+	//"encoding/json"
 
 	"github.com/pkg/errors"
 	"github.com/golang-jwt/jwt/v4"
@@ -68,11 +68,7 @@ func getKeyFunc(httpjwks bool, jwksInfo string) (*keyfunc.JWKS, error) {
 		}
 		return jwks, nil
 	} else {
-		bytes, err := json.Marshal(jwksInfo)
-		if err != nil {
-			return nil, errors.Errorf("Could not marshal string into json %s: %v", jwksInfo, err)
-		}
-		jwks, err := keyfunc.NewJSON(bytes)
+		jwks, err := keyfunc.NewJSON([]byte(jwksInfo))
 		if err != nil {
 			return nil, errors.Errorf("Could not create Keyfunc for json %s: %v", jwksInfo, err)
 		}
