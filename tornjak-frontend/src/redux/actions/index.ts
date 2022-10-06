@@ -27,6 +27,8 @@ import {
     WorkloadSelectorInfoAction,
     AgentWorkloadSelectorInfoAction,
     ClickedDashboardTableAction,
+    NewEntriesAction,
+    GLOBAL_NEW_ENTRIES,
 } from './types';
 
 import { 
@@ -182,6 +184,18 @@ export function entriesListUpdateFunc(globalEntriesList: EntriesList[]): ThunkAc
         dispatch({
             type: GLOBAL_ENTRIES_LIST,
             payload: globalEntriesList
+        });
+    }
+}
+
+// Expected input - List of new entries with their info
+// json representation from SPIFFE golang documentation - https://github.com/spiffe/spire/blob/v0.12.0/proto/spire/types/entry.pb.go#L28-L67
+// newEntriesUpdateFunc returns the list of new entries to be created from yaml with their info
+export function newEntriesUpdateFunc(globalNewEntries: EntriesList[]): ThunkAction<void, RootState, undefined, NewEntriesAction> {
+    return dispatch => {
+        dispatch({
+            type: GLOBAL_NEW_ENTRIES,
+            payload: globalNewEntries
         });
     }
 }
