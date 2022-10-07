@@ -138,6 +138,37 @@ CA #1 Valid Until:	2021-04-07 20:12:30 +0000 UTC
 
 Now that we have the SPIRE deployment set up, it should be fairly simple to use Tornjak.
 
+### Setting up configuration
+
+To start, we need to create tornjak configuration for necessities such as user management, data storage, etc.
+```
+➜  quickstart git:(master) touch tornjak.yaml
+```
+Here is how the file should look.
+```
+➜  quickstart git:(master) cat tornjak.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tornjak-server
+  namespace: spire
+data:
+  tornjak.conf: |
+    plugins {
+      DataStore "sql" {
+        plugin_data {
+          database_type = "sqlite3"
+          connection_string = "./agentlocaldb"
+        }
+      }
+    }
+```
+We can now apply the configuration file.
+```
+➜  quickstart git:(master) kubectl apply -f tornjak.yaml
+configmap/tornjak-server created
+```
+
 ### Replacing the SPIRE server image
 
 We first need to use the Tornjak image. This can be done by modifying the image in the SPIRE server deployment:

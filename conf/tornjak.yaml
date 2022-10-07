@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tornjak-server
+  namespace: spire
+data:
+  tornjak.conf: |
+    plugins {
+      DataStore "sql" {
+        plugin_data {
+          database_type = "sqlite3"
+          connection_string = "./agentlocaldb"
+        }
+      }
+    }
