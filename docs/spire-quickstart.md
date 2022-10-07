@@ -161,7 +161,7 @@ data:
           connection_string = "./agentlocaldb"
         }
       }
-    }
+    
 ```
 We can now apply the configuration file.
 ```
