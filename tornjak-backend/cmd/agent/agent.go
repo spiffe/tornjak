@@ -41,7 +41,7 @@ func main() {
 				Usage:       "Config file path for spire server",
 				Destination: &opt.genericOptions.configFile,
 				Required:    true,
-			},
+			}, // TODO new argument
 			&cli.StringFlag{
 				Name:        "agents-db-string",
 				Value:       "./agentlocaldb",
