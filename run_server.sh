@@ -44,16 +44,22 @@ if [[ "$SPIRE_CONFIG" == "" ]] ; then
 	echo "-c SPIRE_CONFIG must be provided"
 	exit 1
 elif [[ "$TORNJAK_CONFIG" == "" ]] ; then
-	echo "-t TORNJAK_CONFIG must be provided"
-	exit 1
+	#echo "-t TORNJAK_CONFIG must be provided"
+	#exit 1
+	/opt/spire/tornjak-agent -c $SPIRE_CONFIG serverinfo &
+	/opt/spire/tornjak-agent -c $SPIRE_CONFIG http &
+	/opt/spire/tornjak-agent -c $SPIRE_CONFIG http --tls --cert sample-keys/tls.pem --key sample-keys/key.pem  --listen-addr :20000 &
+	/opt/spire/tornjak-agent -c $SPIRE_CONFIG http --mtls --cert sample-keys/tls.pem --key sample-keys/key.pem  --mtls-ca sample-keys/rootCA.pem --listen-addr :30000 &
+else 
+	/opt/spire/tornjak-agent -c $SPIRE_CONFIG -t $TORNJAK_CONFIG serverinfo &
+	/opt/spire/tornjak-agent -c $SPIRE_CONFIG -t $TORNJAK_CONFIG http &
+	/opt/spire/tornjak-agent -c $SPIRE_CONFIG -t $TORNJAK_CONFIG http --tls --cert sample-keys/tls.pem --key sample-keys/key.pem  --listen-addr :20000 &
+	/opt/spire/tornjak-agent -c $SPIRE_CONFIG -t $TORNJAK_CONFIG http --mtls --cert sample-keys/tls.pem --key sample-keys/key.pem  --mtls-ca sample-keys/rootCA.pem --listen-addr :30000 &
 fi
 
 
 # run
 
-/opt/spire/tornjak-agent -c $SPIRE_CONFIG -t $TORNJAK_CONFIG http &
-/opt/spire/tornjak-agent -c $SPIRE_CONFIG -t $TORNJAK_CONFIG http --tls --cert sample-keys/tls.pem --key sample-keys/key.pem  --listen-addr :20000 &
-/opt/spire/tornjak-agent -c $SPIRE_CONFIG -t $TORNJAK_CONFIG http --mtls --cert sample-keys/tls.pem --key sample-keys/key.pem  --mtls-ca sample-keys/rootCA.pem --listen-addr :30000 &
 # PORT=3000 npm start --prefix ./tornjak-frontend &
 /usr/bin/dumb-init /opt/spire/bin/spire-server run -config $SPIRE_CONFIG
 

@@ -620,9 +620,26 @@ func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
 	}
 }
 
+func (s *Server) ConfigureDefaults() (error) {
+	var err error
+	expBackoff := backoff.NewExponentialBackOff()
+	expBackoff.MaxElapsedTime = time.Second
+
+	s.Db, err = agentdb.NewLocalSqliteDB("sqlite3", "./localtornjakdb", expBackoff)
+	if err != nil {
+		return errors.Errorf("Cannot configure default datastore plugin: %v", err)
+	}
+	s.Auth = auth.NewNullVerifier()
+	return nil
+}
+
 func (s *Server) Configure() (error) {
 	var err error
 	//configs := map[string]map[string]catalog.HCLPluginConfig(*s.TornjakConfig.Plugins)
+	if s.TornjakConfig == nil {
+		err = s.ConfigureDefaults()
+		return err
+	}
 	configs := *s.TornjakConfig.Plugins
 	// configure datastore
 	s.Db, err = NewAgentsDB(configs["DataStore"])

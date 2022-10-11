@@ -48,7 +48,7 @@ func main() {
 				Value:       "",
 				Usage:       "Config file path for tornjak server",
 				Destination: &opt.genericOptions.tornjakFile,
-				Required:    true,
+				Required:    false,
 			},
 		},
 		Commands: []*cli.Command{
@@ -140,6 +140,11 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 			log.Fatalf("Error: %v", err)
 		}
 		fmt.Println(serverInfo)
+		tornjakInfo, err := getTornjakConfig(opt.genericOptions.tornjakFile)
+		if err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+		fmt.Println(tornjakInfo)
 	case "http":
 		serverInfo, err := GetServerInfo(config)
 		if err != nil {
@@ -209,12 +214,9 @@ func getSocketPath(config *run.Config) string {
 	return "unix://" + socketPath
 }
 
-// below copied from spire/cmd/spire-server/cli/run/run.go, but with TornjakConfig
-func parseTornjakConfig(path string) (*agentapi.TornjakConfig, error) {
-	c := &agentapi.TornjakConfig{}
-
+func getTornjakConfig(path string) (string, error) {
 	if path == "" {
-		return nil, errors.New("Bad Tornjak config file: path given is empty")
+		return "", nil
 	}
 
 	// friendly error if file is missing
@@ -224,14 +226,31 @@ func parseTornjakConfig(path string) (*agentapi.TornjakConfig, error) {
 			absPath, err := filepath.Abs(path)
 			if err != nil {
 				msg := "could not determine CWD; tornjak config file not found at %s: use -tornjak-config"
-				return nil, fmt.Errorf(msg, path)
+				return "", fmt.Errorf(msg, path)
 			}
 			msg := "could not find tornjak config file %s: please use the -tornjak-config flag"
-			return nil, fmt.Errorf(msg, absPath)
+			return "", fmt.Errorf(msg, absPath)
 		}
-		return nil, fmt.Errorf("unable to read tornjak configuration at %q: %w", path, err)
+		return "", fmt.Errorf("unable to read tornjak configuration at %q: %w", path, err)
 	}
 	data := string(byteData)
+
+	return data, nil
+}
+
+// below copied from spire/cmd/spire-server/cli/run/run.go, but with TornjakConfig
+func parseTornjakConfig(path string) (*agentapi.TornjakConfig, error) {
+	c := &agentapi.TornjakConfig{}
+
+	if path == "" {
+		return nil, nil
+	}
+
+	// friendly error if file is missing
+	data, err := getTornjakConfig(path)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := hcl.Decode(&c, data); err != nil {
 		return nil, fmt.Errorf("unable to decode tornjak configuration at %q: %w", path, err)
