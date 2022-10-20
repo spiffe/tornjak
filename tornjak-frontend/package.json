@@ -31,6 +31,7 @@
     "d3": "^7.0.1",
     "d3-selection": "^3.0.0",
     "dotenv": "^8.2.0",
+    "env-cmd": "^10.1.0",
     "file-saver": "^2.0.5",
     "jwt-decode": "^3.1.2",
     "keycloak-js": "^19.0.1",
@@ -56,6 +57,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build:staging": "env-cmd -f .env.staging npm run build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "dev": "concurrently -k -n COMPILER,NODEMON -c yellow,blue \"tsc -w\" \"nodemon -w dist -q dist/index.js\""

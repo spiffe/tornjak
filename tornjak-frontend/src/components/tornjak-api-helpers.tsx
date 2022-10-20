@@ -204,6 +204,10 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
     if (serverInfo === undefined || JSON.stringify(serverInfo) === '{}') {
       return
     }
+    if (serverInfo.plugins === undefined) {
+      return
+    }
+    console.log(serverInfo.plugins)
     if (serverInfo.plugins["NodeAttestor"].length === 0) {
       return
     }
