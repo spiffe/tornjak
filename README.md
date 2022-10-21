@@ -8,6 +8,11 @@ The project aims to provide a management plane and capabilities for SPIFFE ident
 The goals are to provide global visibility, auditability, and configuration and policy management for identities.
 This can be thought about as a central management plane for identities across SPIRE servers, with the aim for use by an administrator or CISO to govern an organization's workload identities.
 
+## About Us
+* Tornjak [Slack](https://spiffe.slack.com/archives/C024JTTK58T) channel on CNCF SPIFFE
+* [Blogs](./docs/blogs.md)
+* YouTube [Universal Workload Identity](https://www.youtube.com/channel/UCmZKFwbge6WrUCP3OPss6mg) channel
+
 ## Get Started
 
 The following are guides on how to try out Tornjak:
