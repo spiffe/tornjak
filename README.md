@@ -11,7 +11,7 @@ This can be thought about as a central management plane for identities across SP
 ## About Us
 * Tornjak [Slack](https://spiffe.slack.com/archives/C024JTTK58T) channel on CNCF SPIFFE
 * Tornjak [Blogs](./docs/blogs.md)
-* YouTube[Tornjak channel](https://www.youtube.com/channel/UCmZKFwbge6WrUCP3OPss6mg)
+* YouTube [Tornjak channel](https://www.youtube.com/channel/UCmZKFwbge6WrUCP3OPss6mg)
 
 ## Get Started
 
