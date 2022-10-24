@@ -235,7 +235,7 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                 parentId = localNewEntry.parent_id.path;
             }
         }
-        if (localNewEntry.selectors !== undefined && localNewEntry.selectors !== [] && localNewEntry.selectors[0] !== null) {
+        if (localNewEntry.selectors !== undefined && localNewEntry.selectors.length !== 0 && localNewEntry.selectors[0] !== null) {
             var selectors = localNewEntry.selectors;
             var selectorJoinedArray = selectors.map((x) => (x.type + ":" + x.value + "\n"));
             selectorsWithNewline = selectorJoinedArray.join('');
