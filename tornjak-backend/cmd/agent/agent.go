@@ -220,9 +220,10 @@ func getSocketPath(config *run.Config) string {
 	return "unix://" + socketPath
 }
 
-// TODO read and return contents of file, or error if not possible
+
+// TODO read contents of file
 func getTornjakConfig(path string) (string, error) {
-	return path, nil
+	return "", nil
 }
 
 // TODO parse contents from file

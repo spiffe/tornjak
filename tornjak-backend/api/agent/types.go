@@ -20,7 +20,7 @@ type TornjakServerInfo struct {
 	RedirectURL string `json:"authredirect"`
 }*/
 
-type TornjakConfig struct {
+/*type TornjakConfig struct {
 	SQLDriver   string         `hcl:"sqldriver"`
 	SQLFilename string         `hcl:"sqlfilename"`
 
@@ -31,4 +31,26 @@ type PluginConfig struct {
 	PluginType string            `hcl:"plugin_type"`
 	PluginName string            `hcl:"plugin_name"`
 	PluginData map[string]string `hcl:"plugin_data"`
+}*/
+
+/*type TornjakConfig struct {
+	ServerMetadata string `yaml:"ServerMetadata"`
+	DataStore      struct {
+		Drivername string `yaml:"Drivername"`
+		Filename   string `yaml:"Filename"`
+	} `yaml:"DataStore"`
+	UserManagement struct {
+		Enabled     bool   `yaml:"Enabled"`
+		JWKSURL     string `yaml:"JWKSURL"`
+		RedirectURL string `yaml:"RedirectURL"`
+	} `yaml:"UserManagement"`
+}*/
+
+type TornjakConfig struct {
+	ServerMetadata string `yaml:"ServerMetadata"`
+	Datastore_Drivername string `yaml:"Drivername"`
+	Datastore_Filename   string `yaml:"Filename"`
+	UserManagement_Enabled     bool   `yaml:"Enabled"`
+	UserManagement_JWKSURL     string `yaml:"JWKSURL"`
+	UserManagement_RedirectURL string `yaml:"RedirectURL"`
 }
