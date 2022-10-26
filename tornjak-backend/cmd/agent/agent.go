@@ -16,6 +16,7 @@ import (
 type cliOptions struct {
 	genericOptions struct {
 		configFile string
+		tornjakFile string
 	}
 	httpOptions struct {
 		listenAddr string
@@ -25,9 +26,6 @@ type cliOptions struct {
 		tls        bool
 		mtls       bool
 	}
-	dbOptions struct {
-		dbString string
-	}
 }
 
 func main() {
@@ -36,17 +34,19 @@ func main() {
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "spire-config-file",
-				Aliases:     []string{"c"},
+				Aliases:     []string{"spire-config", "c"},
 				Value:       "",
 				Usage:       "Config file path for spire server",
 				Destination: &opt.genericOptions.configFile,
 				Required:    true,
 			},
 			&cli.StringFlag{
-				Name:        "agents-db-string",
-				Value:       "./agentlocaldb",
-				Usage:       "Db string for agents",
-				Destination: &opt.dbOptions.dbString,
+				Name:        "tornjak-config-file",
+				Aliases:     []string{"tornjak-config", "t"},
+				Value:       "",
+				Usage:       "Config file path for tornjak server",
+				Destination: &opt.genericOptions.tornjakFile,
+				Required:    false,
 			},
 		},
 		Commands: []*cli.Command{
@@ -119,30 +119,44 @@ func main() {
 }
 
 func runTornjakCmd(cmd string, opt cliOptions) error {
-	agentdb, err := agentapi.NewAgentsDB(opt.dbOptions.dbString)
+	// configure plugin
+	agentdb, err := agentapi.NewAgentsDB("./agentlocaldb")
 	if err != nil {
 		log.Fatalf("err: %v", err)
 	}
+
+	// parse spire config
 	config, err := run.ParseFile(opt.genericOptions.configFile, false)
 	if err != nil {
 		// Hide internal error since it is specific to arguments of originating library
 		// i.e. asks to set -config which is a different flag in tornjak
 		return errors.New("Unable to parse the config file provided")
 	}
+	
+	// parse tornjak config
+	tornjakConfigContents, err := getTornjakConfig(opt.genericOptions.tornjakFile)
+	if err != nil {
+		return errors.Errorf("Unable to read the tornjak config file provided: %v", err)
+	}
+	tornjakConfig, err := parseTornjakConfig(tornjakConfigContents) 
+	if err != nil {
+		return errors.Errorf("Unable to parse the tornjak config file provided: %v", err)
+	}
+
+	err = testTornjakConfig(tornjakConfig)
+	if err != nil {
+		return errors.Errorf("Parse test failed: %v", err)
+	}
+
+	serverInfo, err := GetServerInfo(config)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
 
 	switch cmd {
 	case "serverinfo":
-		serverInfo, err := GetServerInfo(config)
-		if err != nil {
-			log.Fatalf("Error: %v", err)
-		}
 		fmt.Println(serverInfo)
 	case "http":
-		serverInfo, err := GetServerInfo(config)
-		if err != nil {
-			log.Fatalf("Error: %v", err)
-		}
-
 		apiServer := &agentapi.Server{
 			SpireServerAddr: getSocketPath(config),
 			ListenAddr:      opt.httpOptions.listenAddr,
@@ -204,4 +218,20 @@ func getSocketPath(config *run.Config) string {
 	}
 
 	return "unix://" + socketPath
+}
+
+// TODO read and return contents of file, or error if not possible
+func getTornjakConfig(path string) (string, error) {
+	return path, nil
+}
+
+// TODO parse contents from file
+func parseTornjakConfig(contents string) (*agentapi.TornjakConfig, error) {
+	c := &agentapi.TornjakConfig{}
+	return c, nil
+}
+
+// TODO tests if config is valid
+func testTornjakConfig(config *agentapi.TornjakConfig) (error) {
+	return nil
 }
