@@ -1,0 +1,8 @@
+metadata: "none"
+datastore:
+  drivername: "sqlite3"
+  filename: "./agentlocaldb"
+UserManagement:
+  enabled: true
+  jwksURL: "http://"
+  redirectURL: "http://"

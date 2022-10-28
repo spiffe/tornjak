@@ -1,0 +1,9 @@
+{
+	"metadata": "blahblahblah server",
+	"datastore_drivername": "sqlite3",
+	"datastore_filename": "./agentlocaldb",
+
+	"authorization_enabled": true,
+	"jwksURL": "https://...",
+	"redirectURL": "http://..."
+}
