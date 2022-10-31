@@ -46,8 +46,8 @@ func createDBTable(database *sql.DB, cmd string) error {
 	return nil
 }
 
-func NewLocalSqliteDB(dbpath string, backOffParams backoff.BackOff) (AgentDB, error) {
-	database, err := sql.Open("sqlite3", dbpath)
+func NewLocalSqliteDB(driverName string, dbpath string, backOffParams backoff.BackOff) (AgentDB, error) {
+	database, err := sql.Open(driverName, dbpath)
 	if err != nil {
 		return nil, errors.New("Unable to open connection to DB")
 	}

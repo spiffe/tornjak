@@ -22,7 +22,7 @@ func TestSelectorDB(t *testing.T) {
 	defer cleanup()
 	expBackoff := backoff.NewExponentialBackOff()
 	expBackoff.MaxElapsedTime = time.Second
-	db, err := NewLocalSqliteDB("./local-agentstest-db", expBackoff)
+	db, err := NewLocalSqliteDB("sqlite3", "./local-agentstest-db", expBackoff)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -194,7 +194,7 @@ func TestClusterCreate(t *testing.T) {
 	defer cleanup()
 	expBackoff := backoff.NewExponentialBackOff()
 	expBackoff.MaxElapsedTime = time.Second
-	db, err := NewLocalSqliteDB("./local-agentstest-db", expBackoff)
+	db, err := NewLocalSqliteDB("sqlite3", "./local-agentstest-db", expBackoff)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -390,7 +390,7 @@ func TestClusterEdit(t *testing.T) {
 	defer cleanup()
 	expBackoff := backoff.NewExponentialBackOff()
 	expBackoff.MaxElapsedTime = time.Second
-	db, err := NewLocalSqliteDB("./local-agentstest-db", expBackoff)
+	db, err := NewLocalSqliteDB("sqlite3", "./local-agentstest-db", expBackoff)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -616,7 +616,7 @@ func TestClusterDelete(t *testing.T) {
 	defer cleanup()
 	expBackoff := backoff.NewExponentialBackOff()
 	expBackoff.MaxElapsedTime = time.Second
-	db, err := NewLocalSqliteDB("./local-agentstest-db", expBackoff)
+	db, err := NewLocalSqliteDB("sqlite3", "./local-agentstest-db", expBackoff)
 	if err != nil {
 		t.Fatal(err)
 	}

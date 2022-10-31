@@ -161,7 +161,7 @@ func (s *Server) BatchDeleteEntry(inp BatchDeleteEntryRequest) (*BatchDeleteEntr
 }
 
 type GetTornjakServerInfoRequest struct{}
-type GetTornjakServerInfoResponse TornjakServerInfo
+type GetTornjakServerInfoResponse TornjakSpireServerInfo
 
 func (s *Server) GetTornjakServerInfo(inp GetTornjakServerInfoRequest) (*GetTornjakServerInfoResponse, error) {
 	return (*GetTornjakServerInfoResponse)(&s.SpireServerInfo), nil
