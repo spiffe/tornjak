@@ -14,10 +14,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/cenkalti/backoff/v4"
 	"github.com/gorilla/mux"
+	"github.com/hashicorp/hcl"
+	"github.com/hashicorp/hcl/hcl/ast"
 
+	"github.com/spiffe/spire/pkg/common/catalog"
 	agentdb "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/db"
+	auth "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/auth"
 )
 
 type Server struct {
@@ -30,10 +35,12 @@ type Server struct {
 	MTlsEnabled     bool
 
 	// SpireServerInfo provides config info for the spire server
-	SpireServerInfo TornjakServerInfo
+	SpireServerInfo TornjakSpireServerInfo
 
 	// AgentDB for storing Workload Attestor Plugin Info of agents
+	TornjakConfig *TornjakConfig
 	Db agentdb.AgentDB
+	Auth auth.Auth
 }
 
 func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
@@ -330,29 +337,41 @@ func (s *Server) entryDelete(w http.ResponseWriter, r *http.Request) {
 }
 
 func cors(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=ascii")
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, access-control-allow-origin, access-control-allow-headers, access-control-allow-credentials, Authorization, access-control-allow-methods")
+	w.Header().Set("Access-Control-Expose-Headers", "*, Authorization")
 	w.WriteHeader(http.StatusOK)
 }
 
 func retError(w http.ResponseWriter, emsg string, status int) {
-	w.Header().Set("Content-Type", "text/html; charset=ascii")
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, access-control-allow-origin, access-control-allow-headers, access-control-allow-credentials, Authorization, access-control-allow-methods")
+	w.Header().Set("Access-Control-Expose-Headers", "*, Authorization")
 	http.Error(w, emsg, status)
 }
 
 // Handle preflight checks
-func corsHandler(f func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (s *Server) verificationMiddleware(next http.Handler) (http.Handler) {
+	f := func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "OPTIONS" {
 			cors(w, r)
 			return
+		}
+		err := s.Auth.Verify(r)
+		if err != nil {
+			emsg := fmt.Sprintf("Error authorizing request: %v", err.Error())
+			// error should be written already
+			retError(w, emsg, http.StatusUnauthorized)
+			return
 		} else {
-			f(w, r)
+			next.ServeHTTP(w, r)
 		}
 	}
+	return http.HandlerFunc(f)
 }
 
 func (s *Server) tornjakGetServerInfo(w http.ResponseWriter, r *http.Request) {
@@ -440,30 +459,37 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // HandleRequests connects api links with respective functions
 // Functions currently handle the api calls all as post-requests
 func (s *Server) HandleRequests() {
+	err := s.Configure()
+	if err != nil {
+		log.Fatal("Cannot Configure: ", err)
+	}
 	rtr := mux.NewRouter()
 
 	// Agents
-	rtr.HandleFunc("/api/agent/list", corsHandler(s.agentList))
-	rtr.HandleFunc("/api/agent/ban", corsHandler(s.agentBan))
-	rtr.HandleFunc("/api/agent/delete", corsHandler(s.agentDelete))
-	rtr.HandleFunc("/api/agent/createjointoken", corsHandler(s.agentCreateJoinToken))
+	rtr.HandleFunc("/api/agent/list", s.agentList)
+	rtr.HandleFunc("/api/agent/ban", s.agentBan)
+	rtr.HandleFunc("/api/agent/delete", s.agentDelete)
+	rtr.HandleFunc("/api/agent/createjointoken", s.agentCreateJoinToken)
 
 	// Entries
-	rtr.HandleFunc("/api/entry/list", corsHandler(s.entryList))
-	rtr.HandleFunc("/api/entry/create", corsHandler(s.entryCreate))
-	rtr.HandleFunc("/api/entry/delete", corsHandler(s.entryDelete))
+	rtr.HandleFunc("/api/entry/list", s.entryList)
+	rtr.HandleFunc("/api/entry/create", s.entryCreate)
+	rtr.HandleFunc("/api/entry/delete", s.entryDelete)
 
 	// Tornjak specific
-	rtr.HandleFunc("/api/tornjak/serverinfo", corsHandler(s.tornjakGetServerInfo))
+	rtr.HandleFunc("/api/tornjak/serverinfo", s.tornjakGetServerInfo)
 	// Agents Selectors
-	rtr.HandleFunc("/api/tornjak/selectors/register", corsHandler(s.tornjakPluginDefine))
-	rtr.HandleFunc("/api/tornjak/selectors/list", corsHandler(s.tornjakSelectorsList))
-	rtr.HandleFunc("/api/tornjak/agents/list", corsHandler(s.tornjakAgentsList))
+	rtr.HandleFunc("/api/tornjak/selectors/register", s.tornjakPluginDefine)
+	rtr.HandleFunc("/api/tornjak/selectors/list", s.tornjakSelectorsList)
+	rtr.HandleFunc("/api/tornjak/agents/list", s.tornjakAgentsList)
 	// Clusters
-	rtr.HandleFunc("/api/tornjak/clusters/list", corsHandler(s.clusterList))
-	rtr.HandleFunc("/api/tornjak/clusters/create", corsHandler(s.clusterCreate))
-	rtr.HandleFunc("/api/tornjak/clusters/edit", corsHandler(s.clusterEdit))
-	rtr.HandleFunc("/api/tornjak/clusters/delete", corsHandler(s.clusterDelete))
+	rtr.HandleFunc("/api/tornjak/clusters/list", s.clusterList)
+	rtr.HandleFunc("/api/tornjak/clusters/create", s.clusterCreate)
+	rtr.HandleFunc("/api/tornjak/clusters/edit", s.clusterEdit)
+	rtr.HandleFunc("/api/tornjak/clusters/delete", s.clusterDelete)
+
+	// Middleware
+	rtr.Use(s.verificationMiddleware)
 
 	// UI
 	spa := spaHandler{staticPath: "ui-agent", indexPath: "index.html"}
@@ -526,16 +552,106 @@ func (s *Server) HandleRequests() {
 	}
 }
 
+//TODO map[string]catalog. type
+func getPluginConfig(plugin map[string]catalog.HCLPluginConfig) (string, ast.Node, error) {
+	for k, d := range plugin {
+		return k, d.PluginData, nil
+	}
+	return "", nil, errors.New("No plugin data found")
+}
+
 // NewAgentsDB returns a new agents DB, given a DB connection string
-func NewAgentsDB(dbString string) (agentdb.AgentDB, error) {
+func NewAgentsDB(dbPlugin map[string]catalog.HCLPluginConfig) (agentdb.AgentDB, error) {
+	key, data, err := getPluginConfig(dbPlugin)
+	if err != nil { // error if no config
+		return nil, errors.Errorf("No DataStore plugin found")
+	}
+
+	switch key {
+	case "sql":
+		// TODO can probably add this to config
+		expBackoff := backoff.NewExponentialBackOff()
+		expBackoff.MaxElapsedTime = time.Second
+
+		// decode config to struct
+		var config pluginDataStoreSQL
+		if err := hcl.DecodeObject(&config, data); err != nil {
+			return nil, errors.Errorf("Couldn't parse DB config: %v", err)
+		}
+
+		// create db
+		drivername := config.Drivername
+		dbfile := config.Filename
+
+		db, err := agentdb.NewLocalSqliteDB(drivername, dbfile, expBackoff)
+		if err != nil {
+			return nil, errors.Errorf("Could not start DB driver %s, filename: %s: %v", drivername, dbfile, err)
+		}
+		return db, nil
+	default:
+		return nil, errors.Errorf("Couldn't create datastore")
+	}
+}
+
+// NewAuth returns a new Auth
+func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
+	key, data, err := getPluginConfig(authPlugin)
+	if err != nil { // default used, no error
+		verifier := auth.NewNullVerifier()
+		return verifier, nil
+	}
+
+	switch key {
+	case "KeycloakAuth":
+		// decode config to struct
+		var config pluginAuthKeycloak
+		if err := hcl.DecodeObject(&config, data); err != nil {
+			return nil, errors.Errorf("Couldn't parse Auth config: %v", err)
+		}
+
+		// create verifier TODO make json an option?
+		verifier, err := auth.NewKeycloakVerifier(true, config.JwksURL, config.RedirectURL)
+		if err != nil {
+			return nil, errors.Errorf("Couldn't configure Auth: %v", err)
+		}
+		return verifier, nil
+	default:
+		return nil, errors.Errorf("Invalid option for UserManagement named %s", key)
+	}
+}
+
+func (s *Server) ConfigureDefaults() (error) {
+	var err error
 	expBackoff := backoff.NewExponentialBackOff()
 	expBackoff.MaxElapsedTime = time.Second
 
-	db, err := agentdb.NewLocalSqliteDB(dbString, expBackoff)
+	s.Db, err = agentdb.NewLocalSqliteDB("sqlite3", "./localtornjakdb", expBackoff)
 	if err != nil {
-		return nil, err
+		return errors.Errorf("Cannot configure default datastore plugin: %v", err)
 	}
-	return db, nil
+	s.Auth = auth.NewNullVerifier()
+	return nil
+}
+
+func (s *Server) Configure() (error) {
+	var err error
+	//configs := map[string]map[string]catalog.HCLPluginConfig(*s.TornjakConfig.Plugins)
+	if s.TornjakConfig == nil {
+		err = s.ConfigureDefaults()
+		return err
+	}
+	configs := *s.TornjakConfig.Plugins
+	// configure datastore
+	s.Db, err = NewAgentsDB(configs["DataStore"])
+	if err != nil {
+		return errors.Errorf("Cannot configure datastore plugin: %v", err)
+	}
+	// configure auth
+	s.Auth, err = NewAuth(configs["UserManagement"])
+	if err != nil {
+		return errors.Errorf("Cannot configure auth plugin: %v", err)
+	}
+	return nil
 }
 
 func (s *Server) tornjakSelectorsList(w http.ResponseWriter, r *http.Request) {
