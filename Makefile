@@ -1,6 +1,7 @@
 .PHONY: ui vendor build ui-agent ui-manager container-agent container-agent-push container-manager container-manager-push release-container-agent-multiversions push container-frontend container-frontend-push
 
 CONTAINER_TAG ?= tsidentity/tornjak-spire-server:latest
+CONTAINER_TAG_FRONTEND ?= tsidentity/tornjak-ui:latest
 CONTAINER_VERSION_IMAGEPATH ?= tsidentity/tornjak-spire-server
 CONTAINER_VERSION_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-spire-server
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:latest
@@ -62,10 +63,10 @@ release-container-agent-multiversions-ghcr: bin/tornjak-agent ui-agent
 	done
 
 container-frontend: 
-	docker build --no-cache -f Dockerfile.add-frontend-auth -t ${CONTAINER_TAG} --build-arg REACT_APP_API_SERVER_URI=${APP_SERVER_URI} --build-arg REACT_APP_AUTH_SERVER_URI=${AUTH_SERVER_URI} .
+	docker build --no-cache -f Dockerfile.add-frontend-auth -t ${CONTAINER_TAG_FRONTEND} --build-arg REACT_APP_API_SERVER_URI=${APP_SERVER_URI} --build-arg REACT_APP_AUTH_SERVER_URI=${AUTH_SERVER_URI} .
 
 container-frontend-push: container-frontend
-	docker push ${CONTAINER_TAG}
+	docker push ${CONTAINER_TAG_FRONTEND}
 
 clean:
 	rm -rf bin/
@@ -76,3 +77,4 @@ clean:
 push:
 	docker push ${CONTAINER_TAG}
 	docker push ${CONTAINER_MANAGER_TAG}
+	docker push ${CONTAINER_TAG_FRONTEND}
