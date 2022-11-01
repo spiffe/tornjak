@@ -98,12 +98,20 @@ To build the frontend on a container as a separate image with Auth:
 AUTH_SERVER_URI=http://localhost:8080
 APP_SERVER_URI=http://localhost:10000
 CONTAINER_TAG_FRONTEND=tsidentity/tornjak-ui:latest
-make container-frontend-push
+make container-frontend-auth-push
+```
+
+To build the frontend on a container as a separate image without Auth:
+
+```
+APP_SERVER_URI=http://localhost:10000
+CONTAINER_TAG_FRONTEND=tsidentity/tornjak-ui:latest
+make container-frontend-noauth-push
 ```
 
 This will make frontend available on port 3000
 
-To test build image locally run:
+To test build image locally, run:
 
 ```
 docker run -p 3000:3000 -d tsidentity/tornjak-ui:latest
@@ -112,4 +120,5 @@ docker run -p 3000:3000 -d tsidentity/tornjak-ui:latest
 This will start a server on `http://localhost:3000`
 Please be patient, as it might take a few minutes to compile and start the server. 
 
-Depending on the user used to signin, there will be two different views. And Admin User will have an Admin portal with admin privilages and a viewer user will have restricted access for the Tornjak UI only for viewing.  
+Depending on the user used to signin, there will be two different views. 
+An Admin User will have an Admin portal with admin privilages and a viewer user will have restricted access for the Tornjak UI only for viewing.  

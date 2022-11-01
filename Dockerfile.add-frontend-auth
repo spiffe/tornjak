@@ -1,20 +1,15 @@
-# base image
 FROM node:18.4
-# set working directory
 WORKDIR /usr/src/app
-# install and cache app dependencies
-COPY tornjak-frontend/package*.json ./
-#ADD tornjak-frontend/package.json /usr/src/app/package.json
+COPY tornjak-frontend ./
 RUN npm install
+
 # set env variables
 ARG REACT_APP_API_SERVER_URI
 ENV REACT_APP_API_SERVER_URI $REACT_APP_API_SERVER_URI
 ARG REACT_APP_AUTH_SERVER_URI
 ENV REACT_APP_AUTH_SERVER_URI $REACT_APP_AUTH_SERVER_URI
-# copy project files into the image
-#COPY . .
-COPY tornjak-frontend ./
-# specify port
+
 EXPOSE 3000
+
 # start app
 CMD ["npm", "start"]
