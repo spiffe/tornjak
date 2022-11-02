@@ -97,7 +97,7 @@ To build the frontend on a container as a separate image with Auth:
 ```
 AUTH_SERVER_URI=http://localhost:8080
 APP_SERVER_URI=http://localhost:10000
-CONTAINER_TAG_FRONTEND=tsidentity/tornjak-ui:latest
+CONTAINER_TAG_FRONTEND=tsidentity/tornjak-fe:latest
 make container-frontend-auth-push
 ```
 
@@ -105,7 +105,7 @@ To build the frontend on a container as a separate image without Auth:
 
 ```
 APP_SERVER_URI=http://localhost:10000
-CONTAINER_TAG_FRONTEND=tsidentity/tornjak-ui:latest
+CONTAINER_TAG_FRONTEND=tsidentity/tornjak-fe:latest
 make container-frontend-noauth-push
 ```
 

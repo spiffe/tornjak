@@ -1,7 +1,7 @@
 .PHONY: ui vendor build ui-agent ui-manager container-agent container-agent-push container-manager container-manager-push release-container-agent-multiversions push container-frontend-auth container-frontend-auth-push container-frontend-noauth container-frontend-noauth-push
 
 CONTAINER_TAG ?= tsidentity/tornjak-spire-server:latest
-CONTAINER_TAG_FRONTEND ?= tsidentity/tornjak-ui:latest
+CONTAINER_TAG_FRONTEND ?= tsidentity/tornjak-fe:latest
 CONTAINER_VERSION_IMAGEPATH ?= tsidentity/tornjak-spire-server
 CONTAINER_VERSION_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-spire-server
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:latest
@@ -27,6 +27,7 @@ ui-agent:
 	npm run build --prefix tornjak-frontend
 	rm -rf ui-agent
 	cp -r tornjak-frontend/build ui-agent
+
 
 ui-manager:
 	npm install --prefix tornjak-frontend
