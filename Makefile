@@ -39,7 +39,7 @@ vendor:
 	go mod vendor
 
 container-spire-tornjak-be: bin/tornjak-backend
-	docker build --no-cache -f Dockerfile.add-frontend -t ${CONTAINER_BACKEND_TAG} .
+	docker build --no-cache -f Dockerfile.add-backend -t ${CONTAINER_BACKEND_TAG} .
 
 container-spire-tornjak-be-push: container-spire-tornjak-be
 	docker push ${CONTAINER_BACKEND_TAG}
