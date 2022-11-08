@@ -11,7 +11,7 @@ This can be thought about as a central management plane for identities across SP
 ## About Us
 * Tornjak [Slack](https://spiffe.slack.com/archives/C024JTTK58T) channel on CNCF SPIFFE
 * Tornjak [Blogs](./docs/blogs.md)
-* YouTube [Tornjak channel](https://www.youtube.com/channel/UCmZKFwbge6WrUCP3OPss6mg)
+* YouTube [Tornjak channel](https://www.youtube.com/@tornjak)
 
 ## Get Started
 
@@ -73,7 +73,7 @@ REACT_APP_TORNJAK_MANAGER=true npm start
 
 In this view, there is an additional navigation bar tab titled "Manage Servers" where you may register Tornjak agents.  
 
-### Running Tornjak With Auth
+## User Management Enabled
 Once you have Auth instance running: 
 Example - Keycloak instance running locally or on the cloud 
 
@@ -88,11 +88,14 @@ this will start a listening port on 8080 for the keycloak instance.
 To start the UI with Auth service, run:
 
 ```
+cd tornjak-frontend
 REACT_APP_API_SERVER_URI=http://localhost:10000/
 REACT_APP_AUTH_SERVER_URI=http://localhost:8080/ npm start
 ```
 
 To build the frontend on a container as a separate image with Auth:
+
+Note: Make sure CONTAINER_TAG_FRONTEND point at your directory, as tsidentity can only be used for pulling but not pushing. 
 
 ```
 AUTH_SERVER_URI=http://localhost:8080
@@ -100,6 +103,8 @@ APP_SERVER_URI=http://localhost:10000
 CONTAINER_TAG_FRONTEND=tsidentity/tornjak-fe:latest
 make container-frontend-auth-push
 ```
+
+## User Management Disabled
 
 To build the frontend on a container as a separate image without Auth:
 
