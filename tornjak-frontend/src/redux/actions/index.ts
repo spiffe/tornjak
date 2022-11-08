@@ -1,6 +1,12 @@
 import { ThunkAction } from 'redux-thunk';
 import { RootState } from 'redux/reducers';
 import {
+    GLOBAL_IS_AUTHENTICATED,
+    GLOBAL_ACCESS_TOKEN,
+    GLOBAL_USER_ROLES,
+    IsAuthenticatedAction,
+    AccessTokenAction,
+    UserRolesAction,
     GLOBAL_SERVER_SELECTED,
     GLOBAL_ENTRIES_LIST,
     GLOBAL_AGENTS_LIST,
@@ -41,6 +47,39 @@ import {
     TornjakServerInfo, 
     WorkloadSelectorInfoLabels
 } from 'components/types';
+
+// Expected input - whether user authenticated or not
+// isAuthenticatedUpdateFunc returns true if current user is authenticated
+export function isAuthenticatedUpdateFunc(globalIsAuthenticated: boolean): ThunkAction<void, RootState, undefined, IsAuthenticatedAction> {
+    return dispatch => {
+        dispatch({
+            type: GLOBAL_IS_AUTHENTICATED,
+            payload: globalIsAuthenticated
+        });
+    }
+}
+
+// Expected input - access token
+// accessTokenUpdateFunc returns the updated and valid access token
+export function accessTokenUpdateFunc(globalAccessToken: string | undefined): ThunkAction<void, RootState, undefined, AccessTokenAction> {
+    return dispatch => {
+        dispatch({
+            type: GLOBAL_ACCESS_TOKEN,
+            payload: globalAccessToken
+        });
+    }
+}
+
+// Expected input - user assigned roles
+// UserRolesAction returns the updated user roles
+export function UserRolesUpdateFunc(globalUserRoles: string[]): ThunkAction<void, RootState, undefined, UserRolesAction> {
+    return dispatch => {
+        dispatch({
+            type: GLOBAL_USER_ROLES,
+            payload: globalUserRoles
+        });
+    }
+}
 
 // Expected input - List of clusters with their info
 // clustersListUpdateFunc returns the list of clusters with their info

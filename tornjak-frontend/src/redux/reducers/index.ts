@@ -4,6 +4,7 @@ import agentsReducer from './agentsReducer';
 import entriesReducer from './entriesReducer';
 import tornjakReducer from './tornjakReducer';
 import {combineReducers} from 'redux';
+import authReducer from './authReducer';
 
 const allReducers = combineReducers({
     servers : serversReducer,
@@ -11,6 +12,7 @@ const allReducers = combineReducers({
     agents : agentsReducer,
     entries : entriesReducer,
     tornjak: tornjakReducer,
+    auth: authReducer,
 });
 
 export type RootState = ReturnType<typeof allReducers>;

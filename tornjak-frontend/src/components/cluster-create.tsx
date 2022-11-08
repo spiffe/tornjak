@@ -226,7 +226,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
       return
     }
 
-    if (this.state.clusterAgentsList !== []) {
+    if (this.state.clusterAgentsList.length !== 0) {
       agentsList = this.state.clusterAgentsList;
     }
 

@@ -10,6 +10,27 @@ import {
     WorkloadSelectorInfoLabels
 } from "components/types";
 
+// auth
+export const GLOBAL_IS_AUTHENTICATED = 'GLOBAL_IS_AUTHENTICATED';
+export const GLOBAL_ACCESS_TOKEN = 'GLOBAL_ACCESS_TOKEN';
+export const GLOBAL_USER_ROLES = 'GLOBAL_USER_ROLES';
+
+export interface AuthReducerState {
+    globalIsAuthenticated: boolean,
+    globalAccessToken: string | undefined,
+    globalUserRoles: string[],
+}
+
+export interface IsAuthenticatedAction extends Action<typeof GLOBAL_IS_AUTHENTICATED> {
+    payload: boolean;
+}
+export interface AccessTokenAction extends Action<typeof GLOBAL_ACCESS_TOKEN> {
+    payload: string | undefined;
+}
+export interface UserRolesAction extends Action<typeof GLOBAL_USER_ROLES> {
+    payload: string[];
+}
+
 // agents
 export const GLOBAL_AGENTS_LIST = 'GLOBAL_AGENTS_LIST';
 export const GLOBAL_AGENTS_WORKLOADATTESTOR_INFO = 'GLOBAL_AGENTS_WORKLOADATTESTOR_INFO'

@@ -1,10 +1,10 @@
 import React from "react";
+import { connect } from 'react-redux';
+import { RootState } from 'redux/reducers';
 import { DataTable, DataTableCustomBatchActionsData, DataTableCustomBatchActionsProps, DenormalizedRow } from "carbon-components-react";
-import {
-    Delete16 as Delete,
-} from '@carbon/icons-react';
-import { IoBan, IoDownloadOutline } from "react-icons/io5";
+import { IoBan, IoDownloadOutline, IoTrashOutline } from "react-icons/io5";
 import { ReactDivAttr, ShapeOf } from "carbon-components-react/typings/shared";
+import TornjakHelper from 'components/tornjak-helper';
 const {
     TableToolbar,
     TableToolbarSearch,
@@ -30,13 +30,17 @@ type TableToolBarProp = {
                         ReactDivAttr>(data?: ShapeOf<DataTableCustomBatchActionsData, E>) => 
                         ShapeOf<DataTableCustomBatchActionsProps, E>,
     selectedRows: readonly DenormalizedRow[],
+    // updated user roles
+    globalUserRoles: string[],
 }
 
 type TableToolBarState = {}
 
 class TableToolBar extends React.Component<TableToolBarProp, TableToolBarState> {
+    TornjakHelper: TornjakHelper;
     constructor(props: TableToolBarProp) {
         super(props);
+        this.TornjakHelper = new TornjakHelper(props);
         this.state = {};
     }
 
@@ -47,9 +51,9 @@ class TableToolBar extends React.Component<TableToolBarProp, TableToolBarState> 
                     <TableToolbarSearch onChange={(e) => this.props.onInputChange(e)} />
                 </TableToolbarContent>
                 <TableBatchActions {...this.props.getBatchActionProps()}>
-                    {this.props.deleteEntity !== undefined &&
+                    {this.props.deleteEntity !== undefined && this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) &&
                         <TableBatchAction
-                            renderIcon={Delete}
+                            renderIcon={IoTrashOutline}
                             iconDescription="Delete"
                             onClick={() => {
                                 this.props.deleteEntity(this.props.selectedRows);
@@ -72,7 +76,7 @@ class TableToolBar extends React.Component<TableToolBarProp, TableToolBarState> 
                             Export to Json
                         </TableBatchAction>
                     }
-                    {this.props.banEntity !== undefined &&
+                    {this.props.banEntity !== undefined && this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) &&
                         <TableBatchAction
                             renderIcon={IoBan}
                             iconDescription="Ban"
@@ -91,4 +95,15 @@ class TableToolBar extends React.Component<TableToolBarProp, TableToolBarState> 
     }
 };
 
-export default (TableToolBar)
+const mapStateToProps = (state: RootState) => ({
+    globalUserRoles: state.auth.globalUserRoles,
+  })
+  
+  export default connect(
+    mapStateToProps,
+    {}
+  )(TableToolBar)
+  
+  export { TableToolBar }
+
+//export default (TableToolBar)

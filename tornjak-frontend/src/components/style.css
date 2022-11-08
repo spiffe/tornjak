@@ -2,8 +2,9 @@
   min-width: 20px;
   z-index: 3;
   background-color: black;
-  min-width: 1300px;
+  min-width: 1550px;
   width: 100%;
+  height: 47.5px;
 }
 
 .logo {
@@ -35,7 +36,30 @@
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 3;
   }
+
+  .user-dropdown {
+    position: relative;
+    display: inline-block;
+  }
   
+  .user-dropdown-content {
+    padding-top: 25px;
+    margin-top: 10px;
+    position: absolute;
+    background-color: #f1f1f1;
+    display: none;
+    min-width: 130px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 3;
+    font-weight: bold;
+  }
+
+  .user-dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    z-index: 3;
+  }
+
   .dropdown-content a {
     color: black;
     padding: 12px 16px;
@@ -45,6 +69,10 @@
   .dropdown-content a:hover {background-color: #ddd;}
   .dropdown:hover .dropdown-content {display: block;}
   .dropdown:hover .dropbtn {color: #ffffff; text-decoration: none;}
+
+  .user-dropdown-content a:hover {background-color: #ddd;}
+  .user-dropdown:hover .user-dropdown-content {display: block;}
+  .user-dropdown:hover .dropbtn {color: #ffffff; text-decoration: none;}
 
   .indvidual-list-table {
     margin-top: 10px;
@@ -266,4 +294,34 @@
 
   .selected-entry {
     background-color: rgb(175, 175, 184);
+  }
+
+  .header-toolbar {
+    position: relative;
+    display: inline;
+    float: right;
+  }
+
+  .user-name {
+    position: relative;
+    display: inline-block;
+    color: aliceblue;
+  }
+
+  .not-allowed {
+    color: rgb(6, 165, 165);
+    position: absolute;
+    left: 40%;
+  }
+
+  .admin-toolbar-header {
+    position: relative;
+    display: inline;
+    padding: 15px;
+    color: white;
+    border: 0.1px solid white;
+    padding: 4px;
+    float: right;
+    margin-right: 70px;
+    margin-top: 7px;
   }
