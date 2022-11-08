@@ -110,7 +110,7 @@ Stay on the newly created client "Clients" > "Tornjak-React-auth" panel, in the 
 ![Client Settings Page](/docs/rsrc/keycloak_diagrams/18-client-settings-page.png)
 
 Under the client Access settings sub-section:
-- Set your "Valid redirect URIs" - for example, http://localhost:3000/* - this is an access point to the Tornjak application. If the application is run locally such as on (minikube or kind) this will be localhost, but if the Tornjak runs on the server, it would be an ingress value of the service. [This is the URI you want Keycloak to redirect to after successful login]
+- Set your "Valid redirect URIs" - for example, http://localhost:3000/* - this is an access point to the Tornjak application. If the application is run locally such as on (minikube or kind) this will be localhost, but if the Tornjak runs on the server, it would be an ingress value of the service. [This is the URI you want Keycloak to redirect to after successful login]
 - Set your "Valid post logout redirect URIs" - for example, http://localhost:3000/* [This is the URI you want Keycloak to redirect to after successful logout]
 - Set "Web origins" as '*' (Wildcard to allow all origins)
 
