@@ -1,4 +1,4 @@
-.PHONY: ui vendor build ui-agent ui-manager container-spire-tornjak-be container-spire-tornjak-be-push container-manager container-manager-push release-container-agent-multiversions push container-frontend-auth container-frontend-auth-push #container-frontend-noauth container-frontend-noauth-push
+.PHONY: ui vendor build ui-agent ui-manager container-spire-tornjak-be container-spire-tornjak-be-push container-manager container-manager-push release-container-agent-multiversions push container-frontend container-frontend-push
 
 CONTAINER_BACKEND_TAG ?= tsidentity/spire-server-tornjak-be:latest
 CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-fe:latest
@@ -9,7 +9,7 @@ GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -pat
 #AUTH_SERVER_URI ?= http://localhost:8080
 APP_SERVER_URI ?= http://localhost:10000
 
-all: bin/tornjak-backend bin/tornjak-manager ui-manager container-spire-tornjak-be container-manager container-frontend-auth #container-frontend-noauth
+all: bin/tornjak-backend bin/tornjak-manager ui-manager container-spire-tornjak-be container-manager container-frontend
 
 bin/tornjak-backend: $(GO_FILES) vendor
 	# Build hack because of flake of imported go module
@@ -63,17 +63,11 @@ release-spire-tornjak-be-multiversions-ghcr: bin/tornjak-backend
 		./build-and-push-versioned-container.sh $$i ${CONTAINER_BACKEND_SPIRE_VERSION_GHCR_IMAGEPATH}; \
 	done
 
-container-frontend-auth: 
-	docker build --no-cache -f Dockerfile.frontend-container -t ${CONTAINER_FRONTEND_TAG} --build-arg REACT_APP_API_SERVER_URI=${APP_SERVER_URI} --build-arg REACT_APP_AUTH_SERVER_URI=${AUTH_SERVER_URI} .
+container-frontend: 
+	docker build --no-cache -f Dockerfile.frontend-container -t ${CONTAINER_FRONTEND_TAG} --build-arg REACT_APP_API_SERVER_URI=${APP_SERVER_URI} .
 
-container-frontend-auth-push: container-frontend-auth
+container-frontend-push: container-frontend
 	docker push ${CONTAINER_FRONTEND_TAG}
-
-#container-frontend-noauth: 
-#	docker build --no-cache -f Dockerfile.frontend-container -t ${CONTAINER_FRONTEND_TAG} --build-arg REACT_APP_API_SERVER_URI=${APP_SERVER_URI} .
-
-#container-frontend-noauth-push: container-frontend-noauth
-#	docker push ${CONTAINER_FRONTEND_TAG}
 
 clean:
 	rm -rf bin/
