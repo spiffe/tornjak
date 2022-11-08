@@ -1,0 +1,15 @@
+FROM node:18.4
+WORKDIR /usr/src/app
+COPY tornjak-frontend ./
+RUN npm install
+
+# set env variables
+ARG REACT_APP_API_SERVER_URI
+ENV REACT_APP_API_SERVER_URI $REACT_APP_API_SERVER_URI
+ARG REACT_APP_AUTH_SERVER_URI
+ENV REACT_APP_AUTH_SERVER_URI $REACT_APP_AUTH_SERVER_URI
+
+EXPOSE 3000
+
+# start app
+CMD ["npm", "start"]

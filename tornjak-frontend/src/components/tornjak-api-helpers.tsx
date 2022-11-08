@@ -11,9 +11,26 @@ import {
   EntriesList,
   ClustersList
 } from './types';
+import KeycloakService from "auth/KeycloakAuth";
+const Auth_Server_Uri = process.env.REACT_APP_AUTH_SERVER_URI;
 
 type TornjakApiProp = {}
 type TornjakApiState = {}
+
+if (Auth_Server_Uri) { // inject token if app is in auth mode and check token status/ refresh as needed
+  axios.interceptors.request.use(
+    config => {
+      console.log("Checking token status...")
+      if (KeycloakService.isLoggedIn()) {
+        const setAuthorization = () => {
+          config.headers.Authorization = `Bearer ${KeycloakService.getToken()}`;
+          return Promise.resolve(config);
+        };
+        return KeycloakService.updateToken(setAuthorization);
+      }
+    }
+  )
+}
 
 class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   constructor(props: TornjakApiProp) {
@@ -187,6 +204,10 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
     if (serverInfo === undefined || JSON.stringify(serverInfo) === '{}') {
       return
     }
+    if (serverInfo.plugins === undefined) {
+      return
+    }
+    console.log(serverInfo.plugins)
     if (serverInfo.plugins["NodeAttestor"].length === 0) {
       return
     }
@@ -296,5 +317,6 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 
 }
+
 
 export default TornjakApi;

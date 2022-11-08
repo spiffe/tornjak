@@ -72,3 +72,53 @@ REACT_APP_TORNJAK_MANAGER=true npm start
 ```
 
 In this view, there is an additional navigation bar tab titled "Manage Servers" where you may register Tornjak agents.  
+
+### Running Tornjak With Auth
+Once you have Auth instance running: 
+Example - Keycloak instance running locally or on the cloud 
+
+To run Keycloak locally, run:
+
+```
+docker run -p 8080:8080 -e KEYCLOAK_ADMIN=”username” -e KEYCLOAK_ADMIN_PASSWORD=”password” quay.io/keycloak/keycloak:19.0.1 start-dev
+```
+
+this will start a listening port on 8080 for the keycloak instance. 
+
+To start the UI with Auth service, run:
+
+```
+REACT_APP_API_SERVER_URI=http://localhost:10000/
+REACT_APP_AUTH_SERVER_URI=http://localhost:8080/ npm start
+```
+
+To build the frontend on a container as a separate image with Auth:
+
+```
+AUTH_SERVER_URI=http://localhost:8080
+APP_SERVER_URI=http://localhost:10000
+CONTAINER_TAG_FRONTEND=tsidentity/tornjak-fe:latest
+make container-frontend-auth-push
+```
+
+To build the frontend on a container as a separate image without Auth:
+
+```
+APP_SERVER_URI=http://localhost:10000
+CONTAINER_TAG_FRONTEND=tsidentity/tornjak-fe:latest
+make container-frontend-noauth-push
+```
+
+This will make frontend available on port 3000
+
+To test build image locally, run:
+
+```
+docker run -p 3000:3000 -d tsidentity/tornjak-ui:latest
+```
+
+This will start a server on `http://localhost:3000`
+Please be patient, as it might take a few minutes to compile and start the server. 
+
+Depending on the user used to signin, there will be two different views. 
+An Admin User will have an Admin portal with admin privilages and a viewer user will have restricted access for the Tornjak UI only for viewing.  

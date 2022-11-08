@@ -26,6 +26,16 @@ class TornjakHelper extends Component<TornjakHelperProp, TornjakHelperState> {
     };
   }
 
+  // checkRolesAdminUser takes in userRoles
+  // return whether the user is granted admin role or not
+  checkRolesAdminUser(userRoles: string[]) {
+    const adminString = "admin";
+    const isAdmin = userRoles.find(element => {
+      return element.toLowerCase().includes(adminString.toLowerCase())
+    });
+    return isAdmin;
+  }
+
   // detailsLink takes in selectedRows/ specified data and entity
   // returns a specfic routing link/ URL for an entity
   detailsLink(selectedRows: string, entity: string) {

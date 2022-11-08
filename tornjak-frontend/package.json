@@ -15,6 +15,7 @@
     "@material-ui/styles": "^4.11.4",
     "@material-ui/x-grid": "^4.0.0-alpha.33",
     "@mui/material": "^5.2.7",
+    "@react-keycloak/web": "^3.4.0",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.10.2",
     "@types/react": "^17.0.24",
@@ -30,7 +31,10 @@
     "d3": "^7.0.1",
     "d3-selection": "^3.0.0",
     "dotenv": "^8.2.0",
+    "env-cmd": "^10.1.0",
     "file-saver": "^2.0.5",
+    "jwt-decode": "^3.1.2",
+    "keycloak-js": "^19.0.1",
     "node-sass": "^6.0.1",
     "prop-types": "^15.6.0",
     "puppeteer": "^10.4.0",
@@ -39,7 +43,7 @@
     "react-dom": "^17.0.2",
     "react-icons": "^4.3.1",
     "react-redux": "^7.2.5",
-    "react-router-dom": "^5.3.0",
+    "react-router-dom": "^5.3.3",
     "react-scripts": "^4.0.3",
     "recharts": "^2.1.4",
     "redux": "^4.1.1",
@@ -51,8 +55,9 @@
     "xlsx": "^0.18.5"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts --openssl-legacy-provider start",
     "build": "react-scripts build",
+    "build:staging": "env-cmd -f .env.staging npm run build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "dev": "concurrently -k -n COMPILER,NODEMON -c yellow,blue \"tsc -w\" \"nodemon -w dist -q dist/index.js\""
@@ -85,7 +90,6 @@
     "@types/file-saver": "^2.0.5",
     "@types/react-router-dom": "^5.3.1",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.7",
-    "babel-jest": "^27.2.2",
     "check-prop-types": "^1.1.2",
     "concurrently": "^6.2.2",
     "enzyme": "^3.11.0",
@@ -111,7 +115,6 @@
       "/@carbon/"
     ],
     "transform": {
-      "^.+\\.(js|jsx|ts|tsx|mjs)$": "babel-jest",
       ".+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "jest-transform-stub"
     },
     "snapshotSerializers": [
