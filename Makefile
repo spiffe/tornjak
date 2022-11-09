@@ -7,8 +7,6 @@ CONTAINER_BACKEND_SPIRE_VERSION_GHCR_IMAGEPATH ?= ghcr.io/spiffe/spire-server-to
 CONTAINER_FRONTEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-fe
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:latest
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
-#AUTH_SERVER_URI ?= http://localhost:8080
-APP_SERVER_URI ?= http://localhost:10000
 
 all: bin/tornjak-backend bin/tornjak-manager ui-manager container-spire-tornjak-be container-manager container-frontend
 
