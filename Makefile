@@ -4,6 +4,7 @@ CONTAINER_BACKEND_TAG ?= tsidentity/spire-server-tornjak-be:latest
 CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-fe:latest
 CONTAINER_BACKEND_SPIRE_VERSION_IMAGEPATH ?= tsidentity/spire-server-tornjak-be
 CONTAINER_BACKEND_SPIRE_VERSION_GHCR_IMAGEPATH ?= ghcr.io/spiffe/spire-server-tornjak-be
+CONTAINER_FRONTEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-fe
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:latest
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
 #AUTH_SERVER_URI ?= http://localhost:8080
@@ -68,6 +69,10 @@ container-frontend:
 
 container-frontend-push: container-frontend
 	docker push ${CONTAINER_FRONTEND_TAG}
+
+release-tornjak-fe-ghcr: container-frontend
+	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}
+	docker push ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}
 
 clean:
 	rm -rf bin/
