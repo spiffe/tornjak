@@ -63,7 +63,7 @@ release-spire-tornjak-be-multiversions-ghcr: bin/tornjak-backend
 	done
 
 container-frontend: 
-	docker build --no-cache -f Dockerfile.frontend-container -t ${CONTAINER_FRONTEND_TAG} --build-arg REACT_APP_API_SERVER_URI=${APP_SERVER_URI} .
+	docker build --no-cache -f Dockerfile.frontend-container -t ${CONTAINER_FRONTEND_TAG} .
 
 container-frontend-push: container-frontend
 	docker push ${CONTAINER_FRONTEND_TAG}
