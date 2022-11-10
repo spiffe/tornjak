@@ -92,29 +92,23 @@ REACT_APP_API_SERVER_URI=http://localhost:10000/
 REACT_APP_AUTH_SERVER_URI=http://localhost:8080/ npm start
 ```
 
-To build the frontend on a container as a separate image with Auth:
+To build the frontend on a container as a separate image:
 
 ```
-AUTH_SERVER_URI=http://localhost:8080
-APP_SERVER_URI=http://localhost:10000
 CONTAINER_TAG_FRONTEND=tsidentity/tornjak-fe:latest
 make container-frontend-auth-push
 ```
 
-To build the frontend on a container as a separate image without Auth:
-
-```
-APP_SERVER_URI=http://localhost:10000
-CONTAINER_TAG_FRONTEND=tsidentity/tornjak-fe:latest
-make container-frontend-noauth-push
-```
-
-This will make frontend available on port 3000
-
 To test build image locally, run:
 
 ```
-docker run -p 3000:3000 -d tsidentity/tornjak-ui:latest
+docker run -p 3000:3000 -d -e REACT_APP_API_SERVER_URI='http://localhost:10000' tsidentity/tornjak-fe:latest
+```
+
+Alternatively, to run the image with the authentication/authorization enabled on the local Keycloak instance, run: 
+
+```
+docker run -p 3000:3000 -d -e REACT_APP_API_SERVER_URI='http://localhost:10000' -e REACT_APP_AUTH_SERVER_URI='http://localhost:8080' tsidentity/tornjak-fe:latest
 ```
 
 This will start a server on `http://localhost:3000`
