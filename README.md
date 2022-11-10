@@ -99,7 +99,7 @@ CONTAINER_TAG_FRONTEND=tsidentity/tornjak-fe:latest
 make container-frontend-auth-push
 ```
 
-To test build image locally with authentication/authorization disabled, run:
+To test build image locally, run:
 
 ```
 docker run -p 3000:3000 -d -e REACT_APP_API_SERVER_URI='http://localhost:10000' tsidentity/tornjak-fe:latest
