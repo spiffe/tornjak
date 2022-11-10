@@ -1,9 +1,9 @@
 .PHONY: ui vendor build ui-agent ui-manager container-spire-tornjak-be container-spire-tornjak-be-push container-manager container-manager-push release-container-agent-multiversions push container-frontend container-frontend-push
 
-CONTAINER_BACKEND_TAG ?= tsidentity/spire-server-tornjak-be:latest
+CONTAINER_BACKEND_TAG ?= tsidentity/tornjak-be-spire-server:latest
 CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-fe:latest
-CONTAINER_BACKEND_SPIRE_VERSION_IMAGEPATH ?= tsidentity/spire-server-tornjak-be
-CONTAINER_BACKEND_SPIRE_VERSION_GHCR_IMAGEPATH ?= ghcr.io/spiffe/spire-server-tornjak-be
+CONTAINER_BACKEND_SPIRE_VERSION_IMAGEPATH ?= tsidentity/tornjak-be-spire-server
+CONTAINER_BACKEND_SPIRE_VERSION_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-be-spire-server
 CONTAINER_FRONTEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-fe
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:latest
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
