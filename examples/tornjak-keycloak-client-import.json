@@ -9,9 +9,9 @@
       "redirectUris": [
         "*"
       ],
-      "webOrigins": [*],
+      "webOrigins": ["*"],
       "notBefore": 0,
-      "bearerOnly": true,
+      "bearerOnly": false,
       "consentRequired": false,
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,

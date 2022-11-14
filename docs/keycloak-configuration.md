@@ -1,4 +1,4 @@
-# Setting Up and Running Keycloak Instance
+# Setting Up and Running Local Keycloak Instance
 There are many options to configure and run a Keycloak instance. For this guide, we will use Docker to run the Keycloak instance in a docker container. Make sure you have Docker installed before proceeding with this step. You can follow the instructions here for installation. After installing docker. On your terminal run the following command:
 
 ```
@@ -34,28 +34,54 @@ To create a new realm follow the steps below:
 - Click on the "Master" realm drop-down on the top left side of the console as you can see below
 - Click on "Create Realm"
 
-![Keycloak Administration Console](/docs/rsrc/keycloak_diagrams/9-admin-console.png)
+![Keycloak Administration Console](/docs/rsrc/keycloak_diagrams/6-admin-console.png)
 
-- Give the realm a realm name - For example - "tornjak"
+- Give the realm a realm name - e.g. "Tornjak"
 - Make sure "Enabled" is set to On, as a realm that is not enabled can not be used
-- [Option 1]: The easiest way to create a realm is by using the import feature. To create the Tornjak realm download [this](examples/keycloak-realm-export.json) file. And import to Keycloak by clicking on browse and import your resource file.
+
+![Create Realm Page](/docs/rsrc/keycloak_diagrams/7-create-realm-page.png)
+
+- Click on Create
+- Once the realm is created, you will see the realm name on the top left side of the console as you can see below. Here is where you can switch between different realms you created and visualize the Master Realm settings.
+
+![Tornjak Realm Page](/docs/rsrc/keycloak_diagrams/8-realm-page.png)
+
+### Option 1: Realm Import
+
+- The easiest way to create a realm is by using the import feature. To create the Tornjak realm download [this](examples/Tornjak-keycloak-realm-import.json) file. 
+
+- And import to Keycloak by going to Realm settings. 
+
+![Tornjak Realm Settings Page](/docs/rsrc/keycloak_diagrams/9-realm-settings-page.png)
+
+- Click on Partial Import, on the top right corner under Action.
+
+![Tornjak Realm Import Page](/docs/rsrc/keycloak_diagrams/10-realm-import-page.png)
+
+- Here, you can import your realm resources by clicking on browse and importing your resource file, as you can see below.
+
+![Imported Tornjak Realm Json](/docs/rsrc/keycloak_diagrams/11-imported-realm-json.png)
+
+- Edit any resource in the window present as a JSON format and select the resources you want to import by using the checkbox below the edit window. You can choose what to do if a specific resource already exists, such as Fail Import, Skip or Overwrite. 
+
+- Click Import, and you will see the resources imported as "Added" under the Action column including the realm resource info such as the Type, Name, and ID of the resource imported.
+
+![Imported Resources](/docs/rsrc/keycloak_diagrams/12-imported-resources-window.png)
+
+- Click on Close, to close the window and check if all the resources are imported by going to the respective resource section.
+
 - If you imported all your resources using the above step skip to the appropraite section depending on which resources you already imported such as the clients, roles and groups together with the realm.
 
-- Click on "Create"
 
-![Create Realm Page](/docs/rsrc/keycloak_diagrams/10-create-realm-page.png)
-
-![Create Realm Page](/docs/rsrc/keycloak_diagrams/11-create-realm-page-2.png)
-
-Once the realm is created, you will see the realm name on the top left side of the console as you can see below. Here is where you can switch between different realms you created and visualize the Master Realm settings.
-
-![Tornjak Realm Page](/docs/rsrc/keycloak_diagrams/12-realm-page.png)
+### Option 2: Manual Realm Resource Configuration
 
 ## Creating and Configuring Client
 
 For our Tornjak application, we will be creating one client for the frontend react application to talk to.
 
-If you have not imported your client resource with the realm above, the easiest way to create the client is to import your client using a JSON file. To create the Tornjak client download [this](examples/registrar_template.json) file. And import to Keycloak by clicking on Import client. This will send you to an Import client page, where you can browse locally and import.
+### Option 1: Client Import
+
+If you have not imported your client resource with the realm above, the easiest way to create the client is to import your client using a JSON file. To create the Tornjak client download [this](/examples/tornjak-keycloak-client-import.json) file. And import to Keycloak by clicking on Import client. This will send you to an Import client page, where you can browse locally and import.
 
 ![Import Client Page](/docs/rsrc/keycloak_diagrams/13-import-client-page.png)
 
@@ -64,6 +90,8 @@ After you open your file in the Keycloak console, you will be able to see all se
 ![Tornjak Imported Client Page](/docs/rsrc/keycloak_diagrams/14-imported-client-page.png)
 
 If you follow the above steps to import your client skip to the Assigning Realm Roles and Client Roles section.
+
+### Option 2: Manual Client Resource Configuration
 
 To create a client manually follow the steps below:
 
