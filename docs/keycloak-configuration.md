@@ -46,7 +46,7 @@ To create a new realm follow the steps below:
 
 ![Tornjak Realm Page](/docs/rsrc/keycloak_diagrams/8-realm-page.png)
 
-### Option 1: Realm Import
+# Option 1: Realm Import
 
 - The easiest way to create a realm is by using the import feature. To create the Tornjak realm download [this](examples/Tornjak-keycloak-realm-import.json) file. 
 
@@ -73,7 +73,7 @@ To create a new realm follow the steps below:
 - If you imported all your resources using the above step skip to the appropraite section depending on which resources you already imported such as the clients, roles and groups together with the realm.
 
 
-### Option 2: Manual Realm Resource Configuration
+# Option 2: Manual Realm Resource Configuration
 
 ## Creating and Configuring Client
 
