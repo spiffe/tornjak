@@ -41,5 +41,7 @@ jobs:
       - name: Push artifacts for tornjak-be-spire-multiversions
         run: make release-tornjak-be-spire-multiversions-ghcr
       - name: Build and push tornjak frontend image
-        run: make release-tornjak-fe-ghcr
+        run: make container-frontend-push
+      - name: Push artifacts for tornjak-fe-multiversions
+        run: make release-tornjak-fe-multiversions-ghcr
       - run: echo "🍏 This job's status is ${{ job.status }}."
