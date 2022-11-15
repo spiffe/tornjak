@@ -1,8 +1,9 @@
-.PHONY: ui vendor build ui-agent ui-manager container-tornjak-be-spire container-tornjak-be-spire-push container-manager container-manager-push release-tornjak-be-spire-multiversions push container-frontend container-frontend-push
+.PHONY: ui vendor build ui-agent ui-manager container-tornjak-be-spire container-tornjak-be-spire-push container-manager container-manager-push release-tornjak-be-spire-multiversions release-tornjak-fe-multiversions push container-frontend container-frontend-push
 
 CONTAINER_BACKEND_TAG ?= tsidentity/tornjak-be-spire-server:latest
 CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-fe:latest
 CONTAINER_BACKEND_SPIRE_VERSION_IMAGEPATH ?= tsidentity/tornjak-be-spire-server
+CONTAINER_FRONTEND_SPIRE_VERSION_IMAGEPATH ?= tsidentity/tornjak-fe
 CONTAINER_BACKEND_SPIRE_VERSION_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-be-spire-server
 CONTAINER_FRONTEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-fe
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:latest
@@ -71,6 +72,18 @@ container-frontend-push: container-frontend
 release-tornjak-fe-ghcr: container-frontend
 	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}
 	docker push ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}
+
+release-tornjak-fe-multiversions: container-frontend
+	for i in $(shell cat SPIRE_BUILD_VERSIONS); do \
+		docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_SPIRE_VERSION_IMAGEPATH}:$$i; \
+		docker push ${CONTAINER_FRONTEND_SPIRE_VERSION_IMAGEPATH}:$$i; \
+	done
+
+release-tornjak-fe-multiversions-ghcr: container-frontend
+	for i in $(shell cat SPIRE_BUILD_VERSIONS); do \
+		docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}:$$i; \
+		docker push ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}:$$i; \
+	done
 
 clean:
 	rm -rf bin/
