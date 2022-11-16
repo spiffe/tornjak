@@ -171,8 +171,17 @@ Roles are special privileges given to a user to access your application. Realm r
 
 For our client, we will create two roles "Admin" and "Viewer" roles
 
-- Viewer/ Non-Admin Users - Can not make changes or access exclusive information
-- Admin - Be granted administrative privileges and access information accordingly
+- Viewer/ Non-Admin Users - Can not make changes or access exclusive information such as:
+    - View Clusters page
+    - View the Agents tab
+    - View the Entries tab
+    - View Tornjak ServerInfo tab
+    - View the Tornjak Dashboard tab
+    - Download entries to YAML
+- Admin - Be granted administrative privileges and access information accordingly such as: 
+    - Create and manage Clusters, such as editing and deleting clusters.
+    - Create and manage Entries, such as such as editing and deleting workload entries.
+    - Manage Agents, such as banning and deleting agents. 
 
 For realm roles create two roles with the name:
 
