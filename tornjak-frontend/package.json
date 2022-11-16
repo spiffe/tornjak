@@ -55,7 +55,7 @@
     "xlsx": "^0.18.5"
   },
   "scripts": {
-    "start": "react-scripts --openssl-legacy-provider start",
+    "start": "react-scripts start --openssl-legacy-provider",
     "build": "react-scripts build",
     "build:staging": "env-cmd -f .env.staging npm run build",
     "test": "react-scripts test",
