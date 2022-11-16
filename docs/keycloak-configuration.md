@@ -48,7 +48,7 @@ To create a new realm follow the steps below:
 
 # Option 1: Realm Import
 
-- The easiest way to create a realm is by using the import feature. To create the Tornjak realm download [this](examples/Tornjak-keycloak-realm-import.json) file. 
+- The easiest way to create a realm is by using the import feature. To create the Tornjak realm, download [Tornjak-keycloak-realm-import.json](/examples/Tornjak-keycloak-realm-import.json) file. 
 
 - And import to Keycloak by going to Realm settings. 
 
@@ -62,16 +62,51 @@ To create a new realm follow the steps below:
 
 ![Imported Tornjak Realm Json](/docs/rsrc/keycloak_diagrams/11-imported-realm-json.png)
 
-- Edit any resource in the window present as a JSON format and select the resources you want to import by using the checkbox below the edit window. You can choose what to do if a specific resource already exists, such as Fail Import, Skip or Overwrite. 
+- Select and check all the resources to import. You can also edit the JSON format in the window. Additionally, you can select the appropriate operation in case the resources already exist. Select Skip.
 
 - Click Import, and you will see the resources imported as "Added" under the Action column including the realm resource info such as the Type, Name, and ID of the resource imported.
 
 ![Imported Resources](/docs/rsrc/keycloak_diagrams/12-imported-resources-window.png)
 
-- Click on Close, to close the window and check if all the resources are imported by going to the respective resource section.
+- Click on Close.
 
 - If you imported all your resources using the above step skip to the appropraite section depending on which resources you already imported such as the clients, roles and groups together with the realm.
 
+Importing Tornjak realm with the above step, the following resources will be imported [each resource will be discussed in detail in the following sections]
+
+- Realm metadata including realm roles
+- Client metadata including client roles
+- Group metadata and relationship
+- Scope Mappings
+
+If you imported all the resources using the above step, your realm is configured and you are "almost" good to go.
+
+At this point, we just need to configure the redirect_uri and we should be able to hook up Tornjak.
+
+There are two redirect URIs:
+
+- The first URI is the Valid redirect URIs, this is an access point to the Tornjak application. If the application is run locally such as on (minikube or kind) this will be localhost, which is already imported for you through the import feature. But if Tornjak runs on the cloud, it would be an ingress value of the service. [This is the URI you want Keycloak to redirect to after successful login]
+
+- The second URI is Valid post logout redirect URI, this is the URI you want Keycloak to redirect to after successful logout.
+
+To set up the redirect URIs:
+- While still in tornjak realm, go to your client by clicking on Clients > Tornjak-React-auth and scroll down to Access settings
+
+![Add redirect uri](/docs/rsrc/keycloak_diagrams/13-add-redirect-uri.png)
+
+- Under Access settings, click on the +Add valid redirect URIs icon in theValid redirect URIs section and add your application's ingress/ URI. IMPORTANT: Make sure you add /* after your application URI- e.g. http://example.cloud/*, if you did not add /* after the URI you will receive the following error.
+
+![Invalid redirect uri](/docs/rsrc/keycloak_diagrams/14-invalid-redirect-uri.png)
+
+- Repeat the same step for Valid post logout redirect URI
+
+![Ingress value added for redirect uri](/docs/rsrc/keycloak_diagrams/15-ingress-for-redirect-uri.png)
+
+Now your Tornjak application is up and running. If you go to your localhost or ingress URI where you are running your application you will be redirected to the Keycloak login page.
+
+![Keycloak Login Page Redirect](/docs/rsrc/keycloak_diagrams/16-login-page.png)
+
+The only step remaining is setting default groups/ roles and creating/ registering users to login into the Tornjak application. Check the appropraite section below for those. 
 
 # Option 2: Manual Realm Resource Configuration
 
@@ -81,13 +116,13 @@ For our Tornjak application, we will be creating one client for the frontend rea
 
 ### Option 1: Client Import
 
-If you have not imported your client resource with the realm above, the easiest way to create the client is to import your client using a JSON file. To create the Tornjak client download [this](/examples/tornjak-keycloak-client-import.json) file. And import to Keycloak by clicking on Import client. This will send you to an Import client page, where you can browse locally and import.
+If you have not imported your client resource with the realm above, the easiest way to create the client is to import your client using a JSON file. To create the Tornjak client download [Tornjak-keycloak-client-import.json](/examples/Tornjak-keycloak-client-import.json) file. And import to Keycloak by clicking on Import client. This will send you to an Import client page, where you can browse locally and import.
 
-![Import Client Page](/docs/rsrc/keycloak_diagrams/13-import-client-page.png)
+![Import Client Page](/docs/rsrc/keycloak_diagrams/17-import-client-page.png)
 
 After you open your file in the Keycloak console, you will be able to see all settings imported on your console including the JSON format.
 
-![Tornjak Imported Client Page](/docs/rsrc/keycloak_diagrams/14-imported-client-page.png)
+![Tornjak Imported Client Page](/docs/rsrc/keycloak_diagrams/18-imported-client-page.png)
 
 If you follow the above steps to import your client skip to the Assigning Realm Roles and Client Roles section.
 
@@ -98,7 +133,7 @@ To create a client manually follow the steps below:
 - Under Tornjak realm > Manage >
 - Click on Clients > Clients list, as shown below
 
-![Create Client Page](/docs/rsrc/keycloak_diagrams/15-create-client-page.png)
+![Create Client Page](/docs/rsrc/keycloak_diagrams/19-create-client-page.png)
 
 - Click on "Create Client"
 - Here you can set the "Client type" - which can be "OpenID Connect" or "SAML"
@@ -114,7 +149,7 @@ To create a client manually follow the steps below:
 - You can toggle "Always display in console" to ON, to display this client in the account console
 - Click on Next
 
-![Manually Create Client - Client General Settings Page](/docs/rsrc/keycloak_diagrams/16-client-general.png)
+![Manually Create Client - Client General Settings Page](/docs/rsrc/keycloak_diagrams/20-client-general.png)
 
 - You will then see the "Capability config". Here you can set the client authentication and authorization flows
 - Keep "Client authentication" OFF - as the OIDC type is not confidential access. When set to OFF it is a public access type that we want for our front-end application, as it is a JavaScript-based browser application
@@ -129,13 +164,13 @@ With the authorization flow, the user is sent to the Keycloak login page when ac
 
 - Click Save
 
-![Manually Create Client - Client Capability Config Page](/docs/rsrc/keycloak_diagrams/17-client-capability-config.png)
+![Manually Create Client - Client Capability Config Page](/docs/rsrc/keycloak_diagrams/21-client-capability-config.png)
 
 ## Setting Client Access Settings
 
 Stay on the newly created client "Clients" > "Tornjak-React-auth" panel, in the "Settings" tab:
 
-![Client Settings Page](/docs/rsrc/keycloak_diagrams/18-client-settings-page.png)
+![Client Settings Page](/docs/rsrc/keycloak_diagrams/22-client-settings-page.png)
 
 Under the client Access settings sub-section:
 - Set your "Valid redirect URIs" - for example, http://localhost:3000/* - this is an access point to the Tornjak application. If the application is run locally such as on (minikube or kind) this will be localhost, but if the Tornjak runs on the server, it would be an ingress value of the service. [This is the URI you want Keycloak to redirect to after successful login]
@@ -147,7 +182,7 @@ To permit all origins of Valid Redirect URIs, explicitly add '*'.
 
 - Click on Save
 
-![Client Access Settings Page](/docs/rsrc/keycloak_diagrams/19-client-access-settings.png)
+![Client Access Settings Page](/docs/rsrc/keycloak_diagrams/23-client-access-settings.png)
 
 ## Disabling Full scope Enabled Feature
 Stay on "Clients" > "Tornjak-React-auth" panel:
@@ -155,14 +190,14 @@ Stay on "Clients" > "Tornjak-React-auth" panel:
 - Switch to the Client scopes tab
 - And click on the Tornjak-React-auth-dedicated option
 
-![Client Scopes Page](/docs/rsrc/keycloak_diagrams/20-client-scopes-page.png)
+![Client Scopes Page](/docs/rsrc/keycloak_diagrams/24-client-scopes-page.png)
 
 - Click on the Scope tab
 - Toggle Full scope allowed to OFF
 
 This will disable all restrictions and remove unnecessary information from the access token
 
-![Full Scope Allowed - DISABLED](/docs/rsrc/keycloak_diagrams/21-full-scope-allowed.png)
+![Full Scope Allowed - DISABLED](/docs/rsrc/keycloak_diagrams/25-full-scope-allowed.png)
 
 ## Assigning Realm Roles and Client Roles
 
@@ -202,18 +237,18 @@ To create a Realm role:
 
 - Under your realm (Tornjak) > Realm roles
 
-![Realm Roles Page](/docs/rsrc/keycloak_diagrams/22-realm-roles-page.png)
+![Realm Roles Page](/docs/rsrc/keycloak_diagrams/26-realm-roles-page.png)
 
 - Click on Create role
 - Give your role a "Role name" (e.g. tornjak-admin-realm-role)
 - Give your role "Description" (Optional)
 - Click Save
 
-![Realm Create a Role Page](/docs/rsrc/keycloak_diagrams/23-realm-create-role.png)
+![Realm Create a Role Page](/docs/rsrc/keycloak_diagrams/27-realm-create-role.png)
 
 Repeat the same to create the "tornjak-viewer-realm-role"
 
-![Realm Created Roles Page](/docs/rsrc/keycloak_diagrams/24-realm-created-roles.png)
+![Realm Created Roles Page](/docs/rsrc/keycloak_diagrams/28-realm-created-roles.png)
 
 To create an Admin Client Role:
 
@@ -224,25 +259,25 @@ To create an Admin Client Role:
 - Give your role "Description" (Optional)
 - Click Save
 
-![Client Create Roles Page](/docs/rsrc/keycloak_diagrams/25-client-roles.png)
+![Client Create Roles Page](/docs/rsrc/keycloak_diagrams/29-client-roles.png)
 
 Repeat the same to create a "viewer" role.
 
-![Client-Created Roles Page](/docs/rsrc/keycloak_diagrams/26-client-created-roles.png)
+![Client-Created Roles Page](/docs/rsrc/keycloak_diagrams/30-client-created-roles.png)
 
 To Map Realm and client Roles
 
 - After your client role is created
 - Click on Action on the top right of the console
 
-![Client Associate Roles to Realm Roles Page](/docs/rsrc/keycloak_diagrams/27-client-associated-roles.png)
+![Client Associate Roles to Realm Roles Page](/docs/rsrc/keycloak_diagrams/31-client-associated-roles.png)
 
 - Under "Action", select "Add associated roles"
 - Select the realm role to be mapped
 - Map "tornjak-admin-realm-role" to "admin" role etc.
 - Select Add to save
 
-![List of Available Realm Roles to Map to Client Roles](/docs/rsrc/keycloak_diagrams/28-list-of-available-realm-roles.png)
+![List of Available Realm Roles to Map to Client Roles](/docs/rsrc/keycloak_diagrams/32-list-of-available-realm-roles.png)
 
 
 ## Creating Groups
@@ -256,7 +291,7 @@ To create Groups:
 - Click Save
 - Repeat to create "Viewer-group"
 
-![Create Group Page](/docs/rsrc/keycloak_diagrams/29-create-group.png)
+![Create Group Page](/docs/rsrc/keycloak_diagrams/33-create-group.png)
 
 
 - Select the group name from the list
@@ -264,10 +299,10 @@ To create Groups:
 - E.g. assign roles to the "Admin-group" account, select "tornjak-admin-realm-role"
 - Press Assign
 
-![Role Mapping to Group Page](/docs/rsrc/keycloak_diagrams/30-role-mapping.png)
+![Role Mapping to Group Page](/docs/rsrc/keycloak_diagrams/34-role-mapping.png)
 
 
-![Created Groups Page](/docs/rsrc/keycloak_diagrams/31-created-groups.png)
+![Created Groups Page](/docs/rsrc/keycloak_diagrams/35-created-groups.png)
 
 
 Now one can assign these groups to users accordingly.
@@ -283,7 +318,7 @@ There are some useful realm settings to adjust. For the selected Realm Tornjak, 
 - Toggle ON Remember me- which helps users remember forgotten passwords
 - Toggle ON Edit username - which allows the Keycloak admin to edit the username already set otherwise it is read-only
 
-![Realm Settings Page](/docs/rsrc/keycloak_diagrams/32-realm-settings.png)
+![Realm Settings Page](/docs/rsrc/keycloak_diagrams/36-realm-settings.png)
 
 
 To set Default Groups and default roles to users when they register:
@@ -292,12 +327,14 @@ To set Default Groups and default roles to users when they register:
 - Click on Default groups
 - Add your default group [In our case add "Viewer-group" group as default] this will make viewer group default for all users
 
-![User Registration Realm Settings Page](/docs/rsrc/keycloak_diagrams/33-user-registration.png)
+![User Registration Realm Settings Page](/docs/rsrc/keycloak_diagrams/37-user-registration.png)
 
 
 # Creating And Registering Users
 
-Users can register through the application if User registration is enabled under "Realm settings" > "Login". Another way users can be registered is by the Keycloak admin
+Users can self-register through the Tornjak application if User registration is enabled under "Realm settings" > "Login". By default, every user has read-only access, when they register initially. And Keycloak admin can give admin roles to a Tornjak admin user that is already registered through the Tornjak Application.
+
+Another way users can be registered is by the Keycloak admin, and we will be using this option for this documentation.
 
 To register a user:
 
@@ -310,17 +347,16 @@ To register a user:
 - Type in the user's "Last name"
 - Make sure the user is enabled, by toggling the Enabled flag to ON (As a disabled user can not log in)
 
-![Create User Page](/docs/rsrc/keycloak_diagrams/34-create-user.png)
-
+![Create User Page](/docs/rsrc/keycloak_diagrams/38-create-user.png)
 
 
 - Assign a group, by clicking on Join Groups and selecting from available groups
 
-![Select Group to Assign to User Page](/docs/rsrc/keycloak_diagrams/35-select-group.png)
+![Select Group to Assign to User Page](/docs/rsrc/keycloak_diagrams/39-select-group.png)
 
 - Click on Create
 
-![Created Users Page](/docs/rsrc/keycloak_diagrams/36-created-users.png)
+![Created Users Page](/docs/rsrc/keycloak_diagrams/40-created-users.png)
 
 
 Then assign the password:
@@ -330,10 +366,10 @@ Then assign the password:
 - Enter the password, adjust Temporary as needed
 - Select Save to create
 
-![User Credentials Page](/docs/rsrc/keycloak_diagrams/37-user-credentials.png)
+![User Credentials Page](/docs/rsrc/keycloak_diagrams/41-user-credentials.png)
 
 
-![Assign Password to User Page](/docs/rsrc/keycloak_diagrams/38-assign-password.png)
+![Assign Password to User Page](/docs/rsrc/keycloak_diagrams/42-assign-password.png)
 
 Create two users and assign them to the following groups:
 
