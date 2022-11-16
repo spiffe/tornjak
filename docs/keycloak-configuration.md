@@ -286,7 +286,7 @@ To set Default Groups and default roles to users when they register:
 ![User Registration Realm Settings Page](/docs/rsrc/keycloak_diagrams/33-user-registration.png)
 
 
-## Creating And Registering Users
+# Creating And Registering Users
 
 Users can register through the application if User registration is enabled under "Realm settings" > "Login". Another way users can be registered is by the Keycloak admin
 
