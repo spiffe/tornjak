@@ -77,7 +77,8 @@ In this view, there is an additional navigation bar tab titled "Manage Servers" 
 
 ## Enable User Management
 User Management prevents un-authorized access to Tornjak and SPIRE APIs.
-For more information on enabling the User Management and Keycloak configuration, please check [docs/config-tornjak-agent.md](docs/config-tornjak-agent.md) document.
+For more information on enabling the User Management and Keycloak configuration,
+please check [docs/keycloak-configuration.md](docs/keycloak-configuration.md) document.
 
 First, start Keyclaok instance locally:
 
@@ -101,7 +102,7 @@ Note: Make sure CONTAINER_TAG_FRONTEND point at your directory, as tsidentity ca
 
 ```
 CONTAINER_TAG_FRONTEND=tsidentity/tornjak-fe:latest
-make container-frontend-auth-push
+make container-frontend-push
 ```
 
 ## User Management Disabled
