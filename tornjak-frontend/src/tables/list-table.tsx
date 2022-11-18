@@ -1,5 +1,5 @@
 import React from "react";
-import { DataTable, DataTableHeader, DataTableRow, DenormalizedRow } from "carbon-components-react";
+import { DataTable, DataTableHeader, DataTableRow, DenormalizedRow, Pagination } from "carbon-components-react";
 import ToolBar from './table-toolbar';
 import Head from './table-head';
 import Body from './table-body';
@@ -23,18 +23,35 @@ type DataTableRenderProp = {
     deleteEntity: (selectedRows: readonly DenormalizedRow[]) => string | void,
     banEntity: ((selectedRows: readonly DenormalizedRow[]) => string | void) | undefined,
     downloadEntity: ((selectedRows: readonly DenormalizedRow[]) => string | undefined | void) | undefined,
-    entityType: string
+    entityType: string, 
 }
 
-type DataTableRenderState = {}
+type DataTableRenderState = {
+    page: number, 
+    pageSize: number
+}
 
 class DataTableRender extends React.Component<DataTableRenderProp, DataTableRenderState> {
+    
     constructor(props: DataTableRenderProp) {
         super(props);
-        this.state = {};
+        this.state = {
+            page: 1, 
+            pageSize: 10
+        }
+    }
+
+    onChange(e: DataTableRenderState) {
+        const {page, pageSize} = e;
+
+        if (page && pageSize) {
+            this.setState({page, pageSize})
+        }
     }
 
     render() {
+        const {page, pageSize} = this.state;
+
         return (
             <DataTable
                 isSortable
@@ -70,10 +87,18 @@ class DataTableRender extends React.Component<DataTableRenderProp, DataTableRend
                             />
                             <Body
                                 entityType={this.props.entityType}
-                                rows={rows}
+                                rows={rows.slice((page - 1) * pageSize, page * pageSize)}
                                 getSelectionProps={getSelectionProps}
                             />
                         </Table>
+                        <Pagination 
+                            onChange={(e) => this.onChange(e)}
+                            pageSizes={[2, 5, 10, 20, 50, 100]}
+                            pageSize={10}
+                            backwardText="Previous page"
+                            forwardText="Next page"
+                            totalItems={rows.length}
+                        />
                     </TableContainer>
                 )}
             />
