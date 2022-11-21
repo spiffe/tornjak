@@ -146,7 +146,7 @@ Now that we have the SPIRE deployment set up, it should be fairly simple to use 
 We first need to create the configmap. We can create a new file: 
 
 ```
-% cat tornjak-configmap.yaml 
+➜  quickstart git:(master) k cat tornjak-configmap.yaml 
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -173,7 +173,7 @@ data:
 Next, we need to update the image of the SPIRE server statefulset, as well as make sure we pass in the Tornjak config. The statefulset will look something like this, where we have commented on the changed or new lines: 
 
 ```
-% cat server-statefulset.yaml 
+➜  quickstart git:(master) k cat server-statefulset.yaml 
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -290,7 +290,7 @@ Open a browser to `http://localhost:10000` and you should now be able to make To
 Now that we've deployed and exposed the Tornjak backend, it is easy enough to deploy the separate frontend. We have prebuilt the frontend in a container, so we can simply run it via a single docker command, which will take a couple minutes to run: 
 
 ```
-% docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak-fe:latest 
+➜  quickstart git:(master) ✗ docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak-fe:latest 
 
 > tornjak-frontend@0.1.0 start
 > react-scripts --openssl-legacy-provider start
@@ -314,5 +314,5 @@ To create a production build, use npm run build.
 
 This exposes the frontend at http://localhost:3000.  If you visit in your browser, you should see this page:
 
-![tornjak-ui](rsrc/tornjak-ui.png) # TODO
+![tornjak-ui](rsrc/tornjak-ui.png)
 
