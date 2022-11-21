@@ -1,8 +1,9 @@
 # Tornjak simple deployment with SPIRE k8s quickstart
 
-
-
-In this tutorial, we will show how one can try out tornjak with a SPIRE deployment using the SPIRE k8s quickstart tutorial. As we will see, this is as simple as setting up SPIRE, and replacing the image with the Tornjak compatible image for the SPIRE server. A walkthrough of this guide is also available through [video](https://youtu.be/24VQtKgi4Zc)
+In this doc, we will show how to configure Tornjak with a SPIRE deployment using the SPIRE k8s quickstart tutorial. As we will see, this is as simple as three steps:
+1. setting up SPIRE
+2. creating a configmap for Tornjak
+3. editing the SPIRE server statefulset to use the Tornjak compatible image and pass the configmap as an argument. 
 
 ## Step 1: Setup SPIRE k8s quickstart tutorial (optional)
 
@@ -140,43 +141,120 @@ CA #1 Valid Until:	2021-04-07 20:12:30 +0000 UTC
 
 Now that we have the SPIRE deployment set up, it should be fairly simple to use Tornjak.
 
-### Replacing the SPIRE server image
+### Creating the Tornjak Configmap
 
-We first need to use the Tornjak image. This can be done by modifying the image in the SPIRE server deployment:
-
+We first need to create the configmap. We can create a new file: 
 
 ```
-➜  quickstart git:(master) cat server-statefulset.yaml
-...
+% cat tornjak-configmap.yaml 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tornjak-agent
+  namespace: spire
+data:
+  server.conf: |
+    server {
+      metadata = "insert metadata"
+    }
+
+    plugins {
+      DataStore "sql" {
+        plugin_data {
+          drivername = "sqlite3"
+          filename = "./agentlocaldb"
+        }
+      }
+
+    }
+```
+
+### Updating the SPIRE Server statefulset
+Next, we need to update the image of the SPIRE server statefulset, as well as make sure we pass in the Tornjak config. The statefulset will look something like this, where we have commented on the changed or new lines: 
+
+```
+% cat server-statefulset.yaml 
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: spire-server
+  namespace: spire
+  labels:
+    app: spire-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spire-server
+  serviceName: spire-server
+  template:
+    metadata:
+      namespace: spire
+      labels:
+        app: spire-server
     spec:
       serviceAccountName: spire-server
       containers:
         - name: spire-server
-          image: gcr.io/spiffe-io/spire-server:1.0.0
+          image: ghcr.io/spiffe/tornjak-be-spire-server:1.x.x # NOTE YOUR OWN SPIRE VERSION
+          imagePullPolicy: Always
           args:
             - -config
             - /run/spire/config/server.conf
+            - -tornjak-config # ADDITIONAL ARGUMENT
+            - /run/spire/tornjak-config/server.conf # ADDITIONAL ARGUMENT
           ports:
             - containerPort: 8081
-...
+          volumeMounts:
+            - name: spire-config
+              mountPath: /run/spire/config
+              readOnly: true
+            - name: tornjak-config # ADDITIONAL VOLUME
+              mountPath: /run/spire/tornjak-config # ADDITIONAL VOLUME
+              readOnly: true # ADDITIONAL VOLUME
+            - name: spire-data
+              mountPath: /run/spire/data
+              readOnly: false
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: 8080
+            failureThreshold: 2
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: spire-config
+          configMap:
+            name: spire-server
+        - name: tornjak-config # ADDITIONAL VOLUME
+          configMap: # ADDITIONAL VOLUME
+            name: tornjak-agent # ADDITIONAL VOLUME
+  volumeClaimTemplates:
+    - metadata:
+        name: spire-data
+        namespace: spire
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
 ```
 
-We want to replace the image with the Tornjak image: `ghcr.io/spiffe/tornjak-spire-server:1.0.0`
+### Applying and connecting to the Tornjak agent
+
+First, we must add the configmap:
 
 ```
-➜  quickstart git:(master) cat server-statefulset.yaml
-...
-    spec:
-      serviceAccountName: spire-server
-      containers:
-        - name: spire-server
-          image: ghcr.io/spiffe/tornjak-spire-server:1.0.0
-          args:
-            - -config
-            - /run/spire/config/server.conf
-          ports:
-            - containerPort: 8081
-...
+➜  quickstart git:(master) ✗ kubectl apply -f tornjak-configmap.yaml
+configmap/tornjak-agent created
 ```
 
 We can then apply the changes of the statefulset deployment:
@@ -190,10 +268,10 @@ We will then wait and verify that the `spire-server-0` pod is now started with t
 
 ```
 ➜  quickstart git:(master) ✗ kubectl -n spire describe pod spire-server-0 | grep "Image:"
-    Image:         ghcr.io/spiffe/tornjak-spire-server:1.0.0
+    Image:         ghcr.io/spiffe/tornjak-be-spire-server:1.x.x
 ```
 
-### Connecting to the Tornjak UI
+## Connecting to the Tornjak agent
 
 The Tornjak HTTP server is running on port 10000 on the port. This can easily be accessed by performing a local port forward using `kubectl`. This will cause the local port 10000 to proxy to the Tornjak HTTP server.
 
@@ -203,6 +281,38 @@ Forwarding from 127.0.0.1:10000 -> 10000
 Forwarding from [::1]:10000 -> 10000
 ```
 
-Open a browser to `http://localhost:10000` and you should now be able to start using the Tornjak UI!
+Open a browser to `http://localhost:10000` and you should now be able to make Tornjak API calls!
 
-![tornjak-ui](rsrc/tornjak-ui.png)
+![tornjak-ui](rsrc/tornjak-ui.png) # TODO
+
+## Connecting the Tornjak UI
+
+Now that we've deployed and exposed the Tornjak backend, it is easy enough to deploy the separate frontend. We have prebuilt the frontend in a container, so we can simply run it via a single docker command, which will take a couple minutes to run: 
+
+```
+% docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak-fe:latest 
+
+> tornjak-frontend@0.1.0 start
+> react-scripts --openssl-legacy-provider start
+
+ℹ ｢wds｣: Project is running at http://172.17.0.3/
+ℹ ｢wds｣: webpack output is served from 
+ℹ ｢wds｣: Content not from webpack is served from /usr/src/app/public
+ℹ ｢wds｣: 404s will fallback to /
+Starting the development server...
+
+Compiled successfully!
+
+You can now view tornjak-frontend in the browser.
+
+  Local:            http://localhost:3000
+  On Your Network:  http://172.17.0.3:3000
+
+Note that the development build is not optimized.
+To create a production build, use npm run build.
+```
+
+This exposes the frontend at http://localhost:3000.  If you visit in your browser, you should see this page:
+
+![tornjak-ui](rsrc/tornjak-ui.png) # TODO
+
