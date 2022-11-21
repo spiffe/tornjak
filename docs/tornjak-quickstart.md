@@ -283,7 +283,7 @@ Forwarding from [::1]:10000 -> 10000
 
 Open a browser to `http://localhost:10000` and you should now be able to make Tornjak API calls!
 
-![tornjak-ui](rsrc/tornjak-ui.png) # TODO
+![tornjak-backend-browser](rsrc/tornjak-backend-browser.png)
 
 ## Connecting the Tornjak UI
 
