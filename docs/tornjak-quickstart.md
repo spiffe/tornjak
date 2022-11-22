@@ -248,6 +248,15 @@ spec:
             storage: 1Gi
 ```
 
+Note that there are four key differences in this StatefulSet file from that in the SPIRE quickstart:
+
+1. The image name is changed to this one that contains a SPIRE server and the Tornjak backend. 
+2. There is an additional argument for the Tornjak config. 
+3. We create a volume named `tornjak-config` that reads from the ConfigMap `tornjak-agent`.
+4. We create a volume mount that mounts the `tornjak-config` volume to a path in the container. 
+
+This is all done specifically to pass the Tornjak config file as an argument to the container. 
+
 ### Applying and connecting to the Tornjak agent
 
 First, we must add the ConfigMap:
