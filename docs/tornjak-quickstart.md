@@ -1,9 +1,9 @@
 # Tornjak simple deployment with SPIRE k8s quickstart
 
 In this doc, we will show how to configure Tornjak with a SPIRE deployment using the SPIRE k8s quickstart tutorial. As we will see, this is as simple as three steps:
-1. setting up SPIRE
-2. creating a configmap for Tornjak
-3. editing the SPIRE server statefulset to use the Tornjak compatible image and pass the configmap as an argument. 
+1. setting up 
+2. creating a k8s ConfigMap for storing the Tornjak configuration
+3. editing the SPIRE server statefulset to use the Tornjak compatible image and pass the ConfigMap as an argument. 
 
 ## Step 1: Setup SPIRE k8s quickstart tutorial (optional)
 
@@ -141,12 +141,12 @@ CA #1 Valid Until:	2021-04-07 20:12:30 +0000 UTC
 
 Now that we have the SPIRE deployment set up, it should be fairly simple to use Tornjak.
 
-### Creating the Tornjak Configmap
+### Creating the Tornjak ConfigMap
 
-We first need to create the configmap. We can create a new file: 
+We first need to create the ConfigMap. We can create a new file: 
 
 ```
-➜  quickstart git:(master) k cat tornjak-configmap.yaml 
+➜  quickstart git:(master) cat tornjak-configmap.yaml 
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -173,7 +173,7 @@ data:
 Next, we need to update the image of the SPIRE server statefulset, as well as make sure we pass in the Tornjak config. The statefulset will look something like this, where we have commented on the changed or new lines: 
 
 ```
-➜  quickstart git:(master) k cat server-statefulset.yaml 
+➜  quickstart git:(master) cat server-statefulset.yaml 
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -196,7 +196,7 @@ spec:
       serviceAccountName: spire-server
       containers:
         - name: spire-server
-          image: ghcr.io/spiffe/tornjak-be-spire-server:1.x.x # NOTE YOUR OWN SPIRE VERSION
+          image: ghcr.io/spiffe/tornjak-be-spire-server:1.x.x # :point_left: NOTE YOUR OWN SPIRE VERSION
           imagePullPolicy: Always
           args:
             - -config
@@ -250,7 +250,7 @@ spec:
 
 ### Applying and connecting to the Tornjak agent
 
-First, we must add the configmap:
+First, we must add the ConfigMap:
 
 ```
 ➜  quickstart git:(master) ✗ kubectl apply -f tornjak-configmap.yaml
