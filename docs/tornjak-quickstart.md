@@ -196,22 +196,22 @@ spec:
       serviceAccountName: spire-server
       containers:
         - name: spire-server
-          image: ghcr.io/spiffe/tornjak-be-spire-server:1.x.x # :point_left: NOTE YOUR OWN SPIRE VERSION
+          image: ghcr.io/spiffe/tornjak-be-spire-server:1.x.x # 👈 NOTE YOUR OWN SPIRE VERSION
           imagePullPolicy: Always
           args:
             - -config
             - /run/spire/config/server.conf
-            - -tornjak-config # ADDITIONAL ARGUMENT
-            - /run/spire/tornjak-config/server.conf # ADDITIONAL ARGUMENT
+            - -tornjak-config # 👈 ADDITIONAL ARGUMENT
+            - /run/spire/tornjak-config/server.conf # 👈 ADDITIONAL ARGUMENT
           ports:
             - containerPort: 8081
           volumeMounts:
             - name: spire-config
               mountPath: /run/spire/config
               readOnly: true
-            - name: tornjak-config # ADDITIONAL VOLUME
-              mountPath: /run/spire/tornjak-config # ADDITIONAL VOLUME
-              readOnly: true # ADDITIONAL VOLUME
+            - name: tornjak-config # 👈 ADDITIONAL VOLUME
+              mountPath: /run/spire/tornjak-config # 👈 ADDITIONAL VOLUME
+              readOnly: true # 👈 ADDITIONAL VOLUME
             - name: spire-data
               mountPath: /run/spire/data
               readOnly: false
@@ -233,9 +233,9 @@ spec:
         - name: spire-config
           configMap:
             name: spire-server
-        - name: tornjak-config # ADDITIONAL VOLUME
-          configMap: # ADDITIONAL VOLUME
-            name: tornjak-agent # ADDITIONAL VOLUME
+        - name: tornjak-config # 👈 ADDITIONAL VOLUME
+          configMap: # 👈 ADDITIONAL VOLUME
+            name: tornjak-agent # 👈 ADDITIONAL VOLUME
   volumeClaimTemplates:
     - metadata:
         name: spire-data
