@@ -170,7 +170,7 @@ data:
 ```
 
 ### Updating the SPIRE Server statefulset
-Next, we need to update the image of the SPIRE server statefulset, as well as make sure we pass in the Tornjak config. The statefulset will look something like this, where we have commented on the changed or new lines: 
+Next, we need to update the image of the SPIRE server statefulset, as well as make sure we pass in the Tornjak config. The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines: 
 
 ```
 ➜  quickstart git:(master) cat server-statefulset.yaml 
