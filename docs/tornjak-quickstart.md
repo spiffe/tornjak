@@ -71,7 +71,11 @@ service/spire-server created
 ➜  quickstart git:(master) kubectl get statefulset --namespace spire
 NAME           READY   AGE
 spire-server   1/1     26s
+```
 
+### Deploying the agent and creating test entries
+
+```
 ➜  quickstart git:(master) kubectl apply \
     -f agent-account.yaml \
     -f agent-cluster-role.yaml
