@@ -1,4 +1,4 @@
-FROM gcr.io/spiffe-io/spire-server:{version}
+FROM ghcr.io/spiffe/spire-server:{version}
 RUN apk add curl
 COPY bin/tornjak-backend tornjak-backend
 COPY sample-keys sample-keys
