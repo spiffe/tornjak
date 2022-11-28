@@ -5,6 +5,7 @@ CONTAINER_BACKEND_WITH_SPIRE_TAG ?= tsidentity/tornjak-be-spire-server:latest
 CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-fe:latest
 CONTAINER_BACKEND_SPIRE_VERSION_IMAGEPATH ?= tsidentity/tornjak-be-spire-server
 CONTAINER_BACKEND_SPIRE_VERSION_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-be-spire-server
+CONTAINER_BACKEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-be
 CONTAINER_FRONTEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-fe
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:latest
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
@@ -46,6 +47,10 @@ container-tornjak-be: bin/tornjak-backend
 
 container-tornjak-be-push: container-tornjak-be
 	docker push ${CONTAINER_BACKEND_TAG}
+
+release-tornjak-be-ghcr: container-frontend
+	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_GHCR_IMAGEPATH}
+	docker push ${CONTAINER_BACKEND_GHCR_IMAGEPATH}
 
 container-tornjak-be-spire: bin/tornjak-backend
 	docker build --no-cache -f Dockerfile.add-backend -t ${CONTAINER_BACKEND_WITH_SPIRE_TAG} .
