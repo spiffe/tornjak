@@ -275,6 +275,8 @@ We can then apply the changes of the statefulset deployment:
 ```
 ➜  quickstart git:(master) ✗ kubectl apply -f server-statefulset.yaml
 statefulset.apps/spire-server configured
+➜  quickstart git:(master) ✗ kubectl delete po -n spire spire-server-0
+pod "spire-server-0" deleted
 ```
 
 We will then wait and verify that the `spire-server-0` pod is now started with the new image:
