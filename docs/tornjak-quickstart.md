@@ -275,6 +275,8 @@ We can then apply the changes of the statefulset deployment:
 ```
 ➜  quickstart git:(master) ✗ kubectl apply -f server-statefulset.yaml
 statefulset.apps/spire-server configured
+➜  quickstart git:(master) ✗ kubectl delete po -n spire spire-server-0
+pod "spire-server-0" deleted
 ```
 
 We will then wait and verify that the `spire-server-0` pod is now started with the new image:
@@ -296,7 +298,7 @@ Forwarding from [::1]:10000 -> 10000
 
 Open a browser to `http://localhost:10000` and you should now be able to make Tornjak API calls!
 
-![tornjak-backend-browser](rsrc/tornjak-backend-browser.png)
+![tornjak-agent-browser](rsrc/tornjak-agent-browser.png)
 
 ## Connecting the Tornjak UI
 
