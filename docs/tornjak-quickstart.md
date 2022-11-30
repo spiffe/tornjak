@@ -269,6 +269,136 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 
 </details>
 
+<details><summary>[Click] For the Tornjak-backend sidecar implementation</summary>
+
+There is an additional requirement to mount the SPIRE server socket and make it accessible to the Tornjak backend container. 
+
+The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines: 
+
+```
+➜  quickstart git:(master) cat server-statefulset.yaml 
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: spire-server
+  namespace: spire
+  labels:
+    app: spire-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spire-server
+  serviceName: spire-server
+  template:
+    metadata:
+      namespace: spire
+      labels:
+        app: spire-server
+    spec:
+      serviceAccountName: spire-server
+      containers:
+        - name: spire-server
+          image: ghcr.io/spiffe/spire-server:1.4.4
+          args:
+            - -config
+            - /run/spire/config/server.conf
+          ports:
+            - containerPort: 8081
+          volumeMounts:
+            - name: spire-config
+              mountPath: /run/spire/config
+              readOnly: true
+            - name: spire-data
+              mountPath: /run/spire/data
+              readOnly: false
+            - name: test-socket # 👈 ADDITIONAL VOLUME
+              mountPath: /tmp/spire-server/private # 👈 ADDITIONAL VOLUME
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: 8080
+            failureThreshold: 2
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+	### 👈 BEGIN ADDITIONAL CONTAINER ###
+        - name: tornjak-backend
+          image: docker.io/tsidentity/tornjak-be:latest
+          args:
+            - -config
+            - /run/spire/config/server.conf
+            - -tornjak-config
+            - /run/spire/tornjak-config/server.conf
+          ports:
+            - containerPort: 8081
+          volumeMounts:
+            - name: spire-config
+              mountPath: /run/spire/config
+              readOnly: true
+            - name: tornjak-config
+              mountPath: /run/spire/tornjak-config
+              readOnly: true
+            - name: spire-data
+              mountPath: /run/spire/data
+              readOnly: false
+            - name: test-socket
+              mountPath: /tmp/spire-server/private
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: 8080
+            failureThreshold: 2
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+	### 👈 END ADDITIONAL CONTAINER ###
+      volumes:
+        - name: spire-config
+          configMap:
+            name: spire-server
+        - name: tornjak-config
+          configMap: 
+            name: tornjak-agent
+        - name: test-socket # 👈 ADDITIONAL VOLUME
+          emptyDir: {} # 👈 ADDITIONAL VOLUME
+  volumeClaimTemplates:
+    - metadata:
+        name: spire-data
+        namespace: spire
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+```
+
+Note that there are four key differences in this StatefulSet file from that in the SPIRE quickstart:
+
+1. The image name is changed to this one that contains a SPIRE server and the Tornjak backend. 
+2. There is an additional argument for the Tornjak config. 
+3. We create a volume named `tornjak-config` that reads from the ConfigMap `tornjak-agent`.
+4. We create a volume mount that mounts the `tornjak-config` volume to a path in the container. 
+
+This is all done specifically to pass the Tornjak config file as an argument to the container. 
+
+</details>
+
+
+
 ### Applying and connecting to the Tornjak agent
 
 First, we must add the ConfigMap:
