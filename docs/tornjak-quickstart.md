@@ -174,7 +174,13 @@ data:
 ```
 
 ### Updating the SPIRE Server statefulset
-Next, we need to update the image of the SPIRE server statefulset, as well as make sure we pass in the Tornjak config. The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines: 
+Next, we need to update the image of the SPIRE server statefulset, as well as make sure we pass in the Tornjak config. 
+
+The statefulset will be different depnding on whether you wish to use the sidecar implementation of Tornjak, where there is a separate container, or the image of the Tornjak backend that contains the SPIRE agent in the same container: 
+
+<details><summary>[Click] For the Tornjak-backend wrapped with the SPIRE server</summary>
+
+The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines: 
 
 ```
 ➜  quickstart git:(master) cat server-statefulset.yaml 
@@ -260,6 +266,8 @@ Note that there are four key differences in this StatefulSet file from that in t
 4. We create a volume mount that mounts the `tornjak-config` volume to a path in the container. 
 
 This is all done specifically to pass the Tornjak config file as an argument to the container. 
+
+</details>
 
 ### Applying and connecting to the Tornjak agent
 
