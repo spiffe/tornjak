@@ -369,9 +369,9 @@ spec:
         - name: spire-config
           configMap:
             name: spire-server
-        - name: tornjak-config
-          configMap: 
-            name: tornjak-agent
+        - name: tornjak-config # 👈 ADDITIONAL VOLUME
+          configMap: # 👈 ADDITIONAL VOLUME
+            name: tornjak-agent # 👈 ADDITIONAL VOLUME
         - name: test-socket # 👈 ADDITIONAL VOLUME
           emptyDir: {} # 👈 ADDITIONAL VOLUME
   volumeClaimTemplates:
@@ -386,14 +386,13 @@ spec:
             storage: 1Gi
 ```
 
-Note that there are four key differences in this StatefulSet file from that in the SPIRE quickstart:
+Note that there are three key differences in this StatefulSet file from that in the SPIRE quickstart:
 
-1. The image name is changed to this one that contains a SPIRE server and the Tornjak backend. 
-2. There is an additional argument for the Tornjak config. 
+1. There is a new container. 
 3. We create a volume named `tornjak-config` that reads from the ConfigMap `tornjak-agent`.
-4. We create a volume mount that mounts the `tornjak-config` volume to a path in the container. 
+4. We create a volume named `test-socket` so that the containers may communicate. 
 
-This is all done specifically to pass the Tornjak config file as an argument to the container. 
+This is all done specifically to pass the Tornjak config file as an argument to the container and to allow communication between Tornjak and SPIRE. 
 
 </details>
 
