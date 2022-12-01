@@ -30,9 +30,11 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      # Name images
+      # Create sha tagged image for container-agent
       - name: Set backend-spire image name
-        run: echo "CONTAINER_BACKEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-be-spire-server:$GITHUB_SHA" >> $GITHUB_ENV
+        run: echo "CONTAINER_BACKEND_WITH_SPIRE_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-be-spire-server:$GITHUB_SHA" >> $GITHUB_ENV
+      - name: Set backend image name
+        run: echo "CONTAINER_BACKEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-be:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set frontend image name
         run: echo "CONTAINER_FRONTEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-fe:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set manager image name
@@ -44,6 +46,8 @@ jobs:
       # Create tagged versioned images
       - name: Push artifacts for tornjak-be-spire-multiversions
         run: make release-tornjak-be-spire-multiversions-ghcr
+      - name: Build and push tornjak backend image
+        run: make release-tornjak-be-ghcr
       - name: Build and push tornjak frontend image
         run: make release-tornjak-fe-ghcr
       - name: Build and push tornjak image

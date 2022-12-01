@@ -49,13 +49,10 @@ elif [[ "$TORNJAK_CONFIG" == "" ]] ; then
 	/opt/spire/tornjak-backend -c $SPIRE_CONFIG serverinfo &
 	/opt/spire/tornjak-backend -c $SPIRE_CONFIG http --tls --cert sample-keys/tls.pem --key sample-keys/key.pem  --listen-addr :20000 &
 	/opt/spire/tornjak-backend -c $SPIRE_CONFIG http --mtls --cert sample-keys/tls.pem --key sample-keys/key.pem  --mtls-ca sample-keys/rootCA.pem --listen-addr :30000 &
-	/opt/spire/tornjak-backend -c $SPIRE_CONFIG http &
+	/opt/spire/tornjak-backend -c $SPIRE_CONFIG http
 else 
 	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG serverinfo &
 	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG http --tls --cert sample-keys/tls.pem --key sample-keys/key.pem  --listen-addr :20000 &
 	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG http --mtls --cert sample-keys/tls.pem --key sample-keys/key.pem  --mtls-ca sample-keys/rootCA.pem --listen-addr :30000 &
-	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG http &
+	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG http
 fi
-
-# run SPIRE
-/usr/bin/dumb-init /opt/spire/bin/spire-server run -config $SPIRE_CONFIG

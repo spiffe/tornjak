@@ -1,18 +1,20 @@
-.PHONY: ui vendor build ui-agent ui-manager container-tornjak-be-spire container-tornjak-be-spire-push container-manager container-manager-push release-tornjak-be-spire-multiversions push container-frontend container-frontend-push
+.PHONY: ui vendor build ui-agent ui-manager container-tornjak-be-spire container-tornjak-be-spire-push container-manager container-manager-push release-tornjak-be-spire-multiversions push container-frontend container-frontend-push container-tornjak-be container-tornjak-be-push
 
-CONTAINER_BACKEND_TAG ?= tsidentity/tornjak-be-spire-server:latest
+CONTAINER_BACKEND_TAG ?= tsidentity/tornjak-be:latest
+CONTAINER_BACKEND_WITH_SPIRE_TAG ?= tsidentity/tornjak-be-spire-server:latest
 CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-fe:latest
 CONTAINER_BACKEND_SPIRE_VERSION_IMAGEPATH ?= tsidentity/tornjak-be-spire-server
 
 CONTAINER_TORNJAK_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak
 CONTAINER_BACKEND_SPIRE_VERSION_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-be-spire-server
+CONTAINER_BACKEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-be
 CONTAINER_FRONTEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-fe
 CONTAINER_MANAGER_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-manager
 
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:latest
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
 
-all: bin/tornjak-backend bin/tornjak-manager ui-manager container-tornjak-be-spire container-manager container-frontend
+all: bin/tornjak-backend bin/tornjak-manager ui-manager container-tornjak-be-spire container-manager container-frontend container-tornjak-be
 
 bin/tornjak-backend: $(GO_FILES) vendor
 	# Build hack because of flake of imported go module
@@ -44,11 +46,21 @@ vendor:
 	go mod tidy
 	go mod vendor
 
+container-tornjak-be: bin/tornjak-backend
+	docker build --no-cache -f Dockerfile.backend-container -t ${CONTAINER_BACKEND_TAG} .
+
+container-tornjak-be-push: container-tornjak-be
+	docker push ${CONTAINER_BACKEND_TAG}
+
+release-tornjak-be-ghcr: container-frontend
+	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_GHCR_IMAGEPATH}
+	docker push ${CONTAINER_BACKEND_GHCR_IMAGEPATH}
+
 container-tornjak-be-spire: bin/tornjak-backend
-	docker build --no-cache -f Dockerfile.add-backend -t ${CONTAINER_BACKEND_TAG} .
+	docker build --no-cache -f Dockerfile.add-backend -t ${CONTAINER_BACKEND_WITH_SPIRE_TAG} .
 
 container-tornjak-be-spire-push: container-tornjak-be-spire
-	docker push ${CONTAINER_BACKEND_TAG}
+	docker push ${CONTAINER_BACKEND_WITH_SPIRE_TAG}
 
 container-manager: bin/tornjak-manager ui-manager
 	docker build --no-cache -f Dockerfile.tornjak-manager -t ${CONTAINER_MANAGER_TAG} .
@@ -92,6 +104,7 @@ clean:
 	rm -rf ui-manager/
 
 push:
-	docker push ${CONTAINER_BACKEND_TAG}
+	docker push ${CONTAINER_BACKEND_WITH_SPIRE_TAG}
 	docker push ${CONTAINER_MANAGER_TAG}
+	docker push ${CONTAINER_BACKEND_TAG}
 	docker push ${CONTAINER_FRONTEND_TAG}

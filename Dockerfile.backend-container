@@ -1,0 +1,12 @@
+FROM alpine
+RUN apk add curl
+RUN mkdir -p /opt/spire/bin
+
+WORKDIR /opt/spire
+
+COPY bin/tornjak-backend tornjak-backend
+COPY sample-keys sample-keys
+
+# Add init
+COPY run_backend.sh run_backend.sh
+ENTRYPOINT ["/opt/spire/run_backend.sh"]
