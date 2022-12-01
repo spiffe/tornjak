@@ -312,7 +312,7 @@ spec:
             - name: spire-data
               mountPath: /run/spire/data
               readOnly: false
-            - name: test-socket # 👈 ADDITIONAL VOLUME
+            - name: socket # 👈 ADDITIONAL VOLUME
               mountPath: /tmp/spire-server/private # 👈 ADDITIONAL VOLUME
           livenessProbe:
             httpGet:
@@ -330,7 +330,7 @@ spec:
             periodSeconds: 5
 	### 👈 BEGIN ADDITIONAL CONTAINER ###
         - name: tornjak-backend
-          image: docker.io/tsidentity/tornjak-be:latest
+          image: ghcr.io/spiffe/tornjak-be:latest
           args:
             - -config
             - /run/spire/config/server.conf
@@ -348,22 +348,8 @@ spec:
             - name: spire-data
               mountPath: /run/spire/data
               readOnly: false
-            - name: test-socket
+            - name: socket
               mountPath: /tmp/spire-server/private
-          livenessProbe:
-            httpGet:
-              path: /live
-              port: 8080
-            failureThreshold: 2
-            initialDelaySeconds: 15
-            periodSeconds: 60
-            timeoutSeconds: 3
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 5
 	### 👈 END ADDITIONAL CONTAINER ###
       volumes:
         - name: spire-config
@@ -372,7 +358,7 @@ spec:
         - name: tornjak-config # 👈 ADDITIONAL VOLUME
           configMap: # 👈 ADDITIONAL VOLUME
             name: tornjak-agent # 👈 ADDITIONAL VOLUME
-        - name: test-socket # 👈 ADDITIONAL VOLUME
+        - name: socket # 👈 ADDITIONAL VOLUME
           emptyDir: {} # 👈 ADDITIONAL VOLUME
   volumeClaimTemplates:
     - metadata:
@@ -388,7 +374,7 @@ spec:
 
 Note that there are three key differences in this StatefulSet file from that in the SPIRE quickstart:
 
-1. There is a new container. 
+1. There is a new container in the pod named tornjak-backend. 
 3. We create a volume named `tornjak-config` that reads from the ConfigMap `tornjak-agent`.
 4. We create a volume named `test-socket` so that the containers may communicate. 
 
