@@ -37,6 +37,10 @@ jobs:
         run: echo "CONTAINER_BACKEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-be:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set frontend image name
         run: echo "CONTAINER_FRONTEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-fe:$GITHUB_SHA" >> $GITHUB_ENV
+      - name: Set manager image name
+        run: echo "CONTAINER_MANAGER_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-manager:$GITHUB_SHA" >> $GITHUB_ENV
+
+      # create images
       - name: Build and push tornjak backend image
         run: make container-tornjak-be-spire-push
       # Create tagged versioned images
@@ -46,4 +50,8 @@ jobs:
         run: make release-tornjak-be-ghcr
       - name: Build and push tornjak frontend image
         run: make release-tornjak-fe-ghcr
+      - name: Build and push tornjak image
+        run: make release-tornjak-ghcr
+      - name: Build and push tornjak manager image
+        run: make release-tornjak-manager-ghcr
       - run: echo "🍏 This job's status is ${{ job.status }}."
