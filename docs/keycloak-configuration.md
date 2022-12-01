@@ -94,7 +94,7 @@ To set up the redirect URIs:
 
 ![Add redirect uri](/docs/rsrc/keycloak_diagrams/13-add-redirect-uri.png)
 
-- Under Access settings, click on the +Add valid redirect URIs icon in theValid redirect URIs section and add your application's ingress/ URI. IMPORTANT: Make sure you add /* after your application URI- e.g. http://example.cloud/*, if you did not add /* after the URI you will receive the following error.
+- Under Access settings, click on the +Add valid redirect URIs icon in theValid redirect URIs section and add your application's ingress/ URI. IMPORTANT: Make sure you add `/*` after your application URI- e.g. `http://example.cloud/*`, if you did not add `/*` after the URI you will receive the following error.
 
 ![Invalid redirect uri](/docs/rsrc/keycloak_diagrams/14-invalid-redirect-uri.png)
 
@@ -114,7 +114,7 @@ The only step remaining is setting default groups/ roles and creating/ registeri
 
 For our Tornjak application, we will be creating one client for the frontend react application to talk to.
 
-##### Option 1: Client Import
+<details><summary>[Option 1] Client Import</summary>
 
 If you have not imported your client resource with the realm above, the easiest way to create the client is to import your client using a JSON file. To create the Tornjak client download [Tornjak-keycloak-client-import.json](/examples/Tornjak-keycloak-client-import.json) file. And import to Keycloak by clicking on Import client. This will send you to an Import client page, where you can browse locally and import.
 
@@ -126,7 +126,9 @@ After you open your file in the Keycloak console, you will be able to see all se
 
 If you follow the above steps to import your client skip to the Assigning Realm Roles and Client Roles section.
 
-##### Option 2: Manual Client Resource Configuration
+</details>
+
+<details><summary>[Option 2] Manual Client Resource Configuration</summary>
 
 To create a client manually follow the steps below:
 
@@ -165,6 +167,8 @@ With the authorization flow, the user is sent to the Keycloak login page when ac
 - Click Save
 
 ![Manually Create Client - Client Capability Config Page](/docs/rsrc/keycloak_diagrams/21-client-capability-config.png)
+
+</details>
 
 #### Setting Client Access Settings
 
