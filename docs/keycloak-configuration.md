@@ -46,7 +46,7 @@ To create a new realm follow the steps below:
 
 ![Tornjak Realm Page](/docs/rsrc/keycloak_diagrams/8-realm-page.png)
 
-# Option 1: Realm Import
+### Option 1: Realm Import
 
 - The easiest way to create a realm is by using the import feature. To create the Tornjak realm, download [Tornjak-keycloak-realm-import.json](/examples/Tornjak-keycloak-realm-import.json) file. 
 
@@ -108,13 +108,13 @@ Now your Tornjak application is up and running. If you go to your localhost or i
 
 The only step remaining is setting default groups/ roles and creating/ registering users to login into the Tornjak application. Check the appropraite section below for those. 
 
-# Option 2: Manual Realm Resource Configuration
+### Option 2: Manual Realm Resource Configuration
 
-## Creating and Configuring Client
+#### Creating and Configuring Client
 
 For our Tornjak application, we will be creating one client for the frontend react application to talk to.
 
-### Option 1: Client Import
+##### Option 1: Client Import
 
 If you have not imported your client resource with the realm above, the easiest way to create the client is to import your client using a JSON file. To create the Tornjak client download [Tornjak-keycloak-client-import.json](/examples/Tornjak-keycloak-client-import.json) file. And import to Keycloak by clicking on Import client. This will send you to an Import client page, where you can browse locally and import.
 
@@ -126,7 +126,7 @@ After you open your file in the Keycloak console, you will be able to see all se
 
 If you follow the above steps to import your client skip to the Assigning Realm Roles and Client Roles section.
 
-### Option 2: Manual Client Resource Configuration
+##### Option 2: Manual Client Resource Configuration
 
 To create a client manually follow the steps below:
 
@@ -166,7 +166,7 @@ With the authorization flow, the user is sent to the Keycloak login page when ac
 
 ![Manually Create Client - Client Capability Config Page](/docs/rsrc/keycloak_diagrams/21-client-capability-config.png)
 
-## Setting Client Access Settings
+#### Setting Client Access Settings
 
 Stay on the newly created client "Clients" > "Tornjak-React-auth" panel, in the "Settings" tab:
 
@@ -184,7 +184,7 @@ To permit all origins of Valid Redirect URIs, explicitly add '*'.
 
 ![Client Access Settings Page](/docs/rsrc/keycloak_diagrams/23-client-access-settings.png)
 
-## Disabling Full scope Enabled Feature
+#### Disabling Full scope Enabled Feature
 Stay on "Clients" > "Tornjak-React-auth" panel:
 
 - Switch to the Client scopes tab
@@ -199,7 +199,7 @@ This will disable all restrictions and remove unnecessary information from the a
 
 ![Full Scope Allowed - DISABLED](/docs/rsrc/keycloak_diagrams/25-full-scope-allowed.png)
 
-## Assigning Realm Roles and Client Roles
+#### Assigning Realm Roles and Client Roles
 
 Roles are special privileges given to a user to access your application. Realm roles are specific to your realm as client roles are specific to the client. But realm roles can be mapped to client roles to associate roles or allow inheritance. 
 
@@ -280,7 +280,7 @@ To Map Realm and client Roles
 ![List of Available Realm Roles to Map to Client Roles](/docs/rsrc/keycloak_diagrams/32-list-of-available-realm-roles.png)
 
 
-## Creating Groups
+#### Creating Groups
 Groups and Roles have a similar purpose. They both give users special and specific permissions or access to use the application in a certain way. Using Groups you can apply multiple roles to a user or group of users and make the role-assigning process efficient and easy. 
 
 To create Groups:
@@ -308,7 +308,7 @@ To create Groups:
 Now one can assign these groups to users accordingly.
 
 
-## Adjusting Optional Settings Under Realm Settings
+### Adjusting Optional Settings Under Realm Settings
 
 There are some useful realm settings to adjust. For the selected Realm Tornjak, Select "Realm settings" under the "Configure" sub-section on the left side of the panel:
 
@@ -330,7 +330,7 @@ To set Default Groups and default roles to users when they register:
 ![User Registration Realm Settings Page](/docs/rsrc/keycloak_diagrams/37-user-registration.png)
 
 
-# Creating And Registering Users
+## Creating And Registering Users
 
 Users can self-register through the Tornjak application if User registration is enabled under "Realm settings" > "Login". By default, every user has read-only access, when they register initially. And Keycloak admin can give admin roles to a Tornjak admin user that is already registered through the Tornjak Application.
 
