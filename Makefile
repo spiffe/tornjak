@@ -52,7 +52,7 @@ container-tornjak-be: bin/tornjak-backend
 container-tornjak-be-push: container-tornjak-be
 	docker push ${CONTAINER_BACKEND_TAG}
 
-release-tornjak-be-ghcr: container-backend
+release-tornjak-be-ghcr: container-tornjak-be
 	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_GHCR_IMAGEPATH}
 	docker push ${CONTAINER_BACKEND_GHCR_IMAGEPATH}
 
