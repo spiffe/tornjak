@@ -2,7 +2,7 @@
 
 | Published Date | Title | Abstract |
 |----------------| ------|----------|
-| 2022-11-16 | [Guide To Keycloak Configuration For Tornjak]() | Instructions for Keycloak Setup to support Tornjak users |
+| 2022-11-16 | [Guide To Keycloak Configuration For Tornjak](https://medium.com/universal-workload-identity/step-by-step-guide-to-setup-keycloak-configuration-for-tornjak-dbe5c3049034) | Instructions for Keycloak Setup to support Tornjak users |
 | 2022-10-26 | [Identity Access Management (IAM) Integration With Tornjak](https://medium.com/universal-workload-identity/identity-access-management-iam-integration-with-tornjak-749984966ab5) | Overview of IAM for Tornjak |
 | 2022-03-11 | [Tornjak Open Source Project](https://medium.com/universal-workload-identity/tornjak-open-source-project-under-cncf-spifee-spire-43eb974e4bc9) | Overview of Tornjak architecture |
 | 2021-09-10 | [Deploying Tornjak with Helm Charts](https://medium.com/universal-workload-identity/deploying-tornjak-with-helm-charts-e51fc21b962c) | How to deploy Tornjak with Helm charts |
