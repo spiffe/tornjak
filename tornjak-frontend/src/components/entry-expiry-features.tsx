@@ -8,6 +8,7 @@ import {
   entryExpiryUpdateFunc
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
+var moment = require('moment');
 const JSMaxSafeTime = 8640000000000 // JS cannot represent times safely larger than this
 
 type EntryExpiryProp = {
@@ -82,23 +83,23 @@ class EntryExpiryFeatures extends Component<EntryExpiryProp, EntryExpiryState> {
     this.expiryTimeUpdate(seconds)
   }
 
-  // TODO some odd behavior with dates like February 33 exists
   isValidDate(d: Date) { // date is successfully translated in Javascript
-    return d instanceof Date && !isNaN(d.getTime())
+    return d instanceof Date && !isNaN(d.getTime());
   }
 
   updateValidDateAndTime(d: string, t: string) {
-    var testDate = new Date(d + ", " + t)
+    var mo = moment(d + ' ' + t, "MM/DD/YYYY hh:mm:ss", true)
+    var testDate = mo._d; //extract date
     this.setState({ // should always reflect what the user sees
       expiryDate: d,
       expiryTime: t
     })
-    if (this.isValidDate(testDate)) {
+    if (this.isValidDate(testDate) && mo.isValid()) {
       this.setState({
         expiryInvalid: false,
       })
-      var seconds = testDate.getSeconds()
-      //var seconds = Math.round(testDate / 1000)
+      var mstoSecConvFactor = 1000;
+      var seconds = Math.floor(testDate.getTime() / mstoSecConvFactor)
       this.expiryTimeUpdate(seconds)
       console.log(d, t, this.state.expiryDate, this.state.expiryTime)
       return
@@ -164,7 +165,7 @@ class EntryExpiryFeatures extends Component<EntryExpiryProp, EntryExpiryState> {
               <div className="expiryOption-entry">
                 <TextInput
                   labelText="Enter local time [*required]"
-                  helperText="00:00:00 - 23:59:59"
+                  helperText="00:00:00 - 23:59:59 [hh:mm:ss]"
                   placeholder="hh:mm:ss"
                   //pattern={["^([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\d$"]}
                   onChange={this.onChangeExpiresAtTime}
