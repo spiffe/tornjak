@@ -27,18 +27,21 @@ describe("Cluster List Component", () => {
     })
   })
 
-  it("Should Render", () => {
-    const renderer = new ShallowRenderer()
-    const result = renderer.render(<ClusterList {...props} />)
-    expect(result).toMatchSnapshot()
-  })
-
-  describe("Should Render Individual Components", () => {
+  describe("Should Render Properly", () => {
     const wrapper = shallow(<ClusterList {...props} />)
+    
+    it("Should Render", () => {
+      expect(wrapper).toMatchSnapshot()
+    })
 
     it("Should Render List", () => {
       const clusterListComp = findByTestId(wrapper, "cluster-list")
       expect(clusterListComp.length).toBe(1)
+    })
+
+    it("Undefined Cluster List", () => {
+      props.globalClustersList = undefined
+      shallow(<ClusterList {...props} />)
     })
   })
 });

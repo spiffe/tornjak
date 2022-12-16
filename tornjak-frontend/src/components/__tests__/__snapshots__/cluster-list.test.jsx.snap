@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Cluster List Component Should Render 1`] = `
+exports[`Cluster List Component Should Render Properly Should Render 1`] = `
 <div
   data-test="cluster-list"
 >
@@ -20,7 +20,7 @@ exports[`Cluster List Component Should Render 1`] = `
   <div
     className="indvidual-list-table"
   >
-    <Memo(Connect(ClustersListTable))
+    <Connect(ClustersListTable)
       data={
         Array [
           <Cluster
