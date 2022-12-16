@@ -2,7 +2,7 @@ import { ClusterList } from "../../components/cluster-list"
 import { findByTestId, checkProps } from "../../Utils/index"
 import { shallow, configure } from "enzyme";
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17"
-import ShallowRenderer from "react-test-renderer/shallow"
+import * as IsManager from "../../components/is_manager"
 
 configure({ adapter: new Adapter() })
 
@@ -40,8 +40,28 @@ describe("Cluster List Component", () => {
     })
 
     it("Undefined Cluster List", () => {
-      props.globalClustersList = undefined
-      shallow(<ClusterList {...props} />)
+      const newProps = {...props}
+      newProps.globalClustersList = undefined
+      shallow(<ClusterList {...newProps} />)
+    })
+
+    describe("With and Without Manager", () => {
+  
+      beforeEach(() => {
+        jest.resetModules()
+      });
+  
+      test("With Manager", () => {
+        IsManager.default = true
+        shallow(<ClusterList {...props} />)
+      })
+
+      test("Without Manager", () => {
+        const newProps = {...props}
+        newProps.globalTornjakServerInfo = {info: "Info"}
+        const newWrapper = shallow(<ClusterList {...newProps} />)
+        newWrapper.instance().componentDidMount()
+      })
     })
   })
 });

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 import IsManager from './is_manager';
 import Table from "tables/clusters-list-table";
@@ -74,6 +74,7 @@ class ClusterList extends Component<ClusterListProp, ClusterListState> {
       this.TornjakApi.populateLocalClustersUpdate(this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
       if (this.props.globalTornjakServerInfo && Object.keys(this.props.globalTornjakServerInfo).length) {
         this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
+        console.log("EZ")
       }
     }
   }
