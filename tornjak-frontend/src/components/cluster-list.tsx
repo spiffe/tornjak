@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import IsManager from './is_manager';
 import Table from "tables/clusters-list-table";
 import TornjakApi from './tornjak-api-helpers';
+// import PropTypes from "prop-types"
 import {
   serverSelectedFunc,
   agentsListUpdateFunc,
@@ -136,7 +137,7 @@ class ClusterList extends Component<ClusterListProp, ClusterListState> {
 //   tornjakMessageFunc: PropTypes.func,
 //   workloadSelectorInfoFunc: PropTypes.func,
 //   agentworkloadSelectorInfoFunc: PropTypes.func,
-//   clustersListUpdateFunc: PropTypes.func,
+//   clustersListUpdateFunc: PropTypes.func
 // };
 
 const mapStateToProps = (state: RootState) => ({
@@ -150,3 +151,6 @@ export default connect(
   mapStateToProps,
   { serverSelectedFunc, agentsListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessageFunc, workloadSelectorInfoFunc, agentworkloadSelectorInfoFunc, clustersListUpdateFunc }
 )(ClusterList)
+
+// needed for unit testing 
+export { ClusterList }

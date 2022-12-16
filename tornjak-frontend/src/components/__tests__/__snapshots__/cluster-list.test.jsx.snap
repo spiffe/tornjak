@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Cluster List Component Should Render 1`] = `
+<div
+  data-test="cluster-list"
+>
+  <h3>
+    Clusters List
+  </h3>
+  <div
+    className="alert-primary"
+    role="alert"
+  >
+    <pre>
+      Test String
+    </pre>
+  </div>
+  <br />
+  <br />
+  <div
+    className="indvidual-list-table"
+  >
+    <Memo(Connect(ClustersListTable))
+      data={
+        Array [
+          <Cluster
+            cluster={Object {}}
+          />,
+        ]
+      }
+      id="table-1"
+    />
+  </div>
+</div>
+`;
