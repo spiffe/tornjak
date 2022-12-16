@@ -74,6 +74,7 @@ describe("Cluster List Component", () => {
           const prevProps = {...props}
           prevProps.globalServerSelected = "Different Test String"
           const newWrapper = shallow(<ClusterList {...props} />)
+          // Testing the update method with different parameters.
           newWrapper.instance().componentDidUpdate(prevProps)
         })
 

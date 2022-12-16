@@ -93,8 +93,7 @@ class ClusterList extends Component<ClusterListProp, ClusterListState> {
   clusterList() {
     if (typeof this.props.globalClustersList !== 'undefined') {
       return this.props.globalClustersList.map((currentCluster: ClustersList) => {
-        return <Cluster key={currentCluster.name}
-          cluster={currentCluster} />;
+        return <Cluster key={currentCluster.name} cluster={currentCluster} />;
       })
     } else {
       return ""
