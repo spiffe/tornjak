@@ -34,33 +34,50 @@ describe("Cluster List Component", () => {
       expect(wrapper).toMatchSnapshot()
     })
 
-    it("Should Render List", () => {
-      const clusterListComp = findByTestId(wrapper, "cluster-list")
-      expect(clusterListComp.length).toBe(1)
-    })
-
     it("Undefined Cluster List", () => {
       const newProps = {...props}
       newProps.globalClustersList = undefined
       shallow(<ClusterList {...newProps} />)
     })
 
-    describe("With and Without Manager", () => {
+    describe("Methods", () => {
   
       beforeEach(() => {
         jest.resetModules()
       });
+
+      describe("Mounts", () => {
+        
+        test("With Manager", () => {
+          IsManager.default = true
+          shallow(<ClusterList {...props} />)
+        })
   
-      test("With Manager", () => {
-        IsManager.default = true
-        shallow(<ClusterList {...props} />)
+        test("Without Manager", () => {
+          IsManager.default = false
+          const newProps = {...props}
+          newProps.globalTornjakServerInfo = {info: "Info"}
+          shallow(<ClusterList {...newProps} />)
+        })
       })
 
-      test("Without Manager", () => {
-        const newProps = {...props}
-        newProps.globalTornjakServerInfo = {info: "Info"}
-        const newWrapper = shallow(<ClusterList {...newProps} />)
-        newWrapper.instance().componentDidMount()
+      describe("Updates", () => {
+
+        test("With Manager", () => {
+          IsManager.default = true
+          const prevProps = {...props}
+          prevProps.globalServerSelected = "Different Test String"
+          const newWrapper = shallow(<ClusterList {...props} />)
+          newWrapper.instance().componentDidUpdate(prevProps)
+        })
+
+        test("Without Manager", () => {
+          IsManager.default = false
+          const prevProps = {...props}
+          prevProps.globalTornjakServerInfo = {info: "Info"}
+          const newWrapper = shallow(<ClusterList {...props} />)
+          newWrapper.instance().componentDidUpdate(prevProps)
+        })
       })
     })
   })
