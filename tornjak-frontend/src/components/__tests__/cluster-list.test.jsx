@@ -1,6 +1,6 @@
 import { ClusterList } from "../../components/cluster-list"
 import { checkProps, findByTestId } from "../../Utils/index"
-import { shallow, configure } from "enzyme";
+import { shallow, configure } from "enzyme"
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17"
 import * as IsManager from "../../components/is_manager"
 
@@ -13,16 +13,25 @@ const props = {
   globalServerSelected: "Test String",
   globalErrorMessage: "Test String", 
   globalTornjakServerInfo: {}, 
-  globalClustersList: [{}]
-};
+  globalClustersList: []
+}
+
+const clusterParams = {
+  name: "Name", 
+  editedName: "Edited", 
+  creationTime: "Creation", 
+  domainName: "Domain", 
+  managedBy: "Managed", 
+  platformType: "Platform", 
+  agentsList: []
+}
 
 describe("Cluster List Component", () => {
 
   describe("Checking PropTypes", () => {
-
     // Props are allowed to be undefined/missing.
     test("Should NOT throw Warning/ Error", () => {
-      const propsErr = checkProps(ClusterList, props);
+      const propsErr = checkProps(ClusterList, props)
       expect(propsErr).toBeUndefined();
     })
   })
@@ -36,11 +45,16 @@ describe("Cluster List Component", () => {
       expect(wrapper).toMatchSnapshot()
     })
 
-    it("Should Render Cluster Management Component without Errors", () => {
-      // Locates the list element containing the clusters (should be empty at start).
-      const clusterMan = findByTestId(wrapper, "cluster-management");
-      expect(clusterMan.length).toBe(0);
-    });
+    it("Cluster Validation/Adding", () => {
+      const list = wrapper.instance().props.globalClustersList
+      list.push(clusterParams)
+
+      const clusters = wrapper.instance().clusterList()
+      expect(clusters.length).toBe(1)
+
+      const cluster = clusters[0].props.cluster
+      expect(cluster).toEqual(clusterParams)
+    })
 
     it("Undefined Cluster List", () => {
       // Renders with different props to ensure the project works with multiple parameters.
@@ -88,4 +102,4 @@ describe("Cluster List Component", () => {
       })
     })
   })
-});
+})

@@ -21,13 +21,7 @@ exports[`Cluster List Component Should Render Properly Should Render 1`] = `
     className="indvidual-list-table"
   >
     <Connect(ClustersListTable)
-      data={
-        Array [
-          <Cluster
-            cluster={Object {}}
-          />,
-        ]
-      }
+      data={Array []}
       id="table-1"
     />
   </div>

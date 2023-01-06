@@ -426,4 +426,4 @@ export default connect(
   { clusterTypeInfoFunc, serverSelectedFunc, selectorInfoFunc, agentsListUpdateFunc, tornjakMessageFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc }
 )(ClusterCreate)
 
-export { ClusterCreate };
+export { ClusterCreate }

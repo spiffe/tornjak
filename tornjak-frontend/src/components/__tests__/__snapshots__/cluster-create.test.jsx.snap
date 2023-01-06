@@ -1,0 +1,169 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Cluster Create Component Should Render 1`] = `
+<div>
+  <div
+    className="cluster-create"
+    data-test="cluster-create"
+  >
+    <div
+      className="create-create-title"
+      data-test="create-title"
+    >
+      <h3>
+        Create Cluster
+      </h3>
+    </div>
+    <form
+      data-test="create-cluster-form"
+      onSubmit={[Function]}
+    >
+      <br />
+      <br />
+      <div
+        className="entry-form"
+      >
+        <div
+          className="clustername-input-field"
+          data-test="clustername-input-field"
+        >
+          <TextInput
+            aria-required="true"
+            data-test="clustername-Text-input-field"
+            helperText="i.e. exampleabc"
+            id="clusterNameInputField"
+            invalidText="A valid value is required - refer to helper text below"
+            labelText="Cluster Name [*required]"
+            onChange={[Function]}
+            placeholder="Enter CLUSTER NAME"
+            required={true}
+          />
+        </div>
+        <div
+          className="clustertype-drop-down"
+          data-test="clustertype-drop-down"
+        >
+          <Dropdown
+            aria-required="true"
+            ariaLabel="clustertype-drop-down"
+            direction="bottom"
+            disabled={false}
+            helperText=""
+            id="clustertype-drop-down"
+            itemToElement={null}
+            itemToString={[Function]}
+            items={Array []}
+            label="Select Cluster Type"
+            light={false}
+            onChange={[Function]}
+            titleText="Cluster Type [*required]"
+            type="default"
+          />
+          <p
+            className="cluster-helper"
+          >
+            i.e. Kubernetes, VMs...
+          </p>
+        </div>
+        <div
+          className="cluster-domain-name-input-field"
+          data-test="cluster-domain-name-input-field"
+        >
+          <TextInput
+            helperText="i.e. example.org"
+            id="clusterDomainNameInputField"
+            invalidText="A valid value is required - refer to helper text below"
+            labelText="Cluster Domain Name/ URL"
+            onChange={[Function]}
+            placeholder="Enter CLUSTER DOMAIN NAME/ URL"
+          />
+        </div>
+        <div
+          className="cluster-managed-by-input-field"
+        >
+          <TextInput
+            data-test="cluster-domain-name-input-text-field"
+            helperText="i.e. person-A"
+            id="clusterNameInputField"
+            invalidText="A valid value is required - refer to helper text below"
+            labelText="Cluster Managed By"
+            onChange={[Function]}
+            placeholder="Enter CLUSTER MANAGED BY"
+          />
+        </div>
+        <div
+          className="agents-multiselect"
+          data-test="agents-multiselect"
+        >
+          <FilterableMultiSelect
+            ariaLabel="Choose an item"
+            compareItems={[Function]}
+            direction="bottom"
+            disabled={false}
+            filterItems={[Function]}
+            helperText="i.e. spiffe://example.org/agent/myagent1..."
+            id="selectors-multiselect"
+            initialSelectedItems={Array []}
+            itemToString={[Function]}
+            items={
+              Array [
+                Object {},
+              ]
+            }
+            label="Select Agents"
+            light={false}
+            locale="en"
+            onChange={[Function]}
+            open={false}
+            placeholder="Select Agents"
+            selectionFeedback="top-after-reopen"
+            sortItems={[Function]}
+            titleText="Assign Agents To Cluster"
+          />
+        </div>
+        <div
+          className="selectors-textArea"
+          data-test="selectors-textArea"
+        >
+          <TextArea
+            cols={50}
+            defaultValue=""
+            disabled={true}
+            enableCounter={false}
+            helperText="i.e. spiffe://example.org/agent/myagent1..."
+            id="selectors-textArea"
+            invalid={false}
+            invalidText="A valid value is required"
+            labelText="Assigned Agents"
+            light={false}
+            onChange={[Function]}
+            onClick={[Function]}
+            placeholder="Assigned agents will be populated here - Refer to Assign Agents To Cluster"
+            rows={8}
+          />
+        </div>
+        <div
+          className="form-group"
+          data-test="create-cluster-button"
+        >
+          <input
+            className="btn btn-primary"
+            type="submit"
+            value="Create Cluster"
+          />
+        </div>
+        <div
+          data-test="success-message"
+        />
+        <div
+          className="alert-primary"
+          data-test="alert-primary"
+          role="alert"
+        >
+          <pre />
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+`;

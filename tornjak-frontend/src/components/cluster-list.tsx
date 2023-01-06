@@ -151,5 +151,4 @@ export default connect(
   { serverSelectedFunc, agentsListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessageFunc, workloadSelectorInfoFunc, agentworkloadSelectorInfoFunc, clustersListUpdateFunc }
 )(ClusterList)
 
-// needed for unit testing 
 export { ClusterList }
