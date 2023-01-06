@@ -55,8 +55,8 @@ describe("Cluster List Component", () => {
       expect(clusters.length).toBe(1)
 
       // Validates the cluster metadata
-      const cluster = clusters[0].props.cluster
-      expect(cluster).toEqual(clusterParams)
+      expect(cluster.props.cluster).toEqual(clusterParams)
+      expect(cluster.key).toBe(clusterParams.name)
     })
 
     it("Undefined Cluster List", () => {
