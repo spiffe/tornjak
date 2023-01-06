@@ -1,5 +1,5 @@
 import { ClusterList } from "../../components/cluster-list"
-import { checkProps, findByTestId } from "../../Utils/index"
+import { checkProps } from "../../Utils/index"
 import { shallow, configure } from "enzyme"
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17"
 import * as IsManager from "../../components/is_manager"
@@ -46,12 +46,15 @@ describe("Cluster List Component", () => {
     })
 
     it("Cluster Validation/Adding", () => {
+      // Manually adds cluster
       const list = wrapper.instance().props.globalClustersList
       list.push(clusterParams)
 
+      // Checks whether the cluster was added.
       const clusters = wrapper.instance().clusterList()
       expect(clusters.length).toBe(1)
 
+      // Validates the cluster metadata
       const cluster = clusters[0].props.cluster
       expect(cluster).toEqual(clusterParams)
     })
