@@ -35,6 +35,8 @@ import {
     ClickedDashboardTableAction,
     NewEntriesAction,
     GLOBAL_NEW_ENTRIES,
+    EntryExpiryAction,
+    GLOBAL_ENTRY_EXPIRY,
 } from './types';
 
 import { 
@@ -235,6 +237,17 @@ export function newEntriesUpdateFunc(globalNewEntries: EntriesList[]): ThunkActi
         dispatch({
             type: GLOBAL_NEW_ENTRIES,
             payload: globalNewEntries
+        });
+    }
+}
+
+// Expected input - entry expiry time
+// entryExpiryUpdateFunc returns the entry expiry time if set
+export function entryExpiryUpdateFunc(globalEntryExpiryTime: number): ThunkAction<void, RootState, undefined, EntryExpiryAction> {
+    return dispatch => {
+        dispatch({
+            type: GLOBAL_ENTRY_EXPIRY,
+            payload: globalEntryExpiryTime
         });
     }
 }
