@@ -9,7 +9,7 @@ import {
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
 var moment = require('moment');
-const JSMaxSafeTime = 8640000000000 // JS cannot represent times safely larger than this
+const JSMaxSafeTime = 8640000000000 // In seconds - JS cannot represent times safely larger than this
 
 type EntryExpiryProp = {
   // dispatches a payload for the entry expiry time and has a return type of void

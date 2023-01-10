@@ -859,17 +859,6 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                     </div>
                     <div className="expiresAt-input" data-test="expiresAt-input">
                       <EntryExpiryFeatures />
-                      {/* <NumberInput
-                        helperText="Entry expires at (seconds since Unix epoch)"
-                        id="expiresAt-input"
-                        invalidText="Number is not valid"
-                        label="Expires At"
-                        //max={100}
-                        min={0}
-                        step={1}
-                        value={0}
-                        onChange={this.onChangeExpiresAt}
-                      /> */}
                     </div>
                     <div className="federates-with-input-field" data-test="federates-with-input-field">
                       <TextInput
