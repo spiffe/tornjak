@@ -80,7 +80,7 @@ User Management prevents un-authorized access to Tornjak and SPIRE APIs.
 For more information on enabling the User Management and Keycloak configuration,
 please check [docs/keycloak-configuration.md](docs/keycloak-configuration.md) document.
 
-First, start Keyclaok instance locally:
+First, start Keycloak instance locally:
 
 ```
 docker run -p 8080:8080 -e KEYCLOAK_ADMIN=”username” -e KEYCLOAK_ADMIN_PASSWORD=”password” quay.io/keycloak/keycloak:19.0.1 start-dev
