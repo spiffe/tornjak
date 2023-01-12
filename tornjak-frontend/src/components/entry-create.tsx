@@ -19,7 +19,7 @@ import {
   tornjakServerInfoUpdateFunc,
   serverInfoUpdateFunc,
   agentworkloadSelectorInfoFunc,
-  newEntriesUpdateFunc
+  newEntriesUpdateFunc,
 } from 'redux/actions';
 import {
   EntriesList,
@@ -32,10 +32,13 @@ import {
   WorkloadSelectorInfoLabels,
 } from './types';
 import { RootState } from 'redux/reducers';
-import CreateEntryYaml from './entry-create-json';
+import EntryExpiryFeatures from './entry-expiry-features';
+import CreateEntryJson from './entry-create-json';
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type CreateEntryProp = {
+  // entry expiry time
+  globalEntryExpiryTime: number,
   // dispatches a payload for the server selected and has a return type of void
   serverSelectedFunc: (globalServerSelected: string) => void,
   // dispatches a payload for list of agents with their metadata info as an array of AgentListType and has a return type of void
@@ -610,7 +613,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
         "selectors": selectorEntries,
         "admin": this.state.adminFlag,
         "ttl": this.state.ttl,
-        "expires_at": this.state.expiresAt,
+        "expires_at": this.props.globalEntryExpiryTime,
         "downstream": this.state.downstream,
         "federates_with": federatedWithList,
         "dns_names": dnsNamesWithList,
@@ -724,7 +727,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           <AccordionItem
             title={<h5>Upload New Entry/ Entries</h5>} open>
             <div className="entry-form">
-              <CreateEntryYaml
+              <CreateEntryJson
                 ParentIdList={ParentIdList_noManualOption} />
               <br></br>
               {this.props.globalNewEntries.length === 0 &&
@@ -855,17 +858,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                       />
                     </div>
                     <div className="expiresAt-input" data-test="expiresAt-input">
-                      <NumberInput
-                        helperText="Entry expires at (seconds since Unix epoch)"
-                        id="expiresAt-input"
-                        invalidText="Number is not valid"
-                        label="Expires At"
-                        //max={100}
-                        min={0}
-                        step={1}
-                        value={0}
-                        onChange={this.onChangeExpiresAt}
-                      />
+                      <EntryExpiryFeatures />
                     </div>
                     <div className="federates-with-input-field" data-test="federates-with-input-field">
                       <TextInput
@@ -921,6 +914,7 @@ const mapStateToProps = (state: RootState) => ({
   globalSelectorInfo: state.servers.globalSelectorInfo,
   globalAgentsList: state.agents.globalAgentsList,
   globalEntriesList: state.entries.globalEntriesList,
+  globalEntryExpiryTime: state.entries.globalEntryExpiryTime,
   globalNewEntries: state.entries.globalNewEntries,
   globalServerInfo: state.servers.globalServerInfo,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,

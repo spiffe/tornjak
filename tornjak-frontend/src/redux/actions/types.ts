@@ -66,10 +66,12 @@ export interface ClusterTypeInfoAction extends Action<typeof GLOBAL_CLUSTER_TYPE
 // entries
 export const GLOBAL_ENTRIES_LIST = 'GLOBAL_ENTRIES_LIST';
 export const GLOBAL_NEW_ENTRIES = 'GLOBAL_NEW_ENTRIES';
+export const GLOBAL_ENTRY_EXPIRY = 'GLOBAL_ENTRY_EXPIRY';
 
 export interface EntriesReducerState {
     globalEntriesList: EntriesList[],
     globalNewEntries: EntriesList[],
+    globalEntryExpiryTime: number,
 }
 
 export interface EntriesListAction extends Action<typeof GLOBAL_ENTRIES_LIST> {
@@ -78,6 +80,10 @@ export interface EntriesListAction extends Action<typeof GLOBAL_ENTRIES_LIST> {
 
 export interface NewEntriesAction extends Action<typeof GLOBAL_NEW_ENTRIES> {
     payload: EntriesList[];
+}
+
+export interface EntryExpiryAction extends Action<typeof GLOBAL_ENTRY_EXPIRY> {
+    payload: number;
 }
 
 // servers
