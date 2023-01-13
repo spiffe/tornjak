@@ -40,7 +40,7 @@ The binary and container can be built with the following command, replacing the 
 This makes the tornjak agent + spire 1.1.3 server container:
 
 ```
-CONTAINER_TAG=tsidentity/tornjak-spire-server:latest make container-agent
+CONTAINER_BACKEND_WITH_SPIRE_TAG=tsidentity/tornjak-spire-server:latest make container-tornjak-be-spire
 ```
 
 The container is run with the same arguments as the SPIRE server image, and usage is transparent. It runs a server hosted on port 10000 accessed via http. A different spire version may be specified within the first line of the [Dockerfile.add-frontend](./Dockerfile.add-frontend#L1) file. Currently, SPIRE versions <= 1.4.0 are compatible with Tornjak.
