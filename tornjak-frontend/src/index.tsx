@@ -7,9 +7,7 @@ import KeycloakService from "./auth/KeycloakAuth";
 
 const renderApp = () =>
   ReactDOM.render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>,
+    <App />,
     document.getElementById('root')
   );
 

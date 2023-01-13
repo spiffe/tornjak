@@ -84,10 +84,10 @@ function App() {
                             <rect className="endbanneroutput"></rect>
                         </svg>
                     </div>
-                </div>
-            </Router>
-        </Provider>
-    );
+                </Router>
+            </Provider>
+        </div>
+    )
 }
 
 export default App;

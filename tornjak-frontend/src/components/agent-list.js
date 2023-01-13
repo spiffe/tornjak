@@ -4,8 +4,8 @@ import IsManager from './is_manager';
 import Table from "tables/agents-list-table";
 import { selectors, workloadSelectors, clusterType } from '../data/data';
 import TornjakApi from './tornjak-api-helpers';
-import {toast} from 'react-toastify';
-import {InlineNotification} from "carbon-components-react";
+import { toast } from 'react-toastify';
+import { InlineNotification, ToastNotification } from "carbon-components-react";
 import {
   serverSelectedFunc,
   agentsListUpdateFunc,
@@ -50,16 +50,20 @@ class AgentList extends Component {
     this.props.clusterTypeInfoFunc(clusterType); //set cluster type info
     this.props.selectorInfoFunc(selectors); //set selector info
     this.props.workloadSelectorInfoFunc(workloadSelectors); //set workload selector info
+
     if (IsManager) {
+
       if (this.props.globalServerSelected !== "") {
         this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc)
         this.TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
         this.TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
       }
+
     } else {
       this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
       this.TornjakApi.populateLocalAgentsUpdate(this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
       this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
+      
       if(this.props.globalTornjakServerInfo !== "") {
         this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
       }
@@ -72,33 +76,24 @@ class AgentList extends Component {
         this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
         this.TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
       }
-    } else {
-        if(prevProps.globalTornjakServerInfo !== this.props.globalTornjakServerInfo)
-        {
-          this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
-          this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
-        }
+    } else if (prevProps.globalTornjakServerInfo !== this.props.globalTornjakServerInfo) {
+        this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
+        this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
     }
     if (this.props.globalErrorMessage !== "OK"){
-      toast.error(this.props.globalErrorMessage);
-      toast.warn(this.props.globalErrorMessage);
-      toast.success(this.props.globalErrorMessage);
-      toast.info(this.props.globalErrorMessage);
-      // toast(<ToastNotification title="Error" caption={this.props.globalErrorMessage} />, {autoClose:false, closeButton:false});
+      toast.error("Error 123")
+      toast(<ToastNotification title="Error" caption={this.props.globalErrorMessage} />, {autoClose: false, closeButton: false});
     }
   }
 
   agentList() {
-    if (typeof this.props.globalAgentsList !== 'undefined') {
-      return this.props.globalAgentsList.map(currentAgent => {
-        return <Agent key={currentAgent.id.path}
-          agent={currentAgent}
-          banAgent={this.banAgent}
-          deleteAgent={this.deleteAgent} />;
-      })
-    } else {
-      return ""
-    }
+    if (typeof this.props.globalAgentsList === "undefined") return ""
+    return this.props.globalAgentsList.map(currentAgent => {
+      return <Agent key={currentAgent.id.path}
+        agent={currentAgent}
+        banAgent={this.banAgent}
+        deleteAgent={this.deleteAgent} />;
+    })
   }
 
   render() {

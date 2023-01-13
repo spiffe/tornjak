@@ -12,8 +12,8 @@ import {
   ClustersList
 } from './types';
 import KeycloakService from "auth/KeycloakAuth";
-const Auth_Server_Uri = process.env.REACT_APP_AUTH_SERVER_URI;
 import {logError, logDebug} from './helpers';
+const Auth_Server_Uri = process.env.REACT_APP_AUTH_SERVER_URI;
 
 type TornjakApiProp = {}
 type TornjakApiState = {}
@@ -180,7 +180,6 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       }).catch(error => {
         tornjakServerInfoUpdateFunc({ "plugins": { "DataStore": [], "KeyManager": [], "NodeAttestor": [], "NodeResolver": [], "Notifier": [] }, "trustDomain": "", "verboseConfig": "" });
         logError(error);
-        tornjakServerInfoUpdateFunc([]);
         tornjakMessageFunc("Error retrieving " + serverName + " : " + error.message);
       });
   }
@@ -246,18 +245,17 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       .then(response => {
         if (!response.data["entries"]) {
           entriesListUpdateFunc([]);
-        } else { entriesListUpdateFunc(response.data["entries"]); }
+        } else { 
+          entriesListUpdateFunc(response.data["entries"]); 
+        }
         tornjakMessageFunc(response.statusText);
       }).catch(error => {
+        logError(error)
+        entriesListUpdateFunc([])
+        tornjakMessageFunc(error.message)
         console.log(error);
         entriesListUpdateFunc([]);
-      } else {entriesListUpdateFunc(response.data["entries"]);}
-      tornjakMessageFunc(response.statusText);
-    }).catch(error => {
-      logError(error);
-      entriesListUpdateFunc([]);
-      tornjakMessageFunc(error.message);
-    })
+      })
   }
 
   // populateAgentsUpdate returns the list of agents with their info in manager mode for the selected server

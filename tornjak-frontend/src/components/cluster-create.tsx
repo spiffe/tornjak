@@ -281,7 +281,8 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
                   labelText="Cluster Name [*required]"
                   placeholder="Enter CLUSTER NAME"
                   onChange={this.onChangeClusterName}
-                  required />
+                  required 
+                />
               </div>
               <div
                 className="clustertype-drop-down"
