@@ -150,7 +150,7 @@ We first need to use the Tornjak image. This can be done by modifying the image 
       serviceAccountName: spire-server
       containers:
         - name: spire-server
-          image: gcr.io/spiffe-io/spire-server:1.0.0
+          image: ghcr.io/spiffe/spire-server:1.4.4
           args:
             - -config
             - /run/spire/config/server.conf
@@ -159,7 +159,7 @@ We first need to use the Tornjak image. This can be done by modifying the image 
 ...
 ```
 
-We want to replace the image with the Tornjak image: `ghcr.io/spiffe/tornjak-spire-server:1.0.0`
+We want to replace the image with the Tornjak image: `ghcr.io/spiffe/tornjak-spire-server:1.4.4`
 
 ```
 ➜  quickstart git:(master) cat server-statefulset.yaml
@@ -168,7 +168,7 @@ We want to replace the image with the Tornjak image: `ghcr.io/spiffe/tornjak-spi
       serviceAccountName: spire-server
       containers:
         - name: spire-server
-          image: ghcr.io/spiffe/tornjak-spire-server:1.0.0
+          image: ghcr.io/spiffe/tornjak-spire-server:1.4.4
           args:
             - -config
             - /run/spire/config/server.conf
