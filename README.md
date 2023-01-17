@@ -40,7 +40,7 @@ The binary and container can be built with the following command, replacing the 
 This makes the tornjak agent + spire 1.1.3 server container:
 
 ```
-CONTAINER_TAG=tsidentity/tornjak-spire-server:latest make container-agent
+CONTAINER_BACKEND_WITH_SPIRE_TAG=tsidentity/tornjak-spire-server:latest make container-tornjak-be-spire
 ```
 
 The container is run with the same arguments as the SPIRE server image, and usage is transparent. It runs a server hosted on port 10000 accessed via http. A different spire version may be specified within the first line of the [Dockerfile.add-frontend](./Dockerfile.add-frontend#L1) file. Currently, SPIRE versions <= 1.4.0 are compatible with Tornjak.
@@ -77,9 +77,10 @@ In this view, there is an additional navigation bar tab titled "Manage Servers" 
 
 ## Enable User Management
 User Management prevents un-authorized access to Tornjak and SPIRE APIs.
-For more information on enabling the User Management and Keycloak configuration, please check [docs/config-tornjak-agent.md](docs/config-tornjak-agent.md) document.
+For more information on enabling the User Management and Keycloak configuration,
+please check [docs/keycloak-configuration.md](docs/keycloak-configuration.md) document.
 
-First, start Keyclaok instance locally:
+First, start Keycloak instance locally:
 
 ```
 docker run -p 8080:8080 -e KEYCLOAK_ADMIN=”username” -e KEYCLOAK_ADMIN_PASSWORD=”password” quay.io/keycloak/keycloak:19.0.1 start-dev
@@ -101,7 +102,7 @@ Note: Make sure CONTAINER_TAG_FRONTEND point at your directory, as tsidentity ca
 
 ```
 CONTAINER_TAG_FRONTEND=tsidentity/tornjak-fe:latest
-make container-frontend-auth-push
+make container-frontend-push
 ```
 
 ## User Management Disabled
