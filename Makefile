@@ -14,7 +14,7 @@ CONTAINER_MANAGER_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-manager
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:latest
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
 
-all: bin/tornjak-backend bin/tornjak-manager ui-manager container-tornjak-be-spire container-manager container-frontend container-tornjak-be
+all: bin/tornjak-backend bin/tornjak-manager ui-manager container-manager container-frontend container-tornjak-be
 
 bin/tornjak-backend: $(GO_FILES) vendor
 	# Build hack because of flake of imported go module
