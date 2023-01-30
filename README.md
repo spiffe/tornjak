@@ -16,7 +16,7 @@ This can be thought about as a central management plane for identities across SP
 ## Get Started
 
 The following are guides on how to try out Tornjak:
-- [Tornjak simple deployment with SPIRE k8s quickstart](docs/spire-quickstart.md)
+- [Tornjak simple deployment with SPIRE k8s quickstart](docs/tornjak-quickstart.md)
 
 Here are a few additional resources:
 - [Tornjak basic functions demo](https://www.youtube.com/watch?v=dOdRu4psKJ8)
