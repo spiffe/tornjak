@@ -1,31 +1,34 @@
 # Contributing
 
-## Development: Building and pushing
+- Pre-built images
+- Building
+  - discuss makefile targets
+- Usage
+  - link to doc with config files + command line arguments
+  - Perhaps the UserManagement part lives here too
+- Development
+  - link to architecture of codebase
+- Testing
+  - frontend local testing section
 
-The binary and container can be built with the following command, replacing the container tag with the desired container tag of choice.
+## Pre-built images
 
+We have published prebuilt images for the components of Tornjak.  We currently support three images:
+- [Tornjak Backend](https://github.com/spiffe/tornjak/pkgs/container/tornjak-be): This image can be deployed as a sidecar with any SPIRE server. 
+- [Tornjak Manager](https://github.com/spiffe/tornjak/pkgs/container/tornjak-manager): A container that runs this image exposes a port to register multiple Tornjak backends and forward typical commands to multiple Tornjak backends from one API. 
+- [Tornjak Frontend](https://github.com/spiffe/tornjak/pkgs/container/tornjak-fe): This image is typically deployed after the Tornjak Backend or Manager are deployed, as it requires a URL to connect directly to the Tornjak backend API.  
 
-This makes the tornjak agent + spire 1.1.3 server container:
+NOTE: Previously, we had images placing the Tornjak backend and SPIRE server in the same container, but these were recently deprecated. Images other than those above are NOT currently supported. 
 
-```
-CONTAINER_BACKEND_WITH_SPIRE_TAG=tsidentity/tornjak-spire-server:latest make container-tornjak-be-spire
-```
+## Building Executables and Images
 
-The container is run with the same arguments as the SPIRE server image, and usage is transparent. It runs a server hosted on port 10000 accessed via http. A different spire version may be specified within the first line of the [Dockerfile.add-frontend](./Dockerfile.add-frontend#L1) file. Currently, SPIRE versions <= 1.4.0 are compatible with Tornjak.
+Building Tornjak can be done with the Makefile. Notable make targets follow:
+- `make bin/tornjak-backend`: makes the Go executable of the Tornjak backend
+- `make bin/tornjak-manager`: makes the Go executable of the Tornjak manager
+- `make ui-agent`: makes the ReactJS app for the Tornjak frontend
+- [TODO](TODO) include containerized images
 
-Alternatively, pre-built Tornjak images can be found at `gcr.io/spiffe-io/tornjak-spire-server:{version}`, where the specified tag denotes the supported SPIRE server version, as listed in the [SPIRE_BUILD_VERSIONS](./SPIRE_BUILD_VERSIONS) document.
-
-### Testing and validating the Tornjak front-end
-To start a local version of the Tornjak front-end server
-point at the running Tornjak APIs:
-
-```console
-cd tornjak-frontend
-REACT_APP_API_SERVER_URI=http://<tornjak_API>/  npm start
-```
-
-Assuming `npm` is installed, this will start a server on `http://localhost:3000`
-Please be patient, as it might take a few minutes to compile and start the server.
+Once built, a container may be run as is described in USAGE [TODO](TODO). 
 
 ### Running the Tornjak Manager
 Once you have a Tornjak agent running, you may run the Tornjak manager by locally running
@@ -42,6 +45,19 @@ REACT_APP_TORNJAK_MANAGER=true npm start
 ```
 
 In this view, there is an additional navigation bar tab titled "Manage Servers" where you may register Tornjak agents.  
+
+Alternatively, one may also run these components in a container. 
+
+### Testing and validating the Tornjak frontend
+To start a local version of the Tornjak frontend, one must have a point at the running Tornjak APIs:
+
+```console
+cd tornjak-frontend
+REACT_APP_API_SERVER_URI=http://<tornjak_API>/  npm start
+```
+
+Assuming `npm` is installed, this will start a server on `http://localhost:3000`
+Please be patient, as it might take a few minutes to compile and start the server.
 
 ## Enable User Management
 User Management prevents un-authorized access to Tornjak and SPIRE APIs.
