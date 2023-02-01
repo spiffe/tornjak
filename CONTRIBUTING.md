@@ -22,13 +22,21 @@ NOTE: Previously, we had images placing the Tornjak backend and SPIRE server in 
 
 ## Building Executables and Images
 
-Building Tornjak can be done with the Makefile. Notable make targets follow:
+Building Tornjak from scratch can be done with the Makefile. Notable make targets follow:
 - `make bin/tornjak-backend`: makes the Go executable of the Tornjak backend
 - `make bin/tornjak-manager`: makes the Go executable of the Tornjak manager
 - `make ui-agent`: makes the ReactJS app for the Tornjak frontend
 - [TODO](TODO) include containerized images
 
-Once built, a container may be run as is described in USAGE [TODO](TODO). 
+## Usage
+
+Once built or pulled, a container may be run as is described in our usage document
+
+## Development
+
+There are code architecture diagrams available in our [api documentation](./docs/tornjak-ui-api-documentation.md#11-overview). 
+
+
 
 ### Running the Tornjak Manager
 Once you have a Tornjak agent running, you may run the Tornjak manager by locally running
