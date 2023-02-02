@@ -19,6 +19,7 @@ type cliOptions struct {
 	genericOptions struct {
 		configFile  string // TODO change name
 		tornjakFile string
+		expandEnv   bool
 	}
 	httpOptions struct {
 		listenAddr string
@@ -48,6 +49,13 @@ func main() {
 				Value:       "",
 				Usage:       "Config file path for tornjak server",
 				Destination: &opt.genericOptions.tornjakFile,
+				Required:    false,
+			},
+			&cli.BoolFlag {
+				Name: 	     "expandEnv",
+				Value:       false,
+				Usage:       "Expansion of variables in config files",
+				Destination: &opt.genericOptions.expandEnv,
 				Required:    false,
 			},
 		},
@@ -122,13 +130,13 @@ func main() {
 
 func runTornjakCmd(cmd string, opt cliOptions) error {
 	// parse configs
-	config, err := run.ParseFile(opt.genericOptions.configFile, false)
+	config, err := run.ParseFile(opt.genericOptions.configFile, opt.genericOptions.expandEnv)
 	if err != nil {
 		// Hide internal error since it is specific to arguments of originating library
 		// i.e. asks to set -config which is a different flag in tornjak
 		return errors.New("Unable to parse the config file provided")
 	}
-	tornjakConfigs, err := parseTornjakConfig(opt.genericOptions.tornjakFile)
+	tornjakConfigs, err := parseTornjakConfig(opt.genericOptions.tornjakFile, opt.genericOptions.expandEnv)
 	if err != nil {
 		return errors.Errorf("Unable to parse the tornjak config file provided %v", err)
 	}
@@ -140,7 +148,7 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 			log.Fatalf("Error: %v", err)
 		}
 		fmt.Println(serverInfo)
-		tornjakInfo, err := getTornjakConfig(opt.genericOptions.tornjakFile)
+		tornjakInfo, err := getTornjakConfig(opt.genericOptions.tornjakFile, opt.genericOptions.expandEnv)
 		if err != nil {
 			log.Fatalf("Error: %v", err)
 		}
@@ -214,7 +222,7 @@ func getSocketPath(config *run.Config) string {
 	return "unix://" + socketPath
 }
 
-func getTornjakConfig(path string) (string, error) {
+func getTornjakConfig(path string, expandEnv bool) (string, error) {
 	if path == "" {
 		return "", nil
 	}
@@ -235,11 +243,16 @@ func getTornjakConfig(path string) (string, error) {
 	}
 	data := string(byteData)
 
+	// expand environment variables if flag is set
+	if expandEnv {
+		data = os.ExpandEnv(data)
+	}
+
 	return data, nil
 }
 
 // below copied from spire/cmd/spire-server/cli/run/run.go, but with TornjakConfig
-func parseTornjakConfig(path string) (*agentapi.TornjakConfig, error) {
+func parseTornjakConfig(path string, expandEnv bool) (*agentapi.TornjakConfig, error) {
 	c := &agentapi.TornjakConfig{}
 
 	if path == "" {
@@ -247,7 +260,7 @@ func parseTornjakConfig(path string) (*agentapi.TornjakConfig, error) {
 	}
 
 	// friendly error if file is missing
-	data, err := getTornjakConfig(path)
+	data, err := getTornjakConfig(path, expandEnv)
 	if err != nil {
 		return nil, err
 	}
