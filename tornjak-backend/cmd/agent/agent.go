@@ -130,7 +130,7 @@ func main() {
 
 func runTornjakCmd(cmd string, opt cliOptions) error {
 	// parse configs
-	config, err := run.ParseFile(opt.genericOptions.configFile, opt.genericOptions.expandEnv)
+	config, err := run.ParseFile(opt.genericOptions.configFile, false)
 	if err != nil {
 		// Hide internal error since it is specific to arguments of originating library
 		// i.e. asks to set -config which is a different flag in tornjak
