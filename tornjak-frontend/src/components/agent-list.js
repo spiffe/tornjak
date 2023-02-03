@@ -80,8 +80,9 @@ class AgentList extends Component {
         this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
         this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
     }
-    if (this.props.globalErrorMessage !== "OK"){
-      toast.error("Error 123")
+    if (this.props.globalErrorMessage !== "OK") {
+      console.log("ERROR")
+      console.log(this.props.globalErrorMessage)
       toast(<ToastNotification title="Error" caption={this.props.globalErrorMessage} />, {autoClose: false, closeButton: false});
     }
   }

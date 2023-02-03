@@ -7,6 +7,7 @@ import {
   serverSelectedFunc
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
+import { timeScale } from '@carbon/charts/configuration';
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type CreateJoinTokenProp = {
@@ -15,7 +16,7 @@ type CreateJoinTokenProp = {
 
 type CreateJoinTokenState = {
   name: string,
-  ttl: number,
+  ttl: number | string,
   token: string,
   spiffeId: string,
   trustDomain: string,
@@ -71,7 +72,7 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
 
   onChangeTtl(e: { target: { value: string; }; }): void {
     this.setState({
-      ttl: Number(e.target.value)
+      ttl: e.target.value ? Number(e.target.value) : String(e.target.value)
     });
   }
 
@@ -144,9 +145,13 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
     if (this.state.spiffeId !== "") {
       const validSpiffeId = (this.parseSpiffeId(this.state.spiffeId))[0];
       if (!validSpiffeId) {
-        this.setState({ message: "ERROR: invalid spiffe ID specified" });
+        this.setState({message: "ERROR: invalid spiffe ID specified"});
         return
       }
+    }
+    if (this.state.ttl === 0) {
+      this.setState({message: "ERROR: ttl cannot be 0"})
+      return
     }
     var cjtData = {
       "ttl": this.state.ttl,
