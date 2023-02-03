@@ -6,8 +6,7 @@ export const displayError = (caption: string, title: string = "Error", consoleMs
     console.log(consoleMsg === undefined ? "ERROR: " + caption : consoleMsg)
 }
 
-export const displayResponseError = (err: {response: {data: string, status: number}}) => {
-    const caption = "Error " + String(err.response.status)
-    console.log(caption)
-    displayError(err.response.data, caption, err.response)
+export const displayResponseError = (caption: string, err: {response: {data: string, status: number}}) => {
+    console.log("Error: " + caption)
+    displayError(err.response.data, "Error " + String(err.response.status), err.response)
 }

@@ -87,7 +87,6 @@ class EntryList extends Component<EntryListProp, EntryListState> {
   }
 
   render() {
-
     return (
       <div data-test="entry-list">
         <h3>Entries List</h3>

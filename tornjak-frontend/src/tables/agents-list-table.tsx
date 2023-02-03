@@ -10,6 +10,31 @@ import Table from './list-table';
 import { AgentsList, AgentsWorkLoadAttestorInfo } from "components/types";
 import { DenormalizedRow } from "carbon-components-react";
 import { RootState } from "redux/reducers";
+import { displayResponseError } from "components/error-api";
+
+const agents = [
+    {
+      id: '1',
+      trustdomain: "example.org",
+      spiffeid: "spiffe://example.org/sample/1",
+      info: "Dummy Data",
+      plugin: "No Plugin Configured For Agent"
+    },
+    {
+      id: '2',
+      trustdomain: "example.org",
+      spiffeid: "spiffe://example.org/sample/2",
+      info: "Dummy Data",
+      plugin: "No Plugin Configured For Agent"
+    },
+    {
+      id: '3',
+      trustdomain: "example.org",
+      spiffeid: "spiffe://example.org/sample/3",
+      info: "Dummy Data",
+      plugin: "No Plugin Configured For Agent"
+    }
+];
 
 // AgentListTable takes in 
 // listTableData: agents data to be rendered on table
@@ -91,13 +116,16 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
     }
 
     deleteAgent(selectedRows: readonly DenormalizedRow[]) {
-        var id: { path: string; trust_domain: string; }[] = [], endpoint = "", prefix = "spiffe://";
+        var id: { path: string; trust_domain: string }[] = [], endpoint = "", prefix = "spiffe://";
         let promises = [];
+
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/agent/delete') + "/" + this.props.globalServerSelected;
+
         } else {
             endpoint = GetApiServerUri('/api/agent/delete');
         }
+
         if (selectedRows !== undefined && selectedRows.length !== 0) {
             for (let i = 0; i < selectedRows.length; i++) {
                 id[i] = { "path": "", "trust_domain": "" }
@@ -124,9 +152,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
                         el.id.path !== id[i].path));
                 }
             })
-            .catch((error) => {
-                console.log(error);
-            })
+            .catch((error) => displayResponseError("Could not delete agent.", error))
     }
 
     banAgent(selectedRows: readonly DenormalizedRow[]) {
@@ -152,16 +178,13 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
                         alert("Ban SUCCESS")
                         this.componentDidMount()
                     })
-                    .catch((error) => {
-                        console.log(error);
-                    })
+                    .catch((error) => displayResponseError("Could not ban agent.", error))
             }
         } else {
             return ""
         }
     }
     render() {
-        const { listTableData } = this.state;
         const headerData = [
             {
                 header: '#No',
@@ -188,7 +211,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
             <div>
                 <Table
                     entityType={"Agent"}
-                    listTableData={listTableData}
+                    listTableData={agents}
                     headerData={headerData}
                     deleteEntity={this.deleteAgent}
                     banEntity={this.banAgent}

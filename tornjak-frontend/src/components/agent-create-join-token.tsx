@@ -131,7 +131,7 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
       const [isIdValid, trustDomain, path] = this.parseSpiffeId(this.state.spiffeId)
       
       if (!isIdValid) {
-        displayError("Invalid SPIFFE Id.")
+        displayError("Invalid SPIFFE id.")
         return
       }
 
@@ -147,7 +147,7 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
 
     axios.post(endpoint, cjtData)
       .then(res => this.setState({ message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' ') }))
-      .catch(err => displayResponseError(err))
+      .catch(err => displayResponseError("Agent creation failed.", err))
   }
 
   render() {

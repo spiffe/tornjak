@@ -34,6 +34,7 @@ import {
 import { RootState } from 'redux/reducers';
 import EntryExpiryFeatures from './entry-expiry-features';
 import CreateEntryJson from './entry-create-json';
+import { displayError, displayResponseError } from './error-api';
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type CreateEntryProp = {
@@ -414,16 +415,12 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   onChangeSelectors(e: { target: { value: string; }; }): void {
     var sid = e.target.value, selectors = "";
     selectors = sid.replace(/\n/g, ",");
-    this.setState({
-      selectors: selectors,
-    });
+    this.setState({selectors: selectors});
   }
 
   onChangeAdminFlag = (selected: boolean): void => {
     var sid = selected;
-    this.setState({
-      adminFlag: sid,
-    });
+    this.setState({adminFlag: sid,});
   }
 
   parseSpiffeId(sid: string): [boolean, string, string] {
@@ -554,7 +551,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     } else if (IsManager && this.state.selectedServer !== "") {
       return GetApiServerUri('/manager-api/entry/create') + "/" + this.state.selectedServer
     } else {
-      this.setState({ message: "Error: No server selected" })
+      displayError("No server selected.")
       return ""
     }
   }
@@ -632,12 +629,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           successJsonMessege: res.data.results[0].status.message
         })
       )
-      .catch(
-        err => this.setState({
-          message: "ERROR:" + err,
-          statusOK: "ERROR"
-        })
-      )
+      .catch(err => displayResponseError("Entry creation failed.", err))
   }
 
   onYAMLEntryCreate(): void {
@@ -668,14 +660,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           })
         }
       )
-      .catch(
-        err => {
-          this.setState({
-            message: "ERROR:" + err,
-            statusOK: "ERROR"
-          })
-        }
-      )
+      .catch(err => displayResponseError("Entry creation failed.", err))
   }
 
   render() {

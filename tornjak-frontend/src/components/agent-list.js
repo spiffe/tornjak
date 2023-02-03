@@ -4,7 +4,6 @@ import IsManager from './is_manager';
 import Table from "tables/agents-list-table";
 import { selectors, workloadSelectors, clusterType } from '../data/data';
 import TornjakApi from './tornjak-api-helpers';
-import { toast } from 'react-toastify';
 import { InlineNotification, ToastNotification } from "carbon-components-react";
 import {
   serverSelectedFunc,
@@ -50,6 +49,7 @@ class AgentList extends Component {
     this.props.clusterTypeInfoFunc(clusterType); //set cluster type info
     this.props.selectorInfoFunc(selectors); //set selector info
     this.props.workloadSelectorInfoFunc(workloadSelectors); //set workload selector info
+
     if (IsManager) {
       if (this.props.globalServerSelected !== "") {
         this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc)
@@ -60,6 +60,7 @@ class AgentList extends Component {
       this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
       this.TornjakApi.populateLocalAgentsUpdate(this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
       this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
+
       if(this.props.globalTornjakServerInfo !== "") {
         this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
       }
@@ -76,9 +77,6 @@ class AgentList extends Component {
         this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
         this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
     }
-    if (this.props.globalErrorMessage !== "OK") {
-      toast(<ToastNotification title="Error" caption={this.props.globalErrorMessage} />, {autoClose: false, closeButton: false})
-    }
   }
 
   agentList() {
@@ -87,7 +85,8 @@ class AgentList extends Component {
       return <Agent key={currentAgent.id.path}
         agent={currentAgent}
         banAgent={this.banAgent}
-        deleteAgent={this.deleteAgent} />;
+        deleteAgent={this.deleteAgent} 
+      />;
     })
   }
 
@@ -97,11 +96,6 @@ class AgentList extends Component {
         <h3>Agents List</h3>
         {this.props.globalErrorMessage !== "OK" &&
           <InlineNotification kind="error" title="Error" subtitle={this.props.globalErrorMessage} />
-          // <div className="alert-primary" role="alert">
-          //   <pre>
-          //     {this.props.globalErrorMessage}
-          //   </pre>
-          // </div>
         }
         <br /><br />
         <div className="indvidual-list-table">
@@ -121,5 +115,15 @@ const mapStateToProps = (state) => ({
 
 export default connect(
   mapStateToProps,
-  { serverSelectedFunc, agentsListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessageFunc, workloadSelectorInfoFunc, agentworkloadSelectorInfoFunc, clusterTypeInfoFunc }
+  { 
+    serverSelectedFunc, 
+    agentsListUpdateFunc, 
+    tornjakServerInfoUpdateFunc, 
+    serverInfoUpdateFunc, 
+    selectorInfoFunc, 
+    tornjakMessageFunc, 
+    workloadSelectorInfoFunc, 
+    agentworkloadSelectorInfoFunc,
+    clusterTypeInfoFunc 
+  }
 )(AgentList)

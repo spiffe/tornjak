@@ -23,6 +23,7 @@ import {
   ClustersList,
   ServerInfo,
 } from './types'
+import { displayError, displayResponseError } from './error-api';
 
 type ClusterEditProp = {
   // dispatches a payload for list of clusters with their metadata info as an array of ClustersList Type and has a return type of void
@@ -296,54 +297,53 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
     }
   }
 
-  onSubmit(e: { preventDefault: () => void; } | undefined): void {
+  onSubmit(e: {preventDefault: () => void} | undefined): void {
+
     if (e !== undefined) {
-      e.preventDefault();
+      e.preventDefault()
     }
 
-    if (this.state.originalClusterName.length === 0) {
-      this.setState({ message: "ERROR: Please Choose a Cluster" });
+    if (this.state.clusterTypeManualEntry && this.state.clusterType === this.state.clusterTypeManualEntryOption) {
+      displayError("Cluster type cannot be empty.")
       return
     }
 
-    if (this.state.clusterName.length === 0) {
-      this.setState({ message: "ERROR: Cluster Name Can Not Be Empty - Enter Cluster Name" });
+    if (!this.state.originalClusterName) {
+      displayError("Please select an existing cluster.")
       return
     }
 
-    if (this.state.clusterType.length === 0) {
-      this.setState({ message: "ERROR: Cluster Type Can Not Be Empty - Choose/ Enter Cluster Type" });
+    if (!this.state.clusterName) {
+      displayError("Cluster name cannot be empty.")
       return
     }
 
     var cjtData = {
-      "cluster": {
-        "Name": this.state.originalClusterName,
-        "EditedName": this.state.clusterName,
-        "PlatformType": this.state.clusterType,
-        "DomainName": this.state.clusterDomainName,
-        "ManagedBy": this.state.clusterManagedBy,
-        "AgentsList": this.state.clusterAgentsList
+      cluster: {
+        Name: this.state.originalClusterName,
+        EditedName: this.state.clusterName,
+        PlatformType: this.state.clusterType,
+        DomainName: this.state.clusterDomainName,
+        ManagedBy: this.state.clusterManagedBy,
+        AgentsList: this.state.clusterAgentsList
       }
     }
 
-    let endpoint = this.getApiEntryCreateEndpoint();
-    if (endpoint === "") {
+    let endpoint = this.getApiEntryCreateEndpoint()
+
+    if (!endpoint) {
       return
     }
+
     axios.post(endpoint, cjtData)
       .then(
         res => this.setState({
           message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
-          statusOK: "OK",
+          statusOK: "OK"
         })
       )
-      .catch(
-        err => this.setState({
-          message: "ERROR:" + err.response.data,
-          statusOK: "ERROR"
-        })
-      )
+      .catch(err => displayResponseError("Could not edit cluster.", err))
+
     if (IsManager) {
       if (this.props.globalServerSelected !== "" && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
         this.TornjakApi.populateClustersUpdate(this.props.globalServerSelected, this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
@@ -352,6 +352,7 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
       this.TornjakApi.populateLocalClustersUpdate(this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
     }
   }
+  
   render() {
     const ClusterNames = this.state.clusterNameList, ClusterType = this.props.clusterTypeList;
     return (
@@ -416,9 +417,7 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
                   invalidText="A valid value is required - refer to helper text below"
                   labelText="Cluster Type - Manual Entry"
                   placeholder="Enter Cluster Type"
-                  onChange={(e) => {
-                    this.onChangeManualClusterType(e);
-                  }}
+                  onChange={(e) => this.onChangeManualClusterType(e)}
                 />
               </div>}
             <div
