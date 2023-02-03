@@ -50,20 +50,16 @@ class AgentList extends Component {
     this.props.clusterTypeInfoFunc(clusterType); //set cluster type info
     this.props.selectorInfoFunc(selectors); //set selector info
     this.props.workloadSelectorInfoFunc(workloadSelectors); //set workload selector info
-
     if (IsManager) {
-
       if (this.props.globalServerSelected !== "") {
         this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc)
         this.TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
         this.TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
       }
-
     } else {
       this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
       this.TornjakApi.populateLocalAgentsUpdate(this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
       this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
-      
       if(this.props.globalTornjakServerInfo !== "") {
         this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
       }
@@ -81,9 +77,7 @@ class AgentList extends Component {
         this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
     }
     if (this.props.globalErrorMessage !== "OK") {
-      console.log("ERROR")
-      console.log(this.props.globalErrorMessage)
-      toast(<ToastNotification title="Error" caption={this.props.globalErrorMessage} />, {autoClose: false, closeButton: false});
+      toast(<ToastNotification title="Error" caption={this.props.globalErrorMessage} />, {autoClose: false, closeButton: false})
     }
   }
 

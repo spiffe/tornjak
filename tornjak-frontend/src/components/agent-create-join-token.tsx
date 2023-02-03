@@ -1,14 +1,12 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
-import {
-  serverSelectedFunc
-} from 'redux/actions';
+import { serverSelectedFunc } from 'redux/actions';
 import { RootState } from 'redux/reducers';
-import { timeScale } from '@carbon/charts/configuration';
-// import PropTypes from "prop-types"; // needed for testing will be removed on last pr
+import { displayError, displayResponseError } from '../components/error-api'
+import { GridColumnsPanel } from '@material-ui/data-grid';
 
 type CreateJoinTokenProp = {
   globalServerSelected: string,
@@ -97,35 +95,9 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
   }
 
   onChangeSpiffeId(e: { target: { value: string; }; }): void {
-    var sid = e.target.value;
-    if (sid.length === 0) {
-      this.setState({
-        spiffeId: sid,
-        trustDomain: "",
-        path: "",
-        message: "",
-      });
-      return
-    }
-
-    const [validSpiffeId, trustDomain, path] = this.parseSpiffeId(sid)
-    if (validSpiffeId) {
-      this.setState({
-        message: "",
-        spiffeId: sid,
-        trustDomain: trustDomain,
-        path: path,
-      });
-      return
-    }
-    // else invalid spiffe ID
     this.setState({
-      spiffeId: sid,
-      message: "Invalid Spiffe ID",
-      trustDomain: "",
-      path: "",
-    });
-    return
+      spiffeId: e.target.value
+    })
   }
 
   getApiTokenEndpoint(): string {
@@ -141,38 +113,41 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
 
   }
   onSubmit(e: { preventDefault: () => void; }): void {
-    e.preventDefault();
-    if (this.state.spiffeId !== "") {
-      const validSpiffeId = (this.parseSpiffeId(this.state.spiffeId))[0];
-      if (!validSpiffeId) {
-        this.setState({message: "ERROR: invalid spiffe ID specified"});
+    e.preventDefault()
+
+    if (this.state.ttl === 0) {
+      displayError("The TTL cannot be 0.")
+      return
+    }
+
+    const cjtData = {
+      ttl: this.state.ttl, 
+      trust_domain: "", 
+      path: "", 
+      token: this.state.token
+    }
+
+    if (this.state.spiffeId) {
+      const [isIdValid, trustDomain, path] = this.parseSpiffeId(this.state.spiffeId)
+      
+      if (!isIdValid) {
+        displayError("Invalid SPIFFE Id.")
         return
       }
+
+      cjtData.trust_domain = trustDomain
+      cjtData.path = path
     }
-    if (this.state.ttl === 0) {
-      this.setState({message: "ERROR: ttl cannot be 0"})
+
+    let endpoint = this.getApiTokenEndpoint()
+
+    if (!endpoint) {
       return
     }
-    var cjtData = {
-      "ttl": this.state.ttl,
-      "trust_domain": this.state.trustDomain,
-      "path": this.state.path,
-      "token": this.state.token,
-    };
-    if (this.state.trustDomain !== "" && this.state.path !== "") {
-      cjtData["trust_domain"] = this.state.trustDomain;
-      cjtData["path"] = this.state.path;
-    }
-    if (this.state.token !== "") {
-      cjtData["token"] = this.state.token;
-    }
-    let endpoint = this.getApiTokenEndpoint();
-    if (endpoint === "") {
-      return
-    }
+
     axios.post(endpoint, cjtData)
       .then(res => this.setState({ message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' ') }))
-      .catch(err => this.setState({ message: "ERROR:" + err + (typeof (err.response) !== "undefined" ? err.response.data : "") }))
+      .catch(err => displayResponseError(err))
   }
 
   render() {
