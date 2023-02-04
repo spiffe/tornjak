@@ -352,7 +352,7 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
       this.TornjakApi.populateLocalClustersUpdate(this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
     }
   }
-  
+
   render() {
     const ClusterNames = this.state.clusterNameList, ClusterType = this.props.clusterTypeList;
     return (
