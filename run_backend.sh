@@ -7,7 +7,7 @@ Usage: run_server [-c <file>] [-t <file>]
 
 -c | -config <file>: SPIRE Config File
 -t | -tornjak-config <file>: Tornjak Config File
--expandEnv | expand environment variables expressed in Tornjak Config File
+-expandEnv : if flag included, expand environment variables expressed in Tornjak Config File
 EOF
 	exit 1
 }
