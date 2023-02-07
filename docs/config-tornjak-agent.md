@@ -79,6 +79,7 @@ The following flags are available for all tornjak-agent commands:
 |:-----------------------|:-----------------------------------|:--------| :--------|
 | `-spire-config`,`-c`   | Config file path for SPIRE server  |         | True     |
 | `-tornjak-config`,`-t` | Config file path for Tornjak agent |         | True     |
+| `expandEnv`            | If flag included, expand environment variables of Tornjak config | False | False   |
 
 ### `tornjak-agent http`
 
