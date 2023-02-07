@@ -77,9 +77,9 @@ The following flags are available for all tornjak-agent commands:
 
 | Command                | Action                             | Default | Required |
 |:-----------------------|:-----------------------------------|:--------| :--------|
-| `-spire-config`,`-c`   | Config file path for SPIRE server  |         | True     |
-| `-tornjak-config`,`-t` | Config file path for Tornjak agent |         | True     |
-| `expandEnv`            | If flag included, expand environment variables of Tornjak config | False | False   |
+| `-spire-config`,`-c`   | Config file path for SPIRE server  |         | true     |
+| `-tornjak-config`,`-t` | Config file path for Tornjak agent |         | true     |
+| `-expandEnv`           | If flag included, expand environment variables in Tornjak config | false   | false    |
 
 ### `tornjak-agent http`
 
@@ -90,9 +90,9 @@ Runs the tornjak http server.
 | `-listen-addr` | listening address for tornjak agent               | :10000  | false    |
 | `-cert`        | CA Cert path for TLS                              |         | false    |
 | `-key`         | Key path for TLS                                  |         | false    |
-| `mtls-ca`      | CA path for mTLS CA                               |         | false    |
-| `tls`          | Enable TLS for http server                        | false   | false    |
-| `mtls`         | enable mTLS for http server (overwrites tls flag) | false   | false    |
+| `-mtls-ca`     | CA path for mTLS CA                               |         | false    |
+| `-tls`         | Enable TLS for http server                        | false   | false    |
+| `-mtls`        | enable mTLS for http server (overwrites tls flag) | false   | false    |
 
 ## Further reading
 
