@@ -23,7 +23,7 @@ server {
 | Type | Name | Description |
 | ---- | ---- | ----------- |
 | DataStore | [sql]() | Default SQL storage for Tornjak metadata |
-| UserManagement | [keycloak](/docs/plugin_auth_keycloak.md) | Requires JWT Bearer Access Token provided for each request |
+| UserManagement | [keycloak](/docs/plugin_server_auth_keycloak.md) | Requires JWT Bearer Access Token provided for each request |
 
 ## Plugin configuration
 
