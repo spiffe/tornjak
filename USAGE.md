@@ -11,11 +11,11 @@ NOTE: Previously, we had images placing the Tornjak backend and SPIRE server in 
 
 This is meant to be deployed where it can access a SPIRE server. To run, the container has three arguments:
 
-| Flag                 | Description                                                 | Default | Arguments | Required |
-|:---------------------|:------------------------------------------------------------|:--------|:----------|:---------|
-| `-config|-c`         | Config file path for SPIRE server                           |         | <path>    | true     |
-| `-tornjak-config|-t` | Config file path for Tornjak                                |         | <path>    | true     |
-| `-expandEnv`         | If included, expand environment variables in Tornjak config | False   |           | false    |
+| Flag                  | Description                                                 | Default | Arguments | Required |
+|:----------------------|:------------------------------------------------------------|:--------|:----------|:---------|
+| `-config\|-c`         | Config file path for SPIRE server                           |         | <path>    | true     |
+| `-tornjak-config\|-t` | Config file path for Tornjak                                |         | <path>    | true     |
+| `-expandEnv`          | If included, expand environment variables in Tornjak config | False   |           | false    |
 
 ```
 docker run -p 10000:10000 -d ghcr.io/spiffe/tornjak-be:latest -c <SPIRE CONFIG PATH> -t <TORNJAK CONFIG PATH> -expandEnv
