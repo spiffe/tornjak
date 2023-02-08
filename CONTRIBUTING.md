@@ -1,7 +1,7 @@
 # Contributing
 
-- Pre-built images
-- Building
+- [Pre-built images](./CONTRIBUTING.md#pre-built-images)
+- [Building Executables and Images from Scratch](#building-executables-and-images-from-scratch)
   - discuss makefile targets
 - Usage
   - link to doc with config files + command line arguments
@@ -15,7 +15,7 @@
 
 For a list of supported public images of Tornjak along with usage instructions please see our [USAGE document](./USAGE.md).
 
-## Building Executables and Images
+## Building Executables and Images from scratch
 
 Building Tornjak from scratch can be done with the Makefile. Notable make targets follow:
 - `make bin/tornjak-backend`: makes the Go executable of the Tornjak backend

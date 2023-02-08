@@ -39,14 +39,18 @@ This creates a service listening on container port 50000, forwarded to localhost
 
 The frontend is meant to connect to either the Tornjak backend or the Tornjak manager. To run the container, we must set some environment variables:
 
-| Variable                  | Description | Default | Argument | Required |
-|:--------------------------|-------------|--|--|--|
-| REACT_APP_API_SERVER_URI  |             |  |  |  |
-| REACT_APP_TORNJAK_MANAGER |             |  |  |  |
-| REACT_APP_AUTH_SERVER_URI |             |  |  |  |
+| Variable                    | Description | Default | Argument | Required |
+|:----------------------------|-------------|--|--|--|
+| `REACT_APP_API_SERVER_URI`  |             |  |  |  |
+| `REACT_APP_TORNJAK_MANAGER` |             |  |  |  |
+| `REACT_APP_AUTH_SERVER_URI` |             |  |  |  |
 
 ```
 docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:50000' -e REACT_APP_TORNJAK_MANAGER=true ghcr.io/spiffe/tornjak-fe:latest
 ```
 
-The above command is an example of how to run the frontend. This creates a UI available at http://localhost:3000 forwarded from container port 3000. It is listening to a Tornjak backend or manager component available at http://localhost:50000, and has 
+The above command is an example of how to run the frontend. This creates a UI available at http://localhost:3000 forwarded from container port 3000. It is listening to a Tornjak manager component available at http://localhost:50000, and knows to run in manager mode with the `REACT_APP_TORNJAK_MANAGER` flag. 
+
+## Further steps
+
+It is recommended to try a full deployment of the Tornjak frontend, backend, and SPIRE Server in minikube. Please see our [tutorial document](./docs/tornjak-quickstart.md) for step-by-step instructions
