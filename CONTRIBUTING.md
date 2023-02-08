@@ -1,54 +1,51 @@
 # Contributing
 
-- [Pre-built images](./CONTRIBUTING.md#pre-built-images)
+- [Pre-built images](#pre-built-images)
+- [Build Requirements](#build-requirements)
 - [Building Executables and Images from Scratch](#building-executables-and-images-from-scratch)
-  - discuss makefile targets
-- Usage
-  - link to doc with config files + command line arguments
-  - Perhaps the UserManagement part lives here too
-- Development
-  - link to architecture of codebase
+- [Development](#development)
 - Testing
   - frontend local testing section
+TODO - Usermanagement? currently in usage
 
 ## Pre-built images
 
 For a list of supported public images of Tornjak along with usage instructions please see our [USAGE document](./USAGE.md).
 
-## Building Executables and Images from scratch
+## Build Requirements
+
+In order to build from scratch, we require the following installations:
+- [Docker]() for the backend
+- [npm]() for the frontend
+
+## Building Executables and Images from Scratch
 
 Building Tornjak from scratch can be done with the Makefile. Notable make targets follow:
 - `make bin/tornjak-backend`: makes the Go executable of the Tornjak backend
 - `make bin/tornjak-manager`: makes the Go executable of the Tornjak manager
 - `make ui-agent`: makes the ReactJS app for the Tornjak frontend
-- [TODO](TODO) include containerized images
+- `make container-tornjak-be`: containerizes Go executable of the Tornjak backend
+- `make container-manager`:`containerizes Go executable of the Tornjak manager
+- `make container-frontend`: containerizes React JS app for the Tornjak frontend
+
+For usage instructions of the containers, please see our [USAGE document](./USAGE.md) to get started.
 
 ## Development
 
-There are code architecture diagrams available in our [api documentation](./docs/tornjak-ui-api-documentation.md#11-overview). 
+There are code architecture diagrams available in our [api documentation](./docs/tornjak-ui-api-documentation.md#11-overview).
 
+## Local testing
 
+We highly recommend starting with our [quickstart tutorial](./docs/tornjak-quickstart.md), using official images and preset configs before development. This tutorial creates a local instance of SPIRE on Minikube, adds Tornjak server, and runs a UI. 
 
-### Running the Tornjak Manager
-Once you have a Tornjak agent running, you may run the Tornjak manager by locally running
+Additionally, one may test out several other features including the following:
+- [Running the Frontend Locally](#running-the-frontend-locally)
+- [Running the Tornjak Manager Backend and Frontend Locally](#running-the-tornjak-manager)
+- [User Management](#user-management)
 
-```
-go run tornjak-backend/cmd/manager/manager.go
-```
+### Running the Frontend Locally
 
-which starts listening on port 50000. To start the manager UI, run:
-
-```
-REACT_APP_API_SERVER_URI=http://localhost:50000/
-REACT_APP_TORNJAK_MANAGER=true npm start
-```
-
-In this view, there is an additional navigation bar tab titled "Manage Servers" where you may register Tornjak agents.  
-
-Alternatively, one may also run these components in a container. 
-
-### Testing and validating the Tornjak frontend
-To start a local version of the Tornjak frontend, one must have a point at the running Tornjak APIs:
+An excellent feature for frontend development is the ability to make changes to the frontend code without needing to restart the application.  To start a local version of the Tornjak frontend, one must have it point at the running Tornjak APIs:
 
 ```console
 cd tornjak-frontend
@@ -58,52 +55,27 @@ REACT_APP_API_SERVER_URI=http://<tornjak_API>/  npm start
 Assuming `npm` is installed, this will start a server on `http://localhost:3000`
 Please be patient, as it might take a few minutes to compile and start the server.
 
-## Enable User Management
-User Management prevents un-authorized access to Tornjak and SPIRE APIs.
-For more information on enabling the User Management and Keycloak configuration,
-please check [docs/keycloak-configuration.md](docs/keycloak-configuration.md) document.
+### Running the Tornjak Manager
 
-First, start Keycloak instance locally:
+You may run the uncontainerized Tornjak manager by locally running the following:
 
 ```
-docker run -p 8080:8080 -e KEYCLOAK_ADMIN=”username” -e KEYCLOAK_ADMIN_PASSWORD=”password” quay.io/keycloak/keycloak:19.0.1 start-dev
+go run tornjak-backend/cmd/manager/manager.go
 ```
 
-Keycloak instance will start listening port on 8080
+which starts listening on port 50000.
 
-Next, start the Tornjak with Auth service:
-
-```
-cd tornjak-frontend
-REACT_APP_API_SERVER_URI=http://localhost:10000/
-REACT_APP_AUTH_SERVER_URI=http://localhost:8080/ npm start
-```
-
-To build the frontend on a container as a separate image:
-
-Note: Make sure CONTAINER_TAG_FRONTEND point at your directory, as tsidentity can only be used for pulling but not pushing.
+To start the manager UI, run:
 
 ```
-CONTAINER_TAG_FRONTEND=tsidentity/tornjak-fe:latest
-make container-frontend-push
+REACT_APP_API_SERVER_URI=http://localhost:50000/
+REACT_APP_TORNJAK_MANAGER=true npm start
 ```
 
-## User Management Disabled
+In this view, there is an additional navigation bar tab titled "Manage Servers" where you may register Tornjak agents. 
 
-To test build image locally, run:
+Alternatively, one may also run these components in a container, as is described in our [USAGE doc](./USAGE.md).
 
-```
-docker run -p 3000:3000 -d -e REACT_APP_API_SERVER_URI='http://localhost:10000' tsidentity/tornjak-fe:latest
-```
+### User Management
 
-Alternatively, to run the image with the authentication/authorization enabled on the local Keycloak instance, run:
-
-```
-docker run -p 3000:3000 -d -e REACT_APP_API_SERVER_URI='http://localhost:10000' -e REACT_APP_AUTH_SERVER_URI='http://localhost:8080' tsidentity/tornjak-fe:latest
-```
-
-This will start a server on `http://localhost:3000`
-Please be patient, as it might take a few minutes to compile and start the server.
-
-Depending on the user used to signin, there will be two different views.
-An Admin User will have an Admin portal with admin privilages and a viewer user will have restricted access for the Tornjak UI only for viewing.  
+User Management prevents un-authorized access to Tornjak and SPIRE APIs. We have several comprehensive resources for getting started with integrating user management in this [User Management documentation](./docs/user-management.md).
