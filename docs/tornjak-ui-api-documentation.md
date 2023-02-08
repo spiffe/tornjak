@@ -301,6 +301,29 @@ Content-Type: application/json; charset=utf-8
   }
 }
 ```
+
+##### /api/tornjak/clusters/list
+```
+Request 
+api/tornjak/clusters/list
+Example response:
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{
+  "clusters": [
+    {"name":"clustername",
+     "editedName":"",
+     "creationTime":"Feb 08 2023 21:02:10",
+     "domainName":"",
+     "managedBy":"",
+     "platformType":"Docker",
+     "agentsList":["agent1"]}
+  ]
+}
+```
+
+
 #### POST
 ##### /api/tornjak/selectors/register
 ```
@@ -320,6 +343,69 @@ Content-Type: application/json; charset=utf-8
 Example response:
 SUCCESS
 ```
+
+##### /api/tornjak/clusters/create
+```
+Request 
+api/tornjak/selectors/register
+Example request payload:
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{
+  "cluster": 
+  {
+    "name": "clusterName",
+    "platformType": "Docker",
+    "agentsList": ["agent1", "agent2"],
+    "domainName": "example.org",
+  }
+}
+Example response:
+SUCCESS
+```
+
+##### /api/tornjak/clusters/edit
+```
+Request 
+api/tornjak/selectors/register
+Example request payload:
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{
+  "cluster": 
+  {
+    "name": "clusterName",
+    "editedName": "newClusterName"
+    "platformType": "Docker",
+    "agentsList": ["agent1"],
+    "domainName": "example.org",
+  }
+}
+Example response:
+SUCCESS
+```
+
+##### /api/tornjak/clusters/delete
+```
+Request 
+api/tornjak/selectors/register
+Example request payload:
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{
+  "cluster": 
+  {
+    "name": "clusterName",
+  }
+}
+Example response:
+SUCCESS
+```
+
+
 
 ## 3.2. Manager API’s
 All of Tornjak agent APIs apply for manager APIs as well except that manager APIs are proxy calls of agent APIs (/manager-api/). In addition to the agent APIs manager API also includes server’s APIs as described below. 
