@@ -4,9 +4,7 @@
 - [Build Requirements](#build-requirements)
 - [Building Executables and Images from Scratch](#building-executables-and-images-from-scratch)
 - [Development](#development)
-- Testing
-  - frontend local testing section
-TODO - Usermanagement? currently in usage
+- [Local Testing](#local-testing)
 
 ## Pre-built images
 
