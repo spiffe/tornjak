@@ -1,10 +1,15 @@
 # Contributing
 
+- [Contributor Guidelines and Governance](#cnotributor-guildelines-and-governance)
 - [Pre-built images](#pre-built-images)
 - [Build Requirements](#build-requirements)
 - [Building Executables and Images from Scratch](#building-executables-and-images)
 - [Development](#development)
 - [Local Testing](#local-testing)
+
+## Contributor Guidelines and Governance
+
+Please see [CONTRIBUTING](https://github.com/spiffe/spiffe/blob/main/CONTRIBUTING.md) and [GOVERNANCE](https://github.com/spiffe/spiffe/blob/main/GOVERNANCE.md) from the SPIFFE project. 
 
 ## Pre-built images
 
@@ -32,7 +37,7 @@ For usage instructions of the containers, please see our [USAGE document](./USAG
 
 ## Development
 
-There are code architecture diagrams available in our [api documentation](./docs/tornjak-ui-api-documentation.md#11-overview).
+We welcome all development attempst and contributions from the community. The easiest place to start is by reviewing our code architecture diagrams available in our [api documentation](./docs/tornjak-ui-api-documentation.md#11-overview).
 
 ## Local testing
 
