@@ -1,6 +1,6 @@
 # Contributing
 
-- [Contributor Guidelines and Governance](#cnotributor-guildelines-and-governance)
+- [Contributor Guidelines and Governance](#contributor-guildelines-and-governance)
 - [Pre-built images](#pre-built-images)
 - [Build Requirements](#build-requirements)
 - [Building Executables and Images from Scratch](#building-executables-and-images)
