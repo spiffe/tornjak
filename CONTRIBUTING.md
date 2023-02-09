@@ -2,28 +2,30 @@
 
 - [Pre-built images](#pre-built-images)
 - [Build Requirements](#build-requirements)
-- [Building Executables and Images from Scratch](#building-executables-and-images-from-scratch)
+- [Building Executables and Images from Scratch](#building-executables-and-images)
 - [Development](#development)
 - [Local Testing](#local-testing)
 
 ## Pre-built images
 
-For a list of supported public images of Tornjak along with usage instructions please see our [USAGE document](./USAGE.md).
+You can use pre-built images for various versions and Tornjak components. For a list of supported public images of Tornjak along with usage instructions please see our [USAGE document](./USAGE.md).
+
+Otherwise, you can follow instructions below to build Tornjak images. 
 
 ## Build Requirements
 
-In order to build from scratch, we require the following installations:
+In order to build, we require the following installations:
 - [Docker]() for the backend
 - [npm]() for the frontend
 
-## Building Executables and Images from Scratch
+## Building Executables and Images
 
-Building Tornjak from scratch can be done with the Makefile. Notable make targets follow:
+Building Tornjak manually can be done with the Makefile. Notable make targets follow:
 - `make bin/tornjak-backend`: makes the Go executable of the Tornjak backend
 - `make bin/tornjak-manager`: makes the Go executable of the Tornjak manager
 - `make ui-agent`: makes the ReactJS app for the Tornjak frontend
 - `make container-tornjak-be`: containerizes Go executable of the Tornjak backend
-- `make container-manager`:`containerizes Go executable of the Tornjak manager
+- `make container-manager`:containerizes Go executable of the Tornjak manager
 - `make container-frontend`: containerizes React JS app for the Tornjak frontend
 
 For usage instructions of the containers, please see our [USAGE document](./USAGE.md) to get started.
