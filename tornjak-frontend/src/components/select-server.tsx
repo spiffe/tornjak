@@ -16,6 +16,7 @@ import {
 
 import { RootState } from 'redux/reducers';
 import { AgentsList, ServerInfo, TornjakServerInfo } from './types';
+import { displayError, displayResponseError } from './error-api';
 
 type SelectServerProp = {
     // dispatches a payload for the list of available servers and their basic info as array of strings and has a return type of void
@@ -87,9 +88,7 @@ class SelectServer extends Component<SelectServerProp, SelectServerState> {
             .then(response => {
                 this.props.serversListUpdateFunc(response.data["servers"]);
             })
-            .catch((error) => {
-                console.log(error);
-            })
+            .catch((error) => displayResponseError("Could not populate servers", error))
     }
 
     serverDropdownList() {

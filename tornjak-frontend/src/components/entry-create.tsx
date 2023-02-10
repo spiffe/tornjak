@@ -390,10 +390,10 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   }
 
   onChangeSelectorsRecommended = (selected: { selectedItems: SelectorLabels[]; } | undefined): void => {
-    if (selected === undefined) {
-      return;
-    }
-    var sid = selected.selectedItems, selectors = "", selectorsDisplay = "";
+    if (selected === undefined) return
+    
+    var sid = selected.selectedItems, selectors = "", selectorsDisplay = ""
+
     for (let i = 0; i < sid.length; i++) {
       if (i !== sid.length - 1) {
         selectors = selectors + sid[i].label + ":\n";
@@ -404,12 +404,15 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
         selectorsDisplay = selectorsDisplay + sid[i].label
       }
     }
-    if (selectorsDisplay.length === 0)
+
+    if (selectorsDisplay.length === 0) {
       selectorsDisplay = "Select Selectors"
+    }
+
     this.setState({
       selectorsRecommendationList: selectors,
       selectorsListDisplay: selectorsDisplay,
-    });
+    })
   }
 
   onChangeSelectors(e: { target: { value: string; }; }): void {

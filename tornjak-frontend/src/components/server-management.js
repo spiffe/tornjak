@@ -6,6 +6,7 @@ import IsManager from './is_manager';
 import {
   serversListUpdateFunc
 } from 'redux/actions';
+import { displayResponseError } from './error-api';
 
 const Server = props => (
   <tr>
@@ -47,9 +48,7 @@ class ServerManagement extends Component {
           console.log(response.data);
           this.props.serversListUpdateFunc(response.data["servers"]);
       })
-      .catch((error) => {
-        console.log(error);
-      })
+      .catch((error) => displayResponseError("Could not refresh server state.", error))
   }
 
   serverList() {
