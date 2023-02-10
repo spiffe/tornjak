@@ -35,6 +35,7 @@ import { RootState } from 'redux/reducers';
 import EntryExpiryFeatures from './entry-expiry-features';
 import CreateEntryJson from './entry-create-json';
 import { displayError, displayResponseError } from './error-api';
+import { ThumbsDown16 } from '@carbon/icons-react';
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type CreateEntryProp = {
@@ -111,8 +112,9 @@ type CreateEntryState = {
 }
 
 class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
-  TornjakApi: TornjakApi;
-  SpiffeHelper: SpiffeHelper;
+  TornjakApi: TornjakApi
+  SpiffeHelper: SpiffeHelper
+
   constructor(props: CreateEntryProp) {
     super(props);
     this.TornjakApi = new TornjakApi(props);
@@ -389,11 +391,9 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     });
   }
 
-  onChangeSelectorsRecommended = (selected: { selectedItems: SelectorLabels[]; } | undefined): void => {
-    if (selected === undefined) {
-      return;
-    }
-    var sid = selected.selectedItems, selectors = "", selectorsDisplay = "";
+  onChangeSelectorsRecommended = (selected: {selectedItems: SelectorLabels[]} | undefined): void => {
+    if (selected === undefined) return
+    var sid = selected.selectedItems, selectors = "", selectorsDisplay = ""
     for (let i = 0; i < sid.length; i++) {
       if (i !== sid.length - 1) {
         selectors = selectors + sid[i].label + ":\n";
@@ -412,8 +412,8 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     });
   }
 
-  onChangeSelectors(e: { target: { value: string; }; }): void {
-    var sid = e.target.value, selectors = "";
+  onChangeSelectors(e: {target: {value: string}}): void {
+    var sid = e.target.value, selectors = ""
     selectors = sid.replace(/\n/g, ",");
     this.setState({selectors: selectors});
   }
@@ -557,28 +557,31 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   }
 
   onSubmit(e: { preventDefault: () => void; }): void {
-    let selectorStrings: string[] = [], federatedWithList: string[] = [], dnsNamesWithList: string[] = [];
-    e.preventDefault();
+    let selectorStrings: string[] = []
+    let federatedWithList: string[] = []
+    let dnsNamesWithList: string[] = []
 
-    const validSpiffeId = (this.parseSpiffeId(this.state.spiffeId))[0];
-    if (!validSpiffeId) {
-      this.setState({ message: "ERROR: invalid spiffe ID specified" });
+    e.preventDefault()
+
+    if (!this.parseSpiffeId(this.state.spiffeId)[0]) {
+      displayError("Invalid SPIFFE id.")
       return
     }
 
-    const validParentId = (this.parseSpiffeId(this.state.parentId))[0];
-    if (!validParentId) {
-      this.setState({ message: "ERROR: invalid parent ID specified" });
+    if (!this.parseSpiffeId(this.state.parentId)[0]) {
+      displayError("Invalid parent id.")
       return
     }
 
     if (this.state.selectors.length !== 0) {
       selectorStrings = this.state.selectors.split(',').map(x => x.trim())
     }
-    if (selectorStrings.length === 0) {
-      this.setState({ message: "ERROR: Selectors cannot be empty" })
+
+    if (selectorStrings.length === 0 && !this.state.selectorsRecommendationList) {
+      displayError("Selectors cannot be empty.")
       return
     }
+
     const selectorEntries = selectorStrings.map(x => x.indexOf(":") > 0 ?
       {
         "type": x.substr(0, x.indexOf(":")),
@@ -586,41 +589,44 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       } : null)
 
     if (selectorEntries.some(x => x == null || x["value"].length === 0)) {
-      this.setState({ message: "ERROR: Selectors not in the correct format should be type:value" })
+      displayError("Selectors in the incorrect format should be type:value.")
       return
     }
 
     if (this.state.federatesWith.length !== 0) {
       federatedWithList = this.state.federatesWith.split(',').map((x: string) => x.trim())
     }
+
     if (this.state.dnsNames.length !== 0) {
       dnsNamesWithList = this.state.dnsNames.split(',').map((x: string) => x.trim())
     }
 
     var cjtData = {
-      "entries": [{
-        "spiffe_id": {
-          "trust_domain": this.state.spiffeIdTrustDomain,
-          "path": this.state.spiffeIdPath,
+      entries: [{
+        spiffe_id: {
+          trust_domain: this.state.spiffeIdTrustDomain,
+          path: this.state.spiffeIdPath,
         },
-        "parent_id": {
-          "trust_domain": this.state.parentIdTrustDomain,
-          "path": this.state.parentIdPath,
+        parent_id: {
+          trust_domain: this.state.parentIdTrustDomain,
+          path: this.state.parentIdPath,
         },
-        "selectors": selectorEntries,
-        "admin": this.state.adminFlag,
-        "ttl": this.state.ttl,
-        "expires_at": this.props.globalEntryExpiryTime,
-        "downstream": this.state.downstream,
-        "federates_with": federatedWithList,
-        "dns_names": dnsNamesWithList,
+        selectors: selectorEntries,
+        admin: this.state.adminFlag,
+        ttl: this.state.ttl,
+        expires_at: this.props.globalEntryExpiryTime,
+        downstream: this.state.downstream,
+        federates_with: federatedWithList,
+        dns_names: dnsNamesWithList,
       }]
     }
 
-    let endpoint = this.getApiEntryCreateEndpoint();
-    if (endpoint === "") {
+    let endpoint = this.getApiEntryCreateEndpoint()
+
+    if (!endpoint) {
       return
     }
+
     axios.post(endpoint, cjtData)
       .then(
         res => this.setState({
@@ -633,29 +639,25 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   }
 
   onYAMLEntryCreate(): void {
-    var entriesStatus: any[] = [], sucessEntriesCount = 0;
-    if (this.props.globalNewEntries === undefined) {
-      return
-    }
-    let endpoint = this.getApiEntryCreateEndpoint();
-    if (endpoint === "") {
-      return
-    }
-    var entries = { "entries": this.props.globalNewEntries };
+    if (this.props.globalNewEntries === undefined) return
+    let endpoint = this.getApiEntryCreateEndpoint()
+    if (endpoint === "") return
+    var entries = {entries: this.props.globalNewEntries}
     axios.post(endpoint, entries)
       .then(
         res => {
           console.log(res.data)
+          var entriesStatus: any[] = [], sucessEntriesCount = 0
           for (var i = 0; i < res.data.results.length; i++) {
-            entriesStatus[i] = res.data.results[i].status.message;
+            entriesStatus[i] = res.data.results[i].status.message
             if (res.data.results[i].status.message === "OK") {
-              sucessEntriesCount++;
+              sucessEntriesCount++
             }
           }
           console.log(entriesStatus)
           this.setState({
             message: "REQUEST:" + JSON.stringify(entries, null, ' ') + "\n\nRESPONSE:" + JSON.stringify(res.data, null, ' '),
-            successNumEntries: { "success": sucessEntriesCount, "fail": entries.entries.length - sucessEntriesCount },
+            successNumEntries: {success: sucessEntriesCount, fail: entries.entries.length - sucessEntriesCount },
             statusOK: "Multiple",
           })
         }
@@ -705,7 +707,6 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
               timeout={0}
               title="Entry Creation Notification"
             />
-            {window.scrollTo({ top: 0, behavior: 'smooth' })}
           </div>
         }
         <Accordion className="accordion-entry-form">

@@ -222,62 +222,44 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
   }
 
   onChangeManualClusterType(e: { target: { value: string; }; } | undefined): void {
-    if (e === undefined) {
-      return;
-    }
-    var sid = e.target.value;
-    if (sid.length === 0) {
-      this.setState({
-        clusterType: sid
-      });
-      return
-    }
-    this.setState({
-      clusterType: sid
-    });
-    return
+    if (e === undefined) return
+    this.setState({clusterType: e.target.value})
   }
 
   onChangeClusterDomainName(e: { target: { value: string; }; } | undefined): void {
-    if (e === undefined) {
-      return;
-    }
-    var sid = e.target.value;
-    this.setState({
-      clusterDomainName: sid
-    });
-    return
+    if (e === undefined) return
+    var sid = e.target.value
+    this.setState({clusterDomainName: sid})
   }
 
   onChangeClusterManagedBy(e: { target: { value: string; }; } | undefined): void {
-    if (e === undefined) {
-      return;
-    }
-    var sid = e.target.value;
-    this.setState({
-      clusterManagedBy: sid
-    });
-    return
+    if (e === undefined) return
+    var sid = e.target.value
+    this.setState({clusterManagedBy: sid})
   }
 
   onChangeAgentsList = (selected: { selectedItems: AgentLabels[]; } | undefined): void => {
-    if (selected === undefined) {
-      return;
-    }
+    if (selected === undefined) return
+
     var sid = selected.selectedItems,
       agents = [],
       agentsDisplay = "",
-      assignedAgentsDisplay = "";
-    let localAgentsIdList = [];
+      assignedAgentsDisplay = ""
+
+    let localAgentsIdList = []
+
     for (let i = 0; i < sid.length; i++) {
       localAgentsIdList[i] = sid[i].label;
     }
+
     agents = localAgentsIdList;
-    agentsDisplay = localAgentsIdList.toString();
-    assignedAgentsDisplay = localAgentsIdList.join("\n");
+    agentsDisplay = localAgentsIdList.toString()
+    assignedAgentsDisplay = localAgentsIdList.join("\n")
+
     if (agentsDisplay.length === 0) {
       agentsDisplay = "Select Agents"
     }
+
     this.setState({
       clusterAgentsList: agents,
       agentsListDisplay: agentsDisplay,
@@ -289,12 +271,12 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
   getApiEntryCreateEndpoint(): string {
     if (!IsManager) {
       return GetApiServerUri('/api/tornjak/clusters/edit')
-    } else if (IsManager && this.state.selectedServer !== "") {
+    } 
+    if (IsManager && this.state.selectedServer !== "") {
       return GetApiServerUri('/manager-api/tornjak/clusters/edit') + "/" + this.state.selectedServer
-    } else {
-      this.setState({ message: "Error: No server selected" })
-      return ""
-    }
+    } 
+    this.setState({ message: "Error: No server selected" })
+    return ""
   }
 
   onSubmit(e: {preventDefault: () => void} | undefined): void {
