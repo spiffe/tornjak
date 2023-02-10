@@ -1,4 +1,4 @@
-import React, { Component, useEffect } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
 import { Dropdown, TextInput, FilterableMultiSelect, Checkbox, TextArea, NumberInput, Accordion, AccordionItem, ToastNotification } from 'carbon-components-react';
@@ -35,7 +35,6 @@ import { RootState } from 'redux/reducers';
 import EntryExpiryFeatures from './entry-expiry-features';
 import CreateEntryJson from './entry-create-json';
 import { displayError, displayResponseError } from './error-api';
-import { selectors } from 'data/data';
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type CreateEntryProp = {
@@ -99,7 +98,7 @@ type CreateEntryState = {
   downstream: boolean,
   message: string,
   statusOK: string,
-  successNumEntries: {success: number, fail: number},
+  successNumEntries: { "success": number, "fail": number },
   successJsonMessege: string,
   selectedServer: string,
   agentsIdList: string[],
@@ -109,13 +108,11 @@ type CreateEntryState = {
   parentIDManualEntry: boolean,
   selectorsList: SelectorLabels[],
   selectorsListDisplay: string,
-  lastMessage: string
 }
 
 class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
-  TornjakApi: TornjakApi
-  SpiffeHelper: SpiffeHelper
-
+  TornjakApi: TornjakApi;
+  SpiffeHelper: SpiffeHelper;
   constructor(props: CreateEntryProp) {
     super(props);
     this.TornjakApi = new TornjakApi(props);
@@ -168,7 +165,6 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       parentIDManualEntry: false,
       selectorsList: [],
       selectorsListDisplay: "Select Selectors",
-      lastMessage: ""
     }
   }
 
@@ -236,9 +232,9 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   }
 
   prepareParentIdAgentsList(): void {
-    var idx = 0, prefix = "spiffe://"
-    let localAgentsIdList: string[] = [], localAgentsIdList_noManualOption: string[] = []
-    if (Object.keys(this.props.globalServerInfo).length === 0) return 
+    var idx = 0, prefix = "spiffe://";
+    let localAgentsIdList: string[] = [], localAgentsIdList_noManualOption: string[] = [];
+    if (Object.keys(this.props.globalServerInfo).length === 0) { return }
     //user prefered option
     localAgentsIdList[0] = this.state.parentIdManualEntryOption;
     //default option
@@ -278,55 +274,47 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   }
 
   prepareSelectorsList(): void {
-    if (this.props.globalServerInfo === undefined) return
-    if (this.props.globalAgentsList === undefined) return
-    if (this.props.globalEntriesList === undefined) return
-
-    var prefix = "spiffe://", agentSelectorSet = false
-    var parentId = this.state.parentId
-
+    if (this.props.globalServerInfo === undefined || this.props.globalAgentsList === undefined || this.props.globalEntriesList === undefined) {
+      return
+    }
+    var prefix = "spiffe://", agentSelectorSet = false;
+    var parentId = this.state.parentId;
     if (this.props.globalServerInfo !== undefined) {
-      var defaultServer = prefix + this.props.globalServerInfo.trustDomain + "/spire/server"
-      var globalAgentsWorkLoadAttestorInfo = this.props.globalAgentsWorkLoadAttestorInfo
-
+      var defaultServer = prefix + this.props.globalServerInfo.trustDomain + "/spire/server";
+      var globalAgentsWorkLoadAttestorInfo = this.props.globalAgentsWorkLoadAttestorInfo;
       if (parentId === defaultServer) {
-        if (Object.keys(this.props.globalServerInfo).length === 0) return 
-
-        let serverNodeAtt = this.props.globalServerInfo.nodeAttestorPlugin
-
+        if (Object.keys(this.props.globalServerInfo).length === 0) { return }
+        let serverNodeAtt = this.props.globalServerInfo.nodeAttestorPlugin;
         if (serverNodeAtt === "aws_iid") {
           this.setState({
             selectorsList: this.props.globalSelectorInfo["aws_iid"]
-          })
-
-        } else if (serverNodeAtt === "gcp_iit") {
+          });
+        }
+        else if (serverNodeAtt === "gcp_iit") {
           this.setState({
             selectorsList: this.props.globalSelectorInfo["gcp_iit"]
-          })
-
-        } else if (serverNodeAtt === "k8s_sat") {
+          });
+        }
+        else if (serverNodeAtt === "k8s_sat") {
           this.setState({
             selectorsList: this.props.globalSelectorInfo["k8s_sat"]
-          })
+          });
         }
         else if (serverNodeAtt === "k8s_psat") {
           this.setState({
             selectorsList: this.props.globalSelectorInfo["k8s_psat"]
-          })
+          });
         }
-
       } else if (parentId !== "") {
-        let agentId = parentId
+        let agentId = parentId;
         // Check if parent ID is not canonical ID, best effort try to match it to an Agent ID for selectors
         if (!this.props.globalAgentsList.map(e => this.SpiffeHelper.getAgentSpiffeid(e)).includes(parentId)) {
-          let fEntries = this.props.globalEntriesList.filter(e => this.SpiffeHelper.getEntrySpiffeid(e) === parentId)
-
+          let fEntries = this.props.globalEntriesList.filter(e => this.SpiffeHelper.getEntrySpiffeid(e) === parentId);
           if (fEntries.length > 0) {
-            let entry = fEntries[0]
+            let entry = fEntries[0];
             let canonicalAgentId = this.SpiffeHelper.getCanonicalAgentSpiffeid(entry, this.props.globalAgentsList)
-
             if (canonicalAgentId !== "") {
-              agentId = canonicalAgentId
+              agentId = canonicalAgentId;
             }
           }
         }
@@ -382,56 +370,57 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   }
 
   onChangeDnsNames(e: { target: { value: string; }; } | undefined): void {
-    if (e === undefined) return
-    this.setState({dnsNames: e.target.value})
-  }
-
-  onChangeFederatesWith(e: { target: { value: string; }; } | undefined): void {
-    if (e === undefined) return
-    this.setState({federatesWith: e.target.value})
-  }
-
-  onChangeSelectorsRecommended = (selected: {selectedItems: SelectorLabels[]} | undefined): void => {
-    if (selected === undefined) return
-
-    var items = selected.selectedItems
-    var selectors = this.state.selectors
-    var selectorsDisplay = this.state.selectorsListDisplay
-
-    console.log(selectors)
-    console.log(selectorsDisplay)
-    console.log(items)
-
-    for (let i = 0; i < items.length; i++) {
-
-      // Last selector
-      if (i === items.length - 1) {
-        selectors += items[i].label + ":"
-        selectorsDisplay += items[i].label
-
-      } else {
-        selectors += items[i].label + ":\n"
-        selectorsDisplay += items[i].label + ","
-      }
+    if (e === undefined) {
+      return;
     }
-
-    if (selectorsDisplay.length === 0) {
-      selectorsDisplay = "Select Selectors"
-    }
-
+    var sid = e.target.value;
     this.setState({
-      selectorsRecommendationList: selectors,
-      selectorsListDisplay: selectorsDisplay,
-      selectors: selectors
+      dnsNames: sid,
     });
   }
 
-  onChangeSelectors(e: {target: {value: string}}): void {
-    this.setState({selectors: e.target.value.replace(/\n/g, ",")});
+  onChangeFederatesWith(e: { target: { value: string; }; } | undefined): void {
+    if (e === undefined) {
+      return;
+    }
+    var sid = e.target.value;
+    this.setState({
+      federatesWith: sid,
+    });
+  }
+
+  onChangeSelectorsRecommended = (selected: { selectedItems: SelectorLabels[]; } | undefined): void => {
+    if (selected === undefined) {
+      return;
+    }
+    var sid = selected.selectedItems, selectors = "", selectorsDisplay = "";
+    for (let i = 0; i < sid.length; i++) {
+      if (i !== sid.length - 1) {
+        selectors = selectors + sid[i].label + ":\n";
+        selectorsDisplay = selectorsDisplay + sid[i].label + ",";
+      }
+      else {
+        selectors = selectors + sid[i].label + ":"
+        selectorsDisplay = selectorsDisplay + sid[i].label
+      }
+    }
+    if (selectorsDisplay.length === 0)
+      selectorsDisplay = "Select Selectors"
+    this.setState({
+      selectorsRecommendationList: selectors,
+      selectorsListDisplay: selectorsDisplay,
+    });
+  }
+
+  onChangeSelectors(e: { target: { value: string; }; }): void {
+    var sid = e.target.value, selectors = "";
+    selectors = sid.replace(/\n/g, ",");
+    this.setState({selectors: selectors});
   }
 
   onChangeAdminFlag = (selected: boolean): void => {
-    this.setState({adminFlag: selected});
+    var sid = selected;
+    this.setState({adminFlag: sid,});
   }
 
   parseSpiffeId(sid: string): [boolean, string, string] {
@@ -479,47 +468,48 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     return
   }
 
-  onChangeParentId = (selected: {selectedItem: string}): void => {
-    var prefix = "spiffe://", sid = selected.selectedItem
-
+  onChangeParentId = (selected: { selectedItem: string; }): void => {
+    var prefix = "spiffe://", sid = selected.selectedItem;
     if (sid.length === 0) {
       this.setState({
         parentId: sid,
         parentIdTrustDomain: "",
         parentIdPath: "",
         message: "",
-      })
-
-    } else if (sid === this.state.parentIdManualEntryOption) {
+      });
+      return
+    }
+    if (sid === this.state.parentIdManualEntryOption) {
       this.setState({
         parentIDManualEntry: true,
         spiffeIdPrefix: "",
         parentId: sid,
-      })
-
-    } else {
-      this.setState({parentIDManualEntry: false})
-      const [validSpiffeId, trustDomain, path] = this.parseSpiffeId(sid)
-      var spiffeIdPrefix = prefix + trustDomain + "/"
-
-      if (validSpiffeId) {
-        this.setState({
-          message: "",
-          parentId: sid,
-          parentIdTrustDomain: trustDomain,
-          parentIdPath: path,
-          spiffeIdPrefix: spiffeIdPrefix,
-        })
-
-      } else {
-        this.setState({
-          parentId: sid,
-          message: "Invalid Parent ID",
-          parentIdTrustDomain: "",
-          parentIdPath: "",
-        })
-      }
+      });
+      return
     }
+    this.setState({
+      parentIDManualEntry: false
+    });
+    const [validSpiffeId, trustDomain, path] = this.parseSpiffeId(sid)
+    var spiffeIdPrefix = prefix + trustDomain + "/";
+    if (validSpiffeId) {
+      this.setState({
+        message: "",
+        parentId: sid,
+        parentIdTrustDomain: trustDomain,
+        parentIdPath: path,
+        spiffeIdPrefix: spiffeIdPrefix,
+      });
+      return
+    }
+    // else invalid spiffe ID
+    this.setState({
+      parentId: sid,
+      message: "Invalid Parent ID",
+      parentIdTrustDomain: "",
+      parentIdPath: "",
+    });
+    return
   }
 
   onChangeManualParentId(e: { target: { value: string; }; }): void {
@@ -558,30 +548,28 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   getApiEntryCreateEndpoint(): string {
     if (!IsManager) {
       return GetApiServerUri('/api/entry/create')
-    } 
-    if (IsManager && this.state.selectedServer !== "") {
+    } else if (IsManager && this.state.selectedServer !== "") {
       return GetApiServerUri('/manager-api/entry/create') + "/" + this.state.selectedServer
-    } 
-    displayError("No server selected.")
-    return ""
+    } else {
+      displayError("No server selected.")
+      return ""
+    }
   }
 
   onSubmit(e: { preventDefault: () => void; }): void {
     let selectorStrings: string[] = []
     let federatedWithList: string[] = []
     let dnsNamesWithList: string[] = []
-
-    e.preventDefault()
-
-    console.log(this.state.selectors)
+    
+    e.preventDefault();
 
     if (!this.parseSpiffeId(this.state.spiffeId)[0]) {
-      displayError("Invalid SPIFFE id.")
+      displayError("Invalid spiffe id.")
       return
     }
 
     if (!this.parseSpiffeId(this.state.parentId)[0]) {
-      displayError("Invalid parent id.")
+      displayError("Invalid parent spiffe id.")
       return
     }
 
@@ -601,7 +589,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       } : null)
 
     if (selectorEntries.some(x => x == null || x["value"].length === 0)) {
-      displayError("Selectors in the incorrect format should be type:value.")
+      displayError("Selectors must be formatted 'type:value'")
       return
     }
 
@@ -634,55 +622,51 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     }
 
     let endpoint = this.getApiEntryCreateEndpoint()
-
-    if (!endpoint) {
+    
+    if (endpoint === "") {
       return
     }
 
     axios.post(endpoint, cjtData)
       .then(
-        res => {
-          console.log(res)
-          this.setState({
-            message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
-            statusOK: "OK",
-            successJsonMessege: res.data.results[0].status.message
-          })
-        }
+        res => this.setState({
+          message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
+          statusOK: "OK",
+          successJsonMessege: res.data.results[0].status.message
+        })
       )
-      .catch(err => displayResponseError("Manual entry creation failed.", err))
+      .catch(err => displayResponseError("Entry creation failed.", err))
   }
 
   onYAMLEntryCreate(): void {
-    if (this.props.globalNewEntries === undefined) return
-
-    let endpoint = this.getApiEntryCreateEndpoint()
-    if (endpoint === "") return
-
-    var entries = {entries: this.props.globalNewEntries}
-
+    var entriesStatus: any[] = [], sucessEntriesCount = 0;
+    if (this.props.globalNewEntries === undefined) {
+      return
+    }
+    let endpoint = this.getApiEntryCreateEndpoint();
+    if (endpoint === "") {
+      return
+    }
+    var entries = { "entries": this.props.globalNewEntries };
     axios.post(endpoint, entries)
       .then(
         res => {
           console.log(res.data)
-          var entriesStatus: any[] = [], sucessEntriesCount = 0
-
           for (var i = 0; i < res.data.results.length; i++) {
-            entriesStatus[i] = res.data.results[i].status.message
-
+            entriesStatus[i] = res.data.results[i].status.message;
             if (res.data.results[i].status.message === "OK") {
-              sucessEntriesCount++
+              sucessEntriesCount++;
             }
           }
-
+          console.log(entriesStatus)
           this.setState({
             message: "REQUEST:" + JSON.stringify(entries, null, ' ') + "\n\nRESPONSE:" + JSON.stringify(res.data, null, ' '),
-            successNumEntries: {success: sucessEntriesCount, fail: entries.entries.length - sucessEntriesCount },
+            successNumEntries: { "success": sucessEntriesCount, "fail": entries.entries.length - sucessEntriesCount },
             statusOK: "Multiple",
           })
         }
       )
-      .catch(err => displayResponseError("YAML entry creation failed.", err))
+      .catch(err => displayResponseError("Entry creation failed.", err))
   }
 
   render() {
@@ -693,7 +677,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           <h3>Create New Entry/ Entries</h3>
         </div>
         <br /><br />
-        {this.state.message !== "" && 
+        {this.state.message !== "" &&
           <div>
             <ToastNotification className="toast-entry-creation-notification"
               kind="info"
@@ -727,7 +711,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
               timeout={0}
               title="Entry Creation Notification"
             />
-            {window.scrollTo({top: 0, behavior: 'smooth'})}
+            {window.scrollTo({ top: 0, behavior: 'smooth' })}
           </div>
         }
         <Accordion className="accordion-entry-form">
@@ -953,17 +937,7 @@ const mapStateToProps = (state: RootState) => ({
 
 export default connect(
   mapStateToProps,
-  { 
-    serverSelectedFunc, 
-    agentworkloadSelectorInfoFunc, 
-    selectorInfoFunc, 
-    agentsListUpdateFunc, 
-    entriesListUpdateFunc, 
-    tornjakMessageFunc, 
-    tornjakServerInfoUpdateFunc, 
-    serverInfoUpdateFunc, 
-    newEntriesUpdateFunc 
-  }
+  { serverSelectedFunc, agentworkloadSelectorInfoFunc, selectorInfoFunc, agentsListUpdateFunc, entriesListUpdateFunc, tornjakMessageFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, newEntriesUpdateFunc }
 )(CreateEntry)
 
 export { CreateEntry }
