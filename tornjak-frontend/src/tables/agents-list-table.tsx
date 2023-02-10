@@ -156,32 +156,29 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
     }
 
     banAgent(selectedRows: readonly DenormalizedRow[]) {
-        var id: { path: string; trust_domain: string; }[] = [], i = 0, endpoint = "", prefix = "spiffe://";
+        var id: {path: string; trust_domain: string}[] = [], i = 0, endpoint = "", prefix = "spiffe://"
+
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/agent/ban') + "/" + this.props.globalServerSelected
+
         } else {
             endpoint = GetApiServerUri('/api/agent/ban')
         }
-        if (selectedRows !== undefined && selectedRows.length !== 0) {
-            for (i = 0; i < selectedRows.length; i++) {
-                id[i] = { "path": "", "trust_domain": "" }
-                id[i]["trust_domain"] = selectedRows[i].cells[1].value;
-                id[i]["path"] = selectedRows[i].cells[2].value.substr(selectedRows[i].cells[1].value.concat(prefix).length);
-                axios.post(endpoint, {
-                    "id": {
-                        "trust_domain": id[i].trust_domain,
-                        "path": id[i].path,
-                    }
+
+        if (selectedRows === undefined || !selectedRows) return ""
+
+        for (i = 0; i < selectedRows.length; i++) {
+            id[i] = {path: "", trust_domain: ""}
+            id[i].trust_domain = selectedRows[i].cells[1].value
+            id[i].path = selectedRows[i].cells[2].value.substr(selectedRows[i].cells[1].value.concat(prefix).length)
+
+            axios.post(endpoint, {id: {trust_domain: id[i].trust_domain, path: id[i].path}})
+                .then(res => {
+                    console.log(res.data)
+                    alert("Ban SUCCESS")
+                    this.componentDidMount()
                 })
-                    .then(res => {
-                        console.log(res.data)
-                        alert("Ban SUCCESS")
-                        this.componentDidMount()
-                    })
-                    .catch((error) => displayResponseError("Could not ban agent.", error))
-            }
-        } else {
-            return ""
+                .catch((error) => displayResponseError("Could not ban agent.", error))
         }
     }
     render() {
@@ -206,7 +203,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
                 header: 'Workload Attestor Plugin',
                 key: 'plugin',
             }
-        ];
+        ]
         return (
             <div>
                 <Table
@@ -218,7 +215,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
                     downloadEntity={undefined}
                 />
             </div>
-        );
+        )
     }
 }
 

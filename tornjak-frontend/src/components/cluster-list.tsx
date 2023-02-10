@@ -15,11 +15,7 @@ import {
   clustersListUpdateFunc,
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
-import {
-  ClustersList,
-  ServerInfo,
-  TornjakServerInfo,
-} from './types'
+import { ClustersList, ServerInfo, TornjakServerInfo } from './types'
 
 type ClusterListProp = {
   // dispatches a payload for list of clusters with their metadata info as an array of ClustersList Type and has a return type of void
@@ -90,14 +86,10 @@ class ClusterList extends Component<ClusterListProp, ClusterListState> {
   }
 
   clusterList() {
-    if (typeof this.props.globalClustersList !== 'undefined') {
-      return this.props.globalClustersList.map((currentCluster: ClustersList) => {
-        return <Cluster key={currentCluster.name}
-          cluster={currentCluster} />;
-      })
-    } else {
-      return ""
-    }
+    if (this.props.globalClustersList === undefined) return ""
+    return this.props.globalClustersList.map((currentCluster: ClustersList) => {
+      return <Cluster key={currentCluster.name} cluster={currentCluster} />
+    })
   }
 
   render() {
@@ -148,5 +140,15 @@ const mapStateToProps = (state: RootState) => ({
 
 export default connect(
   mapStateToProps,
-  { serverSelectedFunc, agentsListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessageFunc, workloadSelectorInfoFunc, agentworkloadSelectorInfoFunc, clustersListUpdateFunc }
+  { 
+    serverSelectedFunc, 
+    agentsListUpdateFunc, 
+    tornjakServerInfoUpdateFunc,
+    serverInfoUpdateFunc, 
+    selectorInfoFunc, 
+    tornjakMessageFunc, 
+    workloadSelectorInfoFunc, 
+    agentworkloadSelectorInfoFunc, 
+    clustersListUpdateFunc 
+  }
 )(ClusterList)

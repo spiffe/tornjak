@@ -50,7 +50,7 @@ class EntryList extends Component<EntryListProp, EntryListState> {
   constructor(props: EntryListProp) {
     super(props);
     this.TornjakApi = new TornjakApi(props);
-    this.state = {};
+    this.state = {}
   }
 
   componentDidMount() {
@@ -76,14 +76,10 @@ class EntryList extends Component<EntryListProp, EntryListState> {
   }
 
   entryList() {
-    if (typeof this.props.globalEntriesList !== 'undefined') {
-      return this.props.globalEntriesList.map((currentEntry: EntriesList) => {
-        return <Entry key={currentEntry.id}
-          entry={currentEntry} />;
-      })
-    } else {
-      return ""
-    }
+    if (this.props.globalEntriesList === undefined) return ""
+    return this.props.globalEntriesList.map((currentEntry: EntriesList) => {
+      return <Entry key={currentEntry.id} entry={currentEntry} />
+    })
   }
 
   render() {

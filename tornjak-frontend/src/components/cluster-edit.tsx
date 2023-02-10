@@ -109,38 +109,28 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
     } else {
       this.TornjakApi.populateLocalClustersUpdate(this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
     }
-    this.prepareClusterNameList();
+    this.prepareClusterNameList()
   }
 
   componentDidUpdate(prevProps: ClusterEditProp) {
     if (IsManager) {
       if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
-        this.setState({ selectedServer: this.props.globalServerSelected });
+        this.setState({selectedServer: this.props.globalServerSelected})
       }
     }
-    if (prevProps.globalClustersList !== this.props.globalClustersList) {
-      this.prepareClusterNameList();
-    }
-    if (prevProps.globalAgentsList !== this.props.globalAgentsList) {
-      this.prepareClusterNameList();
+    if (prevProps.globalClustersList !== this.props.globalClustersList || prevProps.globalAgentsList !== this.props.globalAgentsList) {
+      this.prepareClusterNameList()
     }
   }
 
   prepareClusterNameList(): void {
-    var clusters = this.props.globalClustersList;
-    if (clusters === undefined) {
-      return
-    }
-    let localClusterNameList = [];
-    if (this.props.globalServerInfo === undefined || Object.keys(this.props.globalServerInfo).length === 0) {
-      return
-    }
+    var clusters = this.props.globalClustersList
+    if (clusters === undefined || this.props.globalServerInfo === undefined || Object.keys(this.props.globalServerInfo).length === 0) return
+    let localClusterNameList = []
     for (let i = 0; i < clusters.length; i++) {
-      localClusterNameList[i] = clusters[i].name;
+      localClusterNameList[i] = clusters[i].name
     }
-    this.setState({
-      clusterNameList: localClusterNameList
-    });
+    this.setState({clusterNameList: localClusterNameList})
   }
 
   onChangeClusterNameList = (selected: { selectedItem: string }): void => {
