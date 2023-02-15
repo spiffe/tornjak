@@ -1,5 +1,6 @@
 .PHONY: ui vendor build ui-agent ui-manager container-tornjak-be-spire container-tornjak-be-spire-push container-manager container-manager-push release-tornjak-be-spire-multiversions push container-frontend container-frontend-push container-tornjak-be container-tornjak-be-push
 
+CONTAINER_TAG ?= tsidentity/tornjak:latest
 CONTAINER_BACKEND_TAG ?= tsidentity/tornjak-be:latest
 CONTAINER_BACKEND_WITH_SPIRE_TAG ?= tsidentity/tornjak-be-spire-server:latest
 CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-fe:latest
@@ -46,15 +47,13 @@ vendor:
 	go mod tidy
 	go mod vendor
 
+
+# Containerized components
 container-tornjak-be: bin/tornjak-backend
 	docker build --no-cache -f Dockerfile.backend-container -t ${CONTAINER_BACKEND_TAG} .
 
 container-tornjak-be-push: container-tornjak-be
 	docker push ${CONTAINER_BACKEND_TAG}
-
-release-tornjak-be-ghcr: container-tornjak-be
-	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_GHCR_IMAGEPATH}
-	docker push ${CONTAINER_BACKEND_GHCR_IMAGEPATH}
 
 container-tornjak-be-spire: bin/tornjak-backend
 	docker build --no-cache -f Dockerfile.add-backend -t ${CONTAINER_BACKEND_WITH_SPIRE_TAG} .
@@ -68,6 +67,17 @@ container-manager: bin/tornjak-manager ui-manager
 container-manager-push: container-manager
 	 docker push ${CONTAINER_MANAGER_TAG}
 
+container-frontend: 
+	docker build --no-cache -f Dockerfile.frontend-container -t ${CONTAINER_FRONTEND_TAG} .
+
+container-frontend-push: container-frontend
+	docker push ${CONTAINER_FRONTEND_TAG}
+
+# releases for Github Container Registry
+release-tornjak-be-ghcr: container-tornjak-be
+	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_GHCR_IMAGEPATH}
+	docker push ${CONTAINER_BACKEND_GHCR_IMAGEPATH}
+
 release-tornjak-be-spire-multiversions: bin/tornjak-backend
 	for i in $(shell cat SPIRE_BUILD_VERSIONS); do \
 		./build-and-push-versioned-container.sh $$i ${CONTAINER_BACKEND_SPIRE_VERSION_IMAGEPATH}; \
@@ -77,12 +87,6 @@ release-tornjak-be-spire-multiversions-ghcr: bin/tornjak-backend
 	for i in $(shell cat SPIRE_BUILD_VERSIONS); do \
 		./build-and-push-versioned-container.sh $$i ${CONTAINER_BACKEND_SPIRE_VERSION_GHCR_IMAGEPATH}; \
 	done
-
-container-frontend: 
-	docker build --no-cache -f Dockerfile.frontend-container -t ${CONTAINER_FRONTEND_TAG} .
-
-container-frontend-push: container-frontend
-	docker push ${CONTAINER_FRONTEND_TAG}
 
 release-tornjak-fe-ghcr: container-frontend
 	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}
