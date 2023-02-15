@@ -1,6 +1,5 @@
 FROM alpine
-RUN apk add curl
-RUN mkdir -p /opt/spire/bin
+RUN mkdir -p /opt/spire
 
 WORKDIR /opt/spire
 
