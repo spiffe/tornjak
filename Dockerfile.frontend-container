@@ -1,7 +1,6 @@
-FROM node:18.4
+FROM node:19.6
 WORKDIR /usr/src/app
-COPY tornjak-frontend ./
-RUN npm install
+COPY ui-agent ./
 
 # set env variables
 ENV REACT_APP_API_SERVER_URI $REACT_APP_API_SERVER_URI
@@ -11,4 +10,4 @@ ENV NODE_OPTIONS $NODE_OPTIONS
 EXPOSE 3000
 
 # start app
-CMD ["npm", "start"]
+CMD ["npx", "serve", "-s", "."]
