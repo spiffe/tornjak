@@ -73,7 +73,8 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
       <div className="dropdown">
         <a href="/server/manage" className="dropbtn">Manage Servers</a>
       </div>
-
+    console.log("isAdmin", isAdmin)
+    console.log("withAuth", withAuth)
     return (
       <div data-test="nav-bar">
         <div className="navigation-bar">
