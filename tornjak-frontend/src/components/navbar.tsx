@@ -75,6 +75,7 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
       </div>
     console.log("isAdmin", isAdmin)
     console.log("withAuth", withAuth)
+    console.log("!withAuth", !withAuth)
     return (
       <div data-test="nav-bar">
         <div className="navigation-bar">
@@ -83,7 +84,7 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
               <a href="/clusters" className="dropbtn">Clusters </a>
               <div className="dropdown-content">
                 <a href="/clusters" className="nav-link">Clusters List</a>
-                {(isAdmin || (withAuth === undefined)) &&
+                {(isAdmin || !withAuth) &&
                   <a href="/cluster/clustermanagement" className="nav-link">Cluster Management</a>
                 }
               </div>
@@ -92,7 +93,7 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
               <a href="/agents" className="dropbtn">Agents </a>
               <div className="dropdown-content">
                 <a href="/agents" className="nav-link">Agents List</a>
-                {(isAdmin || (withAuth === undefined)) &&
+                {(isAdmin || !withAuth) &&
                   <a href="/agent/createjointoken" className="nav-link">Create Token</a>
                 }
               </div>
@@ -101,7 +102,7 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
               <a href="/entries" className="dropbtn">Entries</a>
               <div className="dropdown-content">
                 <a href="/entries" className="nav-link">Entries List</a>
-                {(isAdmin || (withAuth === undefined)) &&
+                {(isAdmin || !withAuth) &&
                   <a href="/entry/create" className="nav-link">Create Entries</a>
                 }
               </div>
