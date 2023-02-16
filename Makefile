@@ -67,11 +67,18 @@ container-manager: bin/tornjak-manager ui-manager
 container-manager-push: container-manager
 	 docker push ${CONTAINER_MANAGER_TAG}
 
-container-frontend: 
+container-frontend: ui-agent 
 	docker build --no-cache -f Dockerfile.frontend-container -t ${CONTAINER_FRONTEND_TAG} .
 
 container-frontend-push: container-frontend
 	docker push ${CONTAINER_FRONTEND_TAG}
+
+container-tornjak: ui-agent bin/tornjak-backend 
+	docker build --no-cache -f Dockerfile.tornjak-container -t ${CONTAINER_TAG} .
+
+container-tornjak-push: container-tornjak
+	docker push ${CONTAINER_TAG}
+
 
 # releases for Github Container Registry
 release-tornjak-be-ghcr: container-tornjak-be
