@@ -4,6 +4,8 @@ import AccessNotAllowed from './AccessNotAllowed'
 import { connect } from 'react-redux';
 import { RootState } from 'redux/reducers';
 
+const Auth_Server_Uri = process.env.REACT_APP_AUTH_SERVER_URI;
+
 type RenderOnAdminRoleProp = {
     // updated user roles
     globalUserRoles: string[],
@@ -37,11 +39,14 @@ class RenderOnAdminRole extends Component<RenderOnAdminRoleProp, RenderOnAdminRo
     render() {
         return (
             <div>
-                {this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) &&
-                    this.props.children // if admin role return children
+                {!Auth_Server_Uri &&
+                    this.props.children // if No IAM return children
                 }
-                {!this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) && this.checkPath() &&
-                    <AccessNotAllowed /> // if no admin role return access not allowed
+                {this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) &&
+                    this.props.children // if IAM and admin role return children
+                }
+                {!this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) && this.checkPath() && Auth_Server_Uri &&
+                    <AccessNotAllowed /> // if IAM and no admin role return access not allowed
                 }
             </div>
         );
