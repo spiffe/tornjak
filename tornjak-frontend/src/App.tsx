@@ -17,7 +17,6 @@ import TornjakServerInfo from "./components/tornjak-server-info";
 import TornjakDashBoard from "./components/dashboard/tornjak-dashboard";
 import DashboardDetailsRender from 'components/dashboard/dashboard-details-render';
 import RenderOnAdminRole from 'components/RenderOnAdminRole'
-import { ToastContainer } from 'react-toastify';
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 
