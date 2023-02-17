@@ -12,6 +12,8 @@ const {
     TableCell,
 } = DataTable;
 
+const Auth_Server_Uri = process.env.REACT_APP_AUTH_SERVER_URI;
+
 // Body take in 
 // entityType: type of entity 
 // rows: rows of data to be rendered on table body
@@ -55,7 +57,7 @@ class Body extends React.Component<BodyProp, BodyState> {
                                     cell.value)}
                             </TableCell>
                         ))}
-                        {this.props.entityType === "Agent" && this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) &&
+                        {((this.props.entityType === "Agent" && this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles)) || (this.props.entityType && !Auth_Server_Uri)) &&
                             <TableCell>
                                 <div>
                                     <WorkLoadAttestor
