@@ -11,6 +11,7 @@ import { EntriesList } from "components/types";
 import { RootState } from "redux/reducers";
 import { DenormalizedRow } from "carbon-components-react";
 import { saveAs } from "file-saver";
+import { displayResponseError } from "components/error-api";
 
 // EntriesListTable takes in 
 // listTableData: entries data to be rendered on table
@@ -109,9 +110,7 @@ class EntriesListTable extends React.Component<EntriesListTableProp, EntriesList
                     this.props.entriesListUpdateFunc(this.props.globalEntriesList.filter(el => el.id !== responses[i].data.results[0].id))
                 }
             })
-            .catch((error) => {
-                console.log(error);
-            })
+            .catch((error) => displayResponseError("Cpuld not delete entry", error))
     }
 
     downloadEntries(selectedRows: readonly DenormalizedRow[]) {

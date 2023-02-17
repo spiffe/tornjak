@@ -114,8 +114,7 @@ class AgentList extends Component<AgentListProp, AgentListState> {
   agentList() {
     if (this.props.globalAgentsList && this.props.globalAgentsList.length) {
       return this.props.globalAgentsList.map((currentAgent: AgentsList) => {
-        return <Agent key={currentAgent.id.path}
-          agent={currentAgent} />;
+        return <Agent key={currentAgent.id.path} agent={currentAgent} />
       })
     } else {
       return ""
@@ -170,7 +169,17 @@ const mapStateToProps = (state: RootState) => ({
 
 export default connect(
   mapStateToProps,
-  { serverSelectedFunc, agentsListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessageFunc, workloadSelectorInfoFunc, agentworkloadSelectorInfoFunc, clusterTypeInfoFunc }
-)(AgentList)
+  { 
+    serverSelectedFunc, 
+    agentsListUpdateFunc, 
+    tornjakServerInfoUpdateFunc, 
+    serverInfoUpdateFunc, 
+    selectorInfoFunc, 
+    tornjakMessageFunc, 
+    workloadSelectorInfoFunc, 
+    agentworkloadSelectorInfoFunc, 
+    clusterTypeInfoFunc 
+  }
+) (AgentList)
 
-export { AgentList };
+export { AgentList }

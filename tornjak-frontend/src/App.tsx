@@ -18,6 +18,7 @@ import TornjakDashBoard from "./components/dashboard/tornjak-dashboard";
 import DashboardDetailsRender from 'components/dashboard/dashboard-details-render';
 import RenderOnAdminRole from 'components/RenderOnAdminRole'
 import './App.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
     return (
@@ -57,7 +58,7 @@ function App() {
                 </Router>
             </Provider>
         </div>
-    );
+    )
 }
 
-export default App;
+export default App

@@ -6,6 +6,7 @@ import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
 import { clusterType } from '../data/data';
+import { ToastContainer } from 'react-toastify';
 import './style.css';
 import {
   clusterTypeInfoFunc,
@@ -22,6 +23,7 @@ import {
   AgentsList, 
   ServerInfo,
   TornjakServerInfo } from './types';
+import { displayError, displayResponseError } from './error-api';
 
 type ClusterCreateProp = {
   // dispatches a payload for the server trust domain and nodeAttestorPlugin as a ServerInfoType and has a return type of void
@@ -212,38 +214,32 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
   }
 
   onSubmit(e: { preventDefault: () => void; } | undefined): void {
-    var agentsList: string[] = [];
+
     if (e !== undefined) {
       e.preventDefault();
     }
-    if (this.state.clusterName.length === 0) {
-      this.setState({ message: "ERROR: Cluster Name Can Not Be Empty - Enter Cluster Name" });
-      return
-    }
 
-    if (this.state.clusterType.length === 0) {
-      this.setState({ message: "ERROR: Cluster Type Can Not Be Empty - Choose/ Enter Cluster Type" });
+    if ((this.state.clusterTypeManualEntry && this.state.clusterType === this.state.clusterTypeManualEntryOption) || !this.state.clusterType) {
+      displayError("Cluster type cannot be empty.")
       return
-    }
-
-    if (this.state.clusterAgentsList.length !== 0) {
-      agentsList = this.state.clusterAgentsList;
     }
 
     var cjtData = {
-      "cluster": {
-        "name": this.state.clusterName,
-        "platformType": this.state.clusterType,
-        "domainName": this.state.clusterDomainName,
-        "managedBy": this.state.clusterManagedBy,
-        "agentsList": agentsList
+      cluster: {
+        name: this.state.clusterName,
+        platformType: this.state.clusterType,
+        domainName: this.state.clusterDomainName,
+        managedBy: this.state.clusterManagedBy,
+        agentsList: this.state.clusterAgentsList ? this.state.clusterAgentsList : []
       }
     }
 
-    let endpoint = this.getApiEntryCreateEndpoint();
-    if (endpoint === "") {
+    let endpoint = this.getApiEntryCreateEndpoint()
+
+    if (!endpoint) {
       return
     }
+
     axios.post(endpoint, cjtData)
       .then(
         res => this.setState({
@@ -251,13 +247,9 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
           statusOK: "OK",
         })
       )
-      .catch(
-        err => this.setState({
-          message: "ERROR:" + err.response.data,
-          statusOK: "ERROR"
-        })
-      )
+      .catch(err => displayResponseError("Cluster creation failed.", err))
   }
+
   render() {
     const ClusterType = this.props.clusterTypeList;
     return (
@@ -281,7 +273,9 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
                   labelText="Cluster Name [*required]"
                   placeholder="Enter CLUSTER NAME"
                   onChange={this.onChangeClusterName}
-                  required />
+                  role="cluster-name"
+                  required 
+                />
               </div>
               <div
                 className="clustertype-drop-down"
@@ -294,11 +288,12 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
                   label="Select Cluster Type"
                   titleText="Cluster Type [*required]"
                   onChange={this.onChangeClusterType}
+                  role="cluster-type"
                   //required // typescript throws an error when enabled - need to explore more to enable feature for now "aria-required" is enabled
                 />
                 <p className="cluster-helper">i.e. Kubernetes, VMs...</p>
               </div>
-              {this.state.clusterTypeManualEntry === true &&
+              {this.state.clusterTypeManualEntry &&
                 <div className="clustertype-manual-input-field">
                   <TextInput
                     helperText="i.e. Kubernetes, VMs..."
@@ -378,6 +373,11 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
             </div>
           </form>
         </div>
+        <ToastContainer
+          className="carbon-toast"
+          containerId="notifications"
+          draggable={false}
+        />
       </div>
     )
   }
@@ -426,4 +426,4 @@ export default connect(
   { clusterTypeInfoFunc, serverSelectedFunc, selectorInfoFunc, agentsListUpdateFunc, tornjakMessageFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc }
 )(ClusterCreate)
 
-export { ClusterCreate };
+export { ClusterCreate }
