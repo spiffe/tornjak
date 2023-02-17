@@ -12,30 +12,6 @@ import { DenormalizedRow } from "carbon-components-react";
 import { RootState } from "redux/reducers";
 import { displayResponseError } from "components/error-api";
 
-const agents = [
-    {
-      id: '1',
-      trustdomain: "example.org",
-      spiffeid: "spiffe://example.org/sample/1",
-      info: "Dummy Data",
-      plugin: "No Plugin Configured For Agent"
-    },
-    {
-      id: '2',
-      trustdomain: "example.org",
-      spiffeid: "spiffe://example.org/sample/2",
-      info: "Dummy Data",
-      plugin: "No Plugin Configured For Agent"
-    },
-    {
-      id: '3',
-      trustdomain: "example.org",
-      spiffeid: "spiffe://example.org/sample/3",
-      info: "Dummy Data",
-      plugin: "No Plugin Configured For Agent"
-    }
-];
-
 // AgentListTable takes in 
 // listTableData: agents data to be rendered on table
 // returns agents data inside a carbon component table with specified functions
@@ -182,6 +158,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
         }
     }
     render() {
+        const { listTableData } = this.state;
         const headerData = [
             {
                 header: '#No',
@@ -208,7 +185,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
             <div>
                 <Table
                     entityType={"Agent"}
-                    listTableData={agents}
+                    listTableData={listTableData}
                     headerData={headerData}
                     deleteEntity={this.deleteAgent}
                     banEntity={this.banAgent}
