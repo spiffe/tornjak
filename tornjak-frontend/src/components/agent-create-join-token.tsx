@@ -6,7 +6,6 @@ import IsManager from './is_manager';
 import { serverSelectedFunc } from 'redux/actions';
 import { RootState } from 'redux/reducers';
 import { displayError, displayResponseError } from '../components/error-api'
-import { GridColumnsPanel } from '@material-ui/data-grid';
 
 type CreateJoinTokenProp = {
   globalServerSelected: string,

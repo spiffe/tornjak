@@ -6,6 +6,7 @@ import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
 import { clusterType } from '../data/data';
+import { ToastContainer } from 'react-toastify';
 import './style.css';
 import {
   clusterTypeInfoFunc,
@@ -257,7 +258,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
           <div className="create-create-title" data-test="create-title">
             <h3>Create Cluster</h3>
           </div>
-          <form onSubmit={this.onSubmit} data-test="create-cluster-form">
+          <form onSubmit={this.onSubmit} data-test="create-cluster-form" role="form">
             <br /><br />
             <div className="entry-form">
               <div
@@ -272,6 +273,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
                   labelText="Cluster Name [*required]"
                   placeholder="Enter CLUSTER NAME"
                   onChange={this.onChangeClusterName}
+                  role="cluster-name"
                   required 
                 />
               </div>
@@ -286,6 +288,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
                   label="Select Cluster Type"
                   titleText="Cluster Type [*required]"
                   onChange={this.onChangeClusterType}
+                  role="cluster-type"
                   //required // typescript throws an error when enabled - need to explore more to enable feature for now "aria-required" is enabled
                 />
                 <p className="cluster-helper">i.e. Kubernetes, VMs...</p>
@@ -352,7 +355,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
                 />
               </div>
               <div className="form-group" data-test="create-cluster-button">
-                <input type="submit" value="Create Cluster" className="btn btn-primary" />
+                <input type="submit" value="Create Cluster" className="btn btn-primary" role="create-cluster-button" />
               </div>
               <div data-test="success-message">
                 {this.state.statusOK === "OK" &&
@@ -370,6 +373,11 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
             </div>
           </form>
         </div>
+        <ToastContainer
+          className="carbon-toast"
+          containerId="notifications"
+          draggable={false}
+        />
       </div>
     )
   }
@@ -418,4 +426,4 @@ export default connect(
   { clusterTypeInfoFunc, serverSelectedFunc, selectorInfoFunc, agentsListUpdateFunc, tornjakMessageFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc }
 )(ClusterCreate)
 
-export { ClusterCreate };
+export { ClusterCreate }

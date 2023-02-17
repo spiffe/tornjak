@@ -3,13 +3,6 @@ import PropTypes from 'prop-types';
 import { Popper, Typography, Paper } from '@material-ui/core';
 import Box from '@mui/material/Box';
 
-function isOverflown(element) {
-    return (
-      element.scrollHeight > element.clientHeight ||
-      element.scrollWidth > element.clientWidth
-    );
-}
-
 const GridCellExpand = React.memo(function GridCellExpand(props) {
     const { width, value } = props;
     const cellValue = React.useRef(null);

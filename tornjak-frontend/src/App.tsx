@@ -56,15 +56,10 @@ function App() {
                             </svg>
                         </div>
                     </div>
-                    <ToastContainer
-                        className="carbon-toast"
-                        containerId="notifications"
-                        draggable={false}
-                    />
                 </Router>
             </Provider>
         </div>
     )
 }
 
-export default App;
+export default App

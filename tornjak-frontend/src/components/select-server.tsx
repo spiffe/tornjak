@@ -16,7 +16,7 @@ import {
 
 import { RootState } from 'redux/reducers';
 import { AgentsList, ServerInfo, TornjakServerInfo } from './types';
-import { displayError, displayResponseError } from './error-api';
+import { displayResponseError } from './error-api';
 
 type SelectServerProp = {
     // dispatches a payload for the list of available servers and their basic info as array of strings and has a return type of void

@@ -12,7 +12,7 @@ import {
   ClustersList
 } from './types';
 import KeycloakService from "auth/KeycloakAuth";
-import {logError, logDebug} from './helpers';
+import { logError } from './helpers';
 import { displayResponseError } from './error-api';
 const Auth_Server_Uri = process.env.REACT_APP_AUTH_SERVER_URI;
 

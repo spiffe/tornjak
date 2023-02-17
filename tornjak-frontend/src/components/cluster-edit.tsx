@@ -5,6 +5,7 @@ import { Dropdown, TextInput, FilterableMultiSelect, TextArea } from 'carbon-com
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
+import { ToastContainer } from 'react-toastify';
 import './style.css';
 import {
   clustersListUpdateFunc,
@@ -465,6 +466,11 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
             </div>
           </div>
         </form>
+        <ToastContainer
+          className="carbon-toast"
+          containerId="notifications"
+          draggable={false}
+        />
       </div>
     )
   }
