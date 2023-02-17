@@ -4,7 +4,7 @@ import IsManager from './is_manager';
 import Table from "tables/agents-list-table";
 import { selectors, workloadSelectors, clusterType } from '../data/data';
 import TornjakApi from './tornjak-api-helpers';
-import { InlineNotification, ToastNotification } from "carbon-components-react";
+import { InlineNotification } from "carbon-components-react";
 import {
   serverSelectedFunc,
   agentsListUpdateFunc,

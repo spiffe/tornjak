@@ -49,10 +49,7 @@ class RenderOnAdminRole extends Component<RenderOnAdminRoleProp, RenderOnAdminRo
 }
 
 const mapStateToProps = (state: RootState) => ({
-    globalUserRoles: state.auth.globalUserRoles,
+    globalUserRoles: state.auth.globalUserRoles
 })
 
-export default connect(
-    mapStateToProps,
-    {}
-)(RenderOnAdminRole)
+export default connect(mapStateToProps, {})(RenderOnAdminRole)
