@@ -20,8 +20,9 @@ Otherwise, you can follow instructions below to build Tornjak images.
 ## Build Requirements
 
 In order to build, we require the following installations:
-- [Docker]() for the backend
-- [npm]() for the frontend
+- [Docker](https://docs.docker.com/engine/install/) for the backend build
+- [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for the frontend
+- [Golang](https://go.dev/doc/install) is required if you would like to run the Go backends locally
 
 ## Building Executables and Images
 
@@ -45,8 +46,11 @@ We highly recommend starting with our [quickstart tutorial](./docs/tornjak-quick
 
 Additionally, one may test out several other features including the following:
 - [Running the Frontend Locally](#running-the-frontend-locally)
-- [Running the Tornjak Manager Backend and Frontend Locally](#running-the-tornjak-manager)
+- [Running the Backend Locally](#running-the-backend-locally)
+- [Running the Tornjak Manager Locally](#running-the-tornjak-manager)
 - [User Management](#user-management)
+
+Usage documentation for each of the Tornjak components can be found in our [Usage document](./USAGE.md).
 
 ### Running the Frontend Locally
 
@@ -59,6 +63,16 @@ REACT_APP_API_SERVER_URI=http://<tornjak_API>/  npm start
 
 Assuming `npm` is installed, this will start a server on `http://localhost:3000`
 Please be patient, as it might take a few minutes to compile and start the server.
+
+### Running the Backend Locally
+
+The backend may also be run locally as well. 
+
+```console
+go run tornjak-backend/cmd/agent/agent.go
+```
+
+Note, the above command will print out usage documentation for the server. Please see our [Usage document](./USAGE.md) for more information.  Additionally, full functionality of the server requires a SPIRE server to be running. 
 
 ### Running the Tornjak Manager
 
@@ -83,4 +97,4 @@ Alternatively, one may also run these components in a container, as is described
 
 ### User Management
 
-User Management prevents un-authorized access to Tornjak and SPIRE APIs. We have several comprehensive resources for getting started with integrating user management in this [User Management documentation](./docs/user-management.md).
+User Management is an optional feature that prevents un-authorized access to Tornjak and SPIRE APIs. We have several comprehensive resources for getting started with integrating user management in this [User Management documentation](./docs/user-management.md).
