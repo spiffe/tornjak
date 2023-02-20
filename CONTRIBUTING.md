@@ -72,7 +72,7 @@ The backend may also be run locally as well.
 go run tornjak-backend/cmd/agent/agent.go
 ```
 
-Note, the above command will print out usage documentation for the server. Please see our [Usage document](./USAGE.md) for more information.  Additionally, full functionality of the server requires a SPIRE server to be running. 
+Note, the above command will print out usage documentation for the server. Please see our documentation for the backend [here](./docs/config-tornjak-agent.md) for more information.  Additionally, full functionality of the server requires a SPIRE server to be running. 
 
 ### Running the Tornjak Manager
 

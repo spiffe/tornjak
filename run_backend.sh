@@ -5,9 +5,9 @@ usage() {
 	cat << EOF >&2
 Usage: run_server [-c <file>] [-t <file>]
 
--config,-c <file>: SPIRE Config File
--tornjak-config,-t <file>: Tornjak Config File
--expandEnv : if flag included, expand environment variables expressed in Tornjak Config File
+--config,-c <file>: SPIRE Config File
+--tornjak-config,-t <file>: Tornjak Config File
+--expandEnv : if flag included, expand environment variables expressed in Tornjak Config File
 EOF
 	exit 1
 }
@@ -20,18 +20,18 @@ key="$1"
 
 
 case $key in
-	-c|-config)
+	-c|--config)
 	SPIRE_CONFIG="$2"
 	shift
 	shift
 	;;
-	-t|-tornjak-config)
+	-t|--tornjak-config)
 	TORNJAK_CONFIG="$2"
 	shift
 	shift
 	;;
-	-expandEnv)
-	EXPAND_ENV="-expandEnv"
+	--expandEnv)
+	EXPAND_ENV="--expandEnv"
 	shift
 	;;
 	*)
