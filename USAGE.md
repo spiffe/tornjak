@@ -13,8 +13,8 @@ This is meant to be deployed where it can access a SPIRE server. To run, the con
 
 | Flag                  | Description                                                 | Default | Arguments | Required |
 |:----------------------|:------------------------------------------------------------|:--------|:----------|:---------|
-| `-config\|-c`         | Config file path for SPIRE server                           |         | <path>    | true     |
-| `-tornjak-config\|-t` | Config file path for Tornjak (see our [configuration reference](./docs/config-tornjak-agent.md)) | | <path> | false |
+| `-config\|-c`         | Config file path for SPIRE server                           |         | \<path\>  | true     |
+| `-tornjak-config\|-t` | Config file path for Tornjak (see our [configuration reference](./docs/config-tornjak-agent.md)) | | \<path\> | false |
 | `-expandEnv`          | If included, expand environment variables in Tornjak config | False   |           | false    |
 
 ```
