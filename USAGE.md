@@ -41,9 +41,9 @@ The frontend is meant to connect to either the Tornjak backend or the Tornjak ma
 
 | Variable                    | Description | Default | Argument | Required |
 |:----------------------------|-------------|--|--|--|
-| `REACT_APP_API_SERVER_URI`  |             |  |  |  |
-| `REACT_APP_TORNJAK_MANAGER` |             |  |  |  |
-| `REACT_APP_AUTH_SERVER_URI` |             |  |  |  |
+| `REACT_APP_API_SERVER_URI`  | URI for the Tornjak backend or Manager to connect to |   | `http://localhost:10000` | true |
+| `REACT_APP_TORNJAK_MANAGER` | Boolean for whether the connected server is a manager | false | `true` | false |
+| `REACT_APP_AUTH_SERVER_URI` | URI for the Keycloak instance to obtain access tokens | `` | `http://localhost:8080` | false |
 
 ```
 docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:50000' -e REACT_APP_TORNJAK_MANAGER=true ghcr.io/spiffe/tornjak-fe:latest
