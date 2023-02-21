@@ -5,14 +5,13 @@ usage() {
 	cat << EOF >&2
 Usage: run_server [-c <file>] [-t <file>]
 
--c | -config <file>: SPIRE Config File
--t | -tornjak-config <file>: Tornjak Config File
+-config,-c <file>: SPIRE Config File
+-tornjak-config,-t <file>: Tornjak Config File
 EOF
 	exit 1
 }
 
 # argument parse
-
 while [[ $# -gt 0 ]]
 do
 key="$1"
