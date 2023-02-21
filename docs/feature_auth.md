@@ -36,7 +36,7 @@ To configure the Auth server, please see our [Medium blog](https://medium.com/un
 
 Once the Auth server is set up, we can deploy the backend to require access tokens from our auth server, as detailed in [this followup Medium blog](https://medium.com/universal-workload-identity/guide-to-integrating-tornjak-with-keycloak-for-access-control-to-spire-40a3d5ee5f5a), with more details on the general configuration [here](https://github.com/spiffe/tornjak/blob/main/docs/config-tornjak-agent.md). 
 
-Finally, the frontend must be deployed and configured to obtain access tokens from this auth server. This can be done locally with the environment variable `REACT_APP_AUTH_SERVER_URI`:
+Finally, the frontend must be deployed and configured to obtain access tokens from this auth server. More complete details of this are in [this Medium blog](https://medium.com/universal-workload-identity/guide-to-integrating-tornjak-with-keycloak-for-access-control-to-spire-40a3d5ee5f5a). This can be done locally with the environment variable `REACT_APP_AUTH_SERVER_URI`:
 
 ```
 cd tornjak-frontend
