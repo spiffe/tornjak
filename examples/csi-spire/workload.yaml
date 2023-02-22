@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example-workload
+spec:
+  containers:
+  - name: example-workload
+    image: spiffe-csi-driver-example-workload:example
+    imagePullPolicy: Never
+    volumeMounts:
+    - name: spiffe-workload-api
+      mountPath: /spiffe-workload-api
+      readOnly: true
+    env:
+    - name: SPIFFE_ENDPOINT_SOCKET
+      value: unix:///spiffe-workload-api/spire-agent.sock
+  volumes:
+  - name: spiffe-workload-api
+    csi:
+      driver: "csi.spiffe.io"
+      readOnly: true
