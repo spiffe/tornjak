@@ -1,19 +1,26 @@
-import { toast, ToastOptions } from "react-toastify"
-import { ToastNotification } from "carbon-components-react"
+import { toast, ToastContent, ToastOptions } from "react-toastify"
+import { ToastNotification, ToastNotificationProps } from "carbon-components-react"
 
-const options: ToastOptions = {
-    autoClose: false, 
-    closeButton: false, 
-    role: "error"
+interface NotificationProps extends Omit<ToastNotificationProps, "title"> {
+    title?: string
 }
 
-export const displayError = (caption: string, title: string = "Error", consoleMsg?: any) => {
-    toast(<ToastNotification title={title} caption={caption}/>, options)
-    console.log(consoleMsg === undefined ? "ERROR: " + caption : consoleMsg)
+const defualtProps: ToastNotificationProps = {title: "Notification", kind: "error"}
+const defaultOptions: ToastContent = {autoClose: false, closeButton: false, role: "alert"}
+
+export const showToast = (props?: NotificationProps, options?: ToastOptions): void => {
+    const newProps = {...defualtProps, ...props}
+    toast(<ToastNotification {...newProps} />, {...defaultOptions, ...options})
 }
 
-export const displayResponseError = (caption: string, err: {response: {data: string, status: number}}) => {
-    if (!err.response) return
-    console.log("Error: " + caption)
-    displayError(err.response.data, "Error " + String(err.response.status), err.response)
+type Error = {response: {data: string, status: number}}
+
+const defaultResponseProps = (error: Error): NotificationProps => {
+    return {caption: error.response.data, title: "Error " + String(error.response.status)}
+}
+
+export const showResponseToast = (error: Error, props?: NotificationProps, options?: ToastOptions): void => {
+    showToast({...defaultResponseProps(error), ...props}, options)
+    console.log("Encountered a backend error...")
+    console.log(error.response)
 }

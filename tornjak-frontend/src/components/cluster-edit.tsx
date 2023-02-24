@@ -23,8 +23,8 @@ import {
   AgentsList,
   ClustersList,
   ServerInfo,
-} from './types'
-import { displayError, displayResponseError } from './error-api';
+} from './types';
+import { showResponseToast, showToast } from './error-api';
 
 type ClusterEditProp = {
   // dispatches a payload for list of clusters with their metadata info as an array of ClustersList Type and has a return type of void
@@ -270,22 +270,22 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
     }
 
     if (!this.state.originalClusterName) {
-      displayError("Please select an existing cluster.")
+      showToast({caption: "Please select an existing cluster."})
       return
     }
 
     if (!this.state.clusterName) {
-      displayError("The new cluster name cannot be empty.")
+      showToast({caption: "The new cluster name cannot be empty."})
       return
     }
 
     if (this.state.clusterTypeManualEntry && this.state.clusterType === this.state.clusterTypeManualEntryOption) {
-      displayError("Cluster type cannot be empty.")
+      showToast({caption: "The cluster type cannot be empty."})
       return
     }
 
     if (!this.state.clusterName) {
-      displayError("Cluster name cannot be empty.")
+      showToast({caption: "The cluster name cannot be empty."})
       return
     }
 
@@ -313,7 +313,7 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
           statusOK: "OK"
         })
       )
-      .catch(err => displayResponseError("Could not edit cluster.", err))
+      .catch(err => showResponseToast(err))
 
     if (IsManager) {
       if (this.props.globalServerSelected !== "" && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {

@@ -23,7 +23,7 @@ import {
     AgentsList,
 } from './types';
 import { RootState } from 'redux/reducers';
-import { displayError } from './error-api';
+import { showToast } from './error-api';
 
 type CreateEntryJsonProp = {
     // dispatches a payload for list of new entries uploaded with their metadata info as an array of EntriesListType and has a return type of void
@@ -178,7 +178,7 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                 // populate first entry
                 this.setSelectedEntriesIds(0, 0, parsedData.entries[0])
             } catch (e) {
-                displayError("Encountered a parse error.")
+                showToast({caption: "Encountered a parse error."})
                 console.log(e)
                 this.setState({
                     parseError: true,
