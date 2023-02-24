@@ -120,8 +120,8 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
       return
     }
 
-    if (this.state.ttl === 0) {
-      showToast({caption: "The TTL cannot be zero."})
+    if (this.state.ttl <= 0) {
+      showToast({caption: "The TTL must be positive."})
       return
     }
 
