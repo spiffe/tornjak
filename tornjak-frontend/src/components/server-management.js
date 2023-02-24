@@ -48,7 +48,7 @@ class ServerManagement extends Component {
           console.log(response.data);
           this.props.serversListUpdateFunc(response.data["servers"]);
       })
-      .catch((error) => showResponseToast(error))
+      .catch((error) => showResponseToast(error, {caption: "Couldn't refresh server state."}))
   }
 
   serverList() {

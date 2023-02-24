@@ -13,14 +13,14 @@ export const showToast = (props?: NotificationProps, options?: ToastOptions): vo
     toast(<ToastNotification {...newProps} />, {...defaultOptions, ...options})
 }
 
-type Error = {response: {data: string, status: number}}
+type Response = {response: {data: string, status: number}}
 
-const defaultResponseProps = (error: Error): NotificationProps => {
-    return {caption: error.response.data, title: "Error " + String(error.response.status)}
+const defaultResponseProps = (res: Response): NotificationProps => {
+    return {caption: res.response.data, title: "Error " + String(res.response.status)}
 }
 
-export const showResponseToast = (error: Error, props?: NotificationProps, options?: ToastOptions): void => {
-    showToast({...defaultResponseProps(error), ...props}, options)
-    console.log("Encountered a backend error...")
-    console.log(error.response)
+export const showResponseToast = (res: Response, props?: NotificationProps, options?: ToastOptions): void => {
+    if (props && props.caption !== undefined) console.log(props.caption)
+    showToast({...defaultResponseProps(res), ...props}, options)
+    console.log(res.response)
 }

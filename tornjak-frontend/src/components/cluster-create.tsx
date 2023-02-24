@@ -248,10 +248,12 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
 
     axios.post(endpoint, cjtData)
       .then(
-        res => this.setState({
+        res => {
+          this.setState({
           message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
           statusOK: "OK",
         })
+      }
       )
       .catch(err => showResponseToast(err))
   }
