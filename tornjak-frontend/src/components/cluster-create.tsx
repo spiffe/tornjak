@@ -17,13 +17,14 @@ import {
   tornjakServerInfoUpdateFunc,
   serverInfoUpdateFunc
 } from 'redux/actions';
-import { RootState } from 'redux/reducers';
+import { RootState } from 'redux/reducers'
 import { 
   AgentLabels,
   AgentsList, 
   ServerInfo,
-  TornjakServerInfo } from './types';
-import { displayError, displayResponseError } from './error-api';
+  TornjakServerInfo 
+} from './types'
+import { showResponseToast, showToast } from './error-api';
 
 type ClusterCreateProp = {
   // dispatches a payload for the server trust domain and nodeAttestorPlugin as a ServerInfoType and has a return type of void
@@ -216,16 +217,16 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
   onSubmit(e: { preventDefault: () => void; } | undefined): void {
 
     if (e !== undefined) {
-      e.preventDefault();
+      e.preventDefault()
     }
 
     if (!this.state.clusterName) {
-      displayError("Cluster name cannot be empty.")
+      showToast({caption: "The cluster name cannot be empty."})
       return
     }
 
     if ((this.state.clusterTypeManualEntry && this.state.clusterType === this.state.clusterTypeManualEntryOption) || !this.state.clusterType) {
-      displayError("Cluster type cannot be empty.")
+      showToast({caption: "The cluster type cannot be empty."})
       return
     }
 
@@ -252,7 +253,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
           statusOK: "OK",
         })
       )
-      .catch(err => displayResponseError("Cluster creation failed.", err))
+      .catch(err => showResponseToast(err))
   }
 
   render() {
@@ -427,7 +428,15 @@ const mapStateToProps = (state: RootState) => ({
 
 export default connect(
   mapStateToProps,
-  { clusterTypeInfoFunc, serverSelectedFunc, selectorInfoFunc, agentsListUpdateFunc, tornjakMessageFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc }
+  { 
+    clusterTypeInfoFunc, 
+    serverSelectedFunc, 
+    selectorInfoFunc, 
+    agentsListUpdateFunc, 
+    tornjakMessageFunc, 
+    tornjakServerInfoUpdateFunc, 
+    serverInfoUpdateFunc 
+  }
 )(ClusterCreate)
 
 export { ClusterCreate }

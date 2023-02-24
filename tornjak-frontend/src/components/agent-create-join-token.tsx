@@ -5,8 +5,8 @@ import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import { serverSelectedFunc } from 'redux/actions';
 import { RootState } from 'redux/reducers';
-import { displayError, displayResponseError } from '../components/error-api'
 import { ToastContainer } from "react-toastify"
+import { showResponseToast, showToast } from './error-api';
 
 type CreateJoinTokenProp = {
   globalServerSelected: string,
@@ -116,12 +116,12 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
     e.preventDefault()
 
     if (this.state.ttl === "") {
-      displayError("The TTL cannot be empty.")
+      showToast({caption: "The TTL cannot be empty."})
       return
     }
 
     if (this.state.ttl === 0) {
-      displayError("The TTL cannot be 0.")
+      showToast({caption: "The TTL cannot be zero."})
       return
     }
 
@@ -136,7 +136,7 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
       const [isIdValid, trustDomain, path] = this.parseSpiffeId(this.state.spiffeId)
       
       if (!isIdValid) {
-        displayError("Invalid SPIFFE id.")
+        showToast({caption: "The spiffe id is invalid."})
         return
       }
 
@@ -152,7 +152,7 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
 
     axios.post(endpoint, cjtData)
       .then(res => this.setState({ message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' ') }))
-      .catch(err => displayResponseError("Agent creation failed.", err))
+      .catch(err => showResponseToast(err))
   }
 
   render() {

@@ -26,13 +26,6 @@ describe("Cluster Create Component", () => {
 
     describe("Cluster type cannot be empty.", () => {
 
-        /*
-        if ((this.state.clusterTypeManualEntry && this.state.clusterType === this.state.clusterTypeManualEntryOption) || !this.state.clusterType) {
-      displayError("Cluster type cannot be empty.")
-      return
-    }
-        */
-
         it("Manual", () => {
             fireEvent.change(screen.getByRole("cluster-type"), {selectedItem: "----Select this option and Enter Custom Cluster Type Below----"})
         })
@@ -45,7 +38,7 @@ describe("Cluster Create Component", () => {
             fireEvent.click(screen.getByRole("create-cluster-button"))
 
             await waitFor(() => {
-                const notification = screen.getByRole("error")
+                const notification = screen.getByRole("alert")
                 const [ caption ] = notification.getElementsByClassName("bx--toast-notification__caption")
                 expect(caption.textContent).toBe("Cluster type cannot be empty.")
             })
