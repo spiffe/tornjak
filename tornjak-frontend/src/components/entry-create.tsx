@@ -578,22 +578,22 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     e.preventDefault()
 
     if (!this.state.parentId) {
-      showToast({caption: "The parent id cannot be empty."})
+      showToast({caption: "The parent SPIFFE id cannot be empty."})
       return
     }
 
     if (!this.state.spiffeId) {
-      showToast({caption: "The spiffe id cannot be empty."})
+      showToast({caption: "The SPIFFE id cannot be empty."})
       return
     }
 
     if (!this.parseSpiffeId(this.state.parentId)[0]) {
-      showToast({caption: "The parent spiffe id is invalid."})
+      showToast({caption: "The parent SPIFFE id is invalid."})
       return
     }
 
     if (!this.parseSpiffeId(this.state.spiffeId)[0]) {
-      showToast({caption: "The spiffe id is invalid."})
+      showToast({caption: "The SPIFFE id is invalid."})
       return
     }
 
@@ -659,7 +659,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           successJsonMessege: res.data.results[0].status.message
         })
       )
-      .catch(err => showResponseToast(err))
+      .catch(err => showResponseToast(err, {caption: "Couldn't create entry."}))
   }
 
   onYAMLEntryCreate(): void {
@@ -690,7 +690,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           })
         }
       )
-      .catch(err => showResponseToast(err))
+      .catch(err => showResponseToast(err, {caption: "Couldn't create entry from YAML."}))
   }
 
   render() {
@@ -703,7 +703,8 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
         <br /><br />
         {this.state.message !== "" &&
           <div>
-            <ToastNotification className="toast-entry-creation-notification"
+            <ToastNotification 
+              className="toast-entry-creation-notification"
               kind="info"
               iconDescription="close notification"
               subtitle={
@@ -731,11 +732,12 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                       {this.state.message}
                     </pre>
                   </div>
-                </span>}
+                </span>
+              }
               timeout={0}
               title="Entry Creation Notification"
             />
-            {window.scrollTo({ top: 0, behavior: 'smooth' })}
+            {window.scrollTo({top: 0, behavior: 'smooth'})}
           </div>
         }
         <Accordion className="accordion-entry-form">

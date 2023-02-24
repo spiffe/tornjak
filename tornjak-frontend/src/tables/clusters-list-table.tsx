@@ -114,7 +114,7 @@ class ClustersListTable extends React.Component<ClustersListTableProp, ClustersL
                     this.props.clustersListUpdateFunc(this.props.globalClustersList.filter(el =>el.name !== cluster[i].name))
                 }
             })
-            .catch((error) => showResponseToast(error))
+            .catch((error) => showResponseToast(error, {caption: "Couldn't delete cluster."}))
     }
 
     render() {
