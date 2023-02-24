@@ -173,18 +173,11 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
       assignedAgentsListDisplay: assignedAgentsDisplay, //agents list text box display
       agentsListSelected: agentsListSelected, //initial selected agents
     });
-    return
   }
 
-  onChangeClusterName(e: { target: { value: string; }; } | undefined): void {
-    if (e === undefined) {
-      return;
-    }
-    var sid = e.target.value;
-    this.setState({
-      clusterName: sid
-    });
-    return
+  onChangeClusterName(e: {target: {value: string}} | undefined): void {
+    if (e === undefined) return
+    this.setState({clusterName: e.target.value})
   }
 
   onChangeClusterType = (selected: { selectedItem: string }): void => {
@@ -276,13 +269,18 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
       e.preventDefault()
     }
 
-    if (this.state.clusterTypeManualEntry && this.state.clusterType === this.state.clusterTypeManualEntryOption) {
-      displayError("Cluster type cannot be empty.")
+    if (!this.state.originalClusterName) {
+      displayError("Please select an existing cluster.")
       return
     }
 
-    if (!this.state.originalClusterName) {
-      displayError("Please select an existing cluster.")
+    if (!this.state.clusterName) {
+      displayError("The new cluster name cannot be empty.")
+      return
+    }
+
+    if (this.state.clusterTypeManualEntry && this.state.clusterType === this.state.clusterTypeManualEntryOption) {
+      displayError("Cluster type cannot be empty.")
       return
     }
 
@@ -345,7 +343,6 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
                 label="Select Cluster"
                 titleText="Choose Cluster [*required]"
                 onChange={this.onChangeClusterNameList}
-              //required 
               />
               <p className="cluster-helper">i.e. Choose Cluster Name To Edit</p>
             </div>
@@ -361,7 +358,7 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
                 placeholder="Edit CLUSTER NAME"
                 defaultValue={this.state.clusterName}
                 onChange={this.onChangeClusterName}
-                required />
+              />
             </div>
             <div
               className="clustertype-drop-down"
@@ -375,7 +372,6 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
                 selectedItem={this.state.clusterType}
                 titleText="Edit Cluster Type"
                 onChange={this.onChangeClusterType}
-              //required 
               />
               <p className="cluster-helper">i.e. Kubernetes, VMs...</p>
             </div>

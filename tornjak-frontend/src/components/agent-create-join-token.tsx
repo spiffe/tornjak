@@ -6,6 +6,7 @@ import IsManager from './is_manager';
 import { serverSelectedFunc } from 'redux/actions';
 import { RootState } from 'redux/reducers';
 import { displayError, displayResponseError } from '../components/error-api'
+import { ToastContainer } from "react-toastify"
 
 type CreateJoinTokenProp = {
   globalServerSelected: string,
@@ -114,6 +115,11 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
   onSubmit(e: { preventDefault: () => void; }): void {
     e.preventDefault()
 
+    if (this.state.ttl === "") {
+      displayError("The TTL cannot be empty.")
+      return
+    }
+
     if (this.state.ttl === 0) {
       displayError("The TTL cannot be 0.")
       return
@@ -165,7 +171,6 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
           <div className="form-group">
             <label>Time to live (TTL): </label>
             <input type="number"
-              required
               className="form-control"
               value={this.state.ttl}
               onChange={this.onChangeTtl}
@@ -194,6 +199,11 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
             <input type="submit" value="Create Join Token" className="btn btn-primary" />
           </div>
         </form>
+        <ToastContainer
+          className="carbon-toast"
+          containerId="notifications"
+          draggable={false}
+        />
       </div>
     )
   }
