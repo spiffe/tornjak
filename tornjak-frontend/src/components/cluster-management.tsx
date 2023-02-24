@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { Tabs, Tab } from 'carbon-components-react';
 import ClusterCreate from './cluster-create';
 import ClusterEdit from './cluster-edit';
@@ -22,6 +22,7 @@ import {
   ServerInfo,
   TornjakServerInfo
 } from './types'
+import { toast } from 'react-toastify';
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type ClusterManagementProp = {
@@ -129,13 +130,19 @@ class ClusterManagement extends Component<ClusterManagementProp, ClusterManageme
     });
   }
 
+  handleTabSelect(): void {
+    toast.dismiss()
+  }
+
   render() {
     return (
       <div className="cluster-management-tabs" data-test="cluster-management">
-        <Tabs scrollIntoView={false} >
-          <Tab className="cluster-management-tab1"
+        <Tabs scrollIntoView={false}>
+          <Tab 
+            className="cluster-management-tab1"
             id="tab-1"
             label="Create Cluster"
+            onClick={this.handleTabSelect}
           >
             <ClusterCreate
               clusterTypeList={this.state.clusterTypeList}
@@ -145,6 +152,7 @@ class ClusterManagement extends Component<ClusterManagementProp, ClusterManageme
           <Tab
             id="tab-2"
             label="Edit Cluster"
+            onClick={this.handleTabSelect}
           >
             <ClusterEdit
               clusterTypeList={this.state.clusterTypeList}

@@ -1,8 +1,14 @@
-import { toast } from "react-toastify"
+import { toast, ToastOptions } from "react-toastify"
 import { ToastNotification } from "carbon-components-react"
 
+const options: ToastOptions = {
+    autoClose: false, 
+    closeButton: false, 
+    role: "error"
+}
+
 export const displayError = (caption: string, title: string = "Error", consoleMsg?: any) => {
-    toast(<ToastNotification title={title} caption={caption}/>, {autoClose: false, closeButton: false, role: "error"})
+    toast(<ToastNotification title={title} caption={caption}/>, options)
     console.log(consoleMsg === undefined ? "ERROR: " + caption : consoleMsg)
 }
 
