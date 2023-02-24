@@ -35,6 +35,7 @@ import { RootState } from 'redux/reducers';
 import EntryExpiryFeatures from './entry-expiry-features';
 import CreateEntryJson from './entry-create-json';
 import { displayError, displayResponseError } from './error-api';
+import { ToastContainer } from "react-toastify"
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type CreateEntryProp = {
@@ -564,15 +565,25 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     let federatedWithList: string[] = []
     let dnsNamesWithList: string[] = []
     
-    e.preventDefault();
+    e.preventDefault()
 
-    if (!this.parseSpiffeId(this.state.spiffeId)[0]) {
-      displayError("Invalid spiffe id.")
+    if (!this.state.parentId) {
+      displayError("The parent id cannot be empty.")
+      return
+    }
+
+    if (!this.state.spiffeId) {
+      displayError("The spiffe id cannot be empty.")
       return
     }
 
     if (!this.parseSpiffeId(this.state.parentId)[0]) {
       displayError("Invalid parent spiffe id.")
+      return
+    }
+
+    if (!this.parseSpiffeId(this.state.spiffeId)[0]) {
+      displayError("Invalid spiffe id.")
       return
     }
 
@@ -806,7 +817,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                       this.onChangeSpiffeId(e);
                     }}
                     //onChange={this.onChangeSpiffeId}
-                    required />
+                  />
                 </div>
                 <div className="selectors-multiselect" data-test="selectors-multiselect">
                   <FilterableMultiSelect
@@ -897,6 +908,11 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
             </form>
           </AccordionItem>
         </Accordion>
+        <ToastContainer
+          className="carbon-toast"
+          containerId="notifications"
+          draggable={false}
+        />
       </div>
     )
   }

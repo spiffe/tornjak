@@ -756,10 +756,8 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                                                 labelText="PARENT ID [*required]"
                                                 placeholder="Enter PARENT ID"
                                                 value={this.state.parentId}
-                                                onChange={(e) => {
-                                                    this.onChangeParentIdInput(e);
-                                                }}
-                                                required />
+                                                onChange={(e) => {this.onChangeParentIdInput(e)}}
+                                            />
                                         </div>
                                         <div className="spiffeId-input-field" data-test="spiffeId-input-field">
                                             <TextInput
@@ -775,7 +773,7 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                                                     e.target.value = this.state.spiffeIdPrefix + input.substr(this.state.spiffeIdPrefix.length);
                                                     this.onChangeSpiffeId(e);
                                                 }}
-                                                required />
+                                            />
                                         </div>
                                         <TextArea
                                             cols={50}

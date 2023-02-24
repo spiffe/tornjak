@@ -219,6 +219,11 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
       e.preventDefault();
     }
 
+    if (!this.state.clusterName) {
+      displayError("Cluster name cannot be empty.")
+      return
+    }
+
     if ((this.state.clusterTypeManualEntry && this.state.clusterType === this.state.clusterTypeManualEntryOption) || !this.state.clusterType) {
       displayError("Cluster type cannot be empty.")
       return
@@ -274,7 +279,6 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
                   placeholder="Enter CLUSTER NAME"
                   onChange={this.onChangeClusterName}
                   role="cluster-name"
-                  required 
                 />
               </div>
               <div
@@ -289,7 +293,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
                   titleText="Cluster Type [*required]"
                   onChange={this.onChangeClusterType}
                   role="cluster-type"
-                  //required // typescript throws an error when enabled - need to explore more to enable feature for now "aria-required" is enabled
+                  // typescript throws an error when enabled - need to explore more to enable feature for now "aria-required" is enabled
                 />
                 <p className="cluster-helper">i.e. Kubernetes, VMs...</p>
               </div>
