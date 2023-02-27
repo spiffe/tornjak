@@ -73,6 +73,7 @@ container-frontend: ui-agent
 container-frontend-push: container-frontend
 	docker push ${CONTAINER_FRONTEND_TAG}
 
+# WARNING: EXPERIMENTAL feature to merge frontend and backend in one container
 container-tornjak: ui-agent bin/tornjak-backend 
 	docker build --no-cache -f Dockerfile.tornjak-container -t ${CONTAINER_TAG} .
 
