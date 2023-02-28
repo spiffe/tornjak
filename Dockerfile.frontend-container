@@ -1,6 +1,13 @@
-FROM node:19.6
+FROM node:19.6 AS build
 WORKDIR /usr/src/app
-COPY ui-agent ./
+COPY tornjak-frontend ./
+RUN npm install
+RUN rm -rf build
+RUN NODE_OPTIONS=--openssl-legacy-provider npm run build
+
+FROM node:19.6-alpine
+WORKDIR /usr/src/app
+COPY --from=build /usr/src/app/build ./
 
 # set env variables
 ENV REACT_APP_API_SERVER_URI $REACT_APP_API_SERVER_URI
