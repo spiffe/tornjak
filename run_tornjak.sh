@@ -52,16 +52,18 @@ fi
 
 y | npx serve -s .
 
+cd /opt/spire
+
 if [[ "$TORNJAK_CONFIG" == "" ]] ; then
 	#echo "-t TORNJAK_CONFIG must be provided"
 	#exit 1
-	cd /opt/spire; /opt/spire/tornjak-backend -c $SPIRE_CONFIG $EXPAND_ENV serverinfo &
-	#/opt/spire/tornjak-backend -c $SPIRE_CONFIG $EXPAND_ENV http --tls --cert sample-keys/tls.pem --key sample-keys/key.pem  --listen-addr :20000 &
-	#/opt/spire/tornjak-backend -c $SPIRE_CONFIG $EXPAND_ENV http --mtls --cert sample-keys/tls.pem --key sample-keys/key.pem  --mtls-ca sample-keys/rootCA.pem --listen-addr :30000 &
-	cd /opt/spire; /opt/spire/tornjak-backend -c $SPIRE_CONFIG $EXPAND_ENV http 
+	/opt/spire/tornjak-backend -c $SPIRE_CONFIG $EXPAND_ENV serverinfo &
+	/opt/spire/tornjak-backend -c $SPIRE_CONFIG $EXPAND_ENV http --tls --cert sample-keys/tls.pem --key sample-keys/key.pem  --listen-addr :20000 &
+	/opt/spire/tornjak-backend -c $SPIRE_CONFIG $EXPAND_ENV http --mtls --cert sample-keys/tls.pem --key sample-keys/key.pem  --mtls-ca sample-keys/rootCA.pem --listen-addr :30000 &
+	/opt/spire/tornjak-backend -c $SPIRE_CONFIG $EXPAND_ENV http 
 else 
-	cd /opt/spire; /opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG $EXPAND_ENV serverinfo &
-	#/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG $EXPAND_ENV http --tls --cert sample-keys/tls.pem --key sample-keys/key.pem  --listen-addr :20000 &
-	#/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG $EXPAND_ENV http --mtls --cert sample-keys/tls.pem --key sample-keys/key.pem  --mtls-ca sample-keys/rootCA.pem --listen-addr :30000 &
-	cd /opt/spire; /opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG $EXPAND_ENV http
+	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG $EXPAND_ENV serverinfo &
+	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG $EXPAND_ENV http --tls --cert sample-keys/tls.pem --key sample-keys/key.pem  --listen-addr :20000 &
+	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG $EXPAND_ENV http --mtls --cert sample-keys/tls.pem --key sample-keys/key.pem  --mtls-ca sample-keys/rootCA.pem --listen-addr :30000 &
+	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG $EXPAND_ENV http
 fi

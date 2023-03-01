@@ -39,6 +39,8 @@ jobs:
         run: echo "CONTAINER_BACKEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-be:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set frontend image name
         run: echo "CONTAINER_FRONTEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-fe:$GITHUB_SHA" >> $GITHUB_ENV
+      - name: Set Tornjak image name
+        run: echo "CONTAINER_TAG=ghcr.io/${{ github.repository_owner }}/tornjak:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set manager image name
         run: echo "CONTAINER_MANAGER_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-manager:$GITHUB_SHA" >> $GITHUB_ENV
 

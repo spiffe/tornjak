@@ -101,8 +101,8 @@ release-tornjak-fe-ghcr: container-frontend
 	docker push ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}
 
 # PLACEHOLDER FOR TORNJAK IMAGE WITH BE AND FE
-release-tornjak-ghcr: container-frontend
-	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_TORNJAK_GHCR_IMAGEPATH}
+release-tornjak-ghcr: container-tornjak
+	docker tag ${CONTAINER_TAG} ${CONTAINER_TORNJAK_GHCR_IMAGEPATH}
 	docker push ${CONTAINER_TORNJAK_GHCR_IMAGEPATH}
 
 release-tornjak-manager-ghcr: container-manager
