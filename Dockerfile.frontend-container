@@ -3,7 +3,7 @@ WORKDIR /usr/src/app
 COPY tornjak-frontend ./
 RUN npm install
 RUN rm -rf build
-RUN NODE_OPTIONS=--openssl-legacy-provider npm run build
+RUN NODE_OPTIONS="--max_old_space_size=4096 --openssl-legacy-provider" npm run build
 
 FROM node:19.6-alpine
 WORKDIR /usr/src/app
