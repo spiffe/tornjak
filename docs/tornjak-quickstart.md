@@ -174,9 +174,12 @@ data:
 ```
 
 ### Updating the SPIRE Server statefulset
-Next, we need to update the image of the SPIRE server statefulset, as well as make sure we pass in the Tornjak config. 
+Next, we need to update the deployment of the statefulset to run Tornjak. These steps will be different depending on what architecture makes sense for you. Note we have deprecated support of the architecture where parts of Tornjak run on the same container as SPIRE. 
 
-The statefulset will be different depnding on whether you wish to use the sidecar implementation of Tornjak, where there is a separate container, or the image of the Tornjak backend that contains the SPIRE agent in the same container: 
+Currently, we support two sidecar architectures: 
+
+1. The frontend and backend run in the same container that exposes two separate ports (one frontend and one backend). This is experimental and not ready for production, but is useful for getting started with Tornjak with minimal deployment steps. 
+2. Only the Tornjak backend is run as a sidecar container that exposes only one port (to communicate with the Tornjak backend). It requires more deployment steps to deploy or use the frontend. However, this deployment type is fully-supported, has a smaller sidecar image without the frontend components, and ensures that the frontend and backend share no memory. 
 
 <details><summary>[Click] For the Tornjak-backend wrapped with the SPIRE server. (WARNING: CURRENTLY UNSUPPORTED)</summary>
 
@@ -379,6 +382,127 @@ Note that there are three key differences in this StatefulSet file from that in 
 4. We create a volume named `test-socket` so that the containers may communicate. 
 
 This is all done specifically to pass the Tornjak config file as an argument to the container and to allow communication between Tornjak and SPIRE. 
+
+</details>
+
+<details><summary>[Click] For the Tornjak-backend + frontend sidecar implementation (EXPERIMENTAL)</summary>
+
+This has the same architecture as deploying with just a Tornjak backend, but with an additional Tornjak frontend process deployed in the same container. This will expose two ports: one for the frontend and one for the backend. 
+
+There is an additional requirement to mount the SPIRE server socket and make it accessible to the Tornjak backend container. 
+
+The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines:
+
+```
+➜  quickstart git:(master) cat server-statefulset.yaml 
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: spire-server
+  namespace: spire
+  labels:
+    app: spire-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spire-server
+  serviceName: spire-server
+  template:
+    metadata:
+      namespace: spire
+      labels:
+        app: spire-server
+    spec:
+      serviceAccountName: spire-server
+      containers:
+        - name: spire-server
+          image: ghcr.io/spiffe/spire-server:1.4.4
+          args:
+            - -config
+            - /run/spire/config/server.conf
+          ports:
+            - containerPort: 8081
+          volumeMounts:
+            - name: spire-config
+              mountPath: /run/spire/config
+              readOnly: true
+            - name: spire-data
+              mountPath: /run/spire/data
+              readOnly: false
+            - name: socket # 👈 ADDITIONAL VOLUME
+              mountPath: /tmp/spire-server/private # 👈 ADDITIONAL VOLUME
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: 8080
+            failureThreshold: 2
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+        ### 👈 BEGIN ADDITIONAL CONTAINER ###
+        - name: tornjak
+          image: docker.io/maiariyer/tornjak:latest
+          imagePullPolicy: Always
+          args:
+            - -config
+            - /run/spire/config/server.conf
+            - -tornjak-config
+            - /run/spire/tornjak-config/server.conf
+          env: 
+            - name: REACT_APP_API_SERVER_URI
+              value: http://localhost:10000
+            - name: NODE_OPTIONS
+              value: --openssl-legacy-provider
+          ports:
+            - containerPort: 8081
+          volumeMounts:
+            - name: spire-config
+              mountPath: /run/spire/config
+              readOnly: true
+            - name: tornjak-config
+              mountPath: /run/spire/tornjak-config
+              readOnly: true
+            - name: spire-data
+              mountPath: /run/spire/data
+              readOnly: false
+            - name: socket
+              mountPath: /tmp/spire-server/private
+        ### 👈 END ADDITIONAL CONTAINER ###
+      volumes:
+        - name: spire-config
+          configMap:
+            name: spire-server
+        - name: tornjak-config # 👈 ADDITIONAL VOLUME
+          configMap: # 👈 ADDITIONAL VOLUME
+            name: tornjak-agent # 👈 ADDITIONAL VOLUME
+        - name: socket # 👈 ADDITIONAL VOLUME
+          emptyDir: {} # 👈 ADDITIONAL VOLUME
+  volumeClaimTemplates:
+    - metadata:
+        name: spire-data
+        namespace: spire
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+``` 
+
+Note that there are three key differences in the StatefulSet file from that in the SPIRE quickstart:
+
+1. There is a new container in the pod named `tornjak`. 
+   a. This container uses environment variables to configure the Frontend. 
+   b. This container uses arguments to pass arguments to the Backend. 
+2. We create a volume named tornjak-config that reads from the ConfigMap `tornjak-agent`. 
+3. We create a volume named `test-socket` so that the containers may communicate
 
 </details>
 
