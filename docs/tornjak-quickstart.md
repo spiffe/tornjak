@@ -499,8 +499,8 @@ spec:
 Note that there are three key differences in the StatefulSet file from that in the SPIRE quickstart:
 
 1. There is a new container in the pod named `tornjak`. 
-   a. This container uses environment variables to configure the Frontend. 
-   b. This container uses arguments to pass arguments to the Backend. 
+   1. This container uses environment variables to configure the Frontend. 
+   1. This container uses arguments to pass arguments to the Backend. 
 2. We create a volume named tornjak-config that reads from the ConfigMap `tornjak-agent`. 
 3. We create a volume named `test-socket` so that the containers may communicate
 
@@ -549,7 +549,15 @@ Open a browser to `http://localhost:10000` and you should now be able to make To
 
 ## Connecting the Tornjak UI
 
-Now that we've deployed and exposed the Tornjak backend, it is easy enough to deploy the separate frontend. We have prebuilt the frontend in a container, so we can simply run it via a single docker command, which will take a couple minutes to run: 
+Note that if you chose to deploy the Tornjak image that includes the frontend component, you only need to execute the following command to enable access to the frontend that is already running:
+
+```
+➜  quickstart git:(master) ✗ kubectl -n spire port-forward spire-server-0 3000:3000
+Forwarding from 127.0.0.1:3000 -> 3000
+Forwarding from [::1]:3000 -> 3000
+```
+
+Otherwise, you will need to deploy the separate frontend separately to access the exposed Tornjak backend. We have prebuilt the frontend in a container, so we can simply run it via a single docker command in a separate terminal, which will take a couple minutes to run: 
 
 ```
 ➜  quickstart git:(master) ✗ docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak-fe:latest 
