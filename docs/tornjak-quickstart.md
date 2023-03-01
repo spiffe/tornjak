@@ -448,7 +448,7 @@ spec:
             periodSeconds: 5
         ### 👈 BEGIN ADDITIONAL CONTAINER ###
         - name: tornjak
-          image: docker.io/maiariyer/tornjak:latest
+          image: ghcr.io/spiffe/tornjak:latest
           imagePullPolicy: Always
           args:
             - -config
