@@ -50,20 +50,28 @@ if [[ "$SPIRE_CONFIG" == "" ]] ; then
 	exit 1
 fi
 
-y | npx serve -s .
+y | npx serve -s . &
 
 cd /opt/spire
 
 if [[ "$TORNJAK_CONFIG" == "" ]] ; then
 	#echo "-t TORNJAK_CONFIG must be provided"
 	#exit 1
+	echo "running serverinfo"
 	/opt/spire/tornjak-backend -c $SPIRE_CONFIG $EXPAND_ENV serverinfo &
+	echo "running tls connection"
 	/opt/spire/tornjak-backend -c $SPIRE_CONFIG $EXPAND_ENV http --tls --cert sample-keys/tls.pem --key sample-keys/key.pem  --listen-addr :20000 &
+	echo "running mtls connection"
 	/opt/spire/tornjak-backend -c $SPIRE_CONFIG $EXPAND_ENV http --mtls --cert sample-keys/tls.pem --key sample-keys/key.pem  --mtls-ca sample-keys/rootCA.pem --listen-addr :30000 &
+	echo "running http connection"
 	/opt/spire/tornjak-backend -c $SPIRE_CONFIG $EXPAND_ENV http 
 else 
+	echo "running serverinfo"
 	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG $EXPAND_ENV serverinfo &
+	echo "running tls connection"
 	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG $EXPAND_ENV http --tls --cert sample-keys/tls.pem --key sample-keys/key.pem  --listen-addr :20000 &
+	echo "running mtls connnection"
 	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG $EXPAND_ENV http --mtls --cert sample-keys/tls.pem --key sample-keys/key.pem  --mtls-ca sample-keys/rootCA.pem --listen-addr :30000 &
+	echo "running http connection"
 	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG $EXPAND_ENV http
 fi
