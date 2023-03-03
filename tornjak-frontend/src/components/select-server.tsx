@@ -88,7 +88,7 @@ class SelectServer extends Component<SelectServerProp, SelectServerState> {
             .then(response => {
                 this.props.serversListUpdateFunc(response.data["servers"]);
             })
-            .catch((error) => showResponseToast(error, {caption: "Couldn't populate servers."}))
+            .catch((error) => showResponseToast(error, {caption: "Could not populate servers."}))
     }
 
     serverDropdownList() {

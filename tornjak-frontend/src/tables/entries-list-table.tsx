@@ -110,7 +110,7 @@ class EntriesListTable extends React.Component<EntriesListTableProp, EntriesList
                     this.props.entriesListUpdateFunc(this.props.globalEntriesList.filter(el => el.id !== responses[i].data.results[0].id))
                 }
             })
-            .catch((error) => showResponseToast(error, {caption: "Couldn't delete entry."}))
+            .catch((error) => showResponseToast(error, {caption: "Could not delete entry."}))
     }
 
     downloadEntries(selectedRows: readonly DenormalizedRow[]) {

@@ -178,7 +178,7 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                 // populate first entry
                 this.setSelectedEntriesIds(0, 0, parsedData.entries[0])
             } catch (e) {
-                showToast({caption: "Encountered a parse error."})
+                showToast({caption: "Encountered a parse error. Is the JSON invalid?"})
                 console.log(e)
                 this.setState({
                     parseError: true,
