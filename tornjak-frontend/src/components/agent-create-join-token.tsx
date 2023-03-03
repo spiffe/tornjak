@@ -152,7 +152,7 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
 
     axios.post(endpoint, cjtData)
       .then(res => this.setState({ message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' ') }))
-      .catch(err => showResponseToast(err, {caption: "Couldn't create agent token."}))
+      .catch(err => showResponseToast(err, {caption: "Could not create join token."}))
   }
 
   render() {

@@ -128,7 +128,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
                         el.id.path !== id[i].path));
                 }
             })
-            .catch((error) => showResponseToast(error, {caption: "Couldn't delete agent."}))
+            .catch((error) => showResponseToast(error, {caption: "Could not delete agent."}))
     }
 
     banAgent(selectedRows: readonly DenormalizedRow[]) {
@@ -154,7 +154,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
                     alert("Ban SUCCESS")
                     this.componentDidMount()
                 })
-                .catch((error) => showResponseToast(error, {caption: "Couldn't ban agent."}))
+                .catch((error) => showResponseToast(error, {caption: "Could not ban agent."}))
         }
     }
     render() {

@@ -659,7 +659,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           successJsonMessege: res.data.results[0].status.message
         })
       )
-      .catch(err => showResponseToast(err, {caption: "Couldn't create entry."}))
+      .catch(err => showResponseToast(err, {caption: "Could not create entry."}))
   }
 
   onYAMLEntryCreate(): void {
@@ -690,7 +690,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           })
         }
       )
-      .catch(err => showResponseToast(err, {caption: "Couldn't create entry from YAML."}))
+      .catch(err => showResponseToast(err, {caption: "Could not create entry from YAML."}))
   }
 
   render() {
