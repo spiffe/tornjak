@@ -21,7 +21,7 @@ Otherwise, you can follow instructions below to build Tornjak images.
 
 In order to build, we require the following installations:
 - [Docker](https://docs.docker.com/engine/install/) for the backend build
-- [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for the frontend
+- [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for the frontend build if running locally
 - [Golang](https://go.dev/doc/install) is required if you would like to run the Go backends locally
 
 ## Building Executables and Images
@@ -29,10 +29,11 @@ In order to build, we require the following installations:
 Building Tornjak manually can be done with the Makefile. Notable make targets follow:
 - `make bin/tornjak-backend`: makes the Go executable of the Tornjak backend
 - `make bin/tornjak-manager`: makes the Go executable of the Tornjak manager
-- `make ui-agent`: makes the ReactJS app for the Tornjak frontend
+- `make ui-agent`: makes the optimized ReactJS app for the Tornjak frontend
 - `make container-tornjak-be`: containerizes Go executable of the Tornjak backend
 - `make container-manager`:containerizes Go executable of the Tornjak manager
 - `make container-frontend`: containerizes React JS app for the Tornjak frontend
+- `make container-tornjak`: containerizes Tornjak backend with Tornjak frontend
 
 For usage instructions of the containers, please see our [USAGE document](./USAGE.md) to get started.
 
