@@ -2,8 +2,6 @@ FROM node:19.6 AS build
 WORKDIR /usr/src/app
 COPY tornjak-frontend ./
 RUN npm install
-RUN rm -rf build
-RUN NODE_OPTIONS=--openssl-legacy-provider npm run build
 
 FROM node:19.6-alpine
 
@@ -13,7 +11,7 @@ COPY sample-keys /opt/spire/sample-keys
 COPY run_tornjak.sh /opt/spire/run_tornjak.sh
 
 WORKDIR /usr/src/app
-COPY --from=build /usr/src/app/build ./
+COPY --from=build /usr/src/app ./
 
 # set env variables
 ENV REACT_APP_API_SERVER_URI $REACT_APP_API_SERVER_URI
@@ -23,6 +21,4 @@ ENV NODE_OPTIONS $NODE_OPTIONS
 EXPOSE 3000
 
 # start app
-#CMD ["npm", "start", "&", ";", "/opt/spire/run_tornjak.sh"]
-#CMD ["/bin/sh", "-c", "npm start && /opt/spire/run_tornjak.sh"]
 ENTRYPOINT ["/opt/spire/run_tornjak.sh"]

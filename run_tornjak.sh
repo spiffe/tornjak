@@ -50,7 +50,7 @@ if [[ "$SPIRE_CONFIG" == "" ]] ; then
 	exit 1
 fi
 
-y | npx serve -s . &
+npm start &
 
 cd /opt/spire
 
