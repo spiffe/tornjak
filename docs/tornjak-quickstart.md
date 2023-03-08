@@ -275,6 +275,18 @@ There is an additional requirement to mount the SPIRE server socket and make it 
 The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines: 
 
 ```
+➜  quickstart git:(master) wget -O server-statefulset.yaml https://raw.githubusercontent.com/spiffe/tornjak/main/examples/deployment_sidecar.yaml
+--2023-03-08 12:18:01--  https://raw.githubusercontent.com/spiffe/tornjak/main/examples/deployment_sidecar.yaml
+Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.108.133, 185.199.109.133, 185.199.110.133, ...
+Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.108.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 641 [text/plain]
+Saving to: 'server-statefulset.yaml'
+
+server-statefulset.yaml               100%[==========================================================>]     641  --.-KB/s    in 0s      
+
+2023-03-08 12:18:01 (27.8 MB/s) - 'server-statefulset.yaml' saved [641/641]
+
 ➜  quickstart git:(master) cat server-statefulset.yaml 
 apiVersion: apps/v1
 kind: StatefulSet
@@ -403,7 +415,8 @@ We will then wait and verify that the `spire-server-0` pod is now started with t
 
 ```
 ➜  quickstart git:(master) ✗ kubectl -n spire describe pod spire-server-0 | grep "Image:"
-    Image:         ghcr.io/spiffe/tornjak-be-spire-server:1.x.x
+    Image:         ghcr.io/spiffe/spire-server:1.4.4
+    Image:         ghcr.io/spiffe/tornjak-be:latest
 ```
 
 ## Connecting to the Tornjak agent
