@@ -37,7 +37,7 @@ minikube   Ready    master   79s   v1.18.3
 Next, we will follow the steps from the [SPIRE quickstart for Kubernetes](https://spiffe.io/docs/latest/try/getting-started-k8s/), for the most accurate information, follow the instructions from the page to get your SPIRE deployment set up. Follow through with the tutorial till you get to the end, but do not tear down the components! The output would look like the following:
 
 ```
-➜  ~ git clone git@github.com:spiffe/spire-tutorials.git
+➜  ~ git clone https://github.com/spiffe/spire-tutorials.git
 Cloning into 'spire-tutorials'...
 remote: Enumerating objects: 65, done.
 remote: Counting objects: 100% (65/65), done.
@@ -127,8 +127,7 @@ Selector         : k8s:sa:default
 deployment.apps/client created
 
 ➜  quickstart git:(master) kubectl exec -it $(kubectl get pods -o=jsonpath='{.items[0].metadata.name}' \
-   -l app=client)  -- /bin/sh
-/opt/spire # /opt/spire/bin/spire-agent api fetch -socketPath /run/spire/sockets/agent.sock
+   -l app=client)  -- /opt/spire/bin/spire-agent api fetch -socketPath /run/spire/sockets/agent.sock
 Received 1 svid after 8.8537ms
 
 SPIFFE ID:		spiffe://example.org/ns/default/sa/default
@@ -328,13 +327,12 @@ spec:
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 5
-	### 👈 BEGIN ADDITIONAL CONTAINER ###
-        - name: tornjak-backend
+        - name: tornjak-backend ### 👈 BEGIN ADDITIONAL CONTAINER ###
           image: ghcr.io/spiffe/tornjak-be:latest
           args:
-            - -config
+            - --config
             - /run/spire/config/server.conf
-            - -tornjak-config
+            - --tornjak-config
             - /run/spire/tornjak-config/server.conf
           ports:
             - containerPort: 8081
@@ -349,8 +347,7 @@ spec:
               mountPath: /run/spire/data
               readOnly: false
             - name: socket
-              mountPath: /tmp/spire-server/private
-	### 👈 END ADDITIONAL CONTAINER ###
+              mountPath: /tmp/spire-server/private ### 👈 END ADDITIONAL CONTAINER ###
       volumes:
         - name: spire-config
           configMap:
