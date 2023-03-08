@@ -4,16 +4,24 @@ COPY tornjak-frontend ./
 RUN npm install
 
 FROM node:19.6-alpine
+
+RUN mkdir -p /opt/spire
+COPY bin/tornjak-backend /opt/spire/tornjak-backend
+COPY sample-keys /opt/spire/sample-keys
+COPY run_tornjak.sh /opt/spire/run_tornjak.sh
+
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app ./
 
 # set env variables
 ENV REACT_APP_API_SERVER_URI $REACT_APP_API_SERVER_URI
 ENV REACT_APP_AUTH_SERVER_URI $REACT_APP_AUTH_SERVER_URI
+# defaulting flag to build with Node.js v17+
 ARG NODE_OPTIONS=--openssl-legacy-provider
 ENV NODE_OPTIONS $NODE_OPTIONS
 
 EXPOSE 3000
+EXPOSE 10000
 
 # start app
-CMD ["npm", "start"]
+ENTRYPOINT ["/opt/spire/run_tornjak.sh"]
