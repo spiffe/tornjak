@@ -178,6 +178,7 @@ Next, we need to update the image of the SPIRE server statefulset, as well as ma
 The statefulset will be different depnding on whether you wish to use the sidecar implementation of Tornjak, where there is a separate container, or the image of the Tornjak backend that contains the SPIRE agent in the same container: 
 
 <details><summary>[Click] For the Tornjak-backend wrapped with the SPIRE server. (WARNING: CURRENTLY UNSUPPORTED)</summary>
+-----
 
 The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines: 
 
@@ -269,6 +270,7 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 </details>
 
 <details><summary>[Click] For the Tornjak-backend sidecar implementation</summary>
+-----
 
 There is an additional requirement to mount the SPIRE server socket and make it accessible to the Tornjak backend container. 
 
