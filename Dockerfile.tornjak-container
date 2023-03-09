@@ -1,9 +1,9 @@
-FROM node:19.6 AS build
+FROM node:18 AS build
 WORKDIR /usr/src/app
 COPY tornjak-frontend ./
 RUN npm install
 
-FROM node:19.6-alpine
+FROM node:18-alpine
 
 RUN mkdir -p /opt/spire
 COPY bin/tornjak-backend /opt/spire/tornjak-backend
