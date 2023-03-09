@@ -1,11 +1,7 @@
-FROM node:19.6 AS build
+FROM node:18
 WORKDIR /usr/src/app
 COPY tornjak-frontend ./
 RUN npm install
-
-FROM node:19.6-alpine
-WORKDIR /usr/src/app
-COPY --from=build /usr/src/app ./
 
 # set env variables
 ENV REACT_APP_API_SERVER_URI $REACT_APP_API_SERVER_URI
