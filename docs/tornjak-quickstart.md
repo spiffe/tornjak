@@ -395,7 +395,7 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 
 </details>
 
-<details><summary>[Click] For the Tornjak-backend + frontend sidecar implementation (EXPERIMENTAL)</summary>
+<details><summary><b>[Click] For the Tornjak-backend + frontend sidecar implementation (EXPERIMENTAL)</b></summary>
 
 This has the same architecture as deploying with just a Tornjak backend, but with an additional Tornjak frontend process deployed in the same container. This will expose two ports: one for the frontend and one for the backend. 
 
