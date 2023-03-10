@@ -3,7 +3,7 @@ echo "${@}"
 
 usage() {
 	cat << EOF >&2
-Usage: run_server [-c <file>] [-t <file>]
+Usage: run_server [-c <filename>] [-t <filename>]
 
 --config,-c <file>: SPIRE Config File
 --tornjak-config,-t <file>: Tornjak Config File

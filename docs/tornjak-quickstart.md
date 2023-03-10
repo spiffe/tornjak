@@ -37,7 +37,7 @@ minikube   Ready    master   79s   v1.18.3
 Next, we will follow the steps from the [SPIRE quickstart for Kubernetes](https://spiffe.io/docs/latest/try/getting-started-k8s/), for the most accurate information, follow the instructions from the page to get your SPIRE deployment set up. Follow through with the tutorial till you get to the end, but do not tear down the components! The output would look like the following:
 
 ```
-➜  ~ git clone git@github.com:spiffe/spire-tutorials.git
+➜  ~ git clone https://github.com/spiffe/spire-tutorials.git
 Cloning into 'spire-tutorials'...
 remote: Enumerating objects: 65, done.
 remote: Counting objects: 100% (65/65), done.
@@ -127,8 +127,7 @@ Selector         : k8s:sa:default
 deployment.apps/client created
 
 ➜  quickstart git:(master) kubectl exec -it $(kubectl get pods -o=jsonpath='{.items[0].metadata.name}' \
-   -l app=client)  -- /bin/sh
-/opt/spire # /opt/spire/bin/spire-agent api fetch -socketPath /run/spire/sockets/agent.sock
+   -l app=client)  -- /opt/spire/bin/spire-agent api fetch -socketPath /run/spire/sockets/agent.sock
 Received 1 svid after 8.8537ms
 
 SPIFFE ID:		spiffe://example.org/ns/default/sa/default
@@ -182,7 +181,7 @@ Currently, we support two sidecar architectures:
 2. The frontend and backend run in the same container that exposes two separate ports (one frontend and one backend). This is experimental and not ready for production, but is useful for getting started with Tornjak with minimal deployment steps. 
 
 
-<details><summary>[Click] For the Tornjak-backend wrapped with the SPIRE server. (WARNING: CURRENTLY UNSUPPORTED)</summary>
+<details><summary> <b> [Click] For the Tornjak-backend wrapped with the SPIRE server. (WARNING: CURRENTLY DEPRECATED) </b></summary>
 
 The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines: 
 
@@ -273,13 +272,25 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 
 </details>
 
-<details><summary>[Click] For the Tornjak-backend sidecar implementation</summary>
+<details><summary><b> [Click] For the Tornjak-backend sidecar implementation </b></summary>
 
 There is an additional requirement to mount the SPIRE server socket and make it accessible to the Tornjak backend container. 
 
 The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines: 
 
 ```
+➜  quickstart git:(master) wget -O server-statefulset.yaml https://raw.githubusercontent.com/spiffe/tornjak/main/examples/deployment_sidecar.yaml
+--2023-03-08 12:18:01--  https://raw.githubusercontent.com/spiffe/tornjak/main/examples/deployment_sidecar.yaml
+Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.108.133, 185.199.109.133, 185.199.110.133, ...
+Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.108.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 641 [text/plain]
+Saving to: 'server-statefulset.yaml'
+
+server-statefulset.yaml               100%[==========================================================>]     641  --.-KB/s    in 0s      
+
+2023-03-08 12:18:01 (27.8 MB/s) - 'server-statefulset.yaml' saved [641/641]
+
 ➜  quickstart git:(master) cat server-statefulset.yaml 
 apiVersion: apps/v1
 kind: StatefulSet
@@ -332,13 +343,12 @@ spec:
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 5
-	### 👈 BEGIN ADDITIONAL CONTAINER ###
-        - name: tornjak-backend
+        - name: tornjak-backend ### 👈 BEGIN ADDITIONAL CONTAINER ###
           image: ghcr.io/spiffe/tornjak-be:latest
           args:
-            - -config
+            - --config
             - /run/spire/config/server.conf
-            - -tornjak-config
+            - --tornjak-config
             - /run/spire/tornjak-config/server.conf
           ports:
             - containerPort: 8081
@@ -353,8 +363,7 @@ spec:
               mountPath: /run/spire/data
               readOnly: false
             - name: socket
-              mountPath: /tmp/spire-server/private
-	### 👈 END ADDITIONAL CONTAINER ###
+              mountPath: /tmp/spire-server/private ### 👈 END ADDITIONAL CONTAINER ###
       volumes:
         - name: spire-config
           configMap:
@@ -386,7 +395,7 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 
 </details>
 
-<details><summary>[Click] For the Tornjak-backend + frontend sidecar implementation (EXPERIMENTAL)</summary>
+<details><summary><b>[Click] For the Tornjak-backend + frontend sidecar implementation (EXPERIMENTAL)</b></summary>
 
 This has the same architecture as deploying with just a Tornjak backend, but with an additional Tornjak frontend process deployed in the same container. This will expose two ports: one for the frontend and one for the backend. 
 
@@ -531,7 +540,8 @@ We will then wait and verify that the `spire-server-0` pod is now started with t
 
 ```
 ➜  quickstart git:(master) ✗ kubectl -n spire describe pod spire-server-0 | grep "Image:"
-    Image:         ghcr.io/spiffe/tornjak-be-spire-server:1.x.x
+    Image:         ghcr.io/spiffe/spire-server:1.4.4
+    Image:         ghcr.io/spiffe/tornjak-be:latest
 ```
 
 ## Connecting to the Tornjak agent
