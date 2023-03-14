@@ -25,7 +25,7 @@ spec:
           args:
             - -config
             - /run/spire/config/server.conf
-            - -tornjak-config # 👈 ADDITIONAL ARGUMENT
+            - -tornjak-config                       # 👈 ADDITIONAL ARGUMENT
             - /run/spire/tornjak-config/server.conf # 👈 ADDITIONAL ARGUMENT
           ports:
             - containerPort: 8081
@@ -33,9 +33,9 @@ spec:
             - name: spire-config
               mountPath: /run/spire/config
               readOnly: true
-            - name: tornjak-config # 👈 ADDITIONAL VOLUME
+            - name: tornjak-config                 # 👈 ADDITIONAL VOLUME
               mountPath: /run/spire/tornjak-config # 👈 ADDITIONAL VOLUME
-              readOnly: true # 👈 ADDITIONAL VOLUME
+              readOnly: true                       # 👈 ADDITIONAL VOLUME
             - name: spire-data
               mountPath: /run/spire/data
               readOnly: false
@@ -57,8 +57,8 @@ spec:
         - name: spire-config
           configMap:
             name: spire-server
-        - name: tornjak-config # 👈 ADDITIONAL VOLUME
-          configMap: # 👈 ADDITIONAL VOLUME
+        - name: tornjak-config  # 👈 ADDITIONAL VOLUME
+          configMap:            # 👈 ADDITIONAL VOLUME
             name: tornjak-agent # 👈 ADDITIONAL VOLUME
   volumeClaimTemplates:
     - metadata:

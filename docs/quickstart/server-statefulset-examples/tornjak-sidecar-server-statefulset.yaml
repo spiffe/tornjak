@@ -33,7 +33,7 @@ spec:
             - name: spire-data
               mountPath: /run/spire/data
               readOnly: false
-            - name: socket # 👈 ADDITIONAL VOLUME
+            - name: socket                         # 👈 ADDITIONAL VOLUME
               mountPath: /tmp/spire-server/private # 👈 ADDITIONAL VOLUME
           livenessProbe:
             httpGet:
@@ -82,11 +82,11 @@ spec:
         - name: spire-config
           configMap:
             name: spire-server
-        - name: tornjak-config # 👈 ADDITIONAL VOLUME
-          configMap: # 👈 ADDITIONAL VOLUME
+        - name: tornjak-config  # 👈 ADDITIONAL VOLUME
+          configMap:            # 👈 ADDITIONAL VOLUME
             name: tornjak-agent # 👈 ADDITIONAL VOLUME
-        - name: socket # 👈 ADDITIONAL VOLUME
-          emptyDir: {} # 👈 ADDITIONAL VOLUME
+        - name: socket          # 👈 ADDITIONAL VOLUME
+          emptyDir: {}          # 👈 ADDITIONAL VOLUME
   volumeClaimTemplates:
     - metadata:
         name: spire-data
