@@ -538,7 +538,7 @@ Forwarding from [::1]:10000 -> 10000
 
 Open a browser to `http://localhost:10000` and you should now be able to make Tornjak API calls!
 
-![tornjak-agent-browser](rsrc/tornjak-agent-browser.png)
+![tornjak-agent-browser](../rsrc/tornjak-agent-browser.png)
 
 ## Connecting the Tornjak UI
 
@@ -579,5 +579,5 @@ To create a production build, use npm run build.
 
 This exposes the frontend at http://localhost:3000.  If you visit in your browser, you should see this page:
 
-![tornjak-ui](rsrc/tornjak-ui.png)
+![tornjak-ui](../rsrc/tornjak-ui.png)
 
