@@ -294,7 +294,7 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 
 </details>
 
-<details><summary><b> 🔴 [Click] For the Tornjak-backend + frontend sidecar implementation (if you are unsure, choose thise) </b></summary>
+<details><summary><b> 🔴 [Click] For the Tornjak-backend + frontend sidecar implementation (if you are unsure, choose this) </b></summary>
 
 This has the same architecture as deploying with just a Tornjak backend, but with an additional Tornjak frontend process deployed in the same container. This will expose two ports: one for the frontend and one for the backend. 
 
@@ -524,11 +524,11 @@ $ kubectl -n spire describe pod spire-server-0 | grep "Image:"
     Image:         ghcr.io/spiffe/tornjak-be:latest
 ```
 
-## Connecting to the Tornjak agent
+## Making the Tornjak Backend Accessible
 
-The Tornjak HTTP server is running on port 10000 on the port. This can easily be accessed by performing a local port forward using `kubectl`. This will cause the local port 10000 to proxy to the Tornjak HTTP server.
+The Tornjak HTTP server is running on port 10000 on the pod. This can easily be accessed by performing a local port forward using `kubectl`. This will cause the local port 10000 to proxy to the Tornjak HTTP server.
 
-```
+```terminal
 $ kubectl -n spire port-forward spire-server-0 10000:10000
 Forwarding from 127.0.0.1:10000 -> 10000
 Forwarding from [::1]:10000 -> 10000
@@ -539,6 +539,8 @@ Open a browser to `http://localhost:10000` and you should now be able to make To
 ![tornjak-agent-browser](rsrc/tornjak-agent-browser.png)
 
 ## Connecting the Tornjak UI
+
+Be sure that the backend is accessible at `http://localhost:10000`, as above, or you may not work
 
 Note that if you chose to deploy the Tornjak image that includes the frontend component, you only need to execute the following command to enable access to the frontend that is already running:
 
