@@ -1,17 +1,16 @@
 # Tornjak simple deployment with SPIRE k8s quickstart
 
-In this doc, we will show how to configure Tornjak with a SPIRE deployment using the SPIRE k8s quickstart tutorial. As we will see, this is as simple as three steps:
-1. setting up 
-2. creating a k8s ConfigMap for storing the Tornjak configuration
-3. editing the SPIRE server statefulset to use the Tornjak compatible image and pass the ConfigMap as an argument. 
+In this tutorial, we will show how to configure Tornjak with a SPIRE deployment using the SPIRE k8s quickstart tutorial. This is heavily inspired by the [SPIRE quickstart for Kubernetes](https://spiffe.io/docs/latest/try/getting-started-k8s/).
 
-## Step 1: Setup SPIRE k8s quickstart tutorial (optional)
+This tutorial will get you up and running with Tornjak in two steps:
+1. Deployment
+2. Connecting to the Tornjak frontend
 
-For this tutorial we will utilize the SPIRE k8s quickstart deployment for a SPIRE deployment. If you have a SPIRE deployment set up already, you may skip this step and go ahead to the [section: configuring Tornjak](#step-2-configuring-tornjak). If not we will use the [SPIRE quickstart for Kubernetes](https://spiffe.io/docs/latest/try/getting-started-k8s/).
+## Step 1: Setup SPIRE k8s quickstart tutorial
 
 ### Setting up k8s
 
-For this tutorial, we will use minikube, if you have an existing kubernetes cluster, feel free to use that.
+For this tutorial, we will use minikube. If you have an existing kubernetes cluster, feel free to use that. 
 
 ```
 ➜  ~ minikube start
@@ -31,23 +30,46 @@ NAME       STATUS   ROLES    AGE   VERSION
 minikube   Ready    master   79s   v1.18.3
 ```
 
+### Obtaining the Deployment Files
 
-### Setting up the SPIRE deployment
-
-Next, we will follow the steps from the [SPIRE quickstart for Kubernetes](https://spiffe.io/docs/latest/try/getting-started-k8s/), for the most accurate information, follow the instructions from the page to get your SPIRE deployment set up. Follow through with the tutorial till you get to the end, but do not tear down the components! The output would look like the following:
+To obtain the relevant files, clone our git repository and cd into the correct directory:
 
 ```
-➜  ~ git clone https://github.com/spiffe/spire-tutorials.git
-Cloning into 'spire-tutorials'...
-remote: Enumerating objects: 65, done.
-remote: Counting objects: 100% (65/65), done.
-remote: Compressing objects: 100% (49/49), done.
-remote: Total 725 (delta 20), reused 52 (delta 16), pack-reused 660
-Receiving objects: 100% (725/725), 1008.46 KiB | 9.08 MiB/s, done.
-Resolving deltas: 100% (327/327), done.
+git clone https://github.com/spiffe/tornjak.git
+cd docs/quickstart
+```
 
-➜  ~ cd spire-tutorials/k8s/quickstart
+Notice, the files in this directory are largely the same files as provided by the [SPIRE quickstart for Kubernetes](https://spiffe.io/docs/latest/try/getting-started-k8s/). However, there are some minor key differences. Notice the new ConfigMap file:
 
+```terminal
+➜  quickstart git:(master) cat tornjak-configmap.yaml 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tornjak-agent
+  namespace: spire
+data:
+  server.conf: |
+    server {
+      metadata = "insert metadata"
+    }
+
+    plugins {
+      DataStore "sql" {
+        plugin_data {
+          drivername = "sqlite3"
+          filename = "./agentlocaldb"
+        }
+      }
+
+    }
+```
+
+
+
+
+
+```
 ➜  quickstart git:(master) kubectl apply -f spire-namespace.yaml
 namespace/spire created
 
