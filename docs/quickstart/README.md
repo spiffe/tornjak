@@ -78,7 +78,7 @@ Currently, we support two sidecar architectures:
 1. Only the Tornjak backend is run as a sidecar container that exposes only one port (to communicate with the Tornjak backend). It requires more deployment steps to deploy or use the frontend. However, this deployment type is fully-supported, has a smaller sidecar image without the frontend components, and ensures that the frontend and backend share no memory. 
 2. The frontend and backend run in the same container that exposes two separate ports (one frontend and one backend). This is experimental and not ready for production, but is useful for getting started with Tornjak with minimal deployment steps. 
 
-<details><summary> <b> 🔴 [Click] For the Tornjak-backend wrapped with the SPIRE server. (WARNING: CURRENTLY DEPRECATED) 🔴 </b></summary>
+<details><summary> <b> 🔴 [Click] For the Tornjak-backend wrapped with the SPIRE server. (WARNING: CURRENTLY DEPRECATED) </b></summary>
 
 The relevant file is called `tornjak-spire-server-statefulset.yaml` within the examples directory.  Please copy to the relevant file as follows:
 
@@ -175,7 +175,7 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 
 </details>
 
-<details><summary><b> 🔴 [Click] For the Tornjak-backend sidecar implementation 🔴 </b></summary>
+<details><summary><b> 🔴 [Click] For the Tornjak-backend sidecar implementation</b></summary>
 
 There is an additional requirement to mount the SPIRE server socket and make it accessible to the Tornjak backend container. 
 
@@ -292,7 +292,7 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 
 </details>
 
-<details><summary><b>🔴 [Click] For the Tornjak-backend + frontend sidecar implementation (if you are unsure, choose thise) 🔴 </b></summary>
+<details><summary><b> 🔴 [Click] For the Tornjak-backend + frontend sidecar implementation (if you are unsure, choose thise) </b></summary>
 
 This has the same architecture as deploying with just a Tornjak backend, but with an additional Tornjak frontend process deployed in the same container. This will expose two ports: one for the frontend and one for the backend. 
 
