@@ -119,7 +119,7 @@ spec:
           args:
             - -config
             - /run/spire/config/server.conf
-            - -tornjak-config # 👈 ADDITIONAL ARGUMENT
+            - -tornjak-config                       # 👈 ADDITIONAL ARGUMENT
             - /run/spire/tornjak-config/server.conf # 👈 ADDITIONAL ARGUMENT
           ports:
             - containerPort: 8081
@@ -127,9 +127,9 @@ spec:
             - name: spire-config
               mountPath: /run/spire/config
               readOnly: true
-            - name: tornjak-config # 👈 ADDITIONAL VOLUME
+            - name: tornjak-config                 # 👈 ADDITIONAL VOLUME
               mountPath: /run/spire/tornjak-config # 👈 ADDITIONAL VOLUME
-              readOnly: true # 👈 ADDITIONAL VOLUME
+              readOnly: true                       # 👈 ADDITIONAL VOLUME
             - name: spire-data
               mountPath: /run/spire/data
               readOnly: false
@@ -151,8 +151,8 @@ spec:
         - name: spire-config
           configMap:
             name: spire-server
-        - name: tornjak-config # 👈 ADDITIONAL VOLUME
-          configMap: # 👈 ADDITIONAL VOLUME
+        - name: tornjak-config  # 👈 ADDITIONAL VOLUME
+          configMap:            # 👈 ADDITIONAL VOLUME
             name: tornjak-agent # 👈 ADDITIONAL VOLUME
   volumeClaimTemplates:
     - metadata:
@@ -226,7 +226,7 @@ spec:
             - name: spire-data
               mountPath: /run/spire/data
               readOnly: false
-            - name: socket # 👈 ADDITIONAL VOLUME
+            - name: socket                         # 👈 ADDITIONAL VOLUME
               mountPath: /tmp/spire-server/private # 👈 ADDITIONAL VOLUME
           livenessProbe:
             httpGet:
@@ -242,7 +242,8 @@ spec:
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 5
-        - name: tornjak-backend ### 👈 BEGIN ADDITIONAL CONTAINER ###
+        ### 👈 BEGIN ADDITIONAL CONTAINER ###
+        - name: tornjak-backend
           image: ghcr.io/spiffe/tornjak-be:latest
           args:
             - --config
@@ -262,16 +263,17 @@ spec:
               mountPath: /run/spire/data
               readOnly: false
             - name: socket
-              mountPath: /tmp/spire-server/private ### 👈 END ADDITIONAL CONTAINER ###
+              mountPath: /tmp/spire-server/private
+        ### 👈 END ADDITIONAL CONTAINER ###
       volumes:
         - name: spire-config
           configMap:
             name: spire-server
-        - name: tornjak-config # 👈 ADDITIONAL VOLUME
-          configMap: # 👈 ADDITIONAL VOLUME
+        - name: tornjak-config  # 👈 ADDITIONAL VOLUME
+          configMap:            # 👈 ADDITIONAL VOLUME
             name: tornjak-agent # 👈 ADDITIONAL VOLUME
-        - name: socket # 👈 ADDITIONAL VOLUME
-          emptyDir: {} # 👈 ADDITIONAL VOLUME
+        - name: socket          # 👈 ADDITIONAL VOLUME
+          emptyDir: {}          # 👈 ADDITIONAL VOLUME
   volumeClaimTemplates:
     - metadata:
         name: spire-data
@@ -345,7 +347,7 @@ spec:
             - name: spire-data
               mountPath: /run/spire/data
               readOnly: false
-            - name: socket # 👈 ADDITIONAL VOLUME
+            - name: socket                         # 👈 ADDITIONAL VOLUME
               mountPath: /tmp/spire-server/private # 👈 ADDITIONAL VOLUME
           livenessProbe:
             httpGet:
@@ -394,11 +396,11 @@ spec:
         - name: spire-config
           configMap:
             name: spire-server
-        - name: tornjak-config # 👈 ADDITIONAL VOLUME
-          configMap: # 👈 ADDITIONAL VOLUME
+        - name: tornjak-config  # 👈 ADDITIONAL VOLUME
+          configMap:            # 👈 ADDITIONAL VOLUME
             name: tornjak-agent # 👈 ADDITIONAL VOLUME
-        - name: socket # 👈 ADDITIONAL VOLUME
-          emptyDir: {} # 👈 ADDITIONAL VOLUME
+        - name: socket          # 👈 ADDITIONAL VOLUME
+          emptyDir: {}          # 👈 ADDITIONAL VOLUME
   volumeClaimTemplates:
     - metadata:
         name: spire-data
