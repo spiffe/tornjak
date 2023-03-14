@@ -34,7 +34,7 @@ minikube   Ready    master   79s   v1.18.3
 
 To obtain the relevant files, clone our git repository and cd into the correct directory:
 
-```
+```terminal
 git clone https://github.com/spiffe/tornjak.git
 cd docs/quickstart
 ```
@@ -78,6 +78,8 @@ Currently, we support two sidecar architectures:
 1. Only the Tornjak backend is run as a sidecar container that exposes only one port (to communicate with the Tornjak backend). It requires more deployment steps to deploy or use the frontend. However, this deployment type is fully-supported, has a smaller sidecar image without the frontend components, and ensures that the frontend and backend share no memory. 
 2. The frontend and backend run in the same container that exposes two separate ports (one frontend and one backend). This is experimental and not ready for production, but is useful for getting started with Tornjak with minimal deployment steps. 
 
+Choose one of the below to easily copy in the right server-statefulset file for you. 
+
 <details><summary> <b> 🔴 [Click] For the Tornjak-backend wrapped with the SPIRE server. (WARNING: CURRENTLY DEPRECATED) </b></summary>
 
 The relevant file is called `tornjak-spire-server-statefulset.yaml` within the examples directory.  Please copy to the relevant file as follows:
@@ -89,7 +91,7 @@ cp server-statefulset-examples/tornjak-spire-server-statefulset.yaml server-stat
 The statefulset that deploys a SPIRE server will now look something like this, where we have commented leading with a 👈 on the changed or new lines: 
 
 ```
-➜  quickstart git:(master) cat server-statefulset.yaml 
+$ cat server-statefulset.yaml 
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -188,7 +190,7 @@ cp server-statefulset-examples/backend-sidecar-server-statefulset.yaml server-st
 The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines: 
 
 ```
-➜  quickstart git:(master) cat server-statefulset.yaml 
+$ cat server-statefulset.yaml 
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -307,7 +309,7 @@ cp server-statefulset-examples/tornjak-sidecar-server-statefulset.yaml server-st
 The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines:
 
 ```
-➜  quickstart git:(master) cat server-statefulset.yaml 
+$ cat server-statefulset.yaml 
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -423,11 +425,11 @@ Note that there are three key differences in the StatefulSet file from that in t
 
 Now that we have the correct deployment files, please follow the below steps to deploy Tornjak and SPIRE!
 
-```
-➜  quickstart git:(master) kubectl apply -f spire-namespace.yaml
+```terminal
+$ kubectl apply -f spire-namespace.yaml
 namespace/spire created
 
-➜  quickstart git:(master)  kubectl apply \
+$ kubectl apply \
     -f server-account.yaml \
     -f spire-bundle-configmap.yaml \
     -f tornjak-configmap.yaml \
@@ -437,7 +439,7 @@ configmap/spire-bundle created
 clusterrole.rbac.authorization.k8s.io/spire-server-trust-role created
 clusterrolebinding.rbac.authorization.k8s.io/spire-server-trust-role-binding created
 
-➜  quickstart git:(master) kubectl apply \
+$ kubectl apply \
     -f server-configmap.yaml \
     -f server-statefulset.yaml \
     -f server-service.yaml
@@ -445,32 +447,32 @@ configmap/spire-server created
 statefulset.apps/spire-server created
 service/spire-server created
 
-➜  quickstart git:(master) kubectl get statefulset --namespace spire
+$ kubectl get statefulset --namespace spire
 NAME           READY   AGE
 spire-server   1/1     26s
 ```
 
 ### Deploying the agent and creating test entries
 
-```
-➜  quickstart git:(master) kubectl apply \
+```terminal
+$ kubectl apply \
     -f agent-account.yaml \
     -f agent-cluster-role.yaml
 serviceaccount/spire-agent created
 clusterrole.rbac.authorization.k8s.io/spire-agent-cluster-role created
 clusterrolebinding.rbac.authorization.k8s.io/spire-agent-cluster-role-binding created
 
-➜  quickstart git:(master) kubectl apply \
+$ kubectl apply \
     -f agent-configmap.yaml \
     -f agent-daemonset.yaml
 configmap/spire-agent created
 daemonset.apps/spire-agent created
 
-➜  quickstart git:(master) kubectl get daemonset --namespace spire
+$ kubectl get daemonset --namespace spire
 NAME          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
 spire-agent   1         1         1       1            1           <none>          19s
 
-➜  quickstart git:(master) kubectl exec -n spire spire-server-0 -- \
+$ kubectl exec -n spire spire-server-0 -- \
     /opt/spire/bin/spire-server entry create \
     -spiffeID spiffe://example.org/ns/spire/sa/spire-agent \
     -selector k8s_sat:cluster:demo-cluster \
@@ -486,7 +488,7 @@ Selector         : k8s_sat:agent_ns:spire
 Selector         : k8s_sat:agent_sa:spire-agent
 Selector         : k8s_sat:cluster:demo-cluster
 
-➜  quickstart git:(master) kubectl exec -n spire spire-server-0 -- \
+$ kubectl exec -n spire spire-server-0 -- \
     /opt/spire/bin/spire-server entry create \
     -spiffeID spiffe://example.org/ns/default/sa/default \
     -parentID spiffe://example.org/ns/spire/sa/spire-agent \
@@ -500,10 +502,10 @@ TTL              : default
 Selector         : k8s:ns:default
 Selector         : k8s:sa:default
 
-➜  quickstart git:(master) kubectl apply -f client-deployment.yaml
+$ kubectl apply -f client-deployment.yaml
 deployment.apps/client created
 
-➜  quickstart git:(master) kubectl exec -it $(kubectl get pods -o=jsonpath='{.items[0].metadata.name}' \
+$ kubectl exec -it $(kubectl get pods -o=jsonpath='{.items[0].metadata.name}' \
    -l app=client)  -- /opt/spire/bin/spire-agent api fetch -socketPath /run/spire/sockets/agent.sock
 Received 1 svid after 8.8537ms
 
@@ -516,8 +518,8 @@ CA #1 Valid Until:	2021-04-07 20:12:30 +0000 UTC
 
 Let's verify that the `spire-server-0` pod is now started with the new image:
 
-```TODO
-➜  quickstart git:(master) ✗ kubectl -n spire describe pod spire-server-0 | grep "Image:"
+```terminal
+$ kubectl -n spire describe pod spire-server-0 | grep "Image:"
     Image:         ghcr.io/spiffe/spire-server:1.4.4
     Image:         ghcr.io/spiffe/tornjak-be:latest
 ```
@@ -527,7 +529,7 @@ Let's verify that the `spire-server-0` pod is now started with the new image:
 The Tornjak HTTP server is running on port 10000 on the port. This can easily be accessed by performing a local port forward using `kubectl`. This will cause the local port 10000 to proxy to the Tornjak HTTP server.
 
 ```
-➜  quickstart git:(master) ✗ kubectl -n spire port-forward spire-server-0 10000:10000
+$ kubectl -n spire port-forward spire-server-0 10000:10000
 Forwarding from 127.0.0.1:10000 -> 10000
 Forwarding from [::1]:10000 -> 10000
 ```
