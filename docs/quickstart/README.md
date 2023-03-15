@@ -628,7 +628,11 @@ Forwarding from 127.0.0.1:10000 -> 10000
 Forwarding from [::1]:10000 -> 10000
 ```
 
-Open a browser to `http://localhost:10000/api/tornjak/serverinfo` and you should now be able to make Tornjak API calls!
+Let's test the access to the Tornjak backend application. 
+
+Open a browser to `http://localhost:10000/api/tornjak/serverinfo`
+
+This output represents the backend response. Now you should be able to make Tornjak API calls!
 
 ![tornjak-agent-browser](../rsrc/tornjak-agent-browser.png)
 
