@@ -3,9 +3,11 @@
 In this tutorial, we will show how to configure Tornjak with a SPIRE deployment using the SPIRE k8s quickstart tutorial. This is heavily inspired by the [SPIRE quickstart for Kubernetes](https://spiffe.io/docs/latest/try/getting-started-k8s/).
 
 This tutorial will get you up and running with Tornjak in two steps:
-1. Setup
-2. Deployment of SPIRE and co-located Tornjak
-3. Connecting
+1. [Requirements](#step-0-requirements)
+2. [Setup of Deployment files](#step-1-setup-spire-quickstart-tutorial)
+3. [Deployment of SPIRE and co-located Tornjak](#step-2-deployment)
+4. [Connecting to Tornjak](#step-3-configuring-access-to-tornjak)
+5. [Cleanup](#cleanup)
 
 ## Step 0: Requirements
 
@@ -14,7 +16,7 @@ We tested this quickstart with the following requirements:
  - Kubernetes version 1.18.3
  - Docker version 20.10.23
 
-## Step 1: Setup SPIRE k8s quickstart tutorial
+## Step 1: Setup SPIRE quickstart tutorial
 
 ### Setting up k8s
 
@@ -459,8 +461,7 @@ Note that there are three key differences in the StatefulSet file from that in t
 Now that we have the correct deployment files, please follow the below steps to deploy Tornjak and SPIRE!
 
 ```terminal
-kubectl apply -f spire-namespace.yaml
-kubectl apply \
+kubectl apply -f spire-namespace.yaml \
     -f server-account.yaml \
     -f spire-bundle-configmap.yaml \
     -f tornjak-configmap.yaml \
@@ -483,6 +484,8 @@ spire-server   1/1     26s
 
 ### Deploying the agent and creating test entries
 
+The following steps will configure and deploy the SPIRE agent. 
+
 ```terminal
 kubectl apply \
     -f agent-account.yaml \
@@ -495,8 +498,13 @@ kubectl apply \
 kubectl get daemonset --namespace spire
 ```
 
+```
 NAME          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
 spire-agent   1         1         1       1            1           <none>          19s
+
+```
+
+Then, we can create a registration entry for the node. 
 
 ```
 kubectl exec -n spire spire-server-0 -- \
@@ -519,6 +527,8 @@ Selector         : k8s_sat:agent_sa:spire-agent
 Selector         : k8s_sat:cluster:demo-cluster
 ```
 
+And finally we create a registration workload for the workload, specifying the workload's SPIFFE ID:
+
 ```
 kubectl exec -n spire spire-server-0 -- \
     /opt/spire/bin/spire-server entry create \
@@ -538,9 +548,13 @@ Selector         : k8s:ns:default
 Selector         : k8s:sa:default
 ```
 
+Finally, here we configure a workload container: 
+
 ```
 kubectl apply -f client-deployment.yaml
 ```
+
+And also verify that the container can access the workload API UNIX domain socket:
 
 ```
 kubectl exec -it $(kubectl get pods -o=jsonpath='{.items[0].metadata.name}' \
@@ -565,7 +579,7 @@ kubectl -n spire describe pod spire-server-0 | grep "Image:"
     Image:         ghcr.io/spiffe/tornjak-be:latest
 ```
 
-## Making the Tornjak Backend Accessible
+## Step 3: Configuring Access to Tornjak
 
 The Tornjak HTTP server is running on port 10000 on the pod. This can easily be accessed by performing a local port forward using `kubectl`. This will cause the local port 10000 to proxy to the Tornjak HTTP server.
 
@@ -624,4 +638,25 @@ To create a production build, use npm run build.
 This exposes the frontend at http://localhost:3000.  If you visit in your browser, you should see this page:
 
 ![tornjak-ui](../rsrc/tornjak-ui.png)
+
+## Cleanup
+
+Here are the steps to clean the deployed entities. First, we delete the workload container:
+
+```terminal
+kubectl delete deployment client
+```
+
+Then, delete the spire agent and server, along with the namespace we created:
+
+```terminal
+kubectl delete namespace spire
+```
+
+Finally, we can delete the ClusterRole and ClusterRoleBinding:
+
+```terminal
+kubectl delete clusterrole spire-server-trust-role spire-agent-cluster-role
+kubectl delete clusterrolebinding spire-server-trust-role-binding spire-agent-cluster-role-binding
+```
 
