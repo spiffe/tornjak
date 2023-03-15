@@ -470,7 +470,27 @@ kubectl apply -f spire-namespace.yaml \
     -f server-service.yaml
 ```
 
-The above command should deploy the SPIRE server with Tornjak. Before continuing, check that the spire-server is ready: 
+The above command should deploy the SPIRE server with Tornjak:
+
+```
+namespace/spire created
+serviceaccount/spire-server created
+configmap/spire-bundle created
+configmap/tornjak-agent created
+role.rbac.authorization.k8s.io/spire-server-configmap-role created
+rolebinding.rbac.authorization.k8s.io/spire-server-configmap-role-binding created
+clusterrole.rbac.authorization.k8s.io/spire-server-trust-role created
+clusterrolebinding.rbac.authorization.k8s.io/spire-server-trust-role-binding created
+configmap/spire-server created
+statefulset.apps/spire-server created
+service/spire-server created
+service/tornjak-be-http created
+service/tornjak-be-tls created
+service/tornjak-be-mtls created
+service/tornjak-fe created
+```
+
+Before continuing, check that the spire-server is ready: 
 
 ```
 kubectl get statefulset --namespace spire
@@ -488,9 +508,17 @@ The following steps will configure and deploy the SPIRE agent.
 ```terminal
 kubectl apply \
     -f agent-account.yaml \
-    -f agent-cluster-role.yaml
+    -f agent-cluster-role.yaml \
     -f agent-configmap.yaml \
     -f agent-daemonset.yaml
+```
+
+```
+serviceaccount/spire-agent created
+clusterrole.rbac.authorization.k8s.io/spire-agent-cluster-role created
+clusterrolebinding.rbac.authorization.k8s.io/spire-agent-cluster-role-binding created
+configmap/spire-agent created
+daemonset.apps/spire-agent created
 ```
 
 ```
@@ -506,7 +534,7 @@ spire-agent   1         1         1       1            1           <none>       
 Then, we can create a registration entry for the node. 
 
 ```
-kubectl exec -n spire spire-server-0 -- \
+kubectl exec -n spire -c spire-server spire-server-0 -- \
     /opt/spire/bin/spire-server entry create \
     -spiffeID spiffe://example.org/ns/spire/sa/spire-agent \
     -selector k8s_sat:cluster:demo-cluster \
@@ -529,7 +557,7 @@ Selector         : k8s_sat:cluster:demo-cluster
 And finally we create a registration workload for the workload, specifying the workload's SPIFFE ID:
 
 ```
-kubectl exec -n spire spire-server-0 -- \
+kubectl exec -n spire -c spire-server spire-server-0 -- \
     /opt/spire/bin/spire-server entry create \
     -spiffeID spiffe://example.org/ns/default/sa/default \
     -parentID spiffe://example.org/ns/spire/sa/spire-agent \
@@ -574,6 +602,11 @@ Let's verify that the `spire-server-0` pod is now started with the new image:
 
 ```terminal
 kubectl -n spire describe pod spire-server-0 | grep "Image:"
+```
+
+Should yield two lines:
+
+```
     Image:         ghcr.io/spiffe/spire-server:1.4.4
     Image:         ghcr.io/spiffe/tornjak-be:latest
 ```
@@ -583,16 +616,21 @@ kubectl -n spire describe pod spire-server-0 | grep "Image:"
 The Tornjak HTTP server is running on port 10000 on the pod. This can easily be accessed by performing a local port forward using `kubectl`. This will cause the local port 10000 to proxy to the Tornjak HTTP server.
 
 ```terminal
-$ kubectl -n spire port-forward spire-server-0 10000:10000
+kubectl -n spire port-forward spire-server-0 10000:10000
+```
+
+You'll see something that hangs like this:
+
+```
 Forwarding from 127.0.0.1:10000 -> 10000
 Forwarding from [::1]:10000 -> 10000
 ```
 
-Open a browser to `http://localhost:10000` and you should now be able to make Tornjak API calls!
+Open a browser to `http://localhost:10000/api/tornjak/serverinfo` and you should now be able to make Tornjak API calls!
 
 ![tornjak-agent-browser](../rsrc/tornjak-agent-browser.png)
 
-## Connecting the Tornjak UI
+### Connecting to the Tornjak UI
 
 Make sure that the backend is accessible from your browser at `http://localhost:10000`, as above, or the frontend will not work
 
@@ -612,6 +650,8 @@ Otherwise, you will need to deploy the separate frontend separately to access th
 ```
 docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak-fe:latest 
 ```
+
+After the image is downloaded, you will eventually see the following output:
 
 ```
 > tornjak-frontend@0.1.0 start
@@ -633,6 +673,8 @@ You can now view tornjak-frontend in the browser.
 Note that the development build is not optimized.
 To create a production build, use npm run build.
 ```
+
+Note, it will likely take a few minutes for the applicaiton to compile successfully. 
 
 This exposes the frontend at http://localhost:3000.  If you visit in your browser, you should see this page:
 
