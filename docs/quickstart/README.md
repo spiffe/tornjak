@@ -2,7 +2,9 @@
 
 In this tutorial, we will show how to configure Tornjak with a SPIRE deployment using the SPIRE k8s quickstart tutorial. This is heavily inspired by the [SPIRE quickstart for Kubernetes](https://spiffe.io/docs/latest/try/getting-started-k8s/).
 
-This tutorial will get you up and running with Tornjak in two steps:
+This tutorial will get you up and running with a local deployment of SPIRE and Tornjak in three simple steps: setting up the deployment files, deployment, and connecting to Tornjak. 
+
+Contents
 1. [Requirements](#step-0-requirements)
 2. [Setup of Deployment files](#step-1-setup-quickstart-tutorial)
 3. [Deployment of SPIRE and co-located Tornjak](#step-2-deployment)
@@ -554,7 +556,7 @@ Selector         : k8s_sat:agent_sa:spire-agent
 Selector         : k8s_sat:cluster:demo-cluster
 ```
 
-And finally we create a registration workload for the workload, specifying the workload's SPIFFE ID:
+And we create a registration workload for the workload, specifying the workload's SPIFFE ID:
 
 ```
 kubectl exec -n spire -c spire-server spire-server-0 -- \
@@ -575,7 +577,7 @@ Selector         : k8s:ns:default
 Selector         : k8s:sa:default
 ```
 
-Finally, here we configure a workload container: 
+Finally, here we deploy a workload container: 
 
 ```
 kubectl apply -f client-deployment.yaml
