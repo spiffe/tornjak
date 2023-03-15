@@ -484,30 +484,31 @@ spire-server   1/1     26s
 ### Deploying the agent and creating test entries
 
 ```terminal
-$ kubectl apply \
+kubectl apply \
     -f agent-account.yaml \
     -f agent-cluster-role.yaml
-serviceaccount/spire-agent created
-clusterrole.rbac.authorization.k8s.io/spire-agent-cluster-role created
-clusterrolebinding.rbac.authorization.k8s.io/spire-agent-cluster-role-binding created
-
-$ kubectl apply \
     -f agent-configmap.yaml \
     -f agent-daemonset.yaml
-configmap/spire-agent created
-daemonset.apps/spire-agent created
+```
 
-$ kubectl get daemonset --namespace spire
+```
+kubectl get daemonset --namespace spire
+```
+
 NAME          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
 spire-agent   1         1         1       1            1           <none>          19s
 
-$ kubectl exec -n spire spire-server-0 -- \
+```
+kubectl exec -n spire spire-server-0 -- \
     /opt/spire/bin/spire-server entry create \
     -spiffeID spiffe://example.org/ns/spire/sa/spire-agent \
     -selector k8s_sat:cluster:demo-cluster \
     -selector k8s_sat:agent_ns:spire \
     -selector k8s_sat:agent_sa:spire-agent \
     -node
+```
+
+```
 Entry ID         : 03d0ec2b-54b7-4340-a0b9-d3b2cf1b041a
 SPIFFE ID        : spiffe://example.org/ns/spire/sa/spire-agent
 Parent ID        : spiffe://example.org/spire/server
@@ -516,13 +517,18 @@ TTL              : default
 Selector         : k8s_sat:agent_ns:spire
 Selector         : k8s_sat:agent_sa:spire-agent
 Selector         : k8s_sat:cluster:demo-cluster
+```
 
-$ kubectl exec -n spire spire-server-0 -- \
+```
+kubectl exec -n spire spire-server-0 -- \
     /opt/spire/bin/spire-server entry create \
     -spiffeID spiffe://example.org/ns/default/sa/default \
     -parentID spiffe://example.org/ns/spire/sa/spire-agent \
     -selector k8s:ns:default \
     -selector k8s:sa:default
+```
+
+```
 Entry ID         : 11a367ab-7095-4390-ab89-34dea5fddd61
 SPIFFE ID        : spiffe://example.org/ns/default/sa/default
 Parent ID        : spiffe://example.org/ns/spire/sa/spire-agent
@@ -530,12 +536,18 @@ Revision         : 0
 TTL              : default
 Selector         : k8s:ns:default
 Selector         : k8s:sa:default
+```
 
-$ kubectl apply -f client-deployment.yaml
-deployment.apps/client created
+```
+kubectl apply -f client-deployment.yaml
+```
 
-$ kubectl exec -it $(kubectl get pods -o=jsonpath='{.items[0].metadata.name}' \
+```
+kubectl exec -it $(kubectl get pods -o=jsonpath='{.items[0].metadata.name}' \
    -l app=client)  -- /opt/spire/bin/spire-agent api fetch -socketPath /run/spire/sockets/agent.sock
+```
+
+```
 Received 1 svid after 8.8537ms
 
 SPIFFE ID:		spiffe://example.org/ns/default/sa/default
@@ -548,7 +560,7 @@ CA #1 Valid Until:	2021-04-07 20:12:30 +0000 UTC
 Let's verify that the `spire-server-0` pod is now started with the new image:
 
 ```terminal
-$ kubectl -n spire describe pod spire-server-0 | grep "Image:"
+kubectl -n spire describe pod spire-server-0 | grep "Image:"
     Image:         ghcr.io/spiffe/spire-server:1.4.4
     Image:         ghcr.io/spiffe/tornjak-be:latest
 ```
@@ -574,7 +586,10 @@ Make sure that the backend is accessible from your browser at `http://localhost:
 Note that if you chose to deploy the Tornjak image that includes the frontend component, you only need to execute the following command to enable access to the frontend that is already running:
 
 ```
-➜  quickstart git:(master) ✗ kubectl -n spire port-forward spire-server-0 3000:3000
+kubectl -n spire port-forward spire-server-0 3000:3000
+```
+
+```
 Forwarding from 127.0.0.1:3000 -> 3000
 Forwarding from [::1]:3000 -> 3000
 ```
@@ -582,8 +597,10 @@ Forwarding from [::1]:3000 -> 3000
 Otherwise, you will need to deploy the separate frontend separately to access the exposed Tornjak backend. We have prebuilt the frontend in a container, so we can simply run it via a single docker command in a separate terminal, which will take a couple minutes to run: 
 
 ```
-➜  quickstart git:(master) ✗ docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak-fe:latest 
+docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak-fe:latest 
+```
 
+```
 > tornjak-frontend@0.1.0 start
 > react-scripts --openssl-legacy-provider start
 
