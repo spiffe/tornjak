@@ -4,7 +4,7 @@ In this tutorial, we will show how to configure Tornjak with a SPIRE deployment 
 
 This tutorial will get you up and running with Tornjak in two steps:
 1. Setup
-2. Deployment
+2. Deployment of SPIRE and co-located Tornjak
 3. Connecting
 
 ## Step 0: Requirements
@@ -58,7 +58,12 @@ cd docs/quickstart
 Notice, the files in this directory are largely the same files as provided by the [SPIRE quickstart for Kubernetes](https://spiffe.io/docs/latest/try/getting-started-k8s/). However, there are some minor key differences. Notice the new ConfigMap file:
 
 ```terminal
-$ cat tornjak-configmap.yaml 
+cat tornjak-configmap.yaml 
+```
+
+This configmap has contents to configure the Tornjak backend: 
+
+```
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -81,11 +86,12 @@ data:
     }
 ```
 
-The above is a file that will configure the Tornjak backend. 
+More information on this config file format can be found in [our config documentation](../config-tornjak-agent.md). 
 
 Additionally, we have sample server-statefulset files in the directory `server-statefulset-examples`. We will copy one of them in depending on which deployment scheme you would like. 
 
 ### Choosing the Statefulset Deployment
+
 
 These steps will be different depending on what architecture makes sense for you. Note we have deprecated support of the architecture where parts of Tornjak run on the same container as SPIRE. 
 
@@ -107,7 +113,10 @@ cp server-statefulset-examples/tornjak-spire-server-statefulset.yaml server-stat
 The statefulset that deploys a SPIRE server will now look something like this, where we have commented leading with a 👈 on the changed or new lines: 
 
 ```
-$ cat server-statefulset.yaml 
+cat server-statefulset.yaml 
+```
+
+```
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -206,7 +215,10 @@ cp server-statefulset-examples/backend-sidecar-server-statefulset.yaml server-st
 The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines: 
 
 ```
-$ cat server-statefulset.yaml 
+cat server-statefulset.yaml 
+```
+
+```
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -312,7 +324,7 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 
 </details>
 
-<details><summary><b> 🔴 [Click] For the Tornjak-backend + frontend sidecar implementation (if you are unsure, choose this) </b></summary>
+<details><summary><b> 🔴 [Click] For the Tornjak-backend + frontend sidecar implementation (our default deployment recommended to those getting started) </b></summary>
 
 This has the same architecture as deploying with just a Tornjak backend, but with an additional Tornjak frontend process deployed in the same container. This will expose two ports: one for the frontend and one for the backend. 
 
@@ -327,7 +339,10 @@ cp server-statefulset-examples/tornjak-sidecar-server-statefulset.yaml server-st
 The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines:
 
 ```
-$ cat server-statefulset.yaml 
+cat server-statefulset.yaml 
+```
+
+```
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -444,28 +459,24 @@ Note that there are three key differences in the StatefulSet file from that in t
 Now that we have the correct deployment files, please follow the below steps to deploy Tornjak and SPIRE!
 
 ```terminal
-$ kubectl apply -f spire-namespace.yaml
-namespace/spire created
-
-$ kubectl apply \
+kubectl apply -f spire-namespace.yaml
+kubectl apply \
     -f server-account.yaml \
     -f spire-bundle-configmap.yaml \
     -f tornjak-configmap.yaml \
-    -f server-cluster-role.yaml
-serviceaccount/spire-server created
-configmap/spire-bundle created
-clusterrole.rbac.authorization.k8s.io/spire-server-trust-role created
-clusterrolebinding.rbac.authorization.k8s.io/spire-server-trust-role-binding created
-
-$ kubectl apply \
+    -f server-cluster-role.yaml \
     -f server-configmap.yaml \
     -f server-statefulset.yaml \
     -f server-service.yaml
-configmap/spire-server created
-statefulset.apps/spire-server created
-service/spire-server created
+```
 
-$ kubectl get statefulset --namespace spire
+The above command should deploy the SPIRE server with Tornjak. Before continuing, check that the spire-server is ready: 
+
+```
+kubectl get statefulset --namespace spire
+```
+
+```
 NAME           READY   AGE
 spire-server   1/1     26s
 ```
@@ -558,7 +569,7 @@ Open a browser to `http://localhost:10000` and you should now be able to make To
 
 ## Connecting the Tornjak UI
 
-Be sure that the backend is accessible at `http://localhost:10000`, as above, or you may not work
+Make sure that the backend is accessible from your browser at `http://localhost:10000`, as above, or the frontend will not work
 
 Note that if you chose to deploy the Tornjak image that includes the frontend component, you only need to execute the following command to enable access to the frontend that is already running:
 
