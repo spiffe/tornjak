@@ -4,7 +4,7 @@ In this tutorial, we will show how to configure Tornjak with a SPIRE deployment 
 
 This tutorial will get you up and running with Tornjak in two steps:
 1. [Requirements](#step-0-requirements)
-2. [Setup of Deployment files](#step-1-setup-spire-quickstart-tutorial)
+2. [Setup of Deployment files](#step-1-setup-quickstart-tutorial)
 3. [Deployment of SPIRE and co-located Tornjak](#step-2-deployment)
 4. [Connecting to Tornjak](#step-3-configuring-access-to-tornjak)
 5. [Cleanup](#cleanup)
@@ -12,11 +12,10 @@ This tutorial will get you up and running with Tornjak in two steps:
 ## Step 0: Requirements
 
 We tested this quickstart with the following requirements:
- - Minikube version 1.12.0
- - Kubernetes version 1.18.3
- - Docker version 20.10.23
+ - [Minikube](https://minikube.sigs.k8s.io/docs/start/) version 1.12.0
+ - [Docker](https://docs.docker.com/get-docker/) version 20.10.23
 
-## Step 1: Setup SPIRE quickstart tutorial
+## Step 1: Setup quickstart tutorial
 
 ### Setting up k8s
 
