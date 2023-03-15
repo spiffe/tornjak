@@ -3,8 +3,16 @@
 In this tutorial, we will show how to configure Tornjak with a SPIRE deployment using the SPIRE k8s quickstart tutorial. This is heavily inspired by the [SPIRE quickstart for Kubernetes](https://spiffe.io/docs/latest/try/getting-started-k8s/).
 
 This tutorial will get you up and running with Tornjak in two steps:
-1. Deployment
-2. Connecting to the Tornjak frontend
+1. Setup
+2. Deployment
+3. Connecting
+
+## Step 0: Requirements
+
+We tested this quickstart with the following requirements:
+ - Minikube version 1.12.0
+ - Kubernetes version 1.18.3
+ - Docker version 20.10.23
 
 ## Step 1: Setup SPIRE k8s quickstart tutorial
 
@@ -13,7 +21,10 @@ This tutorial will get you up and running with Tornjak in two steps:
 For this tutorial, we will use minikube. If you have an existing kubernetes cluster, feel free to use that. 
 
 ```terminal
-$ minikube start
+minikube start
+```
+
+```
 😄  minikube v1.12.0 on Darwin 11.2
 🎉  minikube 1.18.1 is available! Download it: https://github.com/kubernetes/minikube/releases/tag/v1.18.1
 💡  To disable this notice, run: 'minikube config set WantUpdateNotification false'
@@ -24,8 +35,13 @@ $ minikube start
 🔎  Verifying Kubernetes components...
 🌟  Enabled addons: default-storageclass, storage-provisioner
 🏄  Done! kubectl is now configured to use "minikube"
+```
 
-$ kubectl get nodes
+```
+kubectl get nodes
+```
+
+```
 NAME       STATUS   ROLES    AGE   VERSION
 minikube   Ready    master   79s   v1.18.3
 ```
@@ -67,9 +83,9 @@ data:
 
 The above is a file that will configure the Tornjak backend. 
 
-Additionally, we have sample server-statefulset files in the directory `server-statefulset-examples`. We will copy one of them in depending on which architecture you would like. 
+Additionally, we have sample server-statefulset files in the directory `server-statefulset-examples`. We will copy one of them in depending on which deployment scheme you would like. 
 
-### Choosing the Statefulset architecture
+### Choosing the Statefulset Deployment
 
 These steps will be different depending on what architecture makes sense for you. Note we have deprecated support of the architecture where parts of Tornjak run on the same container as SPIRE. 
 
