@@ -23,8 +23,8 @@ We tested this quickstart with the following requirements:
 
 For this tutorial, we will use minikube. If you have an existing kubernetes cluster, feel free to use that. 
 
-```shell
-minikube start
+```console
+$ minikube start
 ```
 
 ```
