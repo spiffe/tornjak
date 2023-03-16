@@ -506,12 +506,14 @@ Let's verify that the `spire-server-0` pod is now started with the new image:
 kubectl -n spire describe pod spire-server-0 | grep "Image:"
 ```
 
-Should yield two lines:
+Should yield two lines depending on which deployment you used:
 
 ```
     Image:         ghcr.io/spiffe/spire-server:1.4.4
-    Image:         ghcr.io/spiffe/tornjak-be:latest
+    Image:         <TORNJAK-IMAGE>
 ```
+
+where `<TORNJAK-IMAGE>` is `ghcr.io/spiffe/tornjak:latest` if you deployed the Tornjak with the UI and is `ghcr.io/spiffe/tornjak-be:latest` if you deployed only the Tornjak backend. 
 
 ## Step 3: Configuring Access to Tornjak
 
