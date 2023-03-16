@@ -55,8 +55,6 @@ The above command is an example of how to run the frontend. This creates a UI av
 
 ## Tornjak
 
-WARNING: This is currently an experimental feature. 
-
 This container may be used as an alternative to having a frontend and backend container separately. The backend is configured exactly as the [Tornjak backend] with container arguments, and the frontend is configured exactly as the [Tornjak frontend] with container environment variables. 
 
 An example command:

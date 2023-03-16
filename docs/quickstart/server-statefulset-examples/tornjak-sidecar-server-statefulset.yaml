@@ -33,7 +33,7 @@ spec:
             - name: spire-data
               mountPath: /run/spire/data
               readOnly: false
-            - name: socket # 👈 ADDITIONAL VOLUME
+            - name: socket                         # 👈 ADDITIONAL VOLUME
               mountPath: /tmp/spire-server/private # 👈 ADDITIONAL VOLUME
           livenessProbe:
             httpGet:
@@ -49,13 +49,20 @@ spec:
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 5
-        - name: tornjak-backend ### 👈 BEGIN ADDITIONAL CONTAINER ###
-          image: ghcr.io/spiffe/tornjak-be:latest
+        ### 👈 BEGIN ADDITIONAL CONTAINER ###
+        - name: tornjak
+          image: ghcr.io/spiffe/tornjak:latest
+          imagePullPolicy: Always
           args:
-            - --config
+            - -config
             - /run/spire/config/server.conf
-            - --tornjak-config
+            - -tornjak-config
             - /run/spire/tornjak-config/server.conf
+          env: 
+            - name: REACT_APP_API_SERVER_URI
+              value: http://localhost:10000
+            - name: NODE_OPTIONS
+              value: --openssl-legacy-provider
           ports:
             - containerPort: 8081
           volumeMounts:
@@ -69,16 +76,17 @@ spec:
               mountPath: /run/spire/data
               readOnly: false
             - name: socket
-              mountPath: /tmp/spire-server/private ### 👈 END ADDITIONAL CONTAINER ###
+              mountPath: /tmp/spire-server/private
+        ### 👈 END ADDITIONAL CONTAINER ###
       volumes:
         - name: spire-config
           configMap:
             name: spire-server
-        - name: tornjak-config # 👈 ADDITIONAL VOLUME
-          configMap: # 👈 ADDITIONAL VOLUME
+        - name: tornjak-config  # 👈 ADDITIONAL VOLUME
+          configMap:            # 👈 ADDITIONAL VOLUME
             name: tornjak-agent # 👈 ADDITIONAL VOLUME
-        - name: socket # 👈 ADDITIONAL VOLUME
-          emptyDir: {} # 👈 ADDITIONAL VOLUME
+        - name: socket          # 👈 ADDITIONAL VOLUME
+          emptyDir: {}          # 👈 ADDITIONAL VOLUME
   volumeClaimTemplates:
     - metadata:
         name: spire-data
@@ -89,4 +97,3 @@ spec:
         resources:
           requests:
             storage: 1Gi
-
