@@ -8,11 +8,11 @@ CONTAINER_BACKEND_WITH_SPIRE_TAG ?= tsidentity/tornjak-be-spire-server:latest
 CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-fe:$(VERSION)
 CONTAINER_BACKEND_SPIRE_VERSION_IMAGEPATH ?= tsidentity/tornjak-be-spire-server
 
-CONTAINER_TORNJAK_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak:$(VERSION)
+CONTAINER_TORNJAK_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak
 CONTAINER_BACKEND_SPIRE_VERSION_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-be-spire-server
-CONTAINER_BACKEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-be:$(VERSION)
-CONTAINER_FRONTEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-fe:$(VERSION)
-CONTAINER_MANAGER_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-manager:$(VERSION)
+CONTAINER_BACKEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-be
+CONTAINER_FRONTEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-fe
+CONTAINER_MANAGER_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-manager
 
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:$(VERSION)
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
@@ -85,9 +85,11 @@ container-tornjak-push: container-tornjak
 
 # releases for Github Container Registry
 release-tornjak-be-ghcr: container-tornjak-be
-	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_GHCR_IMAGEPATH}
+	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_GHCR_IMAGEPATH}:latest
+	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_GHCR_IMAGEPATH}:$(VERSION)
 	docker push ${CONTAINER_BACKEND_TAG}
-	docker push ${CONTAINER_BACKEND_GHCR_IMAGEPATH}
+	docker push ${CONTAINER_BACKEND_GHCR_IMAGEPATH}:latest
+	docker push ${CONTAINER_BACKEND_GHCR_IMAGEPATH}:${VERSION}
 
 release-tornjak-be-spire-multiversions: bin/tornjak-backend
 	for i in $(shell cat SPIRE_BUILD_VERSIONS); do \
@@ -100,20 +102,26 @@ release-tornjak-be-spire-multiversions-ghcr: bin/tornjak-backend
 	done
 
 release-tornjak-fe-ghcr: container-frontend
-	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}
+	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}:latest
+	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}:$(VERSION)
 	docker push ${CONTAINER_FRONTEND_TAG}
-	docker push ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}
+	docker push ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}:latest
+	docker push ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}:$(VERSION)
 
 # PLACEHOLDER FOR TORNJAK IMAGE WITH BE AND FE
 release-tornjak-ghcr: container-tornjak
-	docker tag ${CONTAINER_TAG} ${CONTAINER_TORNJAK_GHCR_IMAGEPATH}
+	docker tag ${CONTAINER_TAG} ${CONTAINER_TORNJAK_GHCR_IMAGEPATH}:latest
+	docker tag ${CONTAINER_TAG} ${CONTAINER_TORNJAK_GHCR_IMAGEPATH}:$(VERSION)
 	docker push ${CONTAINER_TAG}
-	docker push ${CONTAINER_TORNJAK_GHCR_IMAGEPATH}
+	docker push ${CONTAINER_TORNJAK_GHCR_IMAGEPATH}:latest
+	docker push ${CONTAINER_TORNJAK_GHCR_IMAGEPATH}:$(VERSION)
 
 release-tornjak-manager-ghcr: container-manager
-	docker tag ${CONTAINER_MANAGER_TAG} ${CONTAINER_MANAGER_GHCR_IMAGEPATH}
+	docker tag ${CONTAINER_MANAGER_TAG} ${CONTAINER_MANAGER_GHCR_IMAGEPATH}:latest
+	docker tag ${CONTAINER_MANAGER_TAG} ${CONTAINER_MANAGER_GHCR_IMAGEPATH}:$(VERSION)
 	docker push ${CONTAINER_MANAGER_TAG}
-	docker push ${CONTAINER_MANAGER_GHCR_IMAGEPATH}
+	docker push ${CONTAINER_MANAGER_GHCR_IMAGEPATH}:latest
+	docker push ${CONTAINER_MANAGER_GHCR_IMAGEPATH}:$(VERSION)
 
 clean:
 	rm -rf bin/
