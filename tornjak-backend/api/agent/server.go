@@ -625,7 +625,7 @@ func (s *Server) ConfigureDefaults() (error) {
 	expBackoff := backoff.NewExponentialBackOff()
 	expBackoff.MaxElapsedTime = time.Second
 
-	s.Db, err = agentdb.NewLocalSqliteDB("sqlite3", "./localtornjakdb", expBackoff)
+	s.Db, err = agentdb.NewLocalSqliteDB("sqlite3", "./tornjak.sqlite3", expBackoff)
 	if err != nil {
 		return errors.Errorf("Cannot configure default datastore plugin: %v", err)
 	}
