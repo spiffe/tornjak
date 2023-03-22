@@ -1,16 +1,18 @@
 .PHONY: ui vendor build ui-agent ui-manager container-tornjak-be-spire container-tornjak-be-spire-push container-manager container-manager-push release-tornjak-be-spire-multiversions push container-frontend container-frontend-push container-tornjak-be container-tornjak-be-push
 
+VERSION=$(shell cat version.txt)
+
 CONTAINER_TAG ?= tsidentity/tornjak:latest
 CONTAINER_BACKEND_TAG ?= tsidentity/tornjak-be:latest
 CONTAINER_BACKEND_WITH_SPIRE_TAG ?= tsidentity/tornjak-be-spire-server:latest
 CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-fe:latest
 CONTAINER_BACKEND_SPIRE_VERSION_IMAGEPATH ?= tsidentity/tornjak-be-spire-server
 
-CONTAINER_TORNJAK_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak
+CONTAINER_TORNJAK_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak:$(VERSION)
 CONTAINER_BACKEND_SPIRE_VERSION_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-be-spire-server
-CONTAINER_BACKEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-be
-CONTAINER_FRONTEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-fe
-CONTAINER_MANAGER_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-manager
+CONTAINER_BACKEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-be:$(VERSION)
+CONTAINER_FRONTEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-fe:$(VERSION)
+CONTAINER_MANAGER_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-manager:$(VERSION)
 
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:latest
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
