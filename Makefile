@@ -2,10 +2,10 @@
 
 VERSION=$(shell cat version.txt)
 
-CONTAINER_TAG ?= tsidentity/tornjak:latest
-CONTAINER_BACKEND_TAG ?= tsidentity/tornjak-be:latest
+CONTAINER_TAG ?= tsidentity/tornjak:$(VERSION)
+CONTAINER_BACKEND_TAG ?= tsidentity/tornjak-be:$(VERSION)
 CONTAINER_BACKEND_WITH_SPIRE_TAG ?= tsidentity/tornjak-be-spire-server:latest
-CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-fe:latest
+CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-fe:$(VERSION)
 CONTAINER_BACKEND_SPIRE_VERSION_IMAGEPATH ?= tsidentity/tornjak-be-spire-server
 
 CONTAINER_TORNJAK_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak:$(VERSION)
@@ -14,7 +14,7 @@ CONTAINER_BACKEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-be:$(VERSION)
 CONTAINER_FRONTEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-fe:$(VERSION)
 CONTAINER_MANAGER_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-manager:$(VERSION)
 
-CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:latest
+CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:$(VERSION)
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
 
 all: bin/tornjak-backend bin/tornjak-manager ui-manager container-manager container-frontend container-tornjak-be
@@ -86,6 +86,7 @@ container-tornjak-push: container-tornjak
 # releases for Github Container Registry
 release-tornjak-be-ghcr: container-tornjak-be
 	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_GHCR_IMAGEPATH}
+	docker push ${CONTAINER_BACKEND_TAG}
 	docker push ${CONTAINER_BACKEND_GHCR_IMAGEPATH}
 
 release-tornjak-be-spire-multiversions: bin/tornjak-backend
@@ -100,15 +101,18 @@ release-tornjak-be-spire-multiversions-ghcr: bin/tornjak-backend
 
 release-tornjak-fe-ghcr: container-frontend
 	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}
+	docker push ${CONTAINER_FRONTEND_TAG}
 	docker push ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}
 
 # PLACEHOLDER FOR TORNJAK IMAGE WITH BE AND FE
 release-tornjak-ghcr: container-tornjak
 	docker tag ${CONTAINER_TAG} ${CONTAINER_TORNJAK_GHCR_IMAGEPATH}
+	docker push ${CONTAINER_TAG}
 	docker push ${CONTAINER_TORNJAK_GHCR_IMAGEPATH}
 
 release-tornjak-manager-ghcr: container-manager
 	docker tag ${CONTAINER_MANAGER_TAG} ${CONTAINER_MANAGER_GHCR_IMAGEPATH}
+	docker push ${CONTAINER_MANAGER_TAG}
 	docker push ${CONTAINER_MANAGER_GHCR_IMAGEPATH}
 
 clean:
