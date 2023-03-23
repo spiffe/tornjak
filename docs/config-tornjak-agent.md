@@ -58,7 +58,7 @@ plugins {
     DataStore "sql" {
         plugin_data {
             database_type = "sqlite3"
-            connection_string = "./agentlocaldb"
+            connection_string = "/run/spire/data/tornjak.sqlite3"
         }
     }
 

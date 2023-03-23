@@ -82,7 +82,7 @@ data:
       DataStore "sql" {
         plugin_data {
           drivername = "sqlite3"
-          filename = "./agentlocaldb"
+          filename = "/run/spire/data/tornjak.sqlite3"
         }
       }
 
