@@ -36,13 +36,13 @@ jobs:
       # - name: Set backend-spire image name
       #   run: echo "CONTAINER_BACKEND_WITH_SPIRE_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-be-spire-server:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set backend image name
-        run: echo "CONTAINER_BACKEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-be:$GITHUB_COMMIT_SHA" >> $GITHUB_ENV
+        run: echo "CONTAINER_BACKEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-be:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set frontend image name
-        run: echo "CONTAINER_FRONTEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-fe:$GITHUB_COMMIT_SHA" >> $GITHUB_ENV
+        run: echo "CONTAINER_FRONTEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-fe:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set Tornjak image name
-        run: echo "CONTAINER_TAG=ghcr.io/${{ github.repository_owner }}/tornjak:$GITHUB_COMMIT_SHA" >> $GITHUB_ENV
+        run: echo "CONTAINER_TAG=ghcr.io/${{ github.repository_owner }}/tornjak:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set manager image name
-        run: echo "CONTAINER_MANAGER_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-manager:$GITHUB_COMMIT_SHA" >> $GITHUB_ENV
+        run: echo "CONTAINER_MANAGER_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-manager:$GITHUB_SHA" >> $GITHUB_ENV
 
       # create images
       # - name: Build and push tornjak backend image
