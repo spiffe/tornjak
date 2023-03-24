@@ -14,15 +14,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/cenkalti/backoff/v4"
 	"github.com/gorilla/mux"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
+	"github.com/pkg/errors"
 
 	"github.com/spiffe/spire/pkg/common/catalog"
-	agentdb "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/db"
 	auth "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/auth"
+	agentdb "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/db"
 )
 
 type Server struct {
@@ -39,8 +39,8 @@ type Server struct {
 
 	// AgentDB for storing Workload Attestor Plugin Info of agents
 	TornjakConfig *TornjakConfig
-	Db agentdb.AgentDB
-	Auth auth.Auth
+	Db            agentdb.AgentDB
+	Auth          auth.Auth
 }
 
 func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
@@ -355,7 +355,7 @@ func retError(w http.ResponseWriter, emsg string, status int) {
 }
 
 // Handle preflight checks
-func (s *Server) verificationMiddleware(next http.Handler) (http.Handler) {
+func (s *Server) verificationMiddleware(next http.Handler) http.Handler {
 	f := func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "OPTIONS" {
 			cors(w, r)
@@ -456,6 +456,19 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
 }
 
+func (s *Server) Home(w http.ResponseWriter, r *http.Request) {
+	var ret = "Welcome to the Tornjak Backend!"
+
+	cors(w, r)
+	je := json.NewEncoder(w)
+
+	var err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+	}
+}
+
 // HandleRequests connects api links with respective functions
 // Functions currently handle the api calls all as post-requests
 func (s *Server) HandleRequests() {
@@ -464,6 +477,9 @@ func (s *Server) HandleRequests() {
 		log.Fatal("Cannot Configure: ", err)
 	}
 	rtr := mux.NewRouter()
+
+	// Home
+	rtr.HandleFunc("/", s.Home)
 
 	// Agents
 	rtr.HandleFunc("/api/agent/list", s.agentList)
@@ -552,7 +568,7 @@ func (s *Server) HandleRequests() {
 	}
 }
 
-//TODO map[string]catalog. type
+// TODO map[string]catalog. type
 func getPluginConfig(plugin map[string]catalog.HCLPluginConfig) (string, ast.Node, error) {
 	for k, d := range plugin {
 		return k, d.PluginData, nil
@@ -620,7 +636,7 @@ func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
 	}
 }
 
-func (s *Server) ConfigureDefaults() (error) {
+func (s *Server) ConfigureDefaults() error {
 	var err error
 	expBackoff := backoff.NewExponentialBackOff()
 	expBackoff.MaxElapsedTime = time.Second
@@ -633,7 +649,7 @@ func (s *Server) ConfigureDefaults() (error) {
 	return nil
 }
 
-func (s *Server) Configure() (error) {
+func (s *Server) Configure() error {
 	var err error
 	//configs := map[string]map[string]catalog.HCLPluginConfig(*s.TornjakConfig.Plugins)
 	if s.TornjakConfig == nil {
