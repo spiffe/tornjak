@@ -39,5 +39,5 @@ ui-agent/
 agent
 node_modules/
 ui-manager/
-.idea/
 Makefile
+.idea/
