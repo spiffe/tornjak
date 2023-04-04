@@ -6,7 +6,7 @@ This tutorial will get you up and running with a local deployment of SPIRE and T
 
 Contents
 - [Step 0: Requirements](#step-0-requirements)
-- [Step 1: Setup of Deployment files](#step-1-setup-deployment-files)
+- [Step 1: Setup Deployment files](#step-1-setup-deployment-files)
 - [Step 2: Deployment of SPIRE and co-located Tornjak](#step-2-deployment-of-spire-and-co-located-tornjak)
 - [Step 3: Configuring Access to Tornjak](#step-3-configuring-access-to-tornjak)
 - [Cleanup](#cleanup)
