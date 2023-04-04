@@ -5,11 +5,11 @@ In this tutorial, we will show how to configure Tornjak with a SPIRE deployment 
 This tutorial will get you up and running with a local deployment of SPIRE and Tornjak in three simple steps: setting up the deployment files, deployment, and connecting to Tornjak. 
 
 Contents
-1. [Requirements](#step-0-requirements)
-2. [Setup of Deployment files](#step-1-setup-quickstart-tutorial)
-3. [Deployment of SPIRE and co-located Tornjak](#step-2-deployment)
-4. [Connecting to Tornjak](#step-3-configuring-access-to-tornjak)
-5. [Cleanup](#cleanup)
+- [Step 0: Requirements](#step-0-requirements)
+- [Step 1: Setup Deployment files](#step-1-setup-deployment-files)
+- [Step 2: Deployment of SPIRE and co-located Tornjak](#step-2-deployment-of-spire-and-co-located-tornjak)
+- [Step 3: Configuring Access to Tornjak](#step-3-configuring-access-to-tornjak)
+- [Cleanup](#cleanup)
 
 ## Step 0: Requirements
 
@@ -17,7 +17,7 @@ We tested this quickstart with the following requirements:
  - [Minikube](https://minikube.sigs.k8s.io/docs/start/) version 1.12.0
  - [Docker](https://docs.docker.com/get-docker/) version 20.10.23
 
-## Step 1: Setup quickstart tutorial
+## Step 1: Setup deployment files
 
 ### Setting up k8s
 
@@ -357,7 +357,7 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 
 </details>
 
-## Step 2: Deployment
+## Step 2: Deployment of SPIRE and co-located Tornjak
 
 Now that we have the correct deployment files, please follow the below steps to deploy Tornjak and SPIRE!
 
