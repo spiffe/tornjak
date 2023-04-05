@@ -73,12 +73,15 @@ class SpiffeHelper extends Component<SpiffeHelperProp, SpiffeHelperState> {
       var status = "Expired"
       var expiry = this.getAgentExpiryMillisecondsFromEpoch(entry)
       var currentTime = this.getMillisecondsFromEpoch()
-      if (banned) {
-        status = "Banned"
-      } else if (expiry > currentTime) {
-        status = "Attested"
+      if (typeof expiry === 'number') {
+        if (banned) {
+          status = "Banned"
+        }
+        else if (expiry > currentTime) {
+          status = "Attested"
+        }
+        return status
       }
-      return status
     }
     return ""
   }
@@ -139,7 +142,7 @@ class SpiffeHelper extends Component<SpiffeHelperProp, SpiffeHelperState> {
     nodeEntries = entries.filter((e: { parent_id: { path: string; }; }) => e.parent_id.path === "/spire/server");
     var lambdas = [];
     var agentEntriesDict: { [key: string]: EntriesList[]; } = {};
-    if(agents === undefined) {
+    if (agents === undefined) {
       return
     }
     for (let i = 0; i < agents.length; i++) {
