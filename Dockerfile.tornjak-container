@@ -20,8 +20,11 @@ ENV REACT_APP_AUTH_SERVER_URI $REACT_APP_AUTH_SERVER_URI
 ARG NODE_OPTIONS=--openssl-legacy-provider
 ENV NODE_OPTIONS $NODE_OPTIONS
 
-EXPOSE 3000
-EXPOSE 10000
+# front-end port
+ENV PORT_FE=3000
+# back-end port
+ENV PORT_BE=10000
+EXPOSE $PORT_FE $PORT_BE
 
 # start app
 ENTRYPOINT ["/opt/spire/run_tornjak.sh"]
