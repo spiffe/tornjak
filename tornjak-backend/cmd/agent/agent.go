@@ -147,7 +147,6 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 		if err != nil {
 			log.Fatalf("Error: %v", err)
 		}
-		fmt.Println(getHealthcheckPath(config))
 		fmt.Println(serverInfo)
 		tornjakInfo, err := getTornjakConfig(opt.genericOptions.tornjakFile, opt.genericOptions.expandEnv)
 		if err != nil {
@@ -159,7 +158,6 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 		if err != nil {
 			log.Fatalf("Error: %v", err)
 		}
-		fmt.Println(getHealthcheckPath(config))
 		apiServer := &agentapi.Server{
 			SpireServerAddr: getSocketPath(config),
 			ListenAddr:      opt.httpOptions.listenAddr,
@@ -221,11 +219,6 @@ func getSocketPath(config *run.Config) string {
 	}
 
 	return "unix://" + socketPath
-}
-
-func getHealthcheckPath(config *run.Config) string {
-	socketPath := config.HealthChecks.BindAddress
-	return socketPath
 }
 
 func getTornjakConfig(path string, expandEnv bool) (string, error) {
