@@ -20,9 +20,9 @@ import (
 type HealthcheckRequest grpc_health_v1.HealthCheckRequest
 type HealthcheckResponse grpc_health_v1.HealthCheckResponse
 
-func (s *Server) SPIREHealthcheck(inp HealthcheckRequest) (*HealthcheckResponse, error) {
+func (s *Server) SPIREHealthcheck(inp HealthcheckRequest) (*HealthcheckResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	// inpReq := debugServer.GetInfoRequest(inp)
-	inpReq := grpc_health_v1.HealthCheckRequest(inp)
+	inpReq := grpc_health_v1.HealthCheckRequest(inp) //nolint:govet //Ignoring mutext (not being used) - sync.Mutex by value is unused for linter fovet
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithInsecure())
 	if err != nil {
