@@ -86,7 +86,7 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) debugServer(w http.ResponseWriter, r *http.Request) {
-	var input DebugServerRequest
+	//var input DebugServerRequest
 	/*buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
@@ -97,7 +97,7 @@ func (s *Server) debugServer(w http.ResponseWriter, r *http.Request) {
 	}
 	data := buf.String()*/
 
-	input = DebugServerRequest{} // HARDCODE because there are no fields to DebugServerRequest
+	input := DebugServerRequest{} // HARDCODE because there are no fields to DebugServerRequest
 	/*if n == 0 {
 		input = DebugServerRequest{}
 	} else {
