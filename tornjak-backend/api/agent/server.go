@@ -100,7 +100,7 @@ func (s *Server) debugServer(w http.ResponseWriter, r *http.Request) {
 	if n == 0 {
 		input = DebugServerRequest{}
 	} else {
-		err := json.Unmarshal([]byte(data), &input)
+		err := json.Unmarshal([]byte(data), &input) //nolint:govet //DebugServerRequest may have fields in the future
 		if err != nil {
 			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
 			retError(w, emsg, http.StatusBadRequest)
