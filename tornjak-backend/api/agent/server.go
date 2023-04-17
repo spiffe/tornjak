@@ -87,9 +87,9 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) debugServer(w http.ResponseWriter, r *http.Request) {
 	var input DebugServerRequest
-	buf := new(strings.Builder)
+	/*buf := new(strings.Builder)
 
-	/*n, err := io.Copy(buf, r.Body)
+	n, err := io.Copy(buf, r.Body)
 	if err != nil {
 		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
 		retError(w, emsg, http.StatusBadRequest)
