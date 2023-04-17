@@ -158,6 +158,7 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 		if err != nil {
 			log.Fatalf("Error: %v", err)
 		}
+
 		apiServer := &agentapi.Server{
 			SpireServerAddr: getSocketPath(config),
 			ListenAddr:      opt.httpOptions.listenAddr,
