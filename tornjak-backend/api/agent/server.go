@@ -97,7 +97,8 @@ func (s *Server) debugServer(w http.ResponseWriter, r *http.Request) {
 	}
 	data := buf.String()
 
-	if n == 0 {
+	input = DebugServerRequest{} // HARDCODE because there are no fields to DebugServerRequest
+	/*if n == 0 {
 		input = DebugServerRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input) //nolint:govet //DebugServerRequest may have fields in the future
@@ -106,7 +107,7 @@ func (s *Server) debugServer(w http.ResponseWriter, r *http.Request) {
 			retError(w, emsg, http.StatusBadRequest)
 			return
 		}
-	}
+	}*/
 
 	ret, err := s.DebugServer(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
