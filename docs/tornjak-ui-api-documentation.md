@@ -49,7 +49,59 @@ Below are UI pages of Tornjak with their respective paths. For details on a spec
 
 
 # 3. Tornjak User Interface (UI) Interaction with API Endpoints
-## 3.1. Agent API’s
+
+## 3.1. Tornjak API’s
+### - [Healthcheck](https://pkg.go.dev/google.golang.org/grpc/health/grpc_health_v1#HealthCheckRequest)
+#### GET
+##### /api/healthcheck
+```
+Request 
+api/healthcheck
+
+Example response:
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{
+    "status": 1
+}
+```
+
+### - [DebugServer](https://github.com/spiffe/spire-api-sdk/tree/main/proto/spire/api/server/debug/v1)
+#### GET
+##### /api/debugserver
+```
+Request 
+api/debugserver
+
+Example response:
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{
+    "svid_chain": [
+        {
+            "id": {
+                "trust_domain": "example.org",
+                "path": "/spire/server"
+            },
+            "expires_at": 111,
+            "subject": "O=SPIRE,C=US,2.5.4.45=#222"
+        },
+        {
+            "id": {
+                "trust_domain": "example.org"
+            },
+            "expires_at": 222,
+            "subject": "O=SPIFFE,C=US"
+        }
+    ],
+    "uptime": 333,
+    "federated_bundles_count": 1
+}
+```
+
+
 ### - [Agents](https://github.com/spiffe/spire-api-sdk/tree/main/proto/spire/api/server/agent/v1)
 #### GET
 ##### /api/agent/list
