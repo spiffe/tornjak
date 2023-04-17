@@ -43,6 +43,48 @@ type Server struct {
 	Auth          auth.Auth
 }
 
+func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
+	var input HealthcheckRequest
+	buf := new(strings.Builder)
+
+	n, err := io.Copy(buf, r.Body)
+	if err != nil {
+		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	data := buf.String()
+
+	if n == 0 {
+		input = HealthcheckRequest{}
+	} else {
+		err := json.Unmarshal([]byte(data), &input)
+		if err != nil {
+			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		}
+	}
+
+	ret, err := s.SPIREHealthcheck(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+
+	cors(w, r)
+	je := json.NewEncoder(w)
+
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+
+}
+
 func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
 	var input ListAgentsRequest
 	buf := new(strings.Builder)
@@ -456,7 +498,7 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
 }
 
-func (s *Server) Home(w http.ResponseWriter, r *http.Request) {
+func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 	var ret = "Welcome to the Tornjak Backend!"
 
 	cors(w, r)
@@ -479,7 +521,10 @@ func (s *Server) HandleRequests() {
 	rtr := mux.NewRouter()
 
 	// Home
-	rtr.HandleFunc("/", s.Home)
+	rtr.HandleFunc("/", s.home)
+
+	// SPIRE server healthcheck
+	rtr.HandleFunc("/api/healthcheck", s.healthcheck)
 
 	// Agents
 	rtr.HandleFunc("/api/agent/list", s.agentList)
