@@ -86,28 +86,7 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) debugServer(w http.ResponseWriter, r *http.Request) {
-	//var input DebugServerRequest
-	/*buf := new(strings.Builder)
-
-	n, err := io.Copy(buf, r.Body)
-	if err != nil {
-		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
-		return
-	}
-	data := buf.String()*/
-
-	input := DebugServerRequest{} // HARDCODE because there are no fields to DebugServerRequest
-	/*if n == 0 {
-		input = DebugServerRequest{}
-	} else {
-		err := json.Unmarshal([]byte(data), &input) //nolint:govet //DebugServerRequest may have fields in the future
-		if err != nil {
-			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-			retError(w, emsg, http.StatusBadRequest)
-			return
-		}
-	}*/
+	input := DebugServerRequest{} // HARDCODED INPUT because there are no fields to DebugServerRequest
 
 	ret, err := s.DebugServer(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
