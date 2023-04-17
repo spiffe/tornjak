@@ -85,6 +85,49 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func (s *Server) debugServer(w http.ResponseWriter, r *http.Request) {
+	var input DebugServerRequest
+	buf := new(strings.Builder)
+
+	n, err := io.Copy(buf, r.Body)
+	if err != nil {
+		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	data := buf.String()
+
+	if n == 0 {
+		input = DebugServerRequest{}
+	} else {
+		err := json.Unmarshal([]byte(data), &input)
+		if err != nil {
+			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		}
+	}
+
+	ret, err := s.DebugServer(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+
+	cors(w, r)
+	je := json.NewEncoder(w)
+
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+
+}
+
+
 func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
 	var input ListAgentsRequest
 	buf := new(strings.Builder)
@@ -524,7 +567,9 @@ func (s *Server) HandleRequests() {
 	rtr.HandleFunc("/", s.home)
 
 	// SPIRE server healthcheck
+	rtr.HandleFunc("/api/debugserver", s.debugServer)
 	rtr.HandleFunc("/api/healthcheck", s.healthcheck)
+	rtr.HandleFunc("/api/debugserver", s.debugServer)
 
 	// Agents
 	rtr.HandleFunc("/api/agent/list", s.agentList)
