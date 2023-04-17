@@ -19,6 +19,7 @@ import DashboardDetailsRender from 'components/dashboard/dashboard-details-rende
 import RenderOnAdminRole from 'components/RenderOnAdminRole'
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
+import SpireHealthCheck from 'components/spire-health-check';
 
 function App() {
     return (
@@ -28,6 +29,9 @@ function App() {
                     <div>
                         <div className="nav-comp">
                             <NavigationBar />
+                        </div>
+                        <div className="health-check">
+                            <SpireHealthCheck />
                         </div>
                         <div className="rest-body">
                             <SelectServer />
