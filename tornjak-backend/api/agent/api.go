@@ -6,12 +6,57 @@ import (
 
 	grpc "google.golang.org/grpc"
 
+	"google.golang.org/grpc/health/grpc_health_v1"
+	debugServer "github.com/spiffe/spire-api-sdk/proto/spire/api/server/debug/v1"
 	agent "github.com/spiffe/spire-api-sdk/proto/spire/api/server/agent/v1"
 	entry "github.com/spiffe/spire-api-sdk/proto/spire/api/server/entry/v1"
 	types "github.com/spiffe/spire-api-sdk/proto/spire/api/types"
 
 	tornjakTypes "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/types"
 )
+
+type HealthcheckRequest grpc_health_v1.HealthCheckRequest
+type HealthcheckResponse grpc_health_v1.HealthCheckResponse
+
+func (s *Server) SPIREHealthcheck(inp HealthcheckRequest) (*HealthcheckResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	inpReq := grpc_health_v1.HealthCheckRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	var conn *grpc.ClientConn
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := grpc_health_v1.NewHealthClient(conn)
+
+	resp, err := client.Check(context.Background(), &inpReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return (*HealthcheckResponse)(resp), nil
+}
+
+type DebugServerRequest debugServer.GetInfoRequest
+type DebugServerResponse debugServer.GetInfoResponse
+
+func (s *Server) DebugServer(inp DebugServerRequest) (*DebugServerResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	inpReq := debugServer.GetInfoRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	var conn *grpc.ClientConn
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := debugServer.NewDebugClient(conn)
+
+	resp, err := client.GetInfo(context.Background(), &inpReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return (*DebugServerResponse)(resp), nil
+}
+
 
 type ListAgentsRequest agent.ListAgentsRequest
 type ListAgentsResponse agent.ListAgentsResponse
