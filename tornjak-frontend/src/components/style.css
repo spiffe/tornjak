@@ -315,8 +315,8 @@
     display:inline-block;
   }
 
-  .edit_entries_button {
-  } 
+  /* .edit_entries_button {
+  }  */
 
   .selected-entry {
     background-color: rgb(175, 175, 184);
@@ -350,4 +350,13 @@
     float: right;
     margin-right: 70px;
     margin-top: 7px;
+  }
+
+  .health-status-check-title {
+    display: inline-block;
+    margin-right: 10px;
+  }
+
+  .health-status-check-icon {
+    display: inline-block;
   }

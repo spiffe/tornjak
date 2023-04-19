@@ -37,18 +37,44 @@ import {
     GLOBAL_NEW_ENTRIES,
     EntryExpiryAction,
     GLOBAL_ENTRY_EXPIRY,
+    GLOBAL_SPIRE_HEALTH_CHECK,
+    SpireHealthCheckAction,
+    GLOBAL_SPIRE_HEALTH_CHECKING,
+    SpireHealthCheckingAction
 } from './types';
 
-import { 
-    AgentsList, 
-    AgentsWorkLoadAttestorInfo, 
-    ClustersList, 
-    EntriesList, 
-    SelectorInfoLabels, 
-    ServerInfo, 
-    TornjakServerInfo, 
+import {
+    AgentsList,
+    AgentsWorkLoadAttestorInfo,
+    ClustersList,
+    EntriesList,
+    SelectorInfoLabels,
+    ServerInfo,
+    TornjakServerInfo,
     WorkloadSelectorInfoLabels
 } from 'components/types';
+
+// Expected input - spire server health check loading
+// spireHealthCheckingFunc returns the loading state
+export function spireHealthCheckingFunc(globalSpireHealthChecking: boolean): ThunkAction<void, RootState, undefined, SpireHealthCheckingAction> {
+    return dispatch => {
+        dispatch({
+            type: GLOBAL_SPIRE_HEALTH_CHECKING,
+            payload: globalSpireHealthChecking
+        });
+    }
+}
+
+// Expected input - spire server health check
+// spireHealthCheckFunc returns the status of spire health
+export function spireHealthCheckFunc(globalSpireHealthCheck: boolean): ThunkAction<void, RootState, undefined, SpireHealthCheckAction> {
+    return dispatch => {
+        dispatch({
+            type: GLOBAL_SPIRE_HEALTH_CHECK,
+            payload: globalSpireHealthCheck
+        });
+    }
+}
 
 // Expected input - whether user authenticated or not
 // isAuthenticatedUpdateFunc returns true if current user is authenticated

@@ -68,7 +68,7 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
   render() {
     const isAdmin = this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles), withAuth = process.env.REACT_APP_AUTH_SERVER_URI;
     let managerNavs;
-    console.log(process.env.REACT_APP_AUTH_SERVER_URI)
+    //console.log(process.env.REACT_APP_AUTH_SERVER_URI)
     managerNavs =
       <div className="dropdown">
         <a href="/server/manage" className="dropbtn">Manage Servers</a>
