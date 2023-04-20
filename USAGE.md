@@ -46,12 +46,14 @@ The frontend is meant to connect to either the Tornjak backend or the Tornjak ma
 | `NODE_OPTIONS`              | Node options for npm start | `--openssl-legacy-provider` | `--openssl-legacy-provider` | false |
 | `REACT_APP_TORNJAK_MANAGER` | Boolean for whether the connected server is a manager | `false` | `true` | false |
 | `REACT_APP_AUTH_SERVER_URI` | URI for the Keycloak instance to obtain access tokens |  | `http://localhost:8080` | false |
+| `PORT_FE` | Port for the frontend to run | `3000` | `3000` | true |
+| `PORT_BE` | Port for the backend to run | `10000` | `10000` | true |
 
 ```
-docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:50000' -e REACT_APP_TORNJAK_MANAGER=true ghcr.io/spiffe/tornjak-fe:latest
+docker run -p 3000:8080 -e REACT_APP_API_SERVER_URI='http://localhost:50000' -e REACT_APP_TORNJAK_MANAGER=true -e PORT_FE-8080 ghcr.io/spiffe/tornjak-fe:latest
 ```
 
-The above command is an example of how to run the frontend. This creates a UI available at http://localhost:3000 forwarded from container port 3000. It is listening to a Tornjak manager component available at http://localhost:50000, and knows to run in manager mode with the `REACT_APP_TORNJAK_MANAGER` flag. 
+The above command is an example of how to run the frontend. This creates a UI available at http://localhost:3000 forwarded from container port `8080`. It is listening to a Tornjak manager component available at http://localhost:50000, and knows to run in manager mode with the `REACT_APP_TORNJAK_MANAGER` flag. 
 
 ## Tornjak
 
@@ -60,10 +62,10 @@ This container may be used as an alternative to having a frontend and backend co
 An example command:
 
 ```
-docker run -p 10000:10000 -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak:latest -c <SPIRE CONFIG PATH> -t <TORNJAK CONFIG PATH>
+docker run -p 10000:10000 -p 3000:8080 -e REACT_APP_API_SERVER_URI='http://localhost:10000' -e PORT_FE-8080 -e PORT_BE-10000 ghcr.io/spiffe/tornjak:latest -c <SPIRE CONFIG PATH> -t <TORNJAK CONFIG PATH>
 ```
 
-The above command creates a UI available at `http://localhost:3000` forwarded from container port 3000. It is listening to the Tornjak backend at `http://localhost:10000`, as given by the `REACT_APP_API_SERVER_URI` value. At the same time, the container is exposing port 10000 for the backend, which reads the SPIRE config and Tornjak config at `<SPIRE CONFIG PATH>` and `<TORNJAK CONFIG PATH>` respectively. 
+The above command creates a UI available at `http://localhost:3000` forwarded from container port `8080`. It is listening to the Tornjak backend at `http://localhost:10000`, as given by the `REACT_APP_API_SERVER_URI` value. At the same time, the container is exposing port `10000` for the backend, which reads the SPIRE config and Tornjak config at `<SPIRE CONFIG PATH>` and `<TORNJAK CONFIG PATH>` respectively. 
 
 NOTE: The value of `REACT_APP_API_SERVER_URI` must be a URI that is separately available to any browser that accesses the frontend. Therefore, in production environments, it is necessary that backend service endpoint be public. 
 
