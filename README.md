@@ -21,6 +21,8 @@ The following are guides on how to try out Tornjak:
 Here are a few additional resources:
 - [Tornjak basic functions demo](https://www.youtube.com/watch?v=dOdRu4psKJ8)
 
+In case of deployment or configuration troubles, check out our [hints documenation](./docs/tornjak-hints.md)
+
 ## Architecture and roadmap
 
 The architecture consists of 2 main components, the agent and the manager.
