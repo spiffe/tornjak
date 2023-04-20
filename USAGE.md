@@ -48,12 +48,14 @@ The frontend is meant to connect to either the Tornjak backend or the Tornjak ma
 | `REACT_APP_AUTH_SERVER_URI` | URI for the Keycloak instance to obtain access tokens |  | `http://localhost:8080` | false |
 | `PORT_FE` | Port for the frontend to run | `3000` | `3000` | true |
 | `PORT_BE` | Port for the backend to run | `10000` | `10000` | true |
+| `REACT_APP_SPIRE_HEALTH_CHECK` | Enable SPIRE health check component | `true` | `true` | false |
+| `REACT_APP_SPIRE_HEALTH_CHECK_TIME` | Set how often SPIRE health should be checked, if component enabled | `120` | `240` | false |
 
 ```
-docker run -p 3000:8080 -e REACT_APP_API_SERVER_URI='http://localhost:50000' -e REACT_APP_TORNJAK_MANAGER=true -e PORT_FE-8080 ghcr.io/spiffe/tornjak-fe:latest
+docker run -p 3000:8080 -e REACT_APP_API_SERVER_URI='http://localhost:50000' -e REACT_APP_TORNJAK_MANAGER=true -e PORT_FE-8080 -e REACT_APP_SPIRE_HEALTH_CHECK=true -e REACT_APP_SPIRE_HEALTH_CHECK_TIME=120 ghcr.io/spiffe/tornjak-fe:latest
 ```
 
-The above command is an example of how to run the frontend. This creates a UI available at http://localhost:3000 forwarded from container port `8080`. It is listening to a Tornjak manager component available at http://localhost:50000, and knows to run in manager mode with the `REACT_APP_TORNJAK_MANAGER` flag. 
+The above command is an example of how to run the frontend. This creates a UI available at http://localhost:3000 forwarded from container port `8080`. It is listening to a Tornjak manager component available at http://localhost:50000, and knows to run in manager mode with the `REACT_APP_TORNJAK_MANAGER` flag. The last two environment variables namely, [`REACT_APP_SPIRE_HEALTH_CHECK` & `REACT_APP_SPIRE_HEALTH_CHECK_TIME`] are used to enable the SPIRE health check component and set how often it should be checked respectively. 
 
 ## Tornjak
 
