@@ -77,7 +77,6 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
     agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void) => {
     axios.post(GetApiServerUri('/manager-api/tornjak/selectors/register/') + serverName, wLoadAttdata)
       .then(res => {
-        //console.log(JSON.stringify(wLoadAttdata, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '));
         refreshSelectorsState(serverName, agentworkloadSelectorInfoFunc);
       }
       )
@@ -122,7 +121,6 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
     }) => {
     axios.get(GetApiServerUri("/manager-api/tornjak/selectors/list/") + serverName, { crossdomain: true })
       .then(response => {
-        //console.log(response.data);
         agentworkloadSelectorInfoFunc(response.data["agents"]);
       })
       .catch((error) => displayResponseError("Error", error))
@@ -149,7 +147,6 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }) => {
     axios.get(GetApiServerUri("/api/tornjak/selectors/list"), { crossdomain: true })
       .then(response => {
-        //console.log(response.data);
         agentworkloadSelectorInfoFunc(response.data["agents"]);
       })
       .catch((error) => displayResponseError("Error", error))
@@ -231,7 +228,6 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
     if (serverInfo.plugins === undefined) {
       return
     }
-    //console.log(serverInfo.plugins)
     if (serverInfo.plugins["NodeAttestor"].length === 0) {
       return
     }

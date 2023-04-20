@@ -38,7 +38,6 @@ class SpireHealthCheck extends Component<SpireHealthCheckProp, SpireHealthCheckS
   }
 
   componentDidMount() {
-    console.log("SPIRE HEALTH CHECK TIME SET TO:", spireHealthCheckTime, "seconds")
     this.startTimer();
     this.TornjakApi.spireHealthCheck(this.props.spireHealthCheckFunc, this.props.spireHealthCheckingFunc);
   }
@@ -46,7 +45,6 @@ class SpireHealthCheck extends Component<SpireHealthCheckProp, SpireHealthCheckS
   componentDidUpdate(prevProps: SpireHealthCheckProp, prevState: SpireHealthCheckState) {
     if (prevState.timer !== this.state.timer) {
       // timer ended, check status of SPIRE
-      console.log('Checking Status of SPIRE...');
       this.TornjakApi.spireHealthCheck(this.props.spireHealthCheckFunc, this.props.spireHealthCheckingFunc);
     }
   }
