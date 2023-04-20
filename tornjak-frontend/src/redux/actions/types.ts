@@ -1,12 +1,12 @@
 import { Action } from "redux";
-import { 
-    AgentsList, 
-    AgentsWorkLoadAttestorInfo, 
-    ClustersList, 
-    EntriesList, 
-    SelectorInfoLabels, 
+import {
+    AgentsList,
+    AgentsWorkLoadAttestorInfo,
+    ClustersList,
+    EntriesList,
+    SelectorInfoLabels,
     ServerInfo,
-    TornjakServerInfo, 
+    TornjakServerInfo,
     WorkloadSelectorInfoLabels
 } from "components/types";
 
@@ -93,6 +93,8 @@ export const GLOBAL_TORNJAK_SERVER_INFO = 'GLOBAL_TORNJAK_SERVER_INFO';
 export const GLOBAL_SERVERS_LIST = 'GLOBAL_SERVERS_LIST';
 export const GLOBAL_SELECTOR_INFO = 'GLOBAL_SELECTOR_INFO';
 export const GLOBAL_WORKLOAD_SELECTOR_INFO = 'GLOBAL_WORKLOAD_SELECTOR_INFO';
+export const GLOBAL_SPIRE_HEALTH_CHECK = 'GLOBAL_SPIRE_HEALTH_CHECK';
+export const GLOBAL_SPIRE_HEALTH_CHECKING = 'GLOBAL_SPIRE_HEALTH_CHECKING';
 
 export interface ServersReducerState {
     globalServerSelected: string,
@@ -100,7 +102,9 @@ export interface ServersReducerState {
     globalTornjakServerInfo: TornjakServerInfo,
     globalServersList: Array<string>,
     globalSelectorInfo: SelectorInfoLabels,
-    globalWorkloadSelectorInfo: WorkloadSelectorInfoLabels ,
+    globalWorkloadSelectorInfo: WorkloadSelectorInfoLabels,
+    globalSpireHealthCheck: boolean,
+    globalSpireHealthChecking: boolean,
 }
 
 export interface ServerSelectedAction extends Action<typeof GLOBAL_SERVER_SELECTED> {
@@ -125,13 +129,23 @@ export interface WorkloadSelectorInfoAction extends Action<typeof GLOBAL_WORKLOA
     payload: WorkloadSelectorInfoLabels;
 }
 
+export interface SpireHealthCheckAction extends Action<typeof GLOBAL_SPIRE_HEALTH_CHECK> {
+    payload: boolean;
+}
+
+export interface SpireHealthCheckingAction extends Action<typeof GLOBAL_SPIRE_HEALTH_CHECKING> {
+    payload: boolean;
+}
+
 export type ServersAction =
     ServerSelectedAction |
     TornjakServerInfoAction |
     ServerInfoAction |
     ServersListAction |
     SelectorInfoAction |
-    WorkloadSelectorInfoAction
+    WorkloadSelectorInfoAction |
+    SpireHealthCheckAction |
+    SpireHealthCheckingAction
 
 // tornjak
 export const GLOBAL_MESSAGE = 'GLOBAL_MESSAGE';
@@ -148,6 +162,6 @@ export interface ClickedDashboardTableAction extends Action<typeof GLOBAL_CLICKE
     payload: string;
 }
 
-export type TornjakAction = 
-    TornjakMessageAction | 
+export type TornjakAction =
+    TornjakMessageAction |
     ClickedDashboardTableAction
