@@ -80,6 +80,32 @@ kubectl -n spire-server delete -f https://github.com/IBM/trusted-service-identit
 
 ---
 
+**Problem:** 
+Pod with Tornjak front-end fails to start.
+Kubectl "Events" page shows the following:
+```console
+Startup probe failed: Get "http://172.17.0.3:3000/": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+```
+Above message is accessible by (assuming `spire` namespace, `[POD]` is a placeholder for the front-end Pod name):
+```console
+kubectl -n spire-server describe po [POD]
+```
+
+**Description:**
+
+_(Often encountered using Minikube)_
+Frontend does not compile in time.
+Cluster environment may be too weak to satisfy the startup probe within the allotted time.
+
+**Solution:**
+
+Increase the `failureThreshold` in the Tornjak deployment file (look for _deployment.yaml_) under `startupProbe`:
+```yaml 
+failureThreshold: 15
+```
+
+---
+
 **Problem:**
 
 Agent log file shows an error:
