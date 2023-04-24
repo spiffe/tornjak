@@ -41,7 +41,7 @@ func main() {
 				Value:       "",
 				Usage:       "Config file path for spire server",
 				Destination: &opt.genericOptions.configFile,
-				Required:    true,
+				Required:    false,
 			},
 			&cli.StringFlag {
 				Name:        "tornjak-config-file",
@@ -134,31 +134,33 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 	if err != nil {
 		// Hide internal error since it is specific to arguments of originating library
 		// i.e. asks to set -config which is a different flag in tornjak
-		return errors.New("Unable to parse the config file provided")
+		// fmt.Printf("SPIRE ERROR (ignore): %v\n", err)
+		//errors.New("Unable to parse the config file provided")
+		err = nil
 	}
 	tornjakConfigs, err := parseTornjakConfig(opt.genericOptions.tornjakFile, opt.genericOptions.expandEnv)
 	if err != nil {
 		return errors.Errorf("Unable to parse the tornjak config file provided %v", err)
 	}
 
+	serverInfo, err := GetServerInfo(config)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+
 	switch cmd {
 	case "serverinfo":
-		serverInfo, err := GetServerInfo(config)
-		if err != nil {
-			log.Fatalf("Error: %v", err)
+		if serverInfo.TrustDomain == "" {
+			fmt.Println("No SPIRE config provided to Tornjak")
+		} else {
+			fmt.Println(serverInfo)
 		}
-		fmt.Println(serverInfo)
 		tornjakInfo, err := getTornjakConfig(opt.genericOptions.tornjakFile, opt.genericOptions.expandEnv)
 		if err != nil {
 			log.Fatalf("Error: %v", err)
 		}
 		fmt.Println(tornjakInfo)
 	case "http":
-		serverInfo, err := GetServerInfo(config)
-		if err != nil {
-			log.Fatalf("Error: %v", err)
-		}
-
 		apiServer := &agentapi.Server{
 			SpireServerAddr: getSocketPath(config),
 			ListenAddr:      opt.httpOptions.listenAddr,
@@ -175,10 +177,12 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 		return errors.New("Unrecognized command from helper func")
 	}
 	return nil
-
 }
 
 func GetServerInfo(config *run.Config) (agentapi.TornjakSpireServerInfo, error) {
+	if config == nil { // no config file provided
+		return agentapi.TornjakSpireServerInfo{}, nil
+	}
 	if config.Plugins == nil {
 		return agentapi.TornjakSpireServerInfo{}, errors.New("config plugins map should not be nil")
 	}
@@ -210,7 +214,8 @@ func GetServerInfo(config *run.Config) (agentapi.TornjakSpireServerInfo, error) 
 }
 
 func getSocketPath(config *run.Config) string {
-	socketPath := config.Server.SocketPath
+	// socketPath := config.Server.SocketPath
+	socketPath := ""
 	if socketPath == "" {
 		// TODO: temporary fix for issue with socket path resolution
 		// using the defaultSocketPath in the SPIRE pkg, manually importing
