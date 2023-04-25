@@ -6,7 +6,9 @@ We publish four container images currently:
 - [Tornjak Frontend](https://github.com/spiffe/tornjak/pkgs/container/tornjak-fe): This image is typically deployed after the Tornjak Backend or Manager are deployed, as it requires a URL to connect directly to the Tornjak backend API.  
 - [Tornjak](https://github.com/spiffe/tornjak/pkgs/container/tornjak): This image containing both Tornjak Backend and Frontend components can deployed as a sidecar alongside a SPIRE Server container
 
-NOTE: Previously, we had images placing the Tornjak backend and SPIRE server in the same container, but these are currently deprecated. The above is a comprehensive list of images 
+NOTE: Previously, we had images placing the Tornjak backend and SPIRE server in the same container, but these are currently deprecated. The above is a comprehensive list of images
+
+Pre-built images can be found at the above links. To decide which tag to use, typically choose a release from [this page](https://github.com/spiffe/tornjak/releases) and choose the corresponding tag. For example, if you are interested in release `tornjak-1.0.2`, then choose image tag `v1.0.2`.
 
 ## Tornjak Backend
 
