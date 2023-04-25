@@ -131,7 +131,7 @@ func main() {
 func runTornjakCmd(cmd string, opt cliOptions) error {
 	// parse configs
 	spire_config_file := opt.genericOptions.configFile
-	var config *run.Config
+	var serverInfo = agentapi.TornjakSpireServerInfo{}
 	if spire_config_file != "" { // if SPIRE config given
 		config, err := run.ParseFile(spire_config_file, false)
 		if err != nil {
@@ -139,15 +139,14 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 			// i.e. asks to set -config which is a different flag in tornjak
 			return errors.New("Unable to parse the config file provided")
 		}
+		serverInfo, err = GetServerInfo(config)
+		if err != nil {
+			log.Fatalf("Error: %v", err)
+		}
 	}
 	tornjakConfigs, err := parseTornjakConfig(opt.genericOptions.tornjakFile, opt.genericOptions.expandEnv)
 	if err != nil {
 		return errors.Errorf("Unable to parse the tornjak config file provided %v", err)
-	}
-
-	serverInfo, err := GetServerInfo(config)
-	if err != nil {
-		log.Fatalf("Error: %v", err)
 	}
 
 	switch cmd {
@@ -164,7 +163,7 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 		fmt.Println(tornjakInfo)
 	case "http":
 		apiServer := &agentapi.Server{
-			SpireServerAddr: getSocketPath(config),
+			SpireServerAddr: getSocketPath(),
 			ListenAddr:      opt.httpOptions.listenAddr,
 			CertPath:        opt.httpOptions.certPath,
 			KeyPath:         opt.httpOptions.keyPath,
@@ -215,16 +214,16 @@ func GetServerInfo(config *run.Config) (agentapi.TornjakSpireServerInfo, error) 
 	}, nil
 }
 
-func getSocketPath(config *run.Config) string {
+func getSocketPath() string {
 	// socketPath := config.Server.SocketPath
-	socketPath := ""
-	if socketPath == "" {
+	// socketPath := ""
+	// if socketPath == "" {
 		// TODO: temporary fix for issue with socket path resolution
 		// using the defaultSocketPath in the SPIRE pkg, manually importing
 		// since it is not a public variable.
 		// https://github.com/spiffe/spire/blob/main/cmd/spire-server/cli/run/run.go#L44
-		socketPath = "/tmp/spire-server/private/api.sock"
-	}
+	socketPath := "/tmp/spire-server/private/api.sock"
+	// }
 
 	return "unix://" + socketPath
 }
