@@ -130,13 +130,15 @@ func main() {
 
 func runTornjakCmd(cmd string, opt cliOptions) error {
 	// parse configs
-	config, err := run.ParseFile(opt.genericOptions.configFile, false)
-	if err != nil {
-		// Hide internal error since it is specific to arguments of originating library
-		// i.e. asks to set -config which is a different flag in tornjak
-		// fmt.Printf("SPIRE ERROR (ignore): %v\n", err)
-		//errors.New("Unable to parse the config file provided")
-		err = nil
+	spire_config_file := opt.genericOptions.configFile
+	var config *run.Config
+	if spire_config_file != "" { // if SPIRE config given
+		config, err := run.ParseFile(spire_config_file, false)
+		if err != nil {
+			// Hide internal error since it is specific to arguments of originating library
+			// i.e. asks to set -config which is a different flag in tornjak
+			return errors.New("Unable to parse the config file provided")
+		}
 	}
 	tornjakConfigs, err := parseTornjakConfig(opt.genericOptions.tornjakFile, opt.genericOptions.expandEnv)
 	if err != nil {
