@@ -216,15 +216,11 @@ func GetServerInfo(config *run.Config) (agentapi.TornjakSpireServerInfo, error) 
 
 func getSocketPath() string {
 	// socketPath := config.Server.SocketPath
-	// socketPath := ""
-	// if socketPath == "" {
-		// TODO: temporary fix for issue with socket path resolution
-		// using the defaultSocketPath in the SPIRE pkg, manually importing
-		// since it is not a public variable.
-		// https://github.com/spiffe/spire/blob/main/cmd/spire-server/cli/run/run.go#L44
+	// TODO: temporary fix for issue with socket path resolution
+	// using the defaultSocketPath in the SPIRE pkg, manually importing
+	// since it is not a public variable.
+	// https://github.com/spiffe/spire/blob/main/cmd/spire-server/cli/run/run.go#L44
 	socketPath := "/tmp/spire-server/private/api.sock"
-	// }
-
 	return "unix://" + socketPath
 }
 
