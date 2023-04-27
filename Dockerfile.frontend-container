@@ -1,13 +1,19 @@
-
-FROM node:16-alpine
+# Build stage
+FROM node:16-alpine3.14 AS build
 
 WORKDIR /usr/src/app
 
 COPY tornjak-frontend .
 
-RUN npm install --omit=dev
+RUN npm install --omit=dev && \
+    npm prune --production
 
-RUN npm prune --production
+# Runtime stage
+FROM node:16-alpine3.14 AS runtime
+
+WORKDIR /usr/src/app
+
+COPY --from=build /usr/src/app .
 
 # set env variables
 ENV REACT_APP_API_SERVER_URI $REACT_APP_API_SERVER_URI
