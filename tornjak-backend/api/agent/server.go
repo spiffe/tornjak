@@ -726,14 +726,16 @@ func (s *Server) Configure() error {
 		err = s.ConfigureDefaults()
 		return err
 	}
-	configs := *s.TornjakConfig.Plugins
+	serverConfig := *s.TornjakConfig.Server
+	fmt.Printf("http listen port.... %s", serverConfig.HttpConfig.ListenPort)
+	pluginConfigs := *s.TornjakConfig.Plugins
 	// configure datastore
-	s.Db, err = NewAgentsDB(configs["DataStore"])
+	s.Db, err = NewAgentsDB(pluginConfigs["DataStore"])
 	if err != nil {
 		return errors.Errorf("Cannot configure datastore plugin: %v", err)
 	}
 	// configure auth
-	s.Auth, err = NewAuth(configs["UserManagement"])
+	s.Auth, err = NewAuth(pluginConfigs["UserManagement"])
 	if err != nil {
 		return errors.Errorf("Cannot configure auth plugin: %v", err)
 	}
