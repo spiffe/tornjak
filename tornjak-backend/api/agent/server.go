@@ -582,7 +582,52 @@ func (s *Server) HandleRequests() {
 	rtr.PathPrefix("/").Handler(spa)
 
 	// TLS Stack handling
-	if s.TlsEnabled || s.MTlsEnabled {
+	serverConfig := s.TornjakConfig.Server
+
+	if serverConfig.HttpConfig.Enabled {
+		fmt.Printf("Starting to listen on %s...\n", serverConfig.HttpConfig.ListenPort)
+		log.Fatal(http.ListenAndServe(serverConfig.HttpConfig.ListenPort, rtr))
+	}
+
+	if serverConfig.TlsConfig.Enabled {
+		certPath := serverConfig.TlsConfig.Cert
+		keyPath := serverConfig.TlsConfig.Key
+		// Create a CA certificate pool and add cert.pem to it
+		caCert, err := ioutil.ReadFile(certPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM(caCert)
+
+		tlsType := "TLS"
+		// Create the TLS Config with the CA pool and enable Client certificate validation
+
+		tlsConfig := &tls.Config{
+			ClientCAs: caCertPool,
+		}
+		tlsConfig.BuildNameToCertificate()
+
+		// Create a Server instance to listen on port 8443 with the TLS config
+		server := &http.Server{
+			Handler:   rtr,
+			Addr:      serverConfig.HttpConfig.ListenPort,
+			TLSConfig: tlsConfig,
+		}
+
+		fmt.Printf("Starting to listen with %s on %s...\n", tlsType, serverConfig.HttpConfig.ListenPort)
+		if _, err := os.Stat(certPath); os.IsNotExist(err) {
+			log.Fatalf("File does not exist %s", certPath)
+		}
+		if _, err := os.Stat(keyPath); os.IsNotExist(err) {
+			log.Fatalf("File does not exist %s", keyPath)
+		}
+		log.Fatal(server.ListenAndServeTLS(certPath, keyPath))
+		return
+
+	}
+
+	/*if serverConfig.TlsConfig.Enabled || serverConfig.MtlsConfig.Enabled {
 
 		// Create a CA certificate pool and add cert.pem to it
 		caCert, err := ioutil.ReadFile(s.CertPath)
@@ -633,9 +678,9 @@ func (s *Server) HandleRequests() {
 		log.Fatal(server.ListenAndServeTLS(s.CertPath, s.KeyPath))
 		return
 	} else {
-		fmt.Printf("Starting to listen on %s...\n", s.ListenAddr)
+		fmt.Printf("Starting to listen on %s...\n", serverConfig.HttpConfig.ListenPort)
 		log.Fatal(http.ListenAndServe(s.ListenAddr, rtr))
-	}
+	}*/
 }
 
 // TODO map[string]catalog. type
@@ -726,8 +771,6 @@ func (s *Server) Configure() error {
 		err = s.ConfigureDefaults()
 		return err
 	}
-	serverConfig := *s.TornjakConfig.Server
-	fmt.Printf("http listen port.... %s", serverConfig.HttpConfig.ListenPort)
 	pluginConfigs := *s.TornjakConfig.Plugins
 	// configure datastore
 	s.Db, err = NewAgentsDB(pluginConfigs["DataStore"])
