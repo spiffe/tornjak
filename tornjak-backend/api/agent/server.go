@@ -534,13 +534,7 @@ func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// HandleRequests connects api links with respective functions
-// Functions currently handle the api calls all as post-requests
-func (s *Server) HandleRequests() {
-	err := s.Configure()
-	if err != nil {
-		log.Fatal("Cannot Configure: ", err)
-	}
+func (s *Server) GetRouter() (*mux.Router) {
 	rtr := mux.NewRouter()
 
 	// Home
@@ -581,6 +575,18 @@ func (s *Server) HandleRequests() {
 	// UI
 	spa := spaHandler{staticPath: "ui-agent", indexPath: "index.html"}
 	rtr.PathPrefix("/").Handler(spa)
+
+	return rtr
+}
+
+// HandleRequests connects api links with respective functions
+// Functions currently handle the api calls all as post-requests
+func (s *Server) HandleRequests() {
+	err := s.Configure()
+	if err != nil {
+		log.Fatal("Cannot Configure: ", err)
+	}
+	rtr := s.GetRouter()
 
 	// TLS Stack handling
 	serverConfig := s.TornjakConfig.Server
