@@ -562,6 +562,7 @@ func (s *Server) HandleRequests() {
 	rtr.HandleFunc("/api/entry/create", s.entryCreate)
 	rtr.HandleFunc("/api/entry/delete", s.entryDelete)
 
+
 	// Tornjak specific
 	rtr.HandleFunc("/api/tornjak/serverinfo", s.tornjakGetServerInfo)
 	// Agents Selectors
@@ -611,11 +612,11 @@ func (s *Server) HandleRequests() {
 		// Create a Server instance to listen on port 8443 with the TLS config
 		server := &http.Server{
 			Handler:   rtr,
-			Addr:      serverConfig.HttpConfig.ListenPort,
+			Addr:      serverConfig.TlsConfig.ListenPort,
 			TLSConfig: tlsConfig,
 		}
 
-		fmt.Printf("Starting to listen with %s on %s...\n", tlsType, serverConfig.HttpConfig.ListenPort)
+		fmt.Printf("Starting to listen with %s on %s...\n", tlsType, serverConfig.TlsConfig.ListenPort)
 		if _, err := os.Stat(certPath); os.IsNotExist(err) {
 			log.Fatalf("File does not exist %s", certPath)
 		}
@@ -627,60 +628,56 @@ func (s *Server) HandleRequests() {
 
 	}
 
-	/*if serverConfig.TlsConfig.Enabled || serverConfig.MtlsConfig.Enabled {
+	if serverConfig.MtlsConfig.Enabled {
+		certPath := serverConfig.MtlsConfig.Cert
+		keyPath := serverConfig.MtlsConfig.Key
+		caPath := serverConfig.MtlsConfig.Ca
 
 		// Create a CA certificate pool and add cert.pem to it
-		caCert, err := ioutil.ReadFile(s.CertPath)
+		caCert, err := ioutil.ReadFile(certPath)
 		if err != nil {
 			log.Fatal(err)
 		}
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
 
-		tlsType := "TLS"
-		// If mTLS is enabled, add mTLS CA path to cert pool as well
-		if s.MTlsCaPath != "" {
-			if _, err := os.Stat(s.MTlsCaPath); os.IsNotExist(err) {
-				log.Fatalf("File does not exist %s", s.MTlsCaPath)
-			}
-			mTLSCaCert, err := ioutil.ReadFile(s.MTlsCaPath)
-			if err != nil {
-				log.Fatal(err)
-			}
-			caCertPool.AppendCertsFromPEM(mTLSCaCert)
-			tlsType = "mTLS"
+		tlsType := "mTLS"
+		// add mTLS CA path to cert pool as well
+		if _, err := os.Stat(caPath); os.IsNotExist(err) {
+			log.Fatalf("File does not exist %s", caPath)
 		}
+		mTLSCaCert, err := ioutil.ReadFile(caPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		caCertPool.AppendCertsFromPEM(mTLSCaCert)
 
 		// Create the TLS Config with the CA pool and enable Client certificate validation
 
-		tlsConfig := &tls.Config{
+		mtlsConfig := &tls.Config{
 			ClientCAs: caCertPool,
 		}
-		if s.MTlsEnabled {
-			tlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
-		}
-		tlsConfig.BuildNameToCertificate()
+		mtlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
+		mtlsConfig.BuildNameToCertificate()
 
 		// Create a Server instance to listen on port 8443 with the TLS config
 		server := &http.Server{
 			Handler:   rtr,
-			Addr:      s.ListenAddr,
-			TLSConfig: tlsConfig,
+			Addr:      serverConfig.MtlsConfig.ListenPort,
+			TLSConfig: mtlsConfig,
 		}
 
-		fmt.Printf("Starting to listen with %s on %s...\n", tlsType, s.ListenAddr)
-		if _, err := os.Stat(s.CertPath); os.IsNotExist(err) {
-			log.Fatalf("File does not exist %s", s.CertPath)
+		fmt.Printf("Starting to listen with %s on %s...\n", tlsType, serverConfig.MtlsConfig.ListenPort)
+		if _, err := os.Stat(certPath); os.IsNotExist(err) {
+			log.Fatalf("File does not exist %s", certPath)
 		}
-		if _, err := os.Stat(s.KeyPath); os.IsNotExist(err) {
-			log.Fatalf("File does not exist %s", s.KeyPath)
+		if _, err := os.Stat(keyPath); os.IsNotExist(err) {
+			log.Fatalf("File does not exist %s", keyPath)
 		}
-		log.Fatal(server.ListenAndServeTLS(s.CertPath, s.KeyPath))
+		log.Fatal(server.ListenAndServeTLS(certPath, keyPath))
 		return
-	} else {
-		fmt.Printf("Starting to listen on %s...\n", serverConfig.HttpConfig.ListenPort)
-		log.Fatal(http.ListenAndServe(s.ListenAddr, rtr))
-	}*/
+	}
+
 }
 
 // TODO map[string]catalog. type
@@ -751,7 +748,7 @@ func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
 	}
 }
 
-func (s *Server) ConfigureDefaults() error {
+func (s *Server) ConfigureDefaultPlugins() error {
 	var err error
 	expBackoff := backoff.NewExponentialBackOff()
 	expBackoff.MaxElapsedTime = time.Second
@@ -764,11 +761,39 @@ func (s *Server) ConfigureDefaults() error {
 	return nil
 }
 
+func (s *Server) VerifyConfig() error {
+	// nil config has no errors
+	if s.TornjakConfig == nil {
+		return nil
+	}
+	// s.TornjakConfig not nil
+	serverConfig := s.TornjakConfig.Server
+	// pluginConfig = s.TornjakConfig.Plugin // no plugin verification
+
+	// all server config connections must be included
+	if serverConfig.HttpConfig == nil {
+		return errors.New("Tornjak Config > server > http not populated")
+	} else if serverConfig.TlsConfig == nil {
+		return errors.New("Tornjak Config > server > tls not populated")
+	} else if  serverConfig.MtlsConfig == nil {
+		return errors.New("Tornjak Config > server > mtls not populate")
+	}
+	// check if at least one connection is enabled
+	if !(serverConfig.HttpConfig.Enabled || serverConfig.TlsConfig.Enabled || serverConfig.MtlsConfig.Enabled) {
+		return errors.New("Tornjak server config does not enable at least one connection")
+	}
+	return nil
+}
+
 func (s *Server) Configure() error {
-	var err error
+	err := s.VerifyConfig()
+	if err != nil {
+		return errors.Errorf("Invalid configuration: %v", err)
+	}
+
 	//configs := map[string]map[string]catalog.HCLPluginConfig(*s.TornjakConfig.Plugins)
 	if s.TornjakConfig == nil {
-		err = s.ConfigureDefaults()
+		err = s.ConfigureDefaultPlugins()
 		return err
 	}
 	pluginConfigs := *s.TornjakConfig.Plugins
