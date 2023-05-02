@@ -16,9 +16,9 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: '1.17'
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v2
         with:
-          node-version: '18'
+          node-version: '15'
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
