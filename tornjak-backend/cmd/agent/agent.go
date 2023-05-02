@@ -21,9 +21,6 @@ type cliOptions struct {
 		tornjakFile string
 		expandEnv   bool
 	}
-	httpOptions struct {
-		spireServerAddr string
-	}
 }
 
 func main() {
@@ -58,15 +55,6 @@ func main() {
 			{
 				Name:  "http",
 				Usage: "Run the tornjak http server",
-				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:		"spire-server-addr",
-						Value: 		"unix:///tmp/spire-server/private/api.sock",
-						Usage:  	"SPIRE Server Listen socket",
-						Destination: 	&opt.httpOptions.spireServerAddr,
-						Required: 	false,
-					},
-				},
 				Action: func(c *cli.Context) error {
 					return runTornjakCmd("http", opt)
 				},
@@ -119,7 +107,6 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 		}
 
 		apiServer := &agentapi.Server{
-			SpireServerAddr: opt.httpOptions.spireServerAddr,
 			SpireServerInfo: serverInfo,
 			TornjakConfig:   tornjakConfigs,
 		}

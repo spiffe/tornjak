@@ -791,7 +791,31 @@ func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
 	}
 }
 
-func (s *Server) ConfigureDefaultPlugins() error {
+func (s *Server) ConfigureDefault() error {
+	// set SPIRE socket to default SPIRE socket - 
+	s.SpireServerAddr = "unix:///tmp/spire-server/private/api.sock"
+	
+	// set default server with only HTTP config
+	defaultHTTPConfig := &httpConfig{
+		Enabled: 	true,
+		ListenPort: 	":10000",
+	}
+	defaultTLSConfig := &tlsConfig{
+		Enabled: 	false,
+	}
+	defaultMTLSConfig := &mtlsConfig{
+		Enabled: 	false,
+	}
+	defaultServer := &serverConfig{
+		SPIRESocket: 	s.SpireServerAddr,
+		HttpConfig:  	defaultHTTPConfig,
+		TlsConfig: 	defaultTLSConfig,
+		MtlsConfig: 	defaultMTLSConfig,
+	}
+	s.TornjakConfig = &TornjakConfig{
+		Server: defaultServer,
+	}
+
 	var err error
 	expBackoff := backoff.NewExponentialBackOff()
 	expBackoff.MaxElapsedTime = time.Second
@@ -811,15 +835,19 @@ func (s *Server) VerifyConfig() error {
 	}
 	// s.TornjakConfig not nil
 	serverConfig := s.TornjakConfig.Server
+	// check if SPIRE socket configured
+	if serverConfig.SPIRESocket == "" {
+		return errors.New("'Tornjak Config > server > spire_socket_path' not populated")
+	}
 	// pluginConfig = s.TornjakConfig.Plugin // no plugin verification
 
 	// all server config connections must be included
 	if serverConfig.HttpConfig == nil {
-		return errors.New("Tornjak Config > server > http not populated")
+		return errors.New("`Tornjak Config > server > http` not populated")
 	} else if serverConfig.TlsConfig == nil {
-		return errors.New("Tornjak Config > server > tls not populated")
+		return errors.New("`Tornjak Config > server > tls` not populated")
 	} else if  serverConfig.MtlsConfig == nil {
-		return errors.New("Tornjak Config > server > mtls not populate")
+		return errors.New("`Tornjak Config > server > mtls` not populate")
 	}
 	// check if at least one connection is enabled
 	if !(serverConfig.HttpConfig.Enabled || serverConfig.TlsConfig.Enabled || serverConfig.MtlsConfig.Enabled) {
@@ -829,16 +857,23 @@ func (s *Server) VerifyConfig() error {
 }
 
 func (s *Server) Configure() error {
+	// verify config first
 	err := s.VerifyConfig()
 	if err != nil {
 		return errors.Errorf("Invalid configuration: %v", err)
 	}
 
-	//configs := map[string]map[string]catalog.HCLPluginConfig(*s.TornjakConfig.Plugins)
+	// if config is nil, configure defaults
 	if s.TornjakConfig == nil {
-		err = s.ConfigureDefaultPlugins()
+		err = s.ConfigureDefault()
 		return err
 	}
+
+	/*  Configure Server  */
+	serverConfig := *s.TornjakConfig.Server
+	s.SpireServerAddr = serverConfig.SPIRESocket
+	
+	/*  Configure Plugins  */
 	pluginConfigs := *s.TornjakConfig.Plugins
 	// configure datastore
 	s.Db, err = NewAgentsDB(pluginConfigs["DataStore"])

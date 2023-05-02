@@ -23,6 +23,7 @@ type TornjakConfig struct {
 /* Server configuration*/
 
 type serverConfig struct {
+	SPIRESocket	string		`hcl:"spire_socket_path"`
 	HttpConfig	*httpConfig	`hcl:"http"`
 	TlsConfig 	*tlsConfig	`hcl:"tls"`
 	MtlsConfig	*mtlsConfig	`hcl:"mtls"`
