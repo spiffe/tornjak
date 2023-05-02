@@ -12,7 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
+	//"sync"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -588,44 +588,45 @@ func (s *Server) HandleRequests() {
 		log.Fatal("Cannot Configure: ", err)
 	}
 	
-	var wg sync.WaitGroup
+	numPorts := 0
+	errChannel := make(chan error, 3)
 	rtr := s.GetRouter()
 
 	// TLS Stack handling
 	serverConfig := s.TornjakConfig.Server
 
 	if serverConfig.HttpConfig.Enabled {
-		wg.Add(1)
+		numPorts += 1
 		listenPort := serverConfig.HttpConfig.ListenPort
+		tlsType := "HTTP"
 		fmt.Printf("Starting to listen on %s...\n", listenPort)
 		go func() {
-			defer wg.Done()
 			err := http.ListenAndServe(listenPort, rtr)
-			log.Printf("HTTP serve error: %v", err)
+			err = errors.Errorf("%s server: Error serving: %v", tlsType, err)
+			errChannel <- err
+			// log.Printf("HTTP serve error: %v", err)
 		}()
 	}
 
 	if serverConfig.TlsConfig.Enabled {
-		wg.Add(1)
+		numPorts += 1
 		listenPort := serverConfig.TlsConfig.ListenPort
 		certPath := serverConfig.TlsConfig.Cert
 		keyPath := serverConfig.TlsConfig.Key
+		tlsType := "TLS"
 
 		go func() {
-			defer wg.Done()
-		
 			// Create a CA certificate pool and add cert.pem to it
 			caCert, err := ioutil.ReadFile(certPath)
 			if err != nil {
-				log.Printf("TLS CA pool error: %v", err)
+				err = errors.Errorf("%s server: CA pool error: %v", tlsType, err)
+				errChannel <- err
 				return
 			}
 			caCertPool := x509.NewCertPool()
 			caCertPool.AppendCertsFromPEM(caCert)
 
-			tlsType := "TLS"
 			// Create the TLS Config with the CA pool and enable Client certificate validation
-
 			tlsConfig := &tls.Config{
 				ClientCAs: caCertPool,
 			}
@@ -640,71 +641,91 @@ func (s *Server) HandleRequests() {
 
 			fmt.Printf("Starting to listen with %s on %s...\n", tlsType, listenPort)
 			if _, err := os.Stat(certPath); os.IsNotExist(err) {
-				log.Printf("File does not exist %s", certPath)
+				err = errors.Errorf("%s server: File does not exist %s", tlsType, certPath)
+				errChannel <- err
 				return
 			}
 			if _, err := os.Stat(keyPath); os.IsNotExist(err) {
-				log.Printf("File does not exist %s", keyPath)
+				err = errors.Errorf("%s server: File does not exist %s", tlsType, keyPath)
+				errChannel <- err
 				return
 			}
 			
 			err = server.ListenAndServeTLS(certPath, keyPath)
-			log.Printf("TLS serve error: %v", err)
+			err = errors.Errorf("%s server: Error serving: %v", tlsType, err)
+			errChannel <- err
 		}()
 	}
 
 	if serverConfig.MtlsConfig.Enabled {
+		numPorts += 1
 		listenPort := serverConfig.MtlsConfig.ListenPort
 		certPath := serverConfig.MtlsConfig.Cert
 		keyPath := serverConfig.MtlsConfig.Key
 		caPath := serverConfig.MtlsConfig.Ca
-
-		// Create a CA certificate pool and add cert.pem to it
-		caCert, err := ioutil.ReadFile(certPath)
-		if err != nil {
-			log.Fatal(err)
-		}
-		caCertPool := x509.NewCertPool()
-		caCertPool.AppendCertsFromPEM(caCert)
-
 		tlsType := "mTLS"
-		// add mTLS CA path to cert pool as well
-		if _, err := os.Stat(caPath); os.IsNotExist(err) {
-			log.Fatalf("File does not exist %s", caPath)
-		}
-		mTLSCaCert, err := ioutil.ReadFile(caPath)
-		if err != nil {
-			log.Fatal(err)
-		}
-		caCertPool.AppendCertsFromPEM(mTLSCaCert)
 
-		// Create the TLS Config with the CA pool and enable Client certificate validation
+		go func() {
+			// Create a CA certificate pool and add cert.pem to it
+			caCert, err := ioutil.ReadFile(certPath)
+			if err != nil {
+				err = errors.Errorf("%s server: CA pool error: %v", tlsType, err)
+				errChannel <- err
+				return
+			}
+			caCertPool := x509.NewCertPool()
+			caCertPool.AppendCertsFromPEM(caCert)
 
-		mtlsConfig := &tls.Config{
-			ClientCAs: caCertPool,
-		}
-		mtlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
-		mtlsConfig.BuildNameToCertificate()
+			// add mTLS CA path to cert pool as well
+			if _, err := os.Stat(caPath); os.IsNotExist(err) {
+				err = errors.Errorf("%s server: File does not exist %s", tlsType, caPath)
+				errChannel <- err
+				return
+			}
+			mTLSCaCert, err := ioutil.ReadFile(caPath)
+			if err != nil {
+				err = errors.Errorf("%s server: Could not read file %s: %v", tlsType, caPath, err)
+				errChannel <- err
+				return
+			}
+			caCertPool.AppendCertsFromPEM(mTLSCaCert)
 
-		// Create a Server instance to listen on port 8443 with the TLS config
-		server := &http.Server{
-			Handler:   rtr,
-			Addr:      listenPort,
-			TLSConfig: mtlsConfig,
-		}
+			// Create the TLS Config with the CA pool and enable Client certificate validation
 
-		fmt.Printf("Starting to listen with %s on %s...\n", tlsType, listenPort)
-		if _, err := os.Stat(certPath); os.IsNotExist(err) {
-			log.Fatalf("File does not exist %s", certPath)
-		}
-		if _, err := os.Stat(keyPath); os.IsNotExist(err) {
-			log.Fatalf("File does not exist %s", keyPath)
-		}
-		log.Fatal(server.ListenAndServeTLS(certPath, keyPath))
-		return
+			mtlsConfig := &tls.Config{
+				ClientCAs: caCertPool,
+			}
+			mtlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
+			mtlsConfig.BuildNameToCertificate()
+
+			// Create a Server instance to listen on port 8443 with the TLS config
+			server := &http.Server{
+				Handler:   rtr,
+				Addr:      listenPort,
+				TLSConfig: mtlsConfig,
+			}
+
+			fmt.Printf("Starting to listen with %s on %s...\n", tlsType, listenPort)
+			if _, err := os.Stat(certPath); os.IsNotExist(err) {
+				err = errors.Errorf("%s server: File does not exist %s", tlsType, certPath)
+				errChannel <- err
+				return
+			}
+			if _, err := os.Stat(keyPath); os.IsNotExist(err) {
+				log.Fatalf("File does not exist %s", keyPath)
+			}
+			err = server.ListenAndServeTLS(certPath, keyPath)
+			err = errors.Errorf("%s server: Error serving: %v", tlsType, err)
+			errChannel <- err
+		}()
 	}
-
-	wg.Wait()
+	
+	// as errors come in, read them, and block
+	for i := 0; i < numPorts; i++ {
+		err := <- errChannel
+		log.Printf("%v", err)
+	}
+	
 }
 
 // TODO map[string]catalog. type
