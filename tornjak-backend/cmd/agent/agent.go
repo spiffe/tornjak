@@ -22,12 +22,7 @@ type cliOptions struct {
 		expandEnv   bool
 	}
 	httpOptions struct {
-		listenAddr string
-		certPath   string
-		keyPath    string
-		mtlsCaPath string
-		tls        bool
-		mtls       bool
+		spireServerAddr string
 	}
 }
 
@@ -63,6 +58,15 @@ func main() {
 			{
 				Name:  "http",
 				Usage: "Run the tornjak http server",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:		"spire-server-addr"
+						Value: 		"unix:///tmp/spire-server/private/api.sock"
+						Usage:  	"SPIRE Server Listen socket"
+						Destination: 	&opt.genericOptions.httpOptions.spireServerAddr,
+						Required: 	false,
+					},
+				},
 				Action: func(c *cli.Context) error {
 					return runTornjakCmd("http", opt)
 				},
@@ -115,7 +119,7 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 		}
 
 		apiServer := &agentapi.Server{
-			SpireServerAddr: getSocketPath(config),
+			SpireServerAddr: opt.genericOptions.httpOptions.spireServerAddr,
 			SpireServerInfo: serverInfo,
 			TornjakConfig:   tornjakConfigs,
 		}
@@ -156,19 +160,6 @@ func GetServerInfo(config *run.Config) (agentapi.TornjakSpireServerInfo, error) 
 		TrustDomain:   config.Server.TrustDomain,
 		VerboseConfig: serverInfo,
 	}, nil
-}
-
-func getSocketPath(config *run.Config) string {
-	socketPath := config.Server.SocketPath
-	if socketPath == "" {
-		// TODO: temporary fix for issue with socket path resolution
-		// using the defaultSocketPath in the SPIRE pkg, manually importing
-		// since it is not a public variable.
-		// https://github.com/spiffe/spire/blob/main/cmd/spire-server/cli/run/run.go#L44
-		socketPath = "/tmp/spire-server/private/api.sock"
-	}
-
-	return "unix://" + socketPath
 }
 
 func getTornjakConfig(path string, expandEnv bool) (string, error) {

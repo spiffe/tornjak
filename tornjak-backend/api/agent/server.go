@@ -12,7 +12,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	//"sync"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -32,8 +31,10 @@ type Server struct {
 	// SpireServerInfo provides config info for the spire server
 	SpireServerInfo TornjakSpireServerInfo
 
-	// AgentDB for storing Workload Attestor Plugin Info of agents
+	// Information from Tornjak Config file passed in as argument
 	TornjakConfig *TornjakConfig
+
+	// Plugins
 	Db            agentdb.AgentDB
 	Auth          auth.Auth
 }
