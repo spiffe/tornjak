@@ -63,7 +63,7 @@ func main() {
 						Name:		"spire-server-addr",
 						Value: 		"unix:///tmp/spire-server/private/api.sock",
 						Usage:  	"SPIRE Server Listen socket",
-						Destination: 	&opt.genericOptions.httpOptions.spireServerAddr,
+						Destination: 	&opt.httpOptions.spireServerAddr,
 						Required: 	false,
 					},
 				},
@@ -119,7 +119,7 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 		}
 
 		apiServer := &agentapi.Server{
-			SpireServerAddr: opt.genericOptions.httpOptions.spireServerAddr,
+			SpireServerAddr: opt.httpOptions.spireServerAddr,
 			SpireServerInfo: serverInfo,
 			TornjakConfig:   tornjakConfigs,
 		}
