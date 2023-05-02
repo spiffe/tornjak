@@ -15,7 +15,7 @@ require (
 	github.com/stretchr/testify v1.7.1 // indirect
 	github.com/urfave/cli/v2 v2.3.0
 	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f // indirect
-	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
+	golang.org/x/net v0.7.0 // indirect
 	google.golang.org/grpc v1.40.0
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
 )
