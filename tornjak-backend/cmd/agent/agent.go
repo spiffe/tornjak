@@ -60,9 +60,9 @@ func main() {
 				Usage: "Run the tornjak http server",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
-						Name:		"spire-server-addr"
-						Value: 		"unix:///tmp/spire-server/private/api.sock"
-						Usage:  	"SPIRE Server Listen socket"
+						Name:		"spire-server-addr",
+						Value: 		"unix:///tmp/spire-server/private/api.sock",
+						Usage:  	"SPIRE Server Listen socket",
 						Destination: 	&opt.genericOptions.httpOptions.spireServerAddr,
 						Required: 	false,
 					},
