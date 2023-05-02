@@ -27,13 +27,7 @@ import (
 )
 
 type Server struct {
-	ListenAddr      string
 	SpireServerAddr string
-	CertPath        string
-	KeyPath         string
-	MTlsCaPath      string
-	TlsEnabled      bool
-	MTlsEnabled     bool
 
 	// SpireServerInfo provides config info for the spire server
 	SpireServerInfo TornjakSpireServerInfo

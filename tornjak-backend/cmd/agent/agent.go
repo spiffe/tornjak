@@ -63,51 +63,6 @@ func main() {
 			{
 				Name:  "http",
 				Usage: "Run the tornjak http server",
-				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:        "listen-addr",
-						Value:       ":10000",
-						Usage:       "listening address for server",
-						Destination: &opt.httpOptions.listenAddr,
-						Required:    false,
-					},
-					&cli.StringFlag{
-						Name:        "cert",
-						Value:       "",
-						Usage:       "CA Cert path for TLS",
-						Destination: &opt.httpOptions.certPath,
-						Required:    false,
-					},
-					&cli.StringFlag{
-						Name:        "key",
-						Value:       "",
-						Usage:       "Key path for TLS",
-						Destination: &opt.httpOptions.keyPath,
-						Required:    false,
-					},
-					&cli.StringFlag{
-						Name:        "mtls-ca",
-						Value:       "",
-						Usage:       "CA path for mTLS CA",
-						Destination: &opt.httpOptions.mtlsCaPath,
-						Required:    false,
-					},
-					&cli.BoolFlag{
-						Name:        "tls",
-						Value:       false,
-						Usage:       "Enable TLS for http server",
-						Destination: &opt.httpOptions.tls,
-						Required:    false,
-					},
-					&cli.BoolFlag{
-						Name:        "mtls",
-						Value:       false,
-						Usage:       "Enable mTLS for http server (overwrites tls flag)",
-						Destination: &opt.httpOptions.mtls,
-						Required:    false,
-					},
-				},
-
 				Action: func(c *cli.Context) error {
 					return runTornjakCmd("http", opt)
 				},
@@ -161,12 +116,6 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 
 		apiServer := &agentapi.Server{
 			SpireServerAddr: getSocketPath(config),
-			ListenAddr:      opt.httpOptions.listenAddr,
-			CertPath:        opt.httpOptions.certPath,
-			KeyPath:         opt.httpOptions.keyPath,
-			MTlsCaPath:      opt.httpOptions.mtlsCaPath,
-			TlsEnabled:      opt.httpOptions.tls,
-			MTlsEnabled:     opt.httpOptions.mtls,
 			SpireServerInfo: serverInfo,
 			TornjakConfig:   tornjakConfigs,
 		}
