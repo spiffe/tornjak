@@ -3,31 +3,19 @@ on: [push, pull_request]
 jobs:
   tornjak-build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x]
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
       - name: Install Golang
         uses: actions/setup-go@v3
         with:
           go-version: '1.17'
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3.6.0
+      - uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: Node.js modules cache, repository
-        uses: actions/cache@v3
-        id: repo-cache
-        with:
-          path: ${{ github.workspace }}/node_modules
-          key: ${{ runner.os }}-${{ matrix.node-version }}-modules-repo-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.node-version }}-modules-repo
+          node-version: '18'
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
