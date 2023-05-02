@@ -14,6 +14,7 @@ FROM node:16-alpine3.14 AS runtime
 WORKDIR /usr/src/app
 
 COPY --from=build /usr/src/app/build .
+COPY --from=build /usr/src/app/.env.prod .
 
 # install serve package
 RUN npm install -g serve
