@@ -4,6 +4,7 @@ on:
     branches:
     - main
     - v1.2.0
+    - image-name
 jobs:
   tornjak-build:
     runs-on: ubuntu-latest
