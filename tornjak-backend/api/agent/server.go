@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -586,55 +587,74 @@ func (s *Server) HandleRequests() {
 	if err != nil {
 		log.Fatal("Cannot Configure: ", err)
 	}
+	
+	var wg sync.WaitGroup
 	rtr := s.GetRouter()
 
 	// TLS Stack handling
 	serverConfig := s.TornjakConfig.Server
 
 	if serverConfig.HttpConfig.Enabled {
-		fmt.Printf("Starting to listen on %s...\n", serverConfig.HttpConfig.ListenPort)
-		log.Fatal(http.ListenAndServe(serverConfig.HttpConfig.ListenPort, rtr))
+		wg.Add(1)
+		listenPort := serverConfig.HttpConfig.ListenPort
+		fmt.Printf("Starting to listen on %s...\n", listenPort)
+		go func() {
+			defer wg.Done()
+			err := http.ListenAndServe(listenPort, rtr)
+			log.Printf("HTTP serve error: %v", err)
+		}()
 	}
 
 	if serverConfig.TlsConfig.Enabled {
+		wg.Add(1)
+		listenPort := serverConfig.TlsConfig.ListenPort
 		certPath := serverConfig.TlsConfig.Cert
 		keyPath := serverConfig.TlsConfig.Key
-		// Create a CA certificate pool and add cert.pem to it
-		caCert, err := ioutil.ReadFile(certPath)
-		if err != nil {
-			log.Fatal(err)
-		}
-		caCertPool := x509.NewCertPool()
-		caCertPool.AppendCertsFromPEM(caCert)
 
-		tlsType := "TLS"
-		// Create the TLS Config with the CA pool and enable Client certificate validation
+		go func() {
+			defer wg.Done()
+		
+			// Create a CA certificate pool and add cert.pem to it
+			caCert, err := ioutil.ReadFile(certPath)
+			if err != nil {
+				log.Printf("TLS CA pool error: %v", err)
+				return
+			}
+			caCertPool := x509.NewCertPool()
+			caCertPool.AppendCertsFromPEM(caCert)
 
-		tlsConfig := &tls.Config{
-			ClientCAs: caCertPool,
-		}
-		tlsConfig.BuildNameToCertificate()
+			tlsType := "TLS"
+			// Create the TLS Config with the CA pool and enable Client certificate validation
 
-		// Create a Server instance to listen on port 8443 with the TLS config
-		server := &http.Server{
-			Handler:   rtr,
-			Addr:      serverConfig.TlsConfig.ListenPort,
-			TLSConfig: tlsConfig,
-		}
+			tlsConfig := &tls.Config{
+				ClientCAs: caCertPool,
+			}
+			tlsConfig.BuildNameToCertificate()
 
-		fmt.Printf("Starting to listen with %s on %s...\n", tlsType, serverConfig.TlsConfig.ListenPort)
-		if _, err := os.Stat(certPath); os.IsNotExist(err) {
-			log.Fatalf("File does not exist %s", certPath)
-		}
-		if _, err := os.Stat(keyPath); os.IsNotExist(err) {
-			log.Fatalf("File does not exist %s", keyPath)
-		}
-		log.Fatal(server.ListenAndServeTLS(certPath, keyPath))
-		return
+			// Create a Server instance to listen on port 8443 with the TLS config
+			server := &http.Server{
+				Handler:   rtr,
+				Addr:      listenPort,
+				TLSConfig: tlsConfig,
+			}
 
+			fmt.Printf("Starting to listen with %s on %s...\n", tlsType, listenPort)
+			if _, err := os.Stat(certPath); os.IsNotExist(err) {
+				log.Printf("File does not exist %s", certPath)
+				return
+			}
+			if _, err := os.Stat(keyPath); os.IsNotExist(err) {
+				log.Printf("File does not exist %s", keyPath)
+				return
+			}
+			
+			err = server.ListenAndServeTLS(certPath, keyPath)
+			log.Printf("TLS serve error: %v", err)
+		}()
 	}
 
 	if serverConfig.MtlsConfig.Enabled {
+		listenPort := serverConfig.MtlsConfig.ListenPort
 		certPath := serverConfig.MtlsConfig.Cert
 		keyPath := serverConfig.MtlsConfig.Key
 		caPath := serverConfig.MtlsConfig.Ca
@@ -669,11 +689,11 @@ func (s *Server) HandleRequests() {
 		// Create a Server instance to listen on port 8443 with the TLS config
 		server := &http.Server{
 			Handler:   rtr,
-			Addr:      serverConfig.MtlsConfig.ListenPort,
+			Addr:      listenPort,
 			TLSConfig: mtlsConfig,
 		}
 
-		fmt.Printf("Starting to listen with %s on %s...\n", tlsType, serverConfig.MtlsConfig.ListenPort)
+		fmt.Printf("Starting to listen with %s on %s...\n", tlsType, listenPort)
 		if _, err := os.Stat(certPath); os.IsNotExist(err) {
 			log.Fatalf("File does not exist %s", certPath)
 		}
@@ -684,6 +704,7 @@ func (s *Server) HandleRequests() {
 		return
 	}
 
+	wg.Wait()
 }
 
 // TODO map[string]catalog. type
