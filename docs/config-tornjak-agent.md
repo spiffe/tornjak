@@ -3,13 +3,38 @@
 This document is a configuration reference for the Tornjak Agent. This is designed after the [SPIRE server config](https://github.com/spiffe/spire/blob/main/doc/spire_server.md). It includes information about plugin types, built-in plugins, the server configuration file, plugin configuration, and command line options for `tornjak-agent` commands.
 
 ## General Tornjak Agent Configs
-Currently it is possible to add metadata, but there is no functionality for this yet. Sample general Tornjak agent configuration:
+The server config will contain information for the three potential connections: HTTP, TLS, and mTLS. See below for sample configuration:
 
 ```hcl
 server {
-    metadata = "sample metadata (perhaps include connectivity information and listen-addr)"
+
+    spire_socket_path = "unix:///tmp/spire-server/private/api.sock" # socket to communicate with SPIRE server
+
+    http {
+        enabled = true # if true, opens HTTP. if false, no HTTP connection opened
+	listen_port = ":10000" # if HTTP enabled, opens HTTP listen port at container port 10000
+    }
+
+    tls {
+        enabled = true # if true, opens TLS. if false, no TLS connection opened
+        listen_port = ":20000" # if enabled, opens TLS listen port at container port 20000
+        cert = "sample-keys/tls.pem" # path of certificate for TLS
+        key = "sample-keys/key.pem" # path of keys for TLS
+    }
+
+    mtls {
+        enabled = true # if true, opens mTLS. if false, no mTLS connection opened
+        listen_port = ":30000" # if enabled, opens mTLS listen port at container port 30000
+        cert = "sample-keys/tls.pem" # path of certificate for mTLS
+        key = "sample-keys/key.pem" # path of keys for mTLS
+        ca = "sample-keys/rootCA.pem" # path of CA for mTLS
+    }
 }
 ```
+
+We have three connection types that can be opened by the server simultaneously: HTTP, TLS, and mTLS. At least one must be enabled, or the program will exit immediately. If one connection crashes, the error is logged, and the others will still run. When all crash, the pr
+
+If there is no config given, the backend will create one HTTP connection at port 10000. 
 
 ## Plugin types
 
@@ -77,22 +102,19 @@ The following flags are available for all tornjak-agent commands:
 
 | Command                | Action                             | Default | Required |
 |:-----------------------|:-----------------------------------|:--------| :--------|
-| `-spire-config`,`-c`   | Config file path for SPIRE server  |         | true     |
-| `-tornjak-config`,`-t` | Config file path for Tornjak agent |         | true     |
-| `-expandEnv`           | If flag included, expand environment variables in Tornjak config | false   | false    |
+| `--spire-config`       | Config file path for SPIRE server  |         | true     |
+| `--tornjak-config`     | Config file path for Tornjak agent |         | true     |
+| `--expandEnv`          | If flag included, expand environment variables in Tornjak config | false   | false    |
+
+Note these flags are passed in directly through the Tornjak container. 
 
 ### `tornjak-agent http`
 
 Runs the tornjak http server. 
 
-| Command        | Action                                            | Default | Required |
-|:---------------|:--------------------------------------------------|:--------| :--------|
-| `-listen-addr` | listening address for tornjak agent               | :10000  | false    |
-| `-cert`        | CA Cert path for TLS                              |         | false    |
-| `-key`         | Key path for TLS                                  |         | false    |
-| `-mtls-ca`     | CA path for mTLS CA                               |         | false    |
-| `-tls`         | Enable TLS for http server                        | false   | false    |
-| `-mtls`        | enable mTLS for http server (overwrites tls flag) | false   | false    |
+| Command             | Action                     | Default                                   | Required |
+|:--------------------|:---------------------------|:------------------------------------------| :--------|
+| `spire-server-addr` | SPIRE Server listen socket | unix:///tmp/spire-server/private/api.sock | false    |
 
 ## Further reading
 

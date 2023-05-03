@@ -28,16 +28,14 @@ func main() {
 	app := &cli.App{
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:        "spire-config-file",
-				Aliases:     []string{"spire-config", "c"},
+				Name:        "spire-config",
 				Value:       "",
 				Usage:       "Config file path for spire server",
 				Destination: &opt.genericOptions.configFile,
 				Required:    true,
 			},
 			&cli.StringFlag {
-				Name:        "tornjak-config-file",
-				Aliases:     []string{"tornjak-config", "t"},
+				Name:        "tornjak-config",
 				Value:       "",
 				Usage:       "Config file path for tornjak server",
 				Destination: &opt.genericOptions.tornjakFile,
