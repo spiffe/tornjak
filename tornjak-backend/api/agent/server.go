@@ -25,7 +25,14 @@ import (
 	agentdb "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/db"
 )
 
+var defaultSpireServerAddr = "unix:///tmp/spire-server/private/api.sock"
+var defaultHttpConfig = &httpConfig{
+	Enabled: true,
+	ListenPort: ":10000",
+}
+
 type Server struct {
+	// SPIRE socket location
 	SpireServerAddr string
 
 	// SpireServerInfo provides config info for the spire server
@@ -552,7 +559,6 @@ func (s *Server) GetRouter() (*mux.Router) {
 	rtr.HandleFunc("/api/entry/create", s.entryCreate)
 	rtr.HandleFunc("/api/entry/delete", s.entryDelete)
 
-
 	// Tornjak specific
 	rtr.HandleFunc("/api/tornjak/serverinfo", s.tornjakGetServerInfo)
 	// Agents Selectors
@@ -590,12 +596,17 @@ func (s *Server) HandleRequests() {
 	// TLS Stack handling
 	serverConfig := s.TornjakConfig.Server
 
-	if serverConfig.HttpConfig.Enabled {
+	if serverConfig.HttpConfig != nil && serverConfig.HttpConfig.Enabled {
 		numPorts += 1
 		listenPort := serverConfig.HttpConfig.ListenPort
 		tlsType := "HTTP"
 		fmt.Printf("Starting to listen on %s...\n", listenPort)
 		go func() {
+			if listenPort == "" {
+				err := errors.Errorf("%s server: Cannot have empty port: %s", tlsType, listenPort)
+				errChannel <- err
+				return
+			}
 			err := http.ListenAndServe(listenPort, rtr)
 			err = errors.Errorf("%s server: Error serving: %v", tlsType, err)
 			errChannel <- err
@@ -603,7 +614,7 @@ func (s *Server) HandleRequests() {
 		}()
 	}
 
-	if serverConfig.TlsConfig.Enabled {
+	if serverConfig.TlsConfig != nil && serverConfig.TlsConfig.Enabled {
 		numPorts += 1
 		listenPort := serverConfig.TlsConfig.ListenPort
 		certPath := serverConfig.TlsConfig.Cert
@@ -611,6 +622,11 @@ func (s *Server) HandleRequests() {
 		tlsType := "TLS"
 
 		go func() {
+			if listenPort == "" {
+				err := errors.Errorf("%s server: Cannot have empty port: %s", tlstype, listenPort)
+				errChannel <- err
+				return
+			}
 			// Create a CA certificate pool and add cert.pem to it
 			caCert, err := ioutil.ReadFile(certPath)
 			if err != nil {
@@ -652,7 +668,7 @@ func (s *Server) HandleRequests() {
 		}()
 	}
 
-	if serverConfig.MtlsConfig.Enabled {
+	if serverConfig.MtlsConfig != nil && serverConfig.MtlsConfig.Enabled {
 		numPorts += 1
 		listenPort := serverConfig.MtlsConfig.ListenPort
 		certPath := serverConfig.MtlsConfig.Cert
@@ -661,6 +677,11 @@ func (s *Server) HandleRequests() {
 		tlsType := "mTLS"
 
 		go func() {
+			if listenPort == "" {
+				err := errors.Errorf("%s server: Cannot have empty port: %s", tlsType, listenPort)
+				errChannel <- err
+				return
+			}
 			// Create a CA certificate pool and add cert.pem to it
 			caCert, err := ioutil.ReadFile(certPath)
 			if err != nil {
@@ -714,7 +735,12 @@ func (s *Server) HandleRequests() {
 			errChannel <- err
 		}()
 	}
-	
+
+	// no ports opened
+	if numPorts == 0 {
+		log.Printf("No connections opened. HINT: at least one HTTP, TLS, or MTLS must be enabled in Tornjak config")
+	}
+
 	// as errors come in, read them, and block
 	for i := 0; i < numPorts; i++ {
 		err := <- errChannel
@@ -723,7 +749,7 @@ func (s *Server) HandleRequests() {
 	
 }
 
-// TODO map[string]catalog. type
+// getPluginConfig returns first plugin configuration
 func getPluginConfig(plugin map[string]catalog.HCLPluginConfig) (string, ast.Node, error) {
 	for k, d := range plugin {
 		return k, d.PluginData, nil
@@ -734,8 +760,14 @@ func getPluginConfig(plugin map[string]catalog.HCLPluginConfig) (string, ast.Nod
 // NewAgentsDB returns a new agents DB, given a DB connection string
 func NewAgentsDB(dbPlugin map[string]catalog.HCLPluginConfig) (agentdb.AgentDB, error) {
 	key, data, err := getPluginConfig(dbPlugin)
-	if err != nil { // error if no config
-		return nil, errors.Errorf("No DataStore plugin found")
+	if err != nil { // default if no config
+		expBackoff := backoff.NewExponentialBackOff()
+		expBackoff.MaxElapsedTime = time.Second
+		db, err := agentdb.NewLocalSqliteDB("sqlite3", "./tornjak.sqlite3", expBackoff)
+		if err != nil {
+			return nil, errors.Errorf("Cannot configure default datastore plugin: %v", err)
+		}
+		return db, nil
 	}
 
 	switch key {
@@ -791,91 +823,27 @@ func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
 	}
 }
 
-func (s *Server) ConfigureDefault() error {
-	// set SPIRE socket to default SPIRE socket - 
-	s.SpireServerAddr = "unix:///tmp/spire-server/private/api.sock"
-	
-	// set default server with only HTTP config
-	defaultHTTPConfig := &httpConfig{
-		Enabled: 	true,
-		ListenPort: 	":10000",
-	}
-	defaultTLSConfig := &tlsConfig{
-		Enabled: 	false,
-	}
-	defaultMTLSConfig := &mtlsConfig{
-		Enabled: 	false,
-	}
-	defaultServer := &serverConfig{
-		SPIRESocket: 	s.SpireServerAddr,
-		HttpConfig:  	defaultHTTPConfig,
-		TlsConfig: 	defaultTLSConfig,
-		MtlsConfig: 	defaultMTLSConfig,
-	}
-	s.TornjakConfig = &TornjakConfig{
-		Server: defaultServer,
-	}
-
-	var err error
-	expBackoff := backoff.NewExponentialBackOff()
-	expBackoff.MaxElapsedTime = time.Second
-
-	s.Db, err = agentdb.NewLocalSqliteDB("sqlite3", "./tornjak.sqlite3", expBackoff)
-	if err != nil {
-		return errors.Errorf("Cannot configure default datastore plugin: %v", err)
-	}
-	s.Auth = auth.NewNullVerifier()
-	return nil
-}
-
-func (s *Server) VerifyConfig() error {
-	// nil config has no errors
-	if s.TornjakConfig == nil {
-		return nil
-	}
-	// s.TornjakConfig not nil
-	serverConfig := s.TornjakConfig.Server
-	// check if SPIRE socket configured
-	if serverConfig.SPIRESocket == "" {
-		return errors.New("'Tornjak Config > server > spire_socket_path' not populated")
-	}
-	// pluginConfig = s.TornjakConfig.Plugin // no plugin verification
-
-	// all server config connections must be included
-	if serverConfig.HttpConfig == nil {
-		return errors.New("`Tornjak Config > server > http` not populated")
-	} else if serverConfig.TlsConfig == nil {
-		return errors.New("`Tornjak Config > server > tls` not populated")
-	} else if  serverConfig.MtlsConfig == nil {
-		return errors.New("`Tornjak Config > server > mtls` not populate")
-	}
-	// check if at least one connection is enabled
-	if !(serverConfig.HttpConfig.Enabled || serverConfig.TlsConfig.Enabled || serverConfig.MtlsConfig.Enabled) {
-		return errors.New("Tornjak server config does not enable at least one connection")
-	}
-	return nil
-}
-
 func (s *Server) Configure() error {
-	// verify config first
-	err := s.VerifyConfig()
-	if err != nil {
-		return errors.Errorf("Invalid configuration: %v", err)
-	}
-
-	// if config is nil, configure defaults
-	if s.TornjakConfig == nil {
-		err = s.ConfigureDefault()
-		return err
-	}
-
 	/*  Configure Server  */
-	serverConfig := *s.TornjakConfig.Server
-	s.SpireServerAddr = serverConfig.SPIRESocket
+	if s.TornjakConfig.Server == nil { // create empty default
+		s.TornjakConfig.Server = &serverConfig{}
+	}
+	if s.TornjakConfig.Server.SPIRESocket == "" { // use default spire socket
+		s.TornjakConfig.Server.SPIRESocket = defaultSpireServerAddr
+	}
+	serverConfig := s.TornjakConfig.Server
+	s.SpireServerAddr = serverConfig.SPIRESocket // for convenience
 	
+	// if none of HTTP TLS or mTLS connection
+	// create HTTP connection at default port
+	if (serverConfig.HttpConfig == nil && serverConfig.TlsConfig == nil && serverConfig.MtlsConfig == nil) {
+		s.TornjakConfig.Server.HttpConfig = defaultHttpConfig
+	}
+
 	/*  Configure Plugins  */
 	pluginConfigs := *s.TornjakConfig.Plugins
 	// configure datastore
+	var err error
 	s.Db, err = NewAgentsDB(pluginConfigs["DataStore"])
 	if err != nil {
 		return errors.Errorf("Cannot configure datastore plugin: %v", err)
