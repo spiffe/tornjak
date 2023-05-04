@@ -75,7 +75,13 @@ metadata:
 data:
   server.conf: |
     server {
-      metadata = "insert metadata"
+      spire_socket_path = "unix:///tmp/spire-server/private/api.sock"
+
+      http {
+        enabled = true
+        listen_port = ":10000"
+      }
+
     }
 
     plugins {
@@ -85,7 +91,6 @@ data:
           filename = "/run/spire/data/tornjak.sqlite3"
         }
       }
-
     }
 ```
 
