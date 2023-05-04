@@ -39,7 +39,7 @@ func main() {
 				Value:       "",
 				Usage:       "Config file path for tornjak server",
 				Destination: &opt.genericOptions.tornjakFile,
-				Required:    false,
+				Required:    true,
 			},
 			&cli.BoolFlag {
 				Name: 	     "expandEnv",

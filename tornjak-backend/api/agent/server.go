@@ -25,12 +25,6 @@ import (
 	agentdb "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/db"
 )
 
-var defaultSpireServerAddr = "unix:///tmp/spire-server/private/api.sock"
-var defaultHttpConfig = &httpConfig{
-	Enabled: true,
-	ListenPort: ":10000",
-}
-
 type Server struct {
 	// SPIRE socket location
 	SpireServerAddr string
@@ -623,7 +617,7 @@ func (s *Server) HandleRequests() {
 
 		go func() {
 			if listenPort == "" {
-				err := errors.Errorf("%s server: Cannot have empty port: %s", tlstype, listenPort)
+				err := errors.Errorf("%s server: Cannot have empty port: %s", tlsType, listenPort)
 				errChannel <- err
 				return
 			}
@@ -760,18 +754,17 @@ func getPluginConfig(plugin map[string]catalog.HCLPluginConfig) (string, ast.Nod
 // NewAgentsDB returns a new agents DB, given a DB connection string
 func NewAgentsDB(dbPlugin map[string]catalog.HCLPluginConfig) (agentdb.AgentDB, error) {
 	key, data, err := getPluginConfig(dbPlugin)
-	if err != nil { // default if no config
-		expBackoff := backoff.NewExponentialBackOff()
-		expBackoff.MaxElapsedTime = time.Second
-		db, err := agentdb.NewLocalSqliteDB("sqlite3", "./tornjak.sqlite3", expBackoff)
-		if err != nil {
-			return nil, errors.Errorf("Cannot configure default datastore plugin: %v", err)
-		}
-		return db, nil
+	if err != nil { // db is required config
+		return nil, errors.New("Required DataStore plugin not configured")
 	}
 
 	switch key {
 	case "sql":
+		// check if data is defined
+		if data == nil {
+			return nil, errors.New("SQL DataStore plugin ('config > plugins > DataStore sql > plugin_data') not populated")
+		}
+
 		// TODO can probably add this to config
 		expBackoff := backoff.NewExponentialBackOff()
 		expBackoff.MaxElapsedTime = time.Second
@@ -823,27 +816,45 @@ func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
 	}
 }
 
+func (s *Server) VerifyConfiguration() error {
+	if s.TornjakConfig == nil {
+		return errors.New("config not given")
+	}
+
+	/*  Verify server  */
+	if s.TornjakConfig.Server == nil { // must be defined
+		return errors.New("'config > server' field not defined")
+	}
+	if s.TornjakConfig.Server.SPIRESocket == "" {
+		return errors.New("'config > server > spire_socket_path' field not defined")
+	}
+
+	serverConfig := s.TornjakConfig.Server
+	if (serverConfig.HttpConfig == nil && serverConfig.TlsConfig == nil && serverConfig.MtlsConfig == nil) {
+		return errors.New("'config > server' must have at least one of HTTP, TLS, or mTLS sections defined")
+	}
+
+	/*  Verify Plugins  */
+	if s.TornjakConfig.Plugins == nil {
+		return errors.New("'config > plugins' field not defined")
+	}
+	return nil
+}
+
 func (s *Server) Configure() error {
+	// Verify Config
+	err := s.VerifyConfiguration()
+	if err != nil {
+		return errors.Errorf("Tornjak Config error: %v", err)
+	}
+
 	/*  Configure Server  */
-	if s.TornjakConfig.Server == nil { // create empty default
-		s.TornjakConfig.Server = &serverConfig{}
-	}
-	if s.TornjakConfig.Server.SPIRESocket == "" { // use default spire socket
-		s.TornjakConfig.Server.SPIRESocket = defaultSpireServerAddr
-	}
 	serverConfig := s.TornjakConfig.Server
 	s.SpireServerAddr = serverConfig.SPIRESocket // for convenience
 	
-	// if none of HTTP TLS or mTLS connection
-	// create HTTP connection at default port
-	if (serverConfig.HttpConfig == nil && serverConfig.TlsConfig == nil && serverConfig.MtlsConfig == nil) {
-		s.TornjakConfig.Server.HttpConfig = defaultHttpConfig
-	}
-
 	/*  Configure Plugins  */
 	pluginConfigs := *s.TornjakConfig.Plugins
 	// configure datastore
-	var err error
 	s.Db, err = NewAgentsDB(pluginConfigs["DataStore"])
 	if err != nil {
 		return errors.Errorf("Cannot configure datastore plugin: %v", err)
