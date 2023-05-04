@@ -1,8 +1,39 @@
-# Tornjak Agent Configuration Reference
+# Tornjak Server Configuration Reference
 
-This document is a configuration reference for the Tornjak Agent. This is designed after the [SPIRE server config](https://github.com/spiffe/spire/blob/main/doc/spire_server.md). It includes information about plugin types, built-in plugins, the server configuration file, plugin configuration, and command line options for `tornjak-agent` commands.
+This document is a reference for the Tornjak server. This is designed after the [SPIRE server config](https://github.com/spiffe/spire/blob/main/doc/spire_server.md). It includes information about plugin types, built-in plugins, the server configuration file, plugin configuration, and command line options for `tornjak-agent` commands.
 
-## General Tornjak Agent Configs
+## Contents
+- [Command line options](#command-line-options)
+- [The Tornjak Config](#the-tornjak-config)
+- [General Tornjak Server Configs](#general-tornjak-server-configs)
+- [About Tornjak Plugins](#about-tornjak-plugins)
+- [Sample Configuration Files](#sample-configuration-files)
+- [Further Reading](#further-reading)
+
+## Command line options
+
+The following flags are available for all tornjak-agent commands:
+
+| Command                | Action                             | Default | Required |
+|:-----------------------|:-----------------------------------|:--------| :--------|
+| `--spire-config`       | Config file path for SPIRE server  |         | true     |
+| `--tornjak-config`     | Config file path for Tornjak agent |         | true     |
+| `--expandEnv`          | If flag included, expand environment variables in Tornjak config | false   | false    |
+
+Note these flags are passed in directly through the Tornjak container. 
+
+### `tornjak-backend serverinfo`
+Prints the SPIRE config and Tornjak config given. 
+
+### `tornjak-backend http`
+
+Runs the tornjak server. 
+
+## The Tornjak Config
+
+The Tornjak config that is passed in must follow a specific format. Examples of this format can be found [below](#sample-configuration-files). In general, it is split into the `server` section with [general Tornjak server configs](#general-tornjak-server-configs), and the `plugins` section. 
+
+## General Tornjak Server Configs
 The server config will contain information for the three potential connections: HTTP, TLS, and mTLS. See below for sample configuration:
 
 ```hcl
@@ -38,21 +69,23 @@ If a section is omitted, that connection will not be created. If all are omitted
 
 If there is no config file given at all, the backend will create one HTTP connection at port 10000. 
 
-## Plugin types
+## About Tornjak plugins
+
+### Plugin types
 
 | Type           | Description | Required |
 |:---------------|:------------|:---------|
 | DataStore      | Provides persistent storage for Tornjak metadata. | True |
 | UserManagement | Secures Tornjak agent and enables authorization logic | False |
 
-## Built-in plugins
+### Built-in plugins
 
 | Type | Name | Description |
 | ---- | ---- | ----------- |
 | DataStore | [sql]() | Default SQL storage for Tornjak metadata |
 | UserManagement | [keycloak](/docs/plugin_server_auth_keycloak.md) | Requires JWT Bearer Access Token provided for each request. More details in [our auth feature doc](/docs/feature_auth.md) |
 
-## Plugin configuration
+### Plugin configuration
 
 The server configuration file also contains a configuration section for the various SPIRE server plugins. Plugin configurations live inside the top-level `plugins { ... }` section, which has the following format:
 
@@ -72,50 +105,11 @@ The following configuration options are available to configure a plugin:
 | --------------- | ---------------------------------------- |
 | plugin_data     | Plugin-specific data                     |
 
-## Sample configuration file
+## Sample configuration files
 
-This section includes a sample configuration file for formatting and syntax reference
+The most basic configuration file can be found [here](./conf/agent/base.conf).
 
-```hcl
-server {
-    metadata = "sample metadata"
-}
-
-plugins {
-    DataStore "sql" {
-        plugin_data {
-            database_type = "sqlite3"
-            connection_string = "/run/spire/data/tornjak.sqlite3"
-        }
-    }
-
-    UserManagement "KeycloakAuth" {
-        plugin_data {
-            jwksURL = "http://localhost:8080/jwks"
-            redirectURL = "http://localhost:10000/*"
-        }
-    }
-}
-```
-
-## Command line options
-
-The following flags are available for all tornjak-agent commands:
-
-| Command                | Action                             | Default | Required |
-|:-----------------------|:-----------------------------------|:--------| :--------|
-| `--spire-config`       | Config file path for SPIRE server  |         | true     |
-| `--tornjak-config`     | Config file path for Tornjak agent |         | true     |
-| `--expandEnv`          | If flag included, expand environment variables in Tornjak config | false   | false    |
-
-Note these flags are passed in directly through the Tornjak container. 
-
-### `tornjak-backend serverinfo`
-Prints the SPIRE config and Tornjak config given. 
-
-### `tornjak-backend http`
-
-Runs the tornjak server. 
+We have an extended configuration file with comments on each section found [here](./conf/agent/full.conf).
 
 ## Further reading
 
