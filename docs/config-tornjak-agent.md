@@ -12,7 +12,7 @@ server {
 
     http {
         enabled = true # if true, opens HTTP. if false, no HTTP connection opened
-	listen_port = ":10000" # if HTTP enabled, opens HTTP listen port at container port 10000
+	    listen_port = ":10000" # if HTTP enabled, opens HTTP listen port at container port 10000
     }
 
     tls {
@@ -32,9 +32,11 @@ server {
 }
 ```
 
-We have three connection types that can be opened by the server simultaneously: HTTP, TLS, and mTLS. At least one must be enabled, or the program will exit immediately. If one connection crashes, the error is logged, and the others will still run. When all crash, the pr
+We have three connection types that can be opened by the server simultaneously: HTTP, TLS, and mTLS. At least one must be enabled, or the program will exit immediately. If one connection crashes, the error is logged, and the others will still run. When all crash, the process crashes. 
 
-If there is no config given, the backend will create one HTTP connection at port 10000. 
+If a section is omitted, that connection will not be created. If all are omitted, the program will exit immediately. 
+
+If there is no config file given at all, the backend will create one HTTP connection at port 10000. 
 
 ## Plugin types
 
@@ -108,13 +110,12 @@ The following flags are available for all tornjak-agent commands:
 
 Note these flags are passed in directly through the Tornjak container. 
 
-### `tornjak-agent http`
+### `tornjak-backend serverinfo`
+Prints the SPIRE config and Tornjak config given. 
 
-Runs the tornjak http server. 
+### `tornjak-backend http`
 
-| Command             | Action                     | Default                                   | Required |
-|:--------------------|:---------------------------|:------------------------------------------| :--------|
-| `spire-server-addr` | SPIRE Server listen socket | unix:///tmp/spire-server/private/api.sock | false    |
+Runs the tornjak server. 
 
 ## Further reading
 
