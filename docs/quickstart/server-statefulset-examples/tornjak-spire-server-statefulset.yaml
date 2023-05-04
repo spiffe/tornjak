@@ -23,9 +23,9 @@ spec:
           image: ghcr.io/spiffe/tornjak-be-spire-server:1.x.x # 👈 NOTE YOUR OWN SPIRE VERSION
           imagePullPolicy: Always
           args:
-            - --spire-config
+            - -config
             - /run/spire/config/server.conf
-            - --tornjak-config                       # 👈 ADDITIONAL ARGUMENT
+            - -tornjak-config                       # 👈 ADDITIONAL ARGUMENT
             - /run/spire/tornjak-config/server.conf # 👈 ADDITIONAL ARGUMENT
           ports:
             - containerPort: 8081
