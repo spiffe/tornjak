@@ -57,6 +57,6 @@ jobs:
         run: make release-tornjak-frontend-ghcr
       - name: Build and push tornjak image
         run: make release-tornjak-ghcr
-      - name: Build and push tornjak manager image
-        run: make release-tornjak-manager-ghcr
+      # - name: Build and push tornjak manager image
+      #  run: make release-tornjak-manager-ghcr
       - run: echo "🍏 This job's status is ${{ job.status }}."
