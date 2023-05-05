@@ -59,11 +59,11 @@ An excellent feature for frontend development is the ability to make changes to 
 
 ```console
 cd tornjak-frontend
-REACT_APP_API_SERVER_URI=http://<tornjak_API>/  npm start
+npm install
+REACT_APP_API_SERVER_URI=http://localhost:3000  npm start
 ```
 
-Assuming `npm` is installed, this will start a server on `http://localhost:3000`
-Please be patient, as it might take a few minutes to compile and start the server.
+This will start a server on `http://localhost:3000`. Please be patient, as it might take a few minutes to compile and start the server.
 
 ### Running the Backend Locally
 
