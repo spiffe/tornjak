@@ -1,23 +1,23 @@
-.PHONY: ui vendor build ui-agent ui-manager container-tornjak-be-spire container-tornjak-be-spire-push container-manager container-manager-push release-tornjak-be-spire-multiversions push container-frontend container-frontend-push compose-frontend container-tornjak-be container-tornjak-be-push
+.PHONY: ui vendor build ui-agent ui-manager container-tornjak-backend-spire container-tornjak-backend-spire-push container-manager container-manager-push release-tornjak-backend-spire-multiversions push container-frontend container-frontend-push container-tornjak-backend container-tornjak-backend-push
 
 VERSION=$(shell cat version.txt)
 
 CONTAINER_TAG ?= tsidentity/tornjak:$(VERSION)
-CONTAINER_BACKEND_TAG ?= tsidentity/tornjak-be:$(VERSION)
-CONTAINER_BACKEND_WITH_SPIRE_TAG ?= tsidentity/tornjak-be-spire-server:latest
-CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-fe:$(VERSION)
-CONTAINER_BACKEND_SPIRE_VERSION_IMAGEPATH ?= tsidentity/tornjak-be-spire-server
+CONTAINER_BACKEND_TAG ?= tsidentity/tornjak-backend:$(VERSION)
+CONTAINER_BACKEND_WITH_SPIRE_TAG ?= tsidentity/tornjak-backend-spire-server:latest
+CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-frontend:$(VERSION)
+CONTAINER_BACKEND_SPIRE_VERSION_IMAGEPATH ?= tsidentity/tornjak-backend-spire-server
 
 CONTAINER_TORNJAK_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak
-CONTAINER_BACKEND_SPIRE_VERSION_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-be-spire-server
-CONTAINER_BACKEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-be
-CONTAINER_FRONTEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-fe
+CONTAINER_BACKEND_SPIRE_VERSION_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-backend-spire-server
+CONTAINER_BACKEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-backend
+CONTAINER_FRONTEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-frontend
 CONTAINER_MANAGER_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-manager
 
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:$(VERSION)
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
 
-all: bin/tornjak-backend bin/tornjak-manager ui-manager container-manager container-frontend container-tornjak-be
+all: bin/tornjak-backend bin/tornjak-manager ui-manager container-manager container-frontend container-tornjak-backend
 
 bin/tornjak-backend: $(GO_FILES) vendor
 	# Build hack because of flake of imported go module
@@ -51,16 +51,16 @@ vendor:
 
 
 # Containerized components
-container-tornjak-be: bin/tornjak-backend
+container-tornjak-backend: bin/tornjak-backend
 	docker build --no-cache -f Dockerfile.backend-container -t ${CONTAINER_BACKEND_TAG} .
 
-container-tornjak-be-push: container-tornjak-be
+container-tornjak-backend-push: container-tornjak-backend
 	docker push ${CONTAINER_BACKEND_TAG}
 
-container-tornjak-be-spire: bin/tornjak-backend
+container-tornjak-backend-spire: bin/tornjak-backend
 	docker build --no-cache -f Dockerfile.add-backend -t ${CONTAINER_BACKEND_WITH_SPIRE_TAG} .
 
-container-tornjak-be-spire-push: container-tornjak-be-spire
+container-tornjak-backend-spire-push: container-tornjak-backend-spire
 	docker push ${CONTAINER_BACKEND_WITH_SPIRE_TAG}
 
 container-manager: bin/tornjak-manager ui-manager
@@ -88,24 +88,24 @@ container-tornjak-push: container-tornjak
 
 
 # releases for Github Container Registry
-release-tornjak-be-ghcr: container-tornjak-be
+release-tornjak-backend-ghcr: container-tornjak-backend
 	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_GHCR_IMAGEPATH}:latest
 	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_GHCR_IMAGEPATH}:$(VERSION)
 	docker push ${CONTAINER_BACKEND_TAG}
 	docker push ${CONTAINER_BACKEND_GHCR_IMAGEPATH}:latest
 	docker push ${CONTAINER_BACKEND_GHCR_IMAGEPATH}:${VERSION}
 
-release-tornjak-be-spire-multiversions: bin/tornjak-backend
+release-tornjak-backend-spire-multiversions: bin/tornjak-backend
 	for i in $(shell cat SPIRE_BUILD_VERSIONS); do \
 		./build-and-push-versioned-container.sh $$i ${CONTAINER_BACKEND_SPIRE_VERSION_IMAGEPATH}; \
 	done
 
-release-tornjak-be-spire-multiversions-ghcr: bin/tornjak-backend
+release-tornjak-backend-spire-multiversions-ghcr: bin/tornjak-backend
 	for i in $(shell cat SPIRE_BUILD_VERSIONS); do \
 		./build-and-push-versioned-container.sh $$i ${CONTAINER_BACKEND_SPIRE_VERSION_GHCR_IMAGEPATH}; \
 	done
 
-release-tornjak-fe-ghcr: container-frontend
+release-tornjak-frontend-ghcr: container-frontend
 	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}:latest
 	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}:$(VERSION)
 	docker push ${CONTAINER_FRONTEND_TAG}

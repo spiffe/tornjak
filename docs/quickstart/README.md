@@ -305,7 +305,7 @@ spec:
             periodSeconds: 5
         ### 👈 BEGIN ADDITIONAL CONTAINER ###
         - name: tornjak-backend
-          image: ghcr.io/spiffe/tornjak-be:latest
+          image: ghcr.io/spiffe/tornjak-backend:latest
           args:
             - --config
             - /run/spire/config/server.conf
@@ -386,10 +386,10 @@ clusterrolebinding.rbac.authorization.k8s.io/spire-server-trust-role-binding cre
 configmap/spire-server created
 statefulset.apps/spire-server created
 service/spire-server created
-service/tornjak-be-http created
-service/tornjak-be-tls created
-service/tornjak-be-mtls created
-service/tornjak-fe created
+service/tornjak-backend-http created
+service/tornjak-backend-tls created
+service/tornjak-backend-mtls created
+service/tornjak-frontend created
 ```
 
 Before continuing, check that the spire-server is ready: 
@@ -513,7 +513,7 @@ Should yield two lines depending on which deployment you used:
     Image:         <TORNJAK-IMAGE>
 ```
 
-where `<TORNJAK-IMAGE>` is `ghcr.io/spiffe/tornjak:latest` if you deployed the Tornjak with the UI and is `ghcr.io/spiffe/tornjak-be:latest` if you deployed only the Tornjak backend. 
+where `<TORNJAK-IMAGE>` is `ghcr.io/spiffe/tornjak:latest` if you deployed the Tornjak with the UI and is `ghcr.io/spiffe/tornjak-backend:latest` if you deployed only the Tornjak backend. 
 
 ## Step 3: Configuring Access to Tornjak
 
@@ -567,7 +567,7 @@ Forwarding from [::1]:3000 -> 3000
 You will need to deploy the separate frontend separately to access the exposed Tornjak backend. We have prebuilt the frontend in a container, so we can simply run it via a single docker command in a separate terminal, which will take a couple minutes to run: 
 
 ```console
-docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak-fe:latest 
+docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak-frontend:latest 
 ```
 
 After the image is downloaded, you will eventually see the following output:

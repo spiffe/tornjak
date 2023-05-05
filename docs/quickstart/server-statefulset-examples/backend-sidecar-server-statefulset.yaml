@@ -51,7 +51,7 @@ spec:
             periodSeconds: 5
         ### 👈 BEGIN ADDITIONAL CONTAINER ###
         - name: tornjak-backend
-          image: ghcr.io/spiffe/tornjak-be:latest
+          image: ghcr.io/spiffe/tornjak-backend:latest
           args:
             - --config
             - /run/spire/config/server.conf

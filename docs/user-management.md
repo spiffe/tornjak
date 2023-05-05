@@ -47,7 +47,7 @@ REACT_APP_AUTH_SERVER_URI=http://localhost:8080/ npm start
 Alternatively, we can do the same on the containerized version:
 
 ```
-docker run -p 3000:3000 -d -e REACT_APP_API_SERVER_URI='http://localhost:10000' -e REACT_APP_AUTH_SERVER_URI='http://localhost:8080' tsidentity/tornjak-fe:latest
+docker run -p 3000:3000 -d -e REACT_APP_API_SERVER_URI='http://localhost:10000' -e REACT_APP_AUTH_SERVER_URI='http://localhost:8080' tsidentity/tornjak-frontend:latest
 ```
 
 This will start a server on `http://localhost:3000`
