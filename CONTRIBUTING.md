@@ -43,7 +43,7 @@ We welcome all development attempst and contributions from the community. The ea
 
 ## Local testing
 
-We highly recommend starting with our [quickstart tutorial](./docs/tornjak-quickstart.md), using official images and preset configs before development. This tutorial creates a local instance of SPIRE on Minikube, adds Tornjak server, and runs a UI. 
+We highly recommend starting with our [quickstart tutorial](docs/quickstart/README.md), using official images and preset configs before development. This tutorial creates a local instance of SPIRE on Minikube, adds Tornjak server, and runs a UI. 
 
 Additionally, one may test out several other features including the following:
 - [Running the Frontend Locally](#running-the-frontend-locally)
