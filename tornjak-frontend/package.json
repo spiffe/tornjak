@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/plugin-transform-runtime": "^7.15.0",
+    "@babel/preset-env": "^7.15.6",
     "@babel/runtime": "^7.15.4",
     "@carbon/charts": "^0.41.80",
     "@carbon/charts-react": "^0.41.80",
@@ -37,6 +39,7 @@
     "dotenv": "^8.2.0",
     "env-cmd": "^10.1.0",
     "file-saver": "^2.0.5",
+    "fs": "^0.0.1-security",
     "jwt-decode": "^3.1.2",
     "keycloak-js": "^19.0.1",
     "moment": "^2.29.4",
@@ -53,13 +56,11 @@
     "redux": "^4.1.1",
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.3.0",
+    "sass": "^1.60.0",
     "stringify-object": "^4.0.1",
     "url-join": "^4.0.1",
     "web-vitals": "^0.2.4",
-    "xlsx": "^0.18.5",
-    "sass": "^1.60.0",
-    "@babel/plugin-transform-runtime": "^7.15.0",
-    "@babel/preset-env": "^7.15.6"
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "PORT=$PORT_FE react-scripts start --openssl-legacy-provider",
@@ -102,6 +103,7 @@
     "jest-transform-stub": "^2.0.0",
     "moxios": "^0.4.0",
     "nodemon": "^2.0.13",
+    "path-browserify": "^1.0.1",
     "puppeteer": "^10.4.0",
     "react-test-renderer": "^17.0.2",
     "redux-mock-store": "^1.5.4"
