@@ -76,6 +76,6 @@ NOTE: The value of `REACT_APP_API_SERVER_URI` must be a URI that is separately a
 
 ## Further steps
 
-It is recommended to try a full deployment of the Tornjak frontend, backend, and SPIRE Server in minikube. Please see our [tutorial document](./docs/tornjak-quickstart.md) for step-by-step instructions. 
+It is recommended to try a full deployment of the Tornjak frontend, backend, and SPIRE Server in minikube. Please see our [tutorial document](docs/quickstart/README.md) for step-by-step instructions. 
 
 

@@ -43,7 +43,7 @@ We welcome all development attempst and contributions from the community. The ea
 
 ## Local testing
 
-We highly recommend starting with our [quickstart tutorial](./docs/tornjak-quickstart.md), using official images and preset configs before development. This tutorial creates a local instance of SPIRE on Minikube, adds Tornjak server, and runs a UI. 
+We highly recommend starting with our [quickstart tutorial](docs/quickstart/README.md), using official images and preset configs before development. This tutorial creates a local instance of SPIRE on Minikube, adds Tornjak server, and runs a UI. 
 
 Additionally, one may test out several other features including the following:
 - [Running the Frontend Locally](#running-the-frontend-locally)
@@ -59,11 +59,11 @@ An excellent feature for frontend development is the ability to make changes to 
 
 ```console
 cd tornjak-frontend
-REACT_APP_API_SERVER_URI=http://<tornjak_API>/  npm start
+npm install
+REACT_APP_API_SERVER_URI=http://localhost:3000  npm start
 ```
 
-Assuming `npm` is installed, this will start a server on `http://localhost:3000`
-Please be patient, as it might take a few minutes to compile and start the server.
+This will start a server on `http://localhost:3000`. Please be patient, as it might take a few minutes to compile and start the server.
 
 ### Running the Backend Locally
 
