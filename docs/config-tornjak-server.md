@@ -1,6 +1,6 @@
 # Tornjak Server Configuration Reference
 
-This document is a reference for the Tornjak server. This is designed after the [SPIRE server config](https://github.com/spiffe/spire/blob/main/doc/spire_server.md). It includes information about plugin types, built-in plugins, the server configuration file, plugin configuration, and command line options for `tornjak-agent` commands.
+This document is a reference for the Tornjak server, and it follows the [SPIRE server config](https://github.com/spiffe/spire/blob/main/doc/spire_server.md). It includes information about plugin types, built-in plugins, the server configuration file, plugin configuration, and command line options for `tornjak-agent` commands.
 
 ## Contents
 - [Command line options](#command-line-options)
@@ -43,19 +43,19 @@ server {
 
     http {
         enabled = true # if true, opens HTTP. if false, no HTTP connection opened
-	    listen_port = ":10000" # if HTTP enabled, opens HTTP listen port at container port 10000
+	    port = ":10000" # if HTTP enabled, opens HTTP listen port at container port 10000
     }
 
     tls {
         enabled = true # if true, opens TLS. if false, no TLS connection opened
-        listen_port = ":20000" # if enabled, opens TLS listen port at container port 20000
+        port = ":20000" # if enabled, opens TLS listen port at container port 20000
         cert = "sample-keys/tls.pem" # path of certificate for TLS
         key = "sample-keys/key.pem" # path of keys for TLS
     }
 
     mtls {
         enabled = true # if true, opens mTLS. if false, no mTLS connection opened
-        listen_port = ":30000" # if enabled, opens mTLS listen port at container port 30000
+        port = ":30000" # if enabled, opens mTLS listen port at container port 30000
         cert = "sample-keys/tls.pem" # path of certificate for mTLS
         key = "sample-keys/key.pem" # path of keys for mTLS
         ca = "sample-keys/rootCA.pem" # path of CA for mTLS
@@ -63,11 +63,9 @@ server {
 }
 ```
 
-We have three connection types that can be opened by the server simultaneously: HTTP, TLS, and mTLS. At least one must be enabled, or the program will exit immediately. If one connection crashes, the error is logged, and the others will still run. When all crash, the process crashes. 
+We have three connection types that can be opened by the server simultaneously: HTTP, TLS, and mTLS. At least one must be enabled, or the program will exit immediately. If one connection crashes, the error is logged, and the others will still run. When all crash, the Tornjak server exits and the container terminates.
 
-If a section is omitted, that connection will not be created. If all are omitted, the program will exit immediately. 
-
-If there is no config file given at all, the backend will create one HTTP connection at port 10000. 
+If a specific section is omitted or not enabled, that connection will not be created. If all are omitted or disabled, the program will exit immediately with an appropriate error log. 
 
 ## About Tornjak plugins
 
@@ -76,7 +74,7 @@ If there is no config file given at all, the backend will create one HTTP connec
 | Type           | Description | Required |
 |:---------------|:------------|:---------|
 | DataStore      | Provides persistent storage for Tornjak metadata. | True |
-| UserManagement | Secures Tornjak agent and enables authorization logic | False |
+| UserManagement | Secures access to Tornjak agent and enables authorization logic | False |
 
 ### Built-in plugins
 

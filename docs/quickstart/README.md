@@ -74,21 +74,24 @@ metadata:
   namespace: spire
 data:
   server.conf: |
+
     server {
+      # location of SPIRE socket
+      # here, set to default SPIRE socket path
       spire_socket_path = "unix:///tmp/spire-server/private/api.sock"
 
+      # configure HTTP connection to Tornjak server
       http {
         enabled = true
-        listen_port = ":10000"
+        port = 10000 # opens at port 10000
       }
-
     }
 
     plugins {
-      DataStore "sql" {
+      DataStore "sql" { # local database plugin
         plugin_data {
           drivername = "sqlite3"
-          filename = "/run/spire/data/tornjak.sqlite3"
+          filename = "/run/spire/data/tornjak.sqlite3" # stores locally in this file
         }
       }
     }

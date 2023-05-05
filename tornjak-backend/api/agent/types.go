@@ -31,19 +31,19 @@ type serverConfig struct {
 
 type httpConfig struct {
 	Enabled		bool	`hcl:"enabled"`
-	ListenPort	string	`hcl:"listen_port"`
+	ListenPort	int	`hcl:"port"`
 }
 
 type tlsConfig struct {
 	Enabled		bool	`hcl:"enabled"`
-	ListenPort	string	`hcl:"listen_port"`
+	ListenPort	int	`hcl:"port"`
 	Cert		string	`hcl:"cert"`
 	Key		string	`hcl:"key"`
 }
 
 type mtlsConfig struct {
 	Enabled		bool	`hcl:"enabled"`
-	ListenPort	string	`hcl:"listen_port"`
+	ListenPort	int	`hcl:"port"`
 	Cert		string	`hcl:"cert"`
 	Key		string	`hcl:"key"`
 	Ca		string	`hcl:"ca"`

@@ -594,14 +594,15 @@ func (s *Server) HandleRequests() {
 		numPorts += 1
 		listenPort := serverConfig.HttpConfig.ListenPort
 		tlsType := "HTTP"
-		fmt.Printf("Starting to listen on %s...\n", listenPort)
 		go func() {
-			if listenPort == "" {
-				err := errors.Errorf("%s server: Cannot have empty port: %s", tlsType, listenPort)
+			if listenPort == 0 {
+				err := errors.Errorf("%s server: Cannot have empty port: %d", tlsType, listenPort)
 				errChannel <- err
 				return
 			}
-			err := http.ListenAndServe(listenPort, rtr)
+			addr := fmt.Sprintf(":%d", listenPort)
+			fmt.Printf("Starting to listen on %s...\n", addr)
+			err := http.ListenAndServe(addr, rtr)
 			err = errors.Errorf("%s server: Error serving: %v", tlsType, err)
 			errChannel <- err
 			// log.Printf("HTTP serve error: %v", err)
@@ -616,11 +617,12 @@ func (s *Server) HandleRequests() {
 		tlsType := "TLS"
 
 		go func() {
-			if listenPort == "" {
-				err := errors.Errorf("%s server: Cannot have empty port: %s", tlsType, listenPort)
+			if listenPort == 0 {
+				err := errors.Errorf("%s server: Cannot have empty port: %d", tlsType, listenPort)
 				errChannel <- err
 				return
 			}
+			addr := fmt.Sprintf(":%d", listenPort)
 			// Create a CA certificate pool and add cert.pem to it
 			caCert, err := ioutil.ReadFile(certPath)
 			if err != nil {
@@ -640,11 +642,11 @@ func (s *Server) HandleRequests() {
 			// Create a Server instance to listen on port 8443 with the TLS config
 			server := &http.Server{
 				Handler:   rtr,
-				Addr:      listenPort,
+				Addr:      addr,
 				TLSConfig: tlsConfig,
 			}
 
-			fmt.Printf("Starting to listen with %s on %s...\n", tlsType, listenPort)
+			fmt.Printf("Starting to listen with %s on %s...\n", tlsType, addr)
 			if _, err := os.Stat(certPath); os.IsNotExist(err) {
 				err = errors.Errorf("%s server: File does not exist %s", tlsType, certPath)
 				errChannel <- err
@@ -671,11 +673,12 @@ func (s *Server) HandleRequests() {
 		tlsType := "mTLS"
 
 		go func() {
-			if listenPort == "" {
-				err := errors.Errorf("%s server: Cannot have empty port: %s", tlsType, listenPort)
+			if listenPort == 0 {
+				err := errors.Errorf("%s server: Cannot have empty port: %d", tlsType, listenPort)
 				errChannel <- err
 				return
 			}
+			addr := fmt.Sprintf(":%d", listenPort)
 			// Create a CA certificate pool and add cert.pem to it
 			caCert, err := ioutil.ReadFile(certPath)
 			if err != nil {
@@ -711,11 +714,11 @@ func (s *Server) HandleRequests() {
 			// Create a Server instance to listen on port 8443 with the TLS config
 			server := &http.Server{
 				Handler:   rtr,
-				Addr:      listenPort,
+				Addr:      addr,
 				TLSConfig: mtlsConfig,
 			}
 
-			fmt.Printf("Starting to listen with %s on %s...\n", tlsType, listenPort)
+			fmt.Printf("Starting to listen with %s on %s...\n", tlsType, addr)
 			if _, err := os.Stat(certPath); os.IsNotExist(err) {
 				err = errors.Errorf("%s server: File does not exist %s", tlsType, certPath)
 				errChannel <- err
