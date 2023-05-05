@@ -1,4 +1,4 @@
-.PHONY: ui vendor build ui-agent ui-manager container-tornjak-backend-spire container-tornjak-backend-spire-push container-manager container-manager-push release-tornjak-backend-spire-multiversions push container-frontend container-frontend-push container-tornjak-backend container-tornjak-backend-push
+.PHONY: ui vendor build container-tornjak-backend-spire container-tornjak-backend-spire-push container-manager container-manager-push release-tornjak-backend-spire-multiversions push container-frontend container-frontend-push container-tornjak-backend container-tornjak-backend-push
 
 VERSION=$(shell cat version.txt)
 
@@ -63,7 +63,7 @@ container-tornjak-backend-spire: bin/tornjak-backend
 container-tornjak-backend-spire-push: container-tornjak-backend-spire
 	docker push ${CONTAINER_BACKEND_WITH_SPIRE_TAG}
 
-container-manager: bin/tornjak-manager ui-manager
+container-manager: bin/tornjak-manager #ui-manager
 	docker build --no-cache -f Dockerfile.tornjak-manager -t ${CONTAINER_MANAGER_TAG} .
 
 container-manager-push: container-manager
