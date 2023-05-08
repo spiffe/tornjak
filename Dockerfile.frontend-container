@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 
 COPY tornjak-frontend .
 
-RUN npm ci --only=production && \
+RUN npm install --omit=dev && \
     npm run build
 
 # Runtime stage
