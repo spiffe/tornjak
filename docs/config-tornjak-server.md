@@ -43,19 +43,19 @@ server {
 
     http {
         enabled = true # if true, opens HTTP. if false, no HTTP connection opened
-	    port = ":10000" # if HTTP enabled, opens HTTP listen port at container port 10000
+	    port = "10000" # if HTTP enabled, opens HTTP listen port at container port 10000
     }
 
     tls {
         enabled = true # if true, opens TLS. if false, no TLS connection opened
-        port = ":20000" # if enabled, opens TLS listen port at container port 20000
+        port = "20000" # if enabled, opens TLS listen port at container port 20000
         cert = "sample-keys/tls.pem" # path of certificate for TLS
         key = "sample-keys/key.pem" # path of keys for TLS
     }
 
     mtls {
         enabled = true # if true, opens mTLS. if false, no mTLS connection opened
-        port = ":30000" # if enabled, opens mTLS listen port at container port 30000
+        port = "30000" # if enabled, opens mTLS listen port at container port 30000
         cert = "sample-keys/tls.pem" # path of certificate for mTLS
         key = "sample-keys/key.pem" # path of keys for mTLS
         ca = "sample-keys/rootCA.pem" # path of CA for mTLS
