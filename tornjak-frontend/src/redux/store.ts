@@ -2,7 +2,7 @@
 import {applyMiddleware, createStore} from 'redux';
 import allReducers from './reducers'; //import all reducers
 import thunk from "redux-thunk";
-import { composeWithDevTools } from 'redux-devtools-extension'; //for Redox dev
+import { composeWithDevTools } from '@redux-devtools/extension'; //for Redox dev
 import { RootState } from './reducers';
 
 function saveToLocalStorage(state: RootState) {

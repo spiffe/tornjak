@@ -72,7 +72,7 @@ class TornjakDashboard extends React.Component {
   }
 
   agentSpiffeids() {
-    if (typeof this.props.globalAgents.globalAgentsList !== undefined) {
+    if (this.props.globalAgents.globalAgentsList !== undefined) {
       return this.props.globalAgents.globalAgentsList.map(currentAgent => {
         return this.SpiffeHelper.getAgentSpiffeid(currentAgent)
       })

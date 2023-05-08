@@ -9,7 +9,7 @@ import {
   spireHealthCheckingFunc
 } from 'redux/actions';
 
-const spireHealthCheckTime: number = parseInt(process.env.REACT_APP_SPIRE_HEALTH_CHECK_TIME ?? '120', 10); // in secods: defualt value of 2 minutes
+const spireHealthCheckTime: number = parseInt(process.env.REACT_APP_SPIRE_HEALTH_CHECK_FREQ_SEC ?? '120', 10); // in secods: defualt value of 2 minutes
 
 type SpireHealthCheckProp = {
   // dispatches a payload for the status of SPIRE health as a boolean has a return type of void
