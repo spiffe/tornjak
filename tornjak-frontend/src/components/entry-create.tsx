@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Dropdown, TextInput, FilterableMultiSelect, Checkbox, TextArea, NumberInput, Accordion, AccordionItem, ToastNotification } from 'carbon-components-react';
 import {
   Button,
-} from '@mui/material';
+} from '@material-ui/core';
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';

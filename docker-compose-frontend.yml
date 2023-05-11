@@ -13,4 +13,3 @@ services:
       - "REACT_APP_API_SERVER_URI=http://localhost:10000"
     #   - "REACT_APP_AUTH_SERVER_URI=http://localhost:8080"
       - REACT_APP_SPIRE_HEALTH_CHECK_ENABLE=false
-      # - REACT_APP_SPIRE_HEALTH_CHECK_FREQ_SEC=120

@@ -1,48 +1,19 @@
-# Build stage
-FROM node:16-alpine3.14 AS build
+FROM node:16-alpine
 
 WORKDIR /usr/src/app
 
 COPY tornjak-frontend .
 
-RUN npm install --omit=dev && \
-    npm run build
+RUN npm install --omit=dev
 
-# Runtime stage
-FROM node:16-alpine3.14 AS runtime
-
-WORKDIR /usr/src/app
-
-COPY --from=build /usr/src/app/build .
-COPY --from=build /usr/src/app/.env.prod .
-
-# install serve package
-RUN npm install -g serve
+RUN npm prune --production
 
 # set env variables
-ARG REACT_APP_API_SERVER_URI
-ARG REACT_APP_AUTH_SERVER_URI
-ARG REACT_APP_SPIRE_HEALTH_CHECK_ENABLE
-ARG REACT_APP_SPIRE_HEALTH_CHECK_FREQ_SEC
-
 ENV REACT_APP_API_SERVER_URI $REACT_APP_API_SERVER_URI
 ENV REACT_APP_AUTH_SERVER_URI $REACT_APP_AUTH_SERVER_URI
 ENV REACT_APP_SPIRE_HEALTH_CHECK_ENABLE $REACT_APP_SPIRE_HEALTH_CHECK_ENABLE
-ENV REACT_APP_SPIRE_HEALTH_CHECK_FREQ_SEC $REACT_APP_SPIRE_HEALTH_CHECK_FREQ_SEC
-# ENV NODE_OPTIONS $NODE_OPTIONS
-# ARG NODE_OPTIONS=--openssl-legacy-provider
 
 ENV PORT_FE=3000
 EXPOSE $PORT_FE
 
-# CMD ["serve", "-s", "."]
-# CMD ["sh", "-c", "PORT=$PORT_FE serve -s build"]
-# CMD ["npm", "start"]
-
-CMD serve -s . -p $PORT_FE
-
-# CMD REACT_APP_API_SERVER_URI=$REACT_APP_API_SERVER_URI \
-#     REACT_APP_AUTH_SERVER_URI=$REACT_APP_AUTH_SERVER_URI \
-#     REACT_APP_SPIRE_HEALTH_CHECK_ENABLE=$REACT_APP_SPIRE_HEALTH_CHECK_ENABLE \
-#     REACT_APP_SPIRE_HEALTH_CHECK_FREQ_SEC=$REACT_APP_SPIRE_HEALTH_CHECK_FREQ_SEC \
-#     serve -s . -p $PORT_FE
+CMD ["npm", "start"]

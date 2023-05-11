@@ -7,6 +7,7 @@ import {
     GLOBAL_WORKLOAD_SELECTOR_INFO,
     GLOBAL_SPIRE_HEALTH_CHECK,
     GLOBAL_SPIRE_HEALTH_CHECKING,
+    GLOBAL_SPIRE_HEALTH_CHECK_Time,
     ServersReducerState,
     ServersAction,
 } from '../actions/types';
@@ -21,6 +22,10 @@ const initialState: ServersReducerState = {
     globalWorkloadSelectorInfo: workloadSelectors,
     globalSpireHealthCheck: false,
     globalSpireHealthChecking: false,
+    globalSpireHealthTime: {
+        SpireHealtCheckTime: 120,
+        SpireHealtCheckFreqDisplay: '2 Minutes',
+    },
 };
 
 export default function serversReducer(state: ServersReducerState = initialState, action: ServersAction) {
@@ -64,6 +69,11 @@ export default function serversReducer(state: ServersReducerState = initialState
             return {
                 ...state,
                 globalSpireHealthChecking: action.payload
+            };
+        case GLOBAL_SPIRE_HEALTH_CHECK_Time:
+            return {
+                ...state,
+                globalSpireHealthTime: action.payload
             };
         default:
             return state;
