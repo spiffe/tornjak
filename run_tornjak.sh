@@ -1,77 +1,11 @@
 #!/bin/sh
 echo "${@}"
 
-usage() {
-	cat << EOF >&2
-Usage: run_server [-c <file>] [-t <file>]
-
--c | -config <file>: SPIRE Config File
--t | -tornjak-config <file>: Tornjak Config File
--expandEnv : if flag included, expand environment variables expressed in Tornjak Config File
-EOF
-	exit 1
-}
-
-# argument parse
-
-while [[ $# -gt 0 ]]
-do
-key="$1"
-
-
-case $key in
-	-c|-config)
-	SPIRE_CONFIG="$2"
-	shift
-	shift
-	;;
-	-t|-tornjak-config)
-	TORNJAK_CONFIG="$2"
-	shift
-	shift
-	;;
-	-expandEnv)
-	EXPAND_ENV="-expandEnv"
-	shift
-	;;
-	*)
-	echo "$key"
-	echo "$2"
-	usage
-	;;
-esac
-done
-
-echo $SPIRE_CONFIG
-echo $TORNJAK_CONFIG
-
-if [[ "$SPIRE_CONFIG" == "" ]] ; then
-	echo "-c SPIRE_CONFIG must be provided"
-	exit 1
-fi
-
+# run frontend in background
 npm start &
 
-cd /opt/spire
+# run serverinfo to print SPIRE config if given and Tornjak config
+/opt/spire/tornjak-backend ${@} serverinfo
 
-if [[ "$TORNJAK_CONFIG" == "" ]] ; then
-	#echo "-t TORNJAK_CONFIG must be provided"
-	#exit 1
-	echo "running serverinfo"
-	/opt/spire/tornjak-backend -c $SPIRE_CONFIG $EXPAND_ENV serverinfo &
-	echo "running tls connection"
-	/opt/spire/tornjak-backend -c $SPIRE_CONFIG $EXPAND_ENV http --tls --cert sample-keys/tls.pem --key sample-keys/key.pem  --listen-addr :20000 &
-	echo "running mtls connection"
-	/opt/spire/tornjak-backend -c $SPIRE_CONFIG $EXPAND_ENV http --mtls --cert sample-keys/tls.pem --key sample-keys/key.pem  --mtls-ca sample-keys/rootCA.pem --listen-addr :30000 &
-	echo "running http connection"
-	/opt/spire/tornjak-backend -c $SPIRE_CONFIG $EXPAND_ENV http 
-else 
-	echo "running serverinfo"
-	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG $EXPAND_ENV serverinfo &
-	echo "running tls connection"
-	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG $EXPAND_ENV http --tls --cert sample-keys/tls.pem --key sample-keys/key.pem  --listen-addr :20000 &
-	echo "running mtls connnection"
-	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG $EXPAND_ENV http --mtls --cert sample-keys/tls.pem --key sample-keys/key.pem  --mtls-ca sample-keys/rootCA.pem --listen-addr :30000 &
-	echo "running http connection"
-	/opt/spire/tornjak-backend -c $SPIRE_CONFIG -t $TORNJAK_CONFIG $EXPAND_ENV http
-fi
+# run Tornjak server
+/opt/spire/tornjak-backend ${@} http
