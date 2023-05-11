@@ -40,7 +40,9 @@ import {
     GLOBAL_SPIRE_HEALTH_CHECK,
     SpireHealthCheckAction,
     GLOBAL_SPIRE_HEALTH_CHECKING,
-    SpireHealthCheckingAction
+    SpireHealthCheckingAction,
+    GLOBAL_SPIRE_HEALTH_CHECK_Time,
+    SpireHealthCheckTimeAction
 } from './types';
 
 import {
@@ -51,8 +53,20 @@ import {
     SelectorInfoLabels,
     ServerInfo,
     TornjakServerInfo,
-    WorkloadSelectorInfoLabels
+    WorkloadSelectorInfoLabels,
+    SpireHealtCheckFreq
 } from 'components/types';
+
+// Expected input - spire server health check refresh rate
+// spireHealthCheckRefreshTimeFunc returns the resfresh rate of spire health check
+export function spireHealthCheckRefreshTimeFunc(globalSpireHealthTime: SpireHealtCheckFreq): ThunkAction<void, RootState, undefined, SpireHealthCheckTimeAction> {
+    return dispatch => {
+        dispatch({
+            type: GLOBAL_SPIRE_HEALTH_CHECK_Time,
+            payload: globalSpireHealthTime
+        });
+    }
+}
 
 // Expected input - spire server health check loading
 // spireHealthCheckingFunc returns the loading state

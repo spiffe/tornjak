@@ -357,3 +357,15 @@
   .health-status-check-icon {
     display: inline-block;
   }
+
+  .spire-health-check-refresh-dropdown {
+    width: 150px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  .divider {
+    border-bottom: 1px solid black;
+    margin-left: -10px;
+    margin-right: -10px;
+  }

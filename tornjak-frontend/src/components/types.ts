@@ -99,6 +99,11 @@ export interface ServerInfo {
   nodeAttestorPlugin: string; // Node Attestor Plugin of server
 }
 
+export interface SpireHealtCheckFreq {
+  SpireHealtCheckTime: number; // Spire health check time
+  SpireHealtCheckFreqDisplay: string; // SPIRE health check dropdown display/ for persistence
+}
+
 // tornjak 
 export interface StringLabels {
   label: string;
