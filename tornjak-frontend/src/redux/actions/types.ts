@@ -7,7 +7,8 @@ import {
     SelectorInfoLabels,
     ServerInfo,
     TornjakServerInfo,
-    WorkloadSelectorInfoLabels
+    WorkloadSelectorInfoLabels,
+    SpireHealtCheckFreq
 } from "components/types";
 
 // auth
@@ -95,6 +96,7 @@ export const GLOBAL_SELECTOR_INFO = 'GLOBAL_SELECTOR_INFO';
 export const GLOBAL_WORKLOAD_SELECTOR_INFO = 'GLOBAL_WORKLOAD_SELECTOR_INFO';
 export const GLOBAL_SPIRE_HEALTH_CHECK = 'GLOBAL_SPIRE_HEALTH_CHECK';
 export const GLOBAL_SPIRE_HEALTH_CHECKING = 'GLOBAL_SPIRE_HEALTH_CHECKING';
+export const GLOBAL_SPIRE_HEALTH_CHECK_Time = 'GLOBAL_SPIRE_HEALTH_CHECK_Time';
 
 export interface ServersReducerState {
     globalServerSelected: string,
@@ -105,6 +107,7 @@ export interface ServersReducerState {
     globalWorkloadSelectorInfo: WorkloadSelectorInfoLabels,
     globalSpireHealthCheck: boolean,
     globalSpireHealthChecking: boolean,
+    globalSpireHealthTime: SpireHealtCheckFreq,
 }
 
 export interface ServerSelectedAction extends Action<typeof GLOBAL_SERVER_SELECTED> {
@@ -137,6 +140,10 @@ export interface SpireHealthCheckingAction extends Action<typeof GLOBAL_SPIRE_HE
     payload: boolean;
 }
 
+export interface SpireHealthCheckTimeAction extends Action<typeof GLOBAL_SPIRE_HEALTH_CHECK_Time> {
+    payload: SpireHealtCheckFreq;
+}
+
 export type ServersAction =
     ServerSelectedAction |
     TornjakServerInfoAction |
@@ -145,7 +152,8 @@ export type ServersAction =
     SelectorInfoAction |
     WorkloadSelectorInfoAction |
     SpireHealthCheckAction |
-    SpireHealthCheckingAction
+    SpireHealthCheckingAction |
+    SpireHealthCheckTimeAction
 
 // tornjak
 export const GLOBAL_MESSAGE = 'GLOBAL_MESSAGE';

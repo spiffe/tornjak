@@ -18,7 +18,7 @@ This can be thought about as a central management plane for identities across SP
 The following are guides on how to try out Tornjak:
 - [Tornjak simple deployment with SPIRE k8s quickstart](docs/quickstart/README.md)
 
-A list of releases can be found at [https://github.com/spiffe/tornjak/releases](https://github.com/spiffe/tornjak/releases). These releases include source code for each stable version of Tornjak image tags. The tag `tornjak-X.Y.Z` corresponds to official pre-built released image. For example, for `tornjak-be`, the pre-built image corresponding to the code at release `tornjak-X.Y.Z` is `tornjak-be:vX.Y.Z`. 
+A list of releases can be found at [https://github.com/spiffe/tornjak/releases](https://github.com/spiffe/tornjak/releases). These releases include source code for each stable version of Tornjak image tags. The tag `tornjak-X.Y.Z` corresponds to official pre-built released image. For example, for `tornjak-backend`, the pre-built image corresponding to the code at release `tornjak-X.Y.Z` is `tornjak-backend:vX.Y.Z`. 
 
 Here are a few additional resources:
 - [Tornjak basic functions demo](https://www.youtube.com/watch?v=dOdRu4psKJ8)

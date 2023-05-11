@@ -16,12 +16,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: tornjak-be-http
+  name: tornjak-backend-http
   namespace: spire
 spec:
   type: NodePort
   ports:
-    - name: tornjak-be-http
+    - name: tornjak-backend-http
       port: 10000
       targetPort: 10000
       protocol: TCP
@@ -31,12 +31,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: tornjak-be-tls
+  name: tornjak-backend-tls
   namespace: spire
 spec:
   type: NodePort
   ports:
-    - name: tornjak-be-tls
+    - name: tornjak-backend-tls
       port: 20000
       targetPort: 20000
       protocol: TCP
@@ -46,12 +46,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: tornjak-be-mtls
+  name: tornjak-backend-mtls
   namespace: spire
 spec:
   type: NodePort
   ports:
-    - name: tornjak-be-mtls
+    - name: tornjak-backend-mtls
       port: 30000
       targetPort: 30000
       protocol: TCP
@@ -62,12 +62,12 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: spire
-  name: tornjak-fe
+  name: tornjak-frontend
 spec:
   type: LoadBalancer
   selector:
     app: spire-server
   ports:
-    - name: tornjak-fe
+    - name: tornjak-frontend
       port: 3000
       targetPort: 3000

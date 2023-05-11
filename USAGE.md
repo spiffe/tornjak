@@ -1,9 +1,9 @@
 # Usage
 
 We publish four container images currently:
-- [Tornjak Backend](https://github.com/spiffe/tornjak/pkgs/container/tornjak-be): This image can be deployed as a sidecar with any SPIRE server. 
+- [Tornjak Backend](https://github.com/spiffe/tornjak/pkgs/container/tornjak-backend): This image can be deployed as a sidecar with any SPIRE server. 
 - [Tornjak Manager](https://github.com/spiffe/tornjak/pkgs/container/tornjak-manager): A container that runs this image exposes a port to register multiple Tornjak backends and forward typical commands to multiple Tornjak backends from one API. 
-- [Tornjak Frontend](https://github.com/spiffe/tornjak/pkgs/container/tornjak-fe): This image is typically deployed after the Tornjak Backend or Manager are deployed, as it requires a URL to connect directly to the Tornjak backend API.  
+- [Tornjak Frontend](https://github.com/spiffe/tornjak/pkgs/container/tornjak-frontend): This image is typically deployed after the Tornjak Backend or Manager are deployed, as it requires a URL to connect directly to the Tornjak backend API.  
 - [Tornjak](https://github.com/spiffe/tornjak/pkgs/container/tornjak): This image containing both Tornjak Backend and Frontend components can deployed as a sidecar alongside a SPIRE Server container
 
 NOTE: Previously, we had images placing the Tornjak backend and SPIRE server in the same container, but these are currently deprecated. The above is a comprehensive list of images
@@ -16,12 +16,12 @@ This is meant to be deployed where it can access a SPIRE server. To run, the con
 
 | Flag                   | Description                                                 | Default | Arguments | Required |
 |:-----------------------|:------------------------------------------------------------|:--------|:----------|:---------|
-| `--config, -c`         | Config file path for SPIRE server                           |         | `<path>`  | true     |
-| `--tornjak-config, -t` | Config file path for Tornjak (see our [configuration reference](./docs/config-tornjak-agent.md)) | | `<path>` | false |
+| `--spire-config`       | Config file path for SPIRE server                           |         | `<path>`  | true     |
+| `--tornjak-config`     | Config file path for Tornjak (see our [configuration reference](./docs/config-tornjak-agent.md)) | | `<path>` | true |
 | `--expandEnv`          | If included, expand environment variables in Tornjak config | False   |           | false    |
 
 ```
-docker run -p 10000:10000 ghcr.io/spiffe/tornjak-be:latest -c <SPIRE CONFIG PATH> -t <TORNJAK CONFIG PATH> -expandEnv
+docker run -p 10000:10000 ghcr.io/spiffe/tornjak-backend:latest -c <SPIRE CONFIG PATH> -t <TORNJAK CONFIG PATH> -expandEnv
 ```
 
 The above command creates a container listening at http://localhost:10000 for Tornjak API calls. Note that the config files must be accessible from INSIDE the container. Also note, this expands the container's environment variables in the Tornjak config map. 
@@ -50,14 +50,13 @@ The frontend is meant to connect to either the Tornjak backend or the Tornjak ma
 | `REACT_APP_AUTH_SERVER_URI` | URI for the Keycloak instance to obtain access tokens |  | `http://localhost:8080` | false |
 | `PORT_FE` | Port for the frontend to run | `3000` | `3000` | true |
 | `PORT_BE` | Port for the backend to run | `10000` | `10000` | true |
-| `REACT_APP_SPIRE_HEALTH_CHECK` | Enable SPIRE health check component | `true` | `true` | false |
-| `REACT_APP_SPIRE_HEALTH_CHECK_TIME` | Set how often SPIRE health should be checked, if component enabled | `120` | `240` | false |
+| `REACT_APP_SPIRE_HEALTH_CHECK_ENABLE` | Enable SPIRE health check component | `false` | `true` | false |
 
 ```
-docker run -p 3000:8080 -e REACT_APP_API_SERVER_URI='http://localhost:50000' -e REACT_APP_TORNJAK_MANAGER=true -e PORT_FE-8080 -e REACT_APP_SPIRE_HEALTH_CHECK=true -e REACT_APP_SPIRE_HEALTH_CHECK_TIME=120 ghcr.io/spiffe/tornjak-fe:latest
+docker run -p 3000:8080 -e REACT_APP_API_SERVER_URI='http://localhost:50000' -e REACT_APP_TORNJAK_MANAGER=true -e PORT_FE-8080 -e REACT_APP_SPIRE_HEALTH_CHECK=true ghcr.io/spiffe/tornjak-frontend:latest
 ```
 
-The above command is an example of how to run the frontend. This creates a UI available at http://localhost:3000 forwarded from container port `8080`. It is listening to a Tornjak manager component available at http://localhost:50000, and knows to run in manager mode with the `REACT_APP_TORNJAK_MANAGER` flag. The last two environment variables namely, [`REACT_APP_SPIRE_HEALTH_CHECK` & `REACT_APP_SPIRE_HEALTH_CHECK_TIME`] are used to enable the SPIRE health check component and set how often it should be checked respectively. 
+The above command is an example of how to run the frontend. This creates a UI available at http://localhost:3000 forwarded from container port `8080`. It is listening to a Tornjak manager component available at http://localhost:50000, and knows to run in manager mode with the `REACT_APP_TORNJAK_MANAGER` flag. The last environment variables namely, `REACT_APP_SPIRE_HEALTH_CHECK_ENABLE` is used to enable the SPIRE health check component. 
 
 ## Tornjak
 

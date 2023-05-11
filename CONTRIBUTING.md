@@ -30,7 +30,7 @@ Building Tornjak manually can be done with the Makefile. Notable make targets fo
 - `make bin/tornjak-backend`: makes the Go executable of the Tornjak backend
 - `make bin/tornjak-manager`: makes the Go executable of the Tornjak manager
 - `make ui-agent`: makes the optimized ReactJS app locally for the Tornjak frontend
-- `make container-tornjak-be`: containerizes Go executable of the Tornjak backend
+- `make container-tornjak-backend`: containerizes Go executable of the Tornjak backend
 - `make container-manager`:containerizes Go executable of the Tornjak manager
 - `make container-frontend`: containerizes React JS app for the Tornjak frontend
 - `make container-tornjak`: containerizes Tornjak backend with Tornjak frontend

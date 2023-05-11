@@ -3,6 +3,7 @@ on:
   push:
     branches:
     - main
+    - v1.2.0
 jobs:
   tornjak-build:
     runs-on: ubuntu-latest
@@ -16,9 +17,9 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: '1.17'
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: '15'
+          node-version: '18'
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
@@ -34,11 +35,11 @@ jobs:
       
       # Deprecating the backend+spire image for now
       # - name: Set backend-spire image name
-      #   run: echo "CONTAINER_BACKEND_WITH_SPIRE_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-be-spire-server:$GITHUB_SHA" >> $GITHUB_ENV
+      #   run: echo "CONTAINER_BACKEND_WITH_SPIRE_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-backend-spire-server:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set backend image name
-        run: echo "CONTAINER_BACKEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-be:$GITHUB_SHA" >> $GITHUB_ENV
+        run: echo "CONTAINER_BACKEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-backend:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set frontend image name
-        run: echo "CONTAINER_FRONTEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-fe:$GITHUB_SHA" >> $GITHUB_ENV
+        run: echo "CONTAINER_FRONTEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-frontend:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set Tornjak image name
         run: echo "CONTAINER_TAG=ghcr.io/${{ github.repository_owner }}/tornjak:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set manager image name
@@ -46,14 +47,14 @@ jobs:
 
       # create images
       # - name: Build and push tornjak backend image
-      #   run: make container-tornjak-be-spire-push
+      #   run: make container-tornjak-backend-spire-push
       # Create tagged versioned images
-      # - name: Push artifacts for tornjak-be-spire-multiversions
-      #   run: make release-tornjak-be-spire-multiversions-ghcr
+      # - name: Push artifacts for tornjak-backend-spire-multiversions
+      #   run: make release-tornjak-backend-spire-multiversions-ghcr
       - name: Build and push tornjak backend image
-        run: make release-tornjak-be-ghcr
+        run: make release-tornjak-backend-ghcr
       - name: Build and push tornjak frontend image
-        run: make release-tornjak-fe-ghcr
+        run: make release-tornjak-frontend-ghcr
       - name: Build and push tornjak image
         run: make release-tornjak-ghcr
       - name: Build and push tornjak manager image

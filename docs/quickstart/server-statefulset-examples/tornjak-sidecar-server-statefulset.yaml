@@ -54,9 +54,9 @@ spec:
           image: ghcr.io/spiffe/tornjak:latest
           imagePullPolicy: Always
           args:
-            - -config
+            - --spire-config
             - /run/spire/config/server.conf
-            - -tornjak-config
+            - --tornjak-config
             - /run/spire/tornjak-config/server.conf
           env: 
             - name: REACT_APP_API_SERVER_URI

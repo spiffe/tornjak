@@ -21,14 +21,6 @@ type cliOptions struct {
 		tornjakFile string
 		expandEnv   bool
 	}
-	httpOptions struct {
-		listenAddr string
-		certPath   string
-		keyPath    string
-		mtlsCaPath string
-		tls        bool
-		mtls       bool
-	}
 }
 
 func main() {
@@ -36,20 +28,18 @@ func main() {
 	app := &cli.App{
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:        "spire-config-file",
-				Aliases:     []string{"spire-config", "c"},
+				Name:        "spire-config",
 				Value:       "",
 				Usage:       "Config file path for spire server",
 				Destination: &opt.genericOptions.configFile,
 				Required:    true,
 			},
 			&cli.StringFlag {
-				Name:        "tornjak-config-file",
-				Aliases:     []string{"tornjak-config", "t"},
+				Name:        "tornjak-config",
 				Value:       "",
 				Usage:       "Config file path for tornjak server",
 				Destination: &opt.genericOptions.tornjakFile,
-				Required:    false,
+				Required:    true,
 			},
 			&cli.BoolFlag {
 				Name: 	     "expandEnv",
@@ -63,51 +53,6 @@ func main() {
 			{
 				Name:  "http",
 				Usage: "Run the tornjak http server",
-				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:        "listen-addr",
-						Value:       ":10000",
-						Usage:       "listening address for server",
-						Destination: &opt.httpOptions.listenAddr,
-						Required:    false,
-					},
-					&cli.StringFlag{
-						Name:        "cert",
-						Value:       "",
-						Usage:       "CA Cert path for TLS",
-						Destination: &opt.httpOptions.certPath,
-						Required:    false,
-					},
-					&cli.StringFlag{
-						Name:        "key",
-						Value:       "",
-						Usage:       "Key path for TLS",
-						Destination: &opt.httpOptions.keyPath,
-						Required:    false,
-					},
-					&cli.StringFlag{
-						Name:        "mtls-ca",
-						Value:       "",
-						Usage:       "CA path for mTLS CA",
-						Destination: &opt.httpOptions.mtlsCaPath,
-						Required:    false,
-					},
-					&cli.BoolFlag{
-						Name:        "tls",
-						Value:       false,
-						Usage:       "Enable TLS for http server",
-						Destination: &opt.httpOptions.tls,
-						Required:    false,
-					},
-					&cli.BoolFlag{
-						Name:        "mtls",
-						Value:       false,
-						Usage:       "Enable mTLS for http server (overwrites tls flag)",
-						Destination: &opt.httpOptions.mtls,
-						Required:    false,
-					},
-				},
-
 				Action: func(c *cli.Context) error {
 					return runTornjakCmd("http", opt)
 				},
@@ -160,13 +105,6 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 		}
 
 		apiServer := &agentapi.Server{
-			SpireServerAddr: getSocketPath(config),
-			ListenAddr:      opt.httpOptions.listenAddr,
-			CertPath:        opt.httpOptions.certPath,
-			KeyPath:         opt.httpOptions.keyPath,
-			MTlsCaPath:      opt.httpOptions.mtlsCaPath,
-			TlsEnabled:      opt.httpOptions.tls,
-			MTlsEnabled:     opt.httpOptions.mtls,
 			SpireServerInfo: serverInfo,
 			TornjakConfig:   tornjakConfigs,
 		}
@@ -207,19 +145,6 @@ func GetServerInfo(config *run.Config) (agentapi.TornjakSpireServerInfo, error) 
 		TrustDomain:   config.Server.TrustDomain,
 		VerboseConfig: serverInfo,
 	}, nil
-}
-
-func getSocketPath(config *run.Config) string {
-	socketPath := config.Server.SocketPath
-	if socketPath == "" {
-		// TODO: temporary fix for issue with socket path resolution
-		// using the defaultSocketPath in the SPIRE pkg, manually importing
-		// since it is not a public variable.
-		// https://github.com/spiffe/spire/blob/main/cmd/spire-server/cli/run/run.go#L44
-		socketPath = "/tmp/spire-server/private/api.sock"
-	}
-
-	return "unix://" + socketPath
 }
 
 func getTornjakConfig(path string, expandEnv bool) (string, error) {
