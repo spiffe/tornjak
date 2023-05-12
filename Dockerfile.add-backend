@@ -5,3 +5,7 @@ COPY bin/tornjak-backend tornjak-backend
 COPY sample-keys sample-keys
 # Add init
 COPY run_server.sh run_server.sh
+
+# add a version link to the image description
+ARG version
+LABEL org.opencontainers.image.description "https://github.com/spiffe/tornjak/releases/tag/$version"

@@ -13,15 +13,9 @@ EXPOSE $PORT_FE
 
 COPY tornjak-frontend .
 
+# add a version link to the image description
+ARG version
+LABEL org.opencontainers.image.description "https://github.com/spiffe/tornjak/releases/tag/$version"
+
 RUN npm install --omit=dev \
     npm prune --production
-
-# set env variables
-ENV REACT_APP_API_SERVER_URI $REACT_APP_API_SERVER_URI
-ENV REACT_APP_AUTH_SERVER_URI $REACT_APP_AUTH_SERVER_URI
-ENV REACT_APP_SPIRE_HEALTH_CHECK_ENABLE $REACT_APP_SPIRE_HEALTH_CHECK_ENABLE
-
-ENV PORT_FE=3000
-EXPOSE $PORT_FE
-
-CMD ["npm", "start"]
