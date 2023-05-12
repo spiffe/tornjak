@@ -16,10 +16,6 @@ COPY tornjak-frontend .
 RUN npm install --omit=dev \
     npm prune --production
 
-# add a version link to the image description
-ARG version
-LABEL org.opencontainers.image.description "https://github.com/spiffe/tornjak/releases/tag/$version"
-
 # set env variables
 ENV REACT_APP_API_SERVER_URI $REACT_APP_API_SERVER_URI
 ENV REACT_APP_AUTH_SERVER_URI $REACT_APP_AUTH_SERVER_URI
