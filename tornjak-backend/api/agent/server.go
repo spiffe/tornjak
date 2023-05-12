@@ -26,19 +26,16 @@ import (
 )
 
 type Server struct {
-	ListenAddr      string
+	// SPIRE socket location
 	SpireServerAddr string
-	CertPath        string
-	KeyPath         string
-	MTlsCaPath      string
-	TlsEnabled      bool
-	MTlsEnabled     bool
 
 	// SpireServerInfo provides config info for the spire server
 	SpireServerInfo TornjakSpireServerInfo
 
-	// AgentDB for storing Workload Attestor Plugin Info of agents
+	// Information from Tornjak Config file passed in as argument
 	TornjakConfig *TornjakConfig
+
+	// Plugins
 	Db            agentdb.AgentDB
 	Auth          auth.Auth
 }
@@ -534,13 +531,7 @@ func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// HandleRequests connects api links with respective functions
-// Functions currently handle the api calls all as post-requests
-func (s *Server) HandleRequests() {
-	err := s.Configure()
-	if err != nil {
-		log.Fatal("Cannot Configure: ", err)
-	}
+func (s *Server) GetRouter() (*mux.Router) {
 	rtr := mux.NewRouter()
 
 	// Home
@@ -581,64 +572,181 @@ func (s *Server) HandleRequests() {
 	spa := spaHandler{staticPath: "ui-agent", indexPath: "index.html"}
 	rtr.PathPrefix("/").Handler(spa)
 
-	// TLS Stack handling
-	if s.TlsEnabled || s.MTlsEnabled {
-
-		// Create a CA certificate pool and add cert.pem to it
-		caCert, err := ioutil.ReadFile(s.CertPath)
-		if err != nil {
-			log.Fatal(err)
-		}
-		caCertPool := x509.NewCertPool()
-		caCertPool.AppendCertsFromPEM(caCert)
-
-		tlsType := "TLS"
-		// If mTLS is enabled, add mTLS CA path to cert pool as well
-		if s.MTlsCaPath != "" {
-			if _, err := os.Stat(s.MTlsCaPath); os.IsNotExist(err) {
-				log.Fatalf("File does not exist %s", s.MTlsCaPath)
-			}
-			mTLSCaCert, err := ioutil.ReadFile(s.MTlsCaPath)
-			if err != nil {
-				log.Fatal(err)
-			}
-			caCertPool.AppendCertsFromPEM(mTLSCaCert)
-			tlsType = "mTLS"
-		}
-
-		// Create the TLS Config with the CA pool and enable Client certificate validation
-
-		tlsConfig := &tls.Config{
-			ClientCAs: caCertPool,
-		}
-		if s.MTlsEnabled {
-			tlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
-		}
-		tlsConfig.BuildNameToCertificate()
-
-		// Create a Server instance to listen on port 8443 with the TLS config
-		server := &http.Server{
-			Handler:   rtr,
-			Addr:      s.ListenAddr,
-			TLSConfig: tlsConfig,
-		}
-
-		fmt.Printf("Starting to listen with %s on %s...\n", tlsType, s.ListenAddr)
-		if _, err := os.Stat(s.CertPath); os.IsNotExist(err) {
-			log.Fatalf("File does not exist %s", s.CertPath)
-		}
-		if _, err := os.Stat(s.KeyPath); os.IsNotExist(err) {
-			log.Fatalf("File does not exist %s", s.KeyPath)
-		}
-		log.Fatal(server.ListenAndServeTLS(s.CertPath, s.KeyPath))
-		return
-	} else {
-		fmt.Printf("Starting to listen on %s...\n", s.ListenAddr)
-		log.Fatal(http.ListenAndServe(s.ListenAddr, rtr))
-	}
+	return rtr
 }
 
-// TODO map[string]catalog. type
+// HandleRequests connects api links with respective functions
+// Functions currently handle the api calls all as post-requests
+func (s *Server) HandleRequests() {
+	err := s.Configure()
+	if err != nil {
+		log.Fatal("Cannot Configure: ", err)
+	}
+	
+	numPorts := 0
+	errChannel := make(chan error, 3)
+	rtr := s.GetRouter()
+
+	// TLS Stack handling
+	serverConfig := s.TornjakConfig.Server
+
+	if serverConfig.HttpConfig != nil && serverConfig.HttpConfig.Enabled {
+		numPorts += 1
+		listenPort := serverConfig.HttpConfig.ListenPort
+		tlsType := "HTTP"
+		go func() {
+			if listenPort == 0 {
+				err := errors.Errorf("%s server: Cannot have empty port: %d", tlsType, listenPort)
+				errChannel <- err
+				return
+			}
+			addr := fmt.Sprintf(":%d", listenPort)
+			fmt.Printf("Starting to listen on %s...\n", addr)
+			err := http.ListenAndServe(addr, rtr)
+			err = errors.Errorf("%s server: Error serving: %v", tlsType, err)
+			errChannel <- err
+			// log.Printf("HTTP serve error: %v", err)
+		}()
+	}
+
+	if serverConfig.TlsConfig != nil && serverConfig.TlsConfig.Enabled {
+		numPorts += 1
+		listenPort := serverConfig.TlsConfig.ListenPort
+		certPath := serverConfig.TlsConfig.Cert
+		keyPath := serverConfig.TlsConfig.Key
+		tlsType := "TLS"
+
+		go func() {
+			if listenPort == 0 {
+				err := errors.Errorf("%s server: Cannot have empty port: %d", tlsType, listenPort)
+				errChannel <- err
+				return
+			}
+			addr := fmt.Sprintf(":%d", listenPort)
+			// Create a CA certificate pool and add cert.pem to it
+			caCert, err := ioutil.ReadFile(certPath)
+			if err != nil {
+				err = errors.Errorf("%s server: CA pool error: %v", tlsType, err)
+				errChannel <- err
+				return
+			}
+			caCertPool := x509.NewCertPool()
+			caCertPool.AppendCertsFromPEM(caCert)
+
+			// Create the TLS Config with the CA pool and enable Client certificate validation
+			tlsConfig := &tls.Config{
+				ClientCAs: caCertPool,
+			}
+			tlsConfig.BuildNameToCertificate()
+
+			// Create a Server instance to listen on port 8443 with the TLS config
+			server := &http.Server{
+				Handler:   rtr,
+				Addr:      addr,
+				TLSConfig: tlsConfig,
+			}
+
+			fmt.Printf("Starting to listen with %s on %s...\n", tlsType, addr)
+			if _, err := os.Stat(certPath); os.IsNotExist(err) {
+				err = errors.Errorf("%s server: File does not exist %s", tlsType, certPath)
+				errChannel <- err
+				return
+			}
+			if _, err := os.Stat(keyPath); os.IsNotExist(err) {
+				err = errors.Errorf("%s server: File does not exist %s", tlsType, keyPath)
+				errChannel <- err
+				return
+			}
+			
+			err = server.ListenAndServeTLS(certPath, keyPath)
+			err = errors.Errorf("%s server: Error serving: %v", tlsType, err)
+			errChannel <- err
+		}()
+	}
+
+	if serverConfig.MtlsConfig != nil && serverConfig.MtlsConfig.Enabled {
+		numPorts += 1
+		listenPort := serverConfig.MtlsConfig.ListenPort
+		certPath := serverConfig.MtlsConfig.Cert
+		keyPath := serverConfig.MtlsConfig.Key
+		caPath := serverConfig.MtlsConfig.Ca
+		tlsType := "mTLS"
+
+		go func() {
+			if listenPort == 0 {
+				err := errors.Errorf("%s server: Cannot have empty port: %d", tlsType, listenPort)
+				errChannel <- err
+				return
+			}
+			addr := fmt.Sprintf(":%d", listenPort)
+			// Create a CA certificate pool and add cert.pem to it
+			caCert, err := ioutil.ReadFile(certPath)
+			if err != nil {
+				err = errors.Errorf("%s server: CA pool error: %v", tlsType, err)
+				errChannel <- err
+				return
+			}
+			caCertPool := x509.NewCertPool()
+			caCertPool.AppendCertsFromPEM(caCert)
+
+			// add mTLS CA path to cert pool as well
+			if _, err := os.Stat(caPath); os.IsNotExist(err) {
+				err = errors.Errorf("%s server: File does not exist %s", tlsType, caPath)
+				errChannel <- err
+				return
+			}
+			mTLSCaCert, err := ioutil.ReadFile(caPath)
+			if err != nil {
+				err = errors.Errorf("%s server: Could not read file %s: %v", tlsType, caPath, err)
+				errChannel <- err
+				return
+			}
+			caCertPool.AppendCertsFromPEM(mTLSCaCert)
+
+			// Create the TLS Config with the CA pool and enable Client certificate validation
+
+			mtlsConfig := &tls.Config{
+				ClientCAs: caCertPool,
+			}
+			mtlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
+			mtlsConfig.BuildNameToCertificate()
+
+			// Create a Server instance to listen on port 8443 with the TLS config
+			server := &http.Server{
+				Handler:   rtr,
+				Addr:      addr,
+				TLSConfig: mtlsConfig,
+			}
+
+			fmt.Printf("Starting to listen with %s on %s...\n", tlsType, addr)
+			if _, err := os.Stat(certPath); os.IsNotExist(err) {
+				err = errors.Errorf("%s server: File does not exist %s", tlsType, certPath)
+				errChannel <- err
+				return
+			}
+			if _, err := os.Stat(keyPath); os.IsNotExist(err) {
+				log.Fatalf("File does not exist %s", keyPath)
+			}
+			err = server.ListenAndServeTLS(certPath, keyPath)
+			err = errors.Errorf("%s server: Error serving: %v", tlsType, err)
+			errChannel <- err
+		}()
+	}
+
+	// no ports opened
+	if numPorts == 0 {
+		log.Printf("No connections opened. HINT: at least one HTTP, TLS, or MTLS must be enabled in Tornjak config")
+	}
+
+	// as errors come in, read them, and block
+	for i := 0; i < numPorts; i++ {
+		err := <- errChannel
+		log.Printf("%v", err)
+	}
+	
+}
+
+// getPluginConfig returns first plugin configuration
 func getPluginConfig(plugin map[string]catalog.HCLPluginConfig) (string, ast.Node, error) {
 	for k, d := range plugin {
 		return k, d.PluginData, nil
@@ -649,12 +757,17 @@ func getPluginConfig(plugin map[string]catalog.HCLPluginConfig) (string, ast.Nod
 // NewAgentsDB returns a new agents DB, given a DB connection string
 func NewAgentsDB(dbPlugin map[string]catalog.HCLPluginConfig) (agentdb.AgentDB, error) {
 	key, data, err := getPluginConfig(dbPlugin)
-	if err != nil { // error if no config
-		return nil, errors.Errorf("No DataStore plugin found")
+	if err != nil { // db is required config
+		return nil, errors.New("Required DataStore plugin not configured")
 	}
 
 	switch key {
 	case "sql":
+		// check if data is defined
+		if data == nil {
+			return nil, errors.New("SQL DataStore plugin ('config > plugins > DataStore sql > plugin_data') not populated")
+		}
+
 		// TODO can probably add this to config
 		expBackoff := backoff.NewExponentialBackOff()
 		expBackoff.MaxElapsedTime = time.Second
@@ -706,34 +819,51 @@ func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
 	}
 }
 
-func (s *Server) ConfigureDefaults() error {
-	var err error
-	expBackoff := backoff.NewExponentialBackOff()
-	expBackoff.MaxElapsedTime = time.Second
-
-	s.Db, err = agentdb.NewLocalSqliteDB("sqlite3", "./tornjak.sqlite3", expBackoff)
-	if err != nil {
-		return errors.Errorf("Cannot configure default datastore plugin: %v", err)
+func (s *Server) VerifyConfiguration() error {
+	if s.TornjakConfig == nil {
+		return errors.New("config not given")
 	}
-	s.Auth = auth.NewNullVerifier()
+
+	/*  Verify server  */
+	if s.TornjakConfig.Server == nil { // must be defined
+		return errors.New("'config > server' field not defined")
+	}
+	if s.TornjakConfig.Server.SPIRESocket == "" {
+		return errors.New("'config > server > spire_socket_path' field not defined")
+	}
+
+	serverConfig := s.TornjakConfig.Server
+	if (serverConfig.HttpConfig == nil && serverConfig.TlsConfig == nil && serverConfig.MtlsConfig == nil) {
+		return errors.New("'config > server' must have at least one of HTTP, TLS, or mTLS sections defined")
+	}
+
+	/*  Verify Plugins  */
+	if s.TornjakConfig.Plugins == nil {
+		return errors.New("'config > plugins' field not defined")
+	}
 	return nil
 }
 
 func (s *Server) Configure() error {
-	var err error
-	//configs := map[string]map[string]catalog.HCLPluginConfig(*s.TornjakConfig.Plugins)
-	if s.TornjakConfig == nil {
-		err = s.ConfigureDefaults()
-		return err
+	// Verify Config
+	err := s.VerifyConfiguration()
+	if err != nil {
+		return errors.Errorf("Tornjak Config error: %v", err)
 	}
-	configs := *s.TornjakConfig.Plugins
+
+	/*  Configure Server  */
+	serverConfig := s.TornjakConfig.Server
+	s.SpireServerAddr = serverConfig.SPIRESocket // for convenience
+	
+	/*  Configure Plugins  */
+	pluginConfigs := *s.TornjakConfig.Plugins
 	// configure datastore
-	s.Db, err = NewAgentsDB(configs["DataStore"])
+	s.Db, err = NewAgentsDB(pluginConfigs["DataStore"])
 	if err != nil {
 		return errors.Errorf("Cannot configure datastore plugin: %v", err)
 	}
 	// configure auth
-	s.Auth, err = NewAuth(configs["UserManagement"])
+	s.Auth, err = NewAuth(pluginConfigs["UserManagement"])
 	if err != nil {
 		return errors.Errorf("Cannot configure auth plugin: %v", err)
 	}
