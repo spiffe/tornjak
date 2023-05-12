@@ -52,7 +52,7 @@ vendor:
 
 # Containerized components
 container-tornjak-backend: bin/tornjak-backend
-	docker build --no-cache -f Dockerfile.backend-container -t ${CONTAINER_BACKEND_TAG} .
+	docker build --no-cache -f Dockerfile.backend-container --build-arg version=$(VERSION) -t ${CONTAINER_BACKEND_TAG} .
 
 container-tornjak-backend-push: container-tornjak-backend
 	docker push ${CONTAINER_BACKEND_TAG}
@@ -70,7 +70,7 @@ container-manager-push: container-manager
 	 docker push ${CONTAINER_MANAGER_TAG}
 
 container-frontend: #ui-agent 
-	docker build --no-cache -f Dockerfile.frontend-container -t ${CONTAINER_FRONTEND_TAG} .
+	docker build --no-cache -f Dockerfile.frontend-container --build-arg version=$(VERSION) -t ${CONTAINER_FRONTEND_TAG} .
 
 compose-frontend: 
 	docker-compose -f docker-compose-frontend.yml up --build --force-recreate -d
