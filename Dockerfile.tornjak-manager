@@ -1,9 +1,10 @@
 FROM alpine:latest
 
-RUN apk add curl
 WORKDIR /
-COPY bin/tornjak-manager tornjak-manager
 #COPY ui-manager ui-manager
 
 # Add init
 ENTRYPOINT ["/tornjak-manager"]
+
+RUN apk add curl
+COPY bin/tornjak-manager tornjak-manager
