@@ -1,18 +1,19 @@
-.PHONY: ui vendor build container-tornjak-backend-spire container-tornjak-backend-spire-push container-manager container-manager-push push container-frontend container-frontend-push container-tornjak-backend container-tornjak-backend-push
+.PHONY: ui vendor build container-tornjak-backend-spire container-manager container-manager-push push container-frontend container-frontend-push container-tornjak-backend container-tornjak-backend-push
 
 VERSION=$(shell cat version.txt)
 
+## when containers are built, they are tagged with these
 CONTAINER_TAG ?= tsidentity/tornjak:$(VERSION)
 CONTAINER_BACKEND_TAG ?= tsidentity/tornjak-backend:$(VERSION)
 CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-frontend:$(VERSION)
-CONTAINER_BACKEND_SPIRE_VERSION_IMAGEPATH ?= tsidentity/tornjak-backend-spire-server
-
-CONTAINER_TORNJAK_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak
-CONTAINER_BACKEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-backend
-CONTAINER_FRONTEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-frontend
-CONTAINER_MANAGER_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-manager
-
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:$(VERSION)
+
+## `make release-*` pushes to above tag as well as below corresponding tag
+CONTAINER_TORNJAK_IMAGEPATH ?= ghcr.io/spiffe/tornjak
+CONTAINER_BACKEND_IMAGEPATH ?= ghcr.io/spiffe/tornjak-backend
+CONTAINER_FRONTEND_IMAGEPATH ?= ghcr.io/spiffe/tornjak-frontend
+CONTAINER_MANAGER_IMAGEPATH ?= ghcr.io/spiffe/tornjak-manager
+
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
 
 all: bin/tornjak-backend bin/tornjak-manager ui-manager container-manager container-frontend container-tornjak-backend
@@ -49,24 +50,21 @@ vendor:
 
 
 # Containerized components
+## Backend container
 container-tornjak-backend: bin/tornjak-backend
 	docker build --no-cache -f Dockerfile.backend-container --build-arg version=$(VERSION) -t ${CONTAINER_BACKEND_TAG} .
 
 container-tornjak-backend-push: container-tornjak-backend
 	docker push ${CONTAINER_BACKEND_TAG}
 
-container-tornjak-backend-spire: bin/tornjak-backend
-	docker build --no-cache -f Dockerfile.add-backend --build-arg version=$(VERSION) -t ${CONTAINER_BACKEND_WITH_SPIRE_TAG} .
-
-container-tornjak-backend-spire-push: container-tornjak-backend-spire
-	docker push ${CONTAINER_BACKEND_WITH_SPIRE_TAG}
-
+## Manager container
 container-manager: bin/tornjak-manager #ui-manager
 	docker build --no-cache -f Dockerfile.tornjak-manager --build-arg version=$(VERSION) -t ${CONTAINER_MANAGER_TAG} .
 
 container-manager-push: container-manager
 	 docker push ${CONTAINER_MANAGER_TAG}
 
+## Frontend container
 container-frontend: #ui-agent 
 	docker build --no-cache -f Dockerfile.frontend-container --build-arg version=$(VERSION) -t ${CONTAINER_FRONTEND_TAG} .
 
@@ -77,7 +75,7 @@ compose-frontend:
 container-frontend-push: container-frontend
 	docker push ${CONTAINER_FRONTEND_TAG}
 
-# WARNING: EXPERIMENTAL feature to merge frontend and backend in one container
+## Backend + Frontend container
 container-tornjak: bin/tornjak-backend #ui-agent
 	docker build --no-cache -f Dockerfile.tornjak-container --build-arg version=$(VERSION) -t ${CONTAINER_TAG} .
 
@@ -85,35 +83,42 @@ container-tornjak-push: container-tornjak
 	docker push ${CONTAINER_TAG}
 
 
-# releases for Github Container Registry
-release-tornjak-backend-ghcr: container-tornjak-backend
-	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_GHCR_IMAGEPATH}:latest
-	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_GHCR_IMAGEPATH}:$(VERSION)
+## BEGIN RELEASES FOR GITHUB CONTAINER REGISTRY ##
+# These targets are used by Github to create official pre-built images
+
+## backend image
+release-tornjak-backend: container-tornjak-backend
+	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_IMAGEPATH}:latest
+	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_IMAGEPATH}:$(VERSION)
 	docker push ${CONTAINER_BACKEND_TAG}
-	docker push ${CONTAINER_BACKEND_GHCR_IMAGEPATH}:latest
-	docker push ${CONTAINER_BACKEND_GHCR_IMAGEPATH}:${VERSION}
+	docker push ${CONTAINER_BACKEND_IMAGEPATH}:latest
+	docker push ${CONTAINER_BACKEND_IMAGEPATH}:${VERSION}
 
-release-tornjak-frontend-ghcr: container-frontend
-	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}:latest
-	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}:$(VERSION)
+## frontend image
+release-tornjak-frontend: container-frontend
+	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_IMAGEPATH}:latest
+	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_IMAGEPATH}:$(VERSION)
 	docker push ${CONTAINER_FRONTEND_TAG}
-	docker push ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}:latest
-	docker push ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}:$(VERSION)
+	docker push ${CONTAINER_FRONTEND_IMAGEPATH}:latest
+	docker push ${CONTAINER_FRONTEND_IMAGEPATH}:$(VERSION)
 
-# PLACEHOLDER FOR TORNJAK IMAGE WITH BE AND FE
-release-tornjak-ghcr: container-tornjak
-	docker tag ${CONTAINER_TAG} ${CONTAINER_TORNJAK_GHCR_IMAGEPATH}:latest
-	docker tag ${CONTAINER_TAG} ${CONTAINER_TORNJAK_GHCR_IMAGEPATH}:$(VERSION)
+# backend + frontend image
+release-tornjak: container-tornjak
+	docker tag ${CONTAINER_TAG} ${CONTAINER_TORNJAK_IMAGEPATH}:latest
+	docker tag ${CONTAINER_TAG} ${CONTAINER_TORNJAK_IMAGEPATH}:$(VERSION)
 	docker push ${CONTAINER_TAG}
-	docker push ${CONTAINER_TORNJAK_GHCR_IMAGEPATH}:latest
-	docker push ${CONTAINER_TORNJAK_GHCR_IMAGEPATH}:$(VERSION)
+	docker push ${CONTAINER_TORNJAK_IMAGEPATH}:latest
+	docker push ${CONTAINER_TORNJAK_IMAGEPATH}:$(VERSION)
 
-release-tornjak-manager-ghcr: container-manager
-	docker tag ${CONTAINER_MANAGER_TAG} ${CONTAINER_MANAGER_GHCR_IMAGEPATH}:latest
-	docker tag ${CONTAINER_MANAGER_TAG} ${CONTAINER_MANAGER_GHCR_IMAGEPATH}:$(VERSION)
+# manager backend
+release-tornjak-manager: container-manager
+	docker tag ${CONTAINER_MANAGER_TAG} ${CONTAINER_MANAGER_IMAGEPATH}:latest
+	docker tag ${CONTAINER_MANAGER_TAG} ${CONTAINER_MANAGER_IMAGEPATH}:$(VERSION)
 	docker push ${CONTAINER_MANAGER_TAG}
-	docker push ${CONTAINER_MANAGER_GHCR_IMAGEPATH}:latest
-	docker push ${CONTAINER_MANAGER_GHCR_IMAGEPATH}:$(VERSION)
+	docker push ${CONTAINER_MANAGER_IMAGEPATH}:latest
+	docker push ${CONTAINER_MANAGER_IMAGEPATH}:$(VERSION)
+
+## END RELEASES FOR GITHUB CONTAINER REGISTRY ##
 
 clean:
 	rm -rf bin/
@@ -122,7 +127,6 @@ clean:
 	rm -rf ui-manager/
 
 push:
-	docker push ${CONTAINER_BACKEND_WITH_SPIRE_TAG}
 	docker push ${CONTAINER_MANAGER_TAG}
 	docker push ${CONTAINER_BACKEND_TAG}
 	docker push ${CONTAINER_FRONTEND_TAG}
