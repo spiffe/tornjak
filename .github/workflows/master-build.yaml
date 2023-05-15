@@ -33,9 +33,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       # Create sha tagged image for container-agent
       
-      # Deprecating the backend+spire image for now
-      # - name: Set backend-spire image name
-      #   run: echo "CONTAINER_BACKEND_WITH_SPIRE_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-backend-spire-server:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set backend image name
         run: echo "CONTAINER_BACKEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-backend:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set frontend image name
@@ -46,11 +43,6 @@ jobs:
         run: echo "CONTAINER_MANAGER_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-manager:$GITHUB_SHA" >> $GITHUB_ENV
 
       # create images
-      # - name: Build and push tornjak backend image
-      #   run: make container-tornjak-backend-spire-push
-      # Create tagged versioned images
-      # - name: Push artifacts for tornjak-backend-spire-multiversions
-      #   run: make release-tornjak-backend-spire-multiversions-ghcr
       - name: Build and push tornjak backend image
         run: make release-tornjak-backend-ghcr
       - name: Build and push tornjak frontend image

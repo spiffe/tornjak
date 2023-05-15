@@ -1,15 +1,13 @@
-.PHONY: ui vendor build container-tornjak-backend-spire container-tornjak-backend-spire-push container-manager container-manager-push release-tornjak-backend-spire-multiversions push container-frontend container-frontend-push container-tornjak-backend container-tornjak-backend-push
+.PHONY: ui vendor build container-tornjak-backend-spire container-tornjak-backend-spire-push container-manager container-manager-push push container-frontend container-frontend-push container-tornjak-backend container-tornjak-backend-push
 
 VERSION=$(shell cat version.txt)
 
 CONTAINER_TAG ?= tsidentity/tornjak:$(VERSION)
 CONTAINER_BACKEND_TAG ?= tsidentity/tornjak-backend:$(VERSION)
-CONTAINER_BACKEND_WITH_SPIRE_TAG ?= tsidentity/tornjak-backend-spire-server:latest
 CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-frontend:$(VERSION)
 CONTAINER_BACKEND_SPIRE_VERSION_IMAGEPATH ?= tsidentity/tornjak-backend-spire-server
 
 CONTAINER_TORNJAK_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak
-CONTAINER_BACKEND_SPIRE_VERSION_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-backend-spire-server
 CONTAINER_BACKEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-backend
 CONTAINER_FRONTEND_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-frontend
 CONTAINER_MANAGER_GHCR_IMAGEPATH ?= ghcr.io/spiffe/tornjak-manager
@@ -94,16 +92,6 @@ release-tornjak-backend-ghcr: container-tornjak-backend
 	docker push ${CONTAINER_BACKEND_TAG}
 	docker push ${CONTAINER_BACKEND_GHCR_IMAGEPATH}:latest
 	docker push ${CONTAINER_BACKEND_GHCR_IMAGEPATH}:${VERSION}
-
-release-tornjak-backend-spire-multiversions: bin/tornjak-backend
-	for i in $(shell cat SPIRE_BUILD_VERSIONS); do \
-		./build-and-push-versioned-container.sh $$i ${CONTAINER_BACKEND_SPIRE_VERSION_IMAGEPATH}; \
-	done
-
-release-tornjak-backend-spire-multiversions-ghcr: bin/tornjak-backend
-	for i in $(shell cat SPIRE_BUILD_VERSIONS); do \
-		./build-and-push-versioned-container.sh $$i ${CONTAINER_BACKEND_SPIRE_VERSION_GHCR_IMAGEPATH}; \
-	done
 
 release-tornjak-frontend-ghcr: container-frontend
 	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_GHCR_IMAGEPATH}:latest
