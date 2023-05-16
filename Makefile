@@ -52,25 +52,25 @@ vendor:
 
 # Containerized components
 container-tornjak-backend: bin/tornjak-backend
-	docker build --no-cache -f Dockerfile.backend-container -t ${CONTAINER_BACKEND_TAG} .
+	docker build --no-cache -f Dockerfile.backend-container --build-arg version=$(VERSION) -t ${CONTAINER_BACKEND_TAG} .
 
 container-tornjak-backend-push: container-tornjak-backend
 	docker push ${CONTAINER_BACKEND_TAG}
 
 container-tornjak-backend-spire: bin/tornjak-backend
-	docker build --no-cache -f Dockerfile.add-backend -t ${CONTAINER_BACKEND_WITH_SPIRE_TAG} .
+	docker build --no-cache -f Dockerfile.add-backend --build-arg version=$(VERSION) -t ${CONTAINER_BACKEND_WITH_SPIRE_TAG} .
 
 container-tornjak-backend-spire-push: container-tornjak-backend-spire
 	docker push ${CONTAINER_BACKEND_WITH_SPIRE_TAG}
 
 container-manager: bin/tornjak-manager #ui-manager
-	docker build --no-cache -f Dockerfile.tornjak-manager -t ${CONTAINER_MANAGER_TAG} .
+	docker build --no-cache -f Dockerfile.tornjak-manager --build-arg version=$(VERSION) -t ${CONTAINER_MANAGER_TAG} .
 
 container-manager-push: container-manager
 	 docker push ${CONTAINER_MANAGER_TAG}
 
 container-frontend: #ui-agent 
-	docker build --no-cache -f Dockerfile.frontend-container -t ${CONTAINER_FRONTEND_TAG} .
+	docker build --no-cache -f Dockerfile.frontend-container --build-arg version=$(VERSION) -t ${CONTAINER_FRONTEND_TAG} .
 
 compose-frontend: 
 	docker-compose -f docker-compose-frontend.yml up --build --force-recreate -d
@@ -81,7 +81,7 @@ container-frontend-push: container-frontend
 
 # WARNING: EXPERIMENTAL feature to merge frontend and backend in one container
 container-tornjak: bin/tornjak-backend #ui-agent
-	docker build --no-cache -f Dockerfile.tornjak-container -t ${CONTAINER_TAG} .
+	docker build --no-cache -f Dockerfile.tornjak-container --build-arg version=$(VERSION) -t ${CONTAINER_TAG} .
 
 container-tornjak-push: container-tornjak
 	docker push ${CONTAINER_TAG}
