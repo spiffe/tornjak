@@ -32,3 +32,4 @@ ENV GITHUB_SHA=$github_sha
 
 RUN npm install --omit=dev \
     npm prune --production
+ENTRYPOINT npx react-inject-env set && npx serve build -p $PORT_FE
