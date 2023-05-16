@@ -50,7 +50,7 @@ vendor:
 
 
 # Containerized components
-## Backend container
+## Build Backend container
 container-tornjak-backend: bin/tornjak-backend
 	docker build --no-cache -f Dockerfile.backend-container --build-arg version=$(VERSION) -t ${CONTAINER_BACKEND_TAG} .
 
