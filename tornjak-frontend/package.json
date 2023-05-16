@@ -3,8 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@redux-devtools/extension": "^3.2.5",
-    "prop-types": "^15.6.0",
     "@babel/runtime": "^7.15.4",
     "@carbon/charts": "^0.41.80",
     "@carbon/charts-react": "^0.41.80",
@@ -15,6 +13,12 @@
     "@material-ui/icons": "^4.11.2",
     "@mui/material": "^5.12.3",
     "@react-keycloak/web": "^3.4.0",
+    "@redux-devtools/extension": "^3.2.5",
+    "@types/carbon__icons-react": "^10.31.2",
+    "@types/carbon-components-react": "^7.55.2",
+    "@types/file-saver": "^2.0.5",
+    "@types/react-dom": "^17.0.9",
+    "@types/react-router-dom": "^5.3.1",
     "axios": "^0.21.4",
     "bootstrap": "^4.5.3",
     "carbon-components": "^10.36.0",
@@ -24,6 +28,7 @@
     "jwt-decode": "^3.1.2",
     "keycloak-js": "^19.0.1",
     "moment": "^2.29.4",
+    "prop-types": "^15.6.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-icons": "^4.3.1",
@@ -34,12 +39,7 @@
     "redux": "^4.1.1",
     "redux-thunk": "^2.3.0",
     "url-join": "^4.0.1",
-    "web-vitals": "^0.2.4",
-    "@types/react-dom": "^17.0.9",
-    "@types/carbon-components-react": "^7.55.2",
-    "@types/carbon__icons-react": "^10.31.2",
-    "@types/file-saver": "^2.0.5",
-    "@types/react-router-dom": "^5.3.1"
+    "web-vitals": "^0.2.4"
   },
   "scripts": {
     "start": "PORT=$PORT_FE react-scripts start --openssl-legacy-provider",
@@ -68,8 +68,8 @@
     ]
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.15.6",
     "@babel/plugin-transform-runtime": "^7.15.0",
+    "@babel/preset-env": "^7.15.6",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.1.1",
     "@types/jest": "^27.0.2",
@@ -88,6 +88,7 @@
     "moxios": "^0.4.0",
     "nodemon": "^2.0.13",
     "puppeteer": "^20.1.2",
+    "react-inject-env": "^2.1.0",
     "react-test-renderer": "^17.0.2",
     "redux-mock-store": "^1.5.4"
   },
