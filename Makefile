@@ -61,7 +61,7 @@ container-tornjak-backend-push: container-tornjak-backend
 ## Build Manager container
 container-manager: bin/tornjak-manager #ui-manager
 	docker build --no-cache -f Dockerfile.tornjak-manager --build-arg version=$(VERSION) -t ${CONTAINER_MANAGER_TAG} .
-
+## Build and push Manager to image repository
 container-manager-push: container-manager
 	 docker push ${CONTAINER_MANAGER_TAG}
 
