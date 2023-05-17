@@ -54,6 +54,7 @@ vendor:
 container-tornjak-backend: bin/tornjak-backend
 	docker build --no-cache -f Dockerfile.backend-container --build-arg version=$(VERSION) -t ${CONTAINER_BACKEND_TAG} .
 
+## Build and push Backend to image repository
 container-tornjak-backend-push: container-tornjak-backend
 	docker push ${CONTAINER_BACKEND_TAG}
 
