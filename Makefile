@@ -81,6 +81,7 @@ container-frontend-push: container-frontend
 container-tornjak: bin/tornjak-backend #ui-agent
 	docker build --no-cache -f Dockerfile.tornjak-container --build-arg version=$(VERSION) -t ${CONTAINER_TAG} .
 
+## Build and push tornjak (Backend + Frontend) to image repository
 container-tornjak-push: container-tornjak
 	docker push ${CONTAINER_TAG}
 
