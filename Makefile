@@ -3,16 +3,16 @@
 VERSION=$(shell cat version.txt)
 
 ## when containers are built, they are tagged with these
-CONTAINER_TAG ?= tsidentity/tornjak:$(VERSION)
+CONTAINER_TORNJAK_TAG ?= tsidentity/tornjak:$(VERSION)
 CONTAINER_BACKEND_TAG ?= tsidentity/tornjak-backend:$(VERSION)
 CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-frontend:$(VERSION)
 CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:$(VERSION)
 
 ## `make release-*` pushes to above tag as well as below corresponding tag
-CONTAINER_TORNJAK_IMAGEPATH ?= ghcr.io/spiffe/tornjak
-CONTAINER_BACKEND_IMAGEPATH ?= ghcr.io/spiffe/tornjak-backend
-CONTAINER_FRONTEND_IMAGEPATH ?= ghcr.io/spiffe/tornjak-frontend
-CONTAINER_MANAGER_IMAGEPATH ?= ghcr.io/spiffe/tornjak-manager
+CONTAINER_TORNJAK_RELEASE_TAG ?= ghcr.io/spiffe/tornjak
+CONTAINER_BACKEND_RELEASE_TAG ?= ghcr.io/spiffe/tornjak-backend
+CONTAINER_FRONTEND_RELEASE_TAG ?= ghcr.io/spiffe/tornjak-frontend
+CONTAINER_MANAGER_RELEASE_TAG ?= ghcr.io/spiffe/tornjak-manager
 
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
 
@@ -79,11 +79,11 @@ container-frontend-push: container-frontend
 
 ## Build tornjak container (Backend + Frontend)
 container-tornjak: bin/tornjak-backend #ui-agent
-	docker build --no-cache -f Dockerfile.tornjak-container --build-arg version=$(VERSION) -t ${CONTAINER_TAG} .
+	docker build --no-cache -f Dockerfile.tornjak-container --build-arg version=$(VERSION) -t ${CONTAINER_TORNJAK_TAG} .
 
 ## Build and push tornjak (Backend + Frontend) to image repository
 container-tornjak-push: container-tornjak
-	docker push ${CONTAINER_TAG}
+	docker push ${CONTAINER_TORNJAK_TAG}
 
 
 ## BEGIN RELEASES FOR GITHUB CONTAINER REGISTRY ##
@@ -91,35 +91,35 @@ container-tornjak-push: container-tornjak
 
 ## backend image
 release-tornjak-backend: container-tornjak-backend
-	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_IMAGEPATH}:latest
-	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_IMAGEPATH}:$(VERSION)
+	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_RELEASE_TAG}:latest
+	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_RELEASE_TAG}:$(VERSION)
 	docker push ${CONTAINER_BACKEND_TAG}
-	docker push ${CONTAINER_BACKEND_IMAGEPATH}:latest
-	docker push ${CONTAINER_BACKEND_IMAGEPATH}:${VERSION}
+	docker push ${CONTAINER_BACKEND_RELEASE_TAG}:latest
+	docker push ${CONTAINER_BACKEND_RELEASE_TAG}:${VERSION}
 
 ## frontend image
 release-tornjak-frontend: container-frontend
-	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_IMAGEPATH}:latest
-	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_IMAGEPATH}:$(VERSION)
+	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_RELEASE_TAG}:latest
+	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_RELEASE_TAG}:$(VERSION)
 	docker push ${CONTAINER_FRONTEND_TAG}
-	docker push ${CONTAINER_FRONTEND_IMAGEPATH}:latest
-	docker push ${CONTAINER_FRONTEND_IMAGEPATH}:$(VERSION)
+	docker push ${CONTAINER_FRONTEND_RELEASE_TAG}:latest
+	docker push ${CONTAINER_FRONTEND_RELEASE_TAG}:$(VERSION)
 
 # backend + frontend image
 release-tornjak: container-tornjak
-	docker tag ${CONTAINER_TAG} ${CONTAINER_TORNJAK_IMAGEPATH}:latest
-	docker tag ${CONTAINER_TAG} ${CONTAINER_TORNJAK_IMAGEPATH}:$(VERSION)
-	docker push ${CONTAINER_TAG}
-	docker push ${CONTAINER_TORNJAK_IMAGEPATH}:latest
-	docker push ${CONTAINER_TORNJAK_IMAGEPATH}:$(VERSION)
+	docker tag ${CONTAINER_TORNJAK_TAG} ${CONTAINER_TORNJAK_RELEASE_TAG}:latest
+	docker tag ${CONTAINER_TORNJAK_TAG} ${CONTAINER_TORNJAK_RELEASE_TAG}:$(VERSION)
+	docker push ${CONTAINER_TORNJAK_TAG}
+	docker push ${CONTAINER_TORNJAK_RELEASE_TAG}:latest
+	docker push ${CONTAINER_TORNJAK_RELEASE_TAG}:$(VERSION)
 
 # manager backend
 release-tornjak-manager: container-manager
-	docker tag ${CONTAINER_MANAGER_TAG} ${CONTAINER_MANAGER_IMAGEPATH}:latest
-	docker tag ${CONTAINER_MANAGER_TAG} ${CONTAINER_MANAGER_IMAGEPATH}:$(VERSION)
+	docker tag ${CONTAINER_MANAGER_TAG} ${CONTAINER_MANAGER_RELEASE_TAG}:latest
+	docker tag ${CONTAINER_MANAGER_TAG} ${CONTAINER_MANAGER_RELEASE_TAG}:$(VERSION)
 	docker push ${CONTAINER_MANAGER_TAG}
-	docker push ${CONTAINER_MANAGER_IMAGEPATH}:latest
-	docker push ${CONTAINER_MANAGER_IMAGEPATH}:$(VERSION)
+	docker push ${CONTAINER_MANAGER_RELEASE_TAG}:latest
+	docker push ${CONTAINER_MANAGER_RELEASE_TAG}:$(VERSION)
 
 ## END RELEASES FOR GITHUB CONTAINER REGISTRY ##
 
@@ -133,3 +133,4 @@ push:
 	docker push ${CONTAINER_MANAGER_TAG}
 	docker push ${CONTAINER_BACKEND_TAG}
 	docker push ${CONTAINER_FRONTEND_TAG}
+	docker push ${CONTAINER_TORNJAK_TAG}
