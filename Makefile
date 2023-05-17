@@ -69,6 +69,7 @@ container-manager-push: container-manager
 container-frontend: #ui-agent 
 	docker build --no-cache -f Dockerfile.frontend-container --build-arg version=$(VERSION) -t ${CONTAINER_FRONTEND_TAG} .
 
+## Build and push Frontend to image repository
 compose-frontend: 
 	docker-compose -f docker-compose-frontend.yml up --build --force-recreate -d
 	docker tag tornjak-public_tornjak-frontend:latest ${CONTAINER_FRONTEND_TAG}
