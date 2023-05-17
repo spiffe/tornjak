@@ -65,7 +65,7 @@ container-manager: bin/tornjak-manager #ui-manager
 container-manager-push: container-manager
 	 docker push ${CONTAINER_MANAGER_TAG}
 
-## Frontend container
+## Build Frontend container
 container-frontend: #ui-agent 
 	docker build --no-cache -f Dockerfile.frontend-container --build-arg version=$(VERSION) -t ${CONTAINER_FRONTEND_TAG} .
 
