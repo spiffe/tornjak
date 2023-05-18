@@ -35,7 +35,7 @@ function App() {
                             <NavigationBar />
                         </div>
                         {spireHealthCheck &&
-                            <div className="health-check">
+                            <div>
                                 <SpireHealthCheck />
                             </div>
                         }
