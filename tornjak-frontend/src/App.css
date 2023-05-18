@@ -79,12 +79,3 @@
   .carbon-toast .bx--toast-notification{
     margin: 0;
   }
-
-  .health-check{
-    float:right;
-    margin-right: 30px;
-    margin-top: 10px;
-    border: 0.1px solid black;
-    padding: 2px 10px 2px 10px;
-    background-color: rgb(233, 233, 233);
-  }
