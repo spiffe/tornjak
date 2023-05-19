@@ -37,6 +37,8 @@ jobs:
       # Deprecating the backend+spire image for now
       # - name: Set backend-spire image name
       #   run: echo "CONTAINER_BACKEND_WITH_SPIRE_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-backend-spire-server:$GITHUB_SHA" >> $GITHUB_ENV
+      - name: Set github commit id
+        run: echo "GITHUB_SHA=$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set backend image name
         run: echo "CONTAINER_BACKEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-backend:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set frontend image name
