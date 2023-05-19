@@ -8,6 +8,6 @@ COPY run_server.sh run_server.sh
 
 # add a version link to the image description
 ARG version
-LABEL org.opencontainers.image.description="Tornjak backend ($version): https://github.com/spiffe/tornjak/releases/tag/$version" \
+LABEL org.opencontainers.image.description="Tornjak backend + SPIRE server 1.1.3: https://github.com/spiffe/tornjak/releases/tag/$version" \
       org.opencontainers.image.source="https://github.com/spiffe/tornjak" \
       org.opencontainers.image.documentation="https://github.com/spiffe/tornjak/tree/main/docs" 
