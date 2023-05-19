@@ -19,7 +19,7 @@ RUN npm install --location=global serve && \
 ENV PORT_FE=3000
 EXPOSE $PORT_FE
 
-ENTRYPOINT npx react-inject-env set && npx serve build -p $PORT_FE
+ENTRYPOINT npx react-inject-env set && serve -s build -p $PORT_FE
 
 # add a version link to the image description
 ARG version

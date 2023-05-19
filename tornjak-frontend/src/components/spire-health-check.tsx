@@ -151,7 +151,7 @@ class SpireHealthCheck extends Component<SpireHealthCheckProp, SpireHealthCheckS
             {!checking &&
               <InlineLoading
                 status="active"
-                description="Checking Status..." />
+                description="Checking" />
             }
             {checking && spireStatus}
           </div>
