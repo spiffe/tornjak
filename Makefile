@@ -1,6 +1,7 @@
 .PHONY: ui vendor build container-tornjak-backend-spire container-tornjak-backend-spire-push container-manager container-manager-push release-tornjak-backend-spire-multiversions push container-frontend container-frontend-push container-tornjak-backend container-tornjak-backend-push
 
 VERSION=$(shell cat version.txt)
+GITHUB_SHA="$(shell git rev-parse HEAD 2>/dev/null)"
 
 CONTAINER_TAG ?= tsidentity/tornjak:$(VERSION)
 CONTAINER_BACKEND_TAG ?= tsidentity/tornjak-backend:$(VERSION)
