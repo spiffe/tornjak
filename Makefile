@@ -91,34 +91,26 @@ container-tornjak-push: container-tornjak
 
 ## backend image
 release-tornjak-backend: container-tornjak-backend
-	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_RELEASE_TAG}:latest
 	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_RELEASE_TAG}:$(VERSION)
 	docker push ${CONTAINER_BACKEND_TAG}
-	docker push ${CONTAINER_BACKEND_RELEASE_TAG}:latest
 	docker push ${CONTAINER_BACKEND_RELEASE_TAG}:${VERSION}
 
 ## frontend image
 release-tornjak-frontend: container-frontend
-	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_RELEASE_TAG}:latest
 	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_RELEASE_TAG}:$(VERSION)
 	docker push ${CONTAINER_FRONTEND_TAG}
-	docker push ${CONTAINER_FRONTEND_RELEASE_TAG}:latest
 	docker push ${CONTAINER_FRONTEND_RELEASE_TAG}:$(VERSION)
 
 # backend + frontend image
 release-tornjak: container-tornjak
-	docker tag ${CONTAINER_TORNJAK_TAG} ${CONTAINER_TORNJAK_RELEASE_TAG}:latest
 	docker tag ${CONTAINER_TORNJAK_TAG} ${CONTAINER_TORNJAK_RELEASE_TAG}:$(VERSION)
 	docker push ${CONTAINER_TORNJAK_TAG}
-	docker push ${CONTAINER_TORNJAK_RELEASE_TAG}:latest
 	docker push ${CONTAINER_TORNJAK_RELEASE_TAG}:$(VERSION)
 
 # manager backend
 release-tornjak-manager: container-manager
-	docker tag ${CONTAINER_MANAGER_TAG} ${CONTAINER_MANAGER_RELEASE_TAG}:latest
 	docker tag ${CONTAINER_MANAGER_TAG} ${CONTAINER_MANAGER_RELEASE_TAG}:$(VERSION)
 	docker push ${CONTAINER_MANAGER_TAG}
-	docker push ${CONTAINER_MANAGER_RELEASE_TAG}:latest
 	docker push ${CONTAINER_MANAGER_RELEASE_TAG}:$(VERSION)
 
 ## END RELEASES FOR GITHUB CONTAINER REGISTRY ##
