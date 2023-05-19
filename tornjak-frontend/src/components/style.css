@@ -374,9 +374,11 @@
 }
 
 .health-check {
+  position: relative;
+  z-index: 3;
   float: right;
-  margin-right: 220px;
-  padding-top: 10px;
+  margin-right: 190px;
+  padding-top: 3px;
 }
 
 .health-status-check-container {
@@ -385,10 +387,10 @@
   background-color: rgb(233, 233, 233);
   display: inline-block;
   margin-left: 5px;
-  margin-top: 40px;
   position: absolute;
   top: 0;
-  margin-top: 85px;
+  margin-top: 27px;
+  min-width: 157px;
 }
 
 .health-status-check-title {
@@ -402,7 +404,6 @@
 
 .spire-health-check-refresh-dropdown {
   width: 115px;
-  margin-bottom: 5px;
   display: inline-block;
 }
 
@@ -412,7 +413,5 @@
 }
 
 .spire-health-helper {
-  font-size: 8px;
   color: rgb(252, 252, 252);
-  margin-top: 2px;
 }
