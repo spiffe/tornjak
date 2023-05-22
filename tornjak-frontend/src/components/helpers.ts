@@ -1,7 +1,8 @@
+import {env} from '../env';
 var urljoin = require('url-join');
 
 // API_SERVER_URL
-const ApiServerUri = process.env["REACT_APP_API_SERVER_URI"];
+const ApiServerUri = env["REACT_APP_API_SERVER_URI"];
 
 export default function GetApiServerUri (uri: string): string {
     return urljoin(ApiServerUri ? ApiServerUri : "/", uri)

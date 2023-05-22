@@ -1,6 +1,7 @@
 .PHONY: ui vendor build container-tornjak-backend-spire container-manager container-manager-push push container-frontend container-frontend-push container-tornjak-backend container-tornjak-backend-push
 
 VERSION=$(shell cat version.txt)
+GITHUB_SHA="$(shell git rev-parse HEAD 2>/dev/null)"
 
 ## when containers are built, they are tagged with these
 CONTAINER_TORNJAK_TAG ?= tsidentity/tornjak:$(VERSION)
@@ -52,22 +53,31 @@ vendor:
 # Containerized components
 ## Build Backend container
 container-tornjak-backend: bin/tornjak-backend
-	docker build --no-cache -f Dockerfile.backend-container --build-arg version=$(VERSION) -t ${CONTAINER_BACKEND_TAG} .
+	docker build --no-cache -f Dockerfile.backend-container --build-arg version=$(VERSION) \
+	--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_BACKEND_TAG} .
 
 ## Build and push Backend to image repository
 container-tornjak-backend-push: container-tornjak-backend
 	docker push ${CONTAINER_BACKEND_TAG}
 
-## Build Manager container
+container-tornjak-backend-spire: bin/tornjak-backend
+	docker build --no-cache -f Dockerfile.add-backend --build-arg version=$(VERSION) \
+	--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_BACKEND_WITH_SPIRE_TAG} .
+
+container-tornjak-backend-spire-push: container-tornjak-backend-spire
+	docker push ${CONTAINER_BACKEND_WITH_SPIRE_TAG}
+
 container-manager: bin/tornjak-manager #ui-manager
-	docker build --no-cache -f Dockerfile.tornjak-manager --build-arg version=$(VERSION) -t ${CONTAINER_MANAGER_TAG} .
-## Build and push Manager to image repository
+	docker build --no-cache -f Dockerfile.tornjak-manager --build-arg version=$(VERSION) \
+	--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_MANAGER_TAG} .
+
 container-manager-push: container-manager
 	 docker push ${CONTAINER_MANAGER_TAG}
 
 ## Build Frontend container
 container-frontend: #ui-agent 
-	docker build --no-cache -f Dockerfile.frontend-container --build-arg version=$(VERSION) -t ${CONTAINER_FRONTEND_TAG} .
+	docker build --no-cache -f Dockerfile.frontend-container --build-arg version=$(VERSION) \
+	--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_FRONTEND_TAG} .
 
 ## Build and push Frontend to image repository
 compose-frontend: 
@@ -79,7 +89,8 @@ container-frontend-push: container-frontend
 
 ## Build tornjak container (Backend + Frontend)
 container-tornjak: bin/tornjak-backend #ui-agent
-	docker build --no-cache -f Dockerfile.tornjak-container --build-arg version=$(VERSION) -t ${CONTAINER_TORNJAK_TAG} .
+	docker build --no-cache -f Dockerfile.tornjak-container --build-arg version=$(VERSION) \
+	--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_TAG} .
 
 ## Build and push tornjak (Backend + Frontend) to image repository
 container-tornjak-push: container-tornjak

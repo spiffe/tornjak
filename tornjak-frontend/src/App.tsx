@@ -20,9 +20,10 @@ import RenderOnAdminRole from 'components/RenderOnAdminRole'
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import SpireHealthCheck from 'components/spire-health-check';
+import {env} from './env';
 
 // to enable SPIRE health check component
-const spireHealthCheck = (process.env.REACT_APP_SPIRE_HEALTH_CHECK_ENABLE === 'true') ?? false; // defualt value false
+const spireHealthCheck = (env.REACT_APP_SPIRE_HEALTH_CHECK_ENABLE === 'true') ?? false; // defualt value false
 
 function App() {
     return (
@@ -34,7 +35,7 @@ function App() {
                             <NavigationBar />
                         </div>
                         {spireHealthCheck &&
-                            <div className="health-check">
+                            <div>
                                 <SpireHealthCheck />
                             </div>
                         }

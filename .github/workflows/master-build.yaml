@@ -33,6 +33,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       # Create sha tagged image for container-agent
       
+      - name: Set github commit id
+        run: echo "GITHUB_SHA=$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set backend image name
         run: echo "CONTAINER_BACKEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-backend:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set frontend image name

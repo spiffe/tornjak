@@ -1,21 +1,35 @@
-FROM node:16-alpine
-
+## Build stage
+FROM node:16-alpine3.14 AS build
 WORKDIR /usr/src/app
-CMD ["npm", "start"]
+COPY tornjak-frontend .
+RUN npm install --omit=dev && \
+    npm run build
 
-# set env variables
-ENV REACT_APP_API_SERVER_URI $REACT_APP_API_SERVER_URI \
-    REACT_APP_AUTH_SERVER_URI $REACT_APP_AUTH_SERVER_URI \
-    REACT_APP_SPIRE_HEALTH_CHECK_ENABLE $REACT_APP_SPIRE_HEALTH_CHECK_ENABLE \
-    PORT_FE=3000
+## Runtime stage
+FROM node:16-alpine3.14 AS runtime
+WORKDIR /usr/src/app
+COPY --from=build /usr/src/app/build ./build
+COPY --from=build /usr/src/app/.env.prod .
 
+# Install serve package and react-inject-env
+RUN npm install --location=global serve && \
+    npm install react-inject-env
+    
+# Set dynamic port, defualt 3000
+ENV PORT_FE=3000
 EXPOSE $PORT_FE
 
-COPY tornjak-frontend .
+ENTRYPOINT npx react-inject-env set && serve -s build -p $PORT_FE
 
 # add a version link to the image description
 ARG version
-LABEL org.opencontainers.image.description "https://github.com/spiffe/tornjak/releases/tag/$version"
+LABEL org.opencontainers.image.description="Tornjak frontend ($version): https://github.com/spiffe/tornjak/releases/tag/$version" \
+      org.opencontainers.image.source="https://github.com/spiffe/tornjak" \
+      org.opencontainers.image.documentation="https://github.com/spiffe/tornjak/tree/main/docs" 
+# create env. variables with the build details
+ENV VERSION=$version
+ENV GITHUB_SHA=$github_sha
 
 RUN npm install --omit=dev \
     npm prune --production
+ENTRYPOINT npx react-inject-env set && serve -s build -p $PORT_FE

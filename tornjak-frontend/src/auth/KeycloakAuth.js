@@ -1,7 +1,8 @@
 import Keycloak from "keycloak-js";
+import {env} from '../env';
 const keycloakConfig = {
     "realm": "tornjak",
-    "url": process.env.REACT_APP_AUTH_SERVER_URI,
+    "url": env.REACT_APP_AUTH_SERVER_URI,
     "ssl-required": "external",
     "clientId": "Tornjak-React-auth",
     "public-client": true,
