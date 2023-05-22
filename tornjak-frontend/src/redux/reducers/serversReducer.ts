@@ -24,7 +24,7 @@ const initialState: ServersReducerState = {
     globalSpireHealthChecking: false,
     globalSpireHealthTime: {
         SpireHealtCheckTime: 120,
-        SpireHealtCheckFreqDisplay: '2 Minutes',
+        SpireHealtCheckFreqDisplay: '2 Mins',
     },
 };
 

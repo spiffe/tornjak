@@ -5,6 +5,8 @@ import { DataTable, DataTableCell, DataTableCustomSelectionData, DataTableCustom
 import WorkLoadAttestor from 'components/work-load-attestor-modal';
 import { ShapeOf } from "carbon-components-react/typings/shared";
 import TornjakHelper from 'components/tornjak-helper';
+import {env} from '../env';
+
 const {
     TableBody,
     TableRow,
@@ -12,7 +14,7 @@ const {
     TableCell,
 } = DataTable;
 
-const Auth_Server_Uri = process.env.REACT_APP_AUTH_SERVER_URI;
+const Auth_Server_Uri = env.REACT_APP_AUTH_SERVER_URI;
 
 // Body take in 
 // entityType: type of entity 

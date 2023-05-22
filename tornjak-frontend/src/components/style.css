@@ -14,358 +14,404 @@
 .dropdown-container {
   margin-left: 200px;
 }
+
 .dropbtn {
-    color: white;
-    padding: 30px;
-    font-size: 16px;
-    border: none;
-  }
-  
-  .dropdown {
-    position: relative;
-    display: inline-block;
-    padding: 15px;
-  }
-  
-  .dropdown-content {
-    margin-top: 10px;
-    position: absolute;
-    background-color: #f1f1f1;
-    display: none;
-    min-width: 130px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 3;
-  }
+  color: white;
+  padding: 30px;
+  font-size: 16px;
+  border: none;
+}
 
-  .user-dropdown {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .user-dropdown-content {
-    padding-top: 25px;
-    margin-top: 10px;
-    position: absolute;
-    background-color: #f1f1f1;
-    display: none;
-    min-width: 130px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 3;
-    font-weight: bold;
-  }
+.dropdown {
+  position: relative;
+  display: inline-block;
+  padding: 15px;
+}
 
-  .user-dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    z-index: 3;
-  }
+.dropdown-content {
+  margin-top: 10px;
+  position: absolute;
+  background-color: #f1f1f1;
+  display: none;
+  min-width: 130px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 3;
+}
 
-  .dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    z-index: 3;
-  }
-  
-  .dropdown-content a:hover {background-color: #ddd;}
-  .dropdown:hover .dropdown-content {display: block;}
-  .dropdown:hover .dropbtn {color: #ffffff; text-decoration: none;}
+.user-dropdown {
+  position: relative;
+  display: inline-block;
+}
 
-  .user-dropdown-content a:hover {background-color: #ddd;}
-  .user-dropdown:hover .user-dropdown-content {display: block;}
-  .user-dropdown:hover .dropbtn {color: #ffffff; text-decoration: none;}
+.user-dropdown-content {
+  padding-top: 25px;
+  margin-top: 10px;
+  position: absolute;
+  background-color: #f1f1f1;
+  display: none;
+  min-width: 130px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 3;
+  font-weight: bold;
+}
 
-  .indvidual-list-table {
-    margin-top: 10px;
-    width: 98%;
-    margin-bottom: 20px;
-  }
+.user-dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  z-index: 3;
+}
 
-  .create-entry-title {
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  .entry-form {
-    margin-left: auto;
-    margin-right: auto;
-    width: 1000px;
-    border-width:1px;
-    border-style:solid;
-    border-color: rgb(180, 178, 178);
-    padding: 30px 30px 30px 30px;
-  }
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  z-index: 3;
+}
 
-  .accordion-entry-form {
-    padding: 30px 30px 30px 30px;
-  }
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
 
-  .parentId-drop-down {
-    margin-bottom: 20px;
-  }
-  
-  .parentId-input-field {
-    margin-bottom: 20px;
-  }
+.dropdown:hover .dropdown-content {
+  display: block;
+}
 
-  .parentId-drop-down-yaml {
-    margin-bottom: 20px;
-    border-width:1px;
-    border-style:solid;
-    border-color: rgb(180, 178, 178);
-    padding: 10px 10px 10px 10px;
-  }
+.dropdown:hover .dropbtn {
+  color: #ffffff;
+  text-decoration: none;
+}
 
-  .clustertype-drop-down {
-    margin-bottom: 20px;
-  }
+.user-dropdown-content a:hover {
+  background-color: #ddd;
+}
 
-  .parentId-manual-input-field {
-    margin-bottom: 20px;
-    margin-left: 40px;
-  }
+.user-dropdown:hover .user-dropdown-content {
+  display: block;
+}
 
-  .clustertype-manual-input-field {
-    margin-bottom: 20px;
-    margin-left: 40px;
-  }
+.user-dropdown:hover .dropbtn {
+  color: #ffffff;
+  text-decoration: none;
+}
 
-  .spiffeId-input-field {
-    margin-bottom: 20px;
-  }
+.indvidual-list-table {
+  margin-top: 10px;
+  width: 98%;
+  margin-bottom: 20px;
+}
 
-  .cluster-domain-name-input-field {
-    margin-bottom: 20px;
-  }
+.create-entry-title {
+  margin-left: auto;
+  margin-right: auto;
+}
 
-  .cluster-managed-by-input-field {
-    margin-bottom: 20px;
-  }
+.entry-form {
+  margin-left: auto;
+  margin-right: auto;
+  width: 1000px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(180, 178, 178);
+  padding: 30px 30px 30px 30px;
+}
 
-  .clustername-input-field {
-    margin-bottom: 20px;
-  }
+.accordion-entry-form {
+  padding: 30px 30px 30px 30px;
+}
 
-  .parentId-helper {
-    font-size: 12px;
-    color:rgb(82, 79, 79);
-    margin-top: 2px;
-  }
+.parentId-drop-down {
+  margin-bottom: 20px;
+}
 
-  .cluster-helper {
-    font-size: 12px;
-    color:rgb(82, 79, 79);
-    margin-top: 2px;  
-  }
-  .selectors-multiselect {
-    margin-bottom: 20px;
-  }
+.parentId-input-field {
+  margin-bottom: 20px;
+}
 
-  .agents-multiselect {
-    margin-bottom: 20px;
-  }
-  .selectors-textArea {
-    margin-bottom: 20px;
-  }
+.parentId-drop-down-yaml {
+  margin-bottom: 20px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(180, 178, 178);
+  padding: 10px 10px 10px 10px;
+}
 
-  .ttl-input {
-    display: inline-block;
-    margin-right: 20px;
-    margin-bottom: 20px;
-    width: 160px
-  }
+.clustertype-drop-down {
+  margin-bottom: 20px;
+}
 
-  .expiresAt-input {
-    margin-right: 20px;
-    margin-bottom: 20px;
-    width: 600px;
-  }
-  
-  .expiry-drop-down {
-    display: inline-block;
-    vertical-align: top;
-    margin-right: 20px;
-    width: 200px;
-  }
-  
-  .expiryEntryFields {
-    display: inline-block;
-    vertical-align: top;
-    width: 200px;
-  }
-  
-  .expiryOption-field {
-    display: inline-block;
-    vertical-align: top;
-    width: 500px;
-  }
-  
-  .expiryOption-entry {
-    margin-right: 20px;
-    display: inline-block;
-    vertical-align: top;
-    width: 200px;
-  }
-  
-  .federates-with-input-field {
-    margin-bottom: 20px;
-    width: 55%;
-  }
-  .dnsnames-input-field {
-    margin-bottom: 20px;
-    width: 55%;
-  }
+.parentId-manual-input-field {
+  margin-bottom: 20px;
+  margin-left: 40px;
+}
 
-  .servers-drp-dwn {
-    margin-top: 5px;
-  }
+.clustertype-manual-input-field {
+  margin-bottom: 20px;
+  margin-left: 40px;
+}
 
-  .success-message {
-    font-weight: bold;
-    color: green;
-  }
+.spiffeId-input-field {
+  margin-bottom: 20px;
+}
 
-  .failed-message {
-    font-weight: bold;
-    color:red;
-  }
+.cluster-domain-name-input-field {
+  margin-bottom: 20px;
+}
 
-  .no-data {
-    margin-top: 120px;
-    margin-left: 200px;
-  }
+.cluster-managed-by-input-field {
+  margin-bottom: 20px;
+}
 
-  .toast-entry-creation-notification {
-    width: 850px;
-  }
+.clustername-input-field {
+  margin-bottom: 20px;
+}
 
-  .toast-messege {
-    width: 700px;
-    border-width:1px;
-    border-style:solid;
-    border-color: rgb(180, 178, 178);
-    padding: 30px 30px 30px 30px;
-  }
+.parentId-helper {
+  font-size: 12px;
+  color: rgb(82, 79, 79);
+  margin-top: 2px;
+}
 
-  .toast-messege-color {
-    color:white;
-  }
+.cluster-helper {
+  font-size: 12px;
+  color: rgb(82, 79, 79);
+  margin-top: 2px;
+}
 
-  .create-entry-button {
-    border-radius: 25px;
-  }
+.selectors-multiselect {
+  margin-bottom: 20px;
+}
 
-  .custom-entry-form-title {
-    display: inline-block;
-  }
+.agents-multiselect {
+  margin-bottom: 20px;
+}
 
-  .edit-entry-container {
-    display: flex;
-    flex-direction: row;
-    width: 1100px
-  }
-  .entries-list-container {
-    height:500px;
-    float:left;
-    display: block;
-    width: 50%;
-    overflow-y: scroll;
-    background-color: rgb(215, 215, 215);
-    padding: 10px 30px 30px 30px;
-  }
+.selectors-textArea {
+  margin-bottom: 20px;
+}
 
-  .entries-edit-form {
-    height:500px;
-    display: block;
-    width: 50%;
-    overflow-y: scroll;
-    margin-left: 20px;
-    margin-top: 10px;
-  }
+.ttl-input {
+  display: inline-block;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  width: 160px
+}
 
-  .federates-with-input-field-yaml {
-    margin-bottom: 20px;
-  }
-  .dnsnames-input-field-yaml {
-    margin-bottom: 20px;
-  }
+.expiresAt-input {
+  margin-right: 20px;
+  margin-bottom: 20px;
+  width: 600px;
+}
 
-  .modal_Entry_list_title {
-    text-transform: capitalize;
-    text-decoration: underline;
-    font-weight: bold;
-    margin-bottom: 5px;
-    font-size: 15px;
-  }
+.expiry-drop-down {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 20px;
+  width: 200px;
+}
 
-  .additional_info_entries_list {
-    font-size: 13px;
-    color:rgb(101, 99, 99);
-  }
+.expiryEntryFields {
+  display: inline-block;
+  vertical-align: top;
+  width: 200px;
+}
 
-  .yaml_view_modal_json {
-    padding: 5px 30px 30px 30px;
-    font-weight: bold;
-    background-color: rgb(213, 213, 213);
-    border-width:1px;
-    border-style:solid;
-    border-color: rgb(180, 178, 178);
-  }
+.expiryOption-field {
+  display: inline-block;
+  vertical-align: top;
+  width: 500px;
+}
 
-  .view_entries_yaml_button {
-    display:inline-block;
-  }
+.expiryOption-entry {
+  margin-right: 20px;
+  display: inline-block;
+  vertical-align: top;
+  width: 200px;
+}
 
-  .selected-entry {
-    background-color: rgb(175, 175, 184);
-  }
+.federates-with-input-field {
+  margin-bottom: 20px;
+  width: 55%;
+}
 
-  .header-toolbar {
-    position: relative;
-    display: inline;
-    float: right;
-  }
+.dnsnames-input-field {
+  margin-bottom: 20px;
+  width: 55%;
+}
 
-  .user-name {
-    position: relative;
-    display: inline-block;
-    color: aliceblue;
-  }
+.servers-drp-dwn {
+  margin-top: 5px;
+}
 
-  .not-allowed {
-    color: rgb(6, 165, 165);
-    position: absolute;
-    left: 40%;
-  }
+.success-message {
+  font-weight: bold;
+  color: green;
+}
 
-  .admin-toolbar-header {
-    position: relative;
-    display: inline;
-    padding: 15px;
-    color: white;
-    border: 0.1px solid white;
-    padding: 4px;
-    float: right;
-    margin-right: 70px;
-    margin-top: 7px;
-  }
+.failed-message {
+  font-weight: bold;
+  color: red;
+}
 
-  .health-status-check-title {
-    display: inline-block;
-    margin-right: 10px;
-  }
+.no-data {
+  margin-top: 120px;
+  margin-left: 200px;
+}
 
-  .health-status-check-icon {
-    display: inline-block;
-  }
+.toast-entry-creation-notification {
+  width: 850px;
+}
 
-  .spire-health-check-refresh-dropdown {
-    width: 150px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-  }
+.toast-messege {
+  width: 700px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(180, 178, 178);
+  padding: 30px 30px 30px 30px;
+}
 
-  .divider {
-    border-bottom: 1px solid black;
-    margin-left: -10px;
-    margin-right: -10px;
-  }
+.toast-messege-color {
+  color: white;
+}
+
+.create-entry-button {
+  border-radius: 25px;
+}
+
+.custom-entry-form-title {
+  display: inline-block;
+}
+
+.edit-entry-container {
+  display: flex;
+  flex-direction: row;
+  width: 1100px
+}
+
+.entries-list-container {
+  height: 500px;
+  float: left;
+  display: block;
+  width: 50%;
+  overflow-y: scroll;
+  background-color: rgb(215, 215, 215);
+  padding: 10px 30px 30px 30px;
+}
+
+.entries-edit-form {
+  height: 500px;
+  display: block;
+  width: 50%;
+  overflow-y: scroll;
+  margin-left: 20px;
+  margin-top: 10px;
+}
+
+.federates-with-input-field-yaml {
+  margin-bottom: 20px;
+}
+
+.dnsnames-input-field-yaml {
+  margin-bottom: 20px;
+}
+
+.modal_Entry_list_title {
+  text-transform: capitalize;
+  text-decoration: underline;
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 15px;
+}
+
+.additional_info_entries_list {
+  font-size: 13px;
+  color: rgb(101, 99, 99);
+}
+
+.yaml_view_modal_json {
+  padding: 5px 30px 30px 30px;
+  font-weight: bold;
+  background-color: rgb(213, 213, 213);
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(180, 178, 178);
+}
+
+.view_entries_yaml_button {
+  display: inline-block;
+}
+
+.selected-entry {
+  background-color: rgb(175, 175, 184);
+}
+
+.header-toolbar {
+  position: relative;
+  display: inline;
+  float: right;
+}
+
+.user-name {
+  position: relative;
+  display: inline-block;
+  color: aliceblue;
+}
+
+.not-allowed {
+  color: rgb(6, 165, 165);
+  position: absolute;
+  left: 40%;
+}
+
+.admin-toolbar-header {
+  position: relative;
+  display: inline;
+  padding: 15px;
+  color: white;
+  border: 0.1px solid white;
+  padding: 4px;
+  float: right;
+  margin-right: 70px;
+  margin-top: 7px;
+}
+
+.health-check {
+  position: relative;
+  z-index: 3;
+  float: right;
+  margin-right: 190px;
+  padding-top: 3px;
+}
+
+.health-status-check-container {
+  border: 0.1px solid black;
+  padding: 2px 10px 2px 10px;
+  background-color: rgb(233, 233, 233);
+  display: inline-block;
+  margin-left: 5px;
+  position: absolute;
+  top: 0;
+  margin-top: 27px;
+  min-width: 157px;
+}
+
+.health-status-check-title {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.health-status-check-icon {
+  display: inline-block;
+}
+
+.spire-health-check-refresh-dropdown {
+  width: 115px;
+  display: inline-block;
+}
+
+.spire-health-refresh-tooltip {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.spire-health-helper {
+  color: rgb(252, 252, 252);
+}
