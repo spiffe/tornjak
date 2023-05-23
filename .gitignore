@@ -41,3 +41,6 @@ node_modules/
 ui-manager/
 .idea/
 Makefile
+
+# Next.js files
+.next

@@ -354,9 +354,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
                   disabled
                 />
               </div>
-              <div className="form-group" data-test="create-cluster-button">
-                <input type="submit" value="Create Cluster" className="btn btn-primary" />
-              </div>
+                <input type="submit" value="Create Cluster" className="btn btn-primary" data-testid="create-cluster-button"/>
               <div data-test="success-message">
                 {this.state.statusOK === "OK" &&
                   <p className="success-message">--CLUSTER SUCCESSFULLY CREATED--</p>

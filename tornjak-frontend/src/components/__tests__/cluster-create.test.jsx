@@ -1,9 +1,9 @@
-import { ClusterCreate } from "../../components/cluster-create"
-import { configure } from "enzyme"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react"
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17"
+import { ClusterCreate } from "../../components/cluster-create";
+import { configure } from "enzyme";
+import { render, screen, within, fireEvent, waitFor } from "@testing-library/react";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 
-configure({adapter: new Adapter()})
+configure({adapter: new Adapter()});
 
 const props = {
     serverInfoUpdateFunc: jest.fn(), 
@@ -16,38 +16,29 @@ const props = {
     globalServerSelected: "Test String", 
     globalErrorMessage: "Test String", 
     globalTornjakServerInfo: {}
-}
+};
+
+const setup = () => render(<ClusterCreate {...props} />); 
 
 describe("Cluster Create Component", () => {
-
-    beforeEach(() => {
-        render(<ClusterCreate {...props} />)
-    })
-
     describe("Cluster type cannot be empty.", () => {
-
-        /*
-        if ((this.state.clusterTypeManualEntry && this.state.clusterType === this.state.clusterTypeManualEntryOption) || !this.state.clusterType) {
-      displayError("Cluster type cannot be empty.")
-      return
-    }
-        */
-
         it("Manual", () => {
-            fireEvent.change(screen.getByRole("cluster-type"), {selectedItem: "----Select this option and Enter Custom Cluster Type Below----"})
-        })
+            setup();
+            fireEvent.change(screen.getByRole("cluster-type"), {selectedItem: "----Select this option and Enter Custom Cluster Type Below----"});
+        });
 
         it("Not manual", () => {
-            fireEvent.change(screen.getByRole("cluster-type"), {selectedItem: ""})
-        })
+            setup();
+            fireEvent.change(screen.getByRole("cluster-type"), {selectedItem: ""});
+        });
 
         afterEach(async () => {
-            fireEvent.click(screen.getByRole("create-cluster-button"))
+            fireEvent.click(screen.getByTestId('create-cluster-button'));
 
             await waitFor(() => {
-                const notification = screen.getByRole("error")
-                const [ caption ] = notification.getElementsByClassName("bx--toast-notification__caption")
-                expect(caption.textContent).toBe("Cluster type cannot be empty.")
+                const notification = screen.getByRole("error");
+                const caption = within(notification).getByText('Cluster type cannot be empty.');
+                expect(caption.textContent).toBe("Cluster type cannot be empty.");
             })
         })
     })

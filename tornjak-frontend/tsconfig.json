@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "target": "es2017",
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "module": "esnext",
     "outDir": "dist",
     "esModuleInterop": true,
@@ -22,9 +22,17 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "plugins": [{"name": "typescript-plugin-css-modules"}]
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules"
+      }
+    ],
+    "incremental": true
   },
   "include": [
     "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }

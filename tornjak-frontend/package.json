@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/plugin-transform-runtime": "^7.15.0",
+    "@babel/preset-env": "^7.15.6",
     "@babel/runtime": "^7.15.4",
     "@carbon/charts": "^0.41.80",
     "@carbon/charts-react": "^0.41.80",
@@ -20,8 +22,6 @@
     "@types/carbon-components-react": "^7.55.2",
     "@types/file-saver": "^2.0.5",
     "@types/jest": "^27.0.2",
-    "@types/node": "^16.10.2",
-    "@types/react": "^17.0.24",
     "@types/react-dom": "^17.0.9",
     "@types/react-redux": "^7.1.20",
     "@types/react-router-dom": "^5.3.1",
@@ -40,6 +40,7 @@
     "jwt-decode": "^3.1.2",
     "keycloak-js": "^19.0.1",
     "moment": "^2.29.4",
+    "next": "^12.1.2",
     "prop-types": "^15.6.0",
     "react": "^17.0.2",
     "react-chartjs-2": "^3.0.5",
@@ -47,32 +48,32 @@
     "react-icons": "^4.3.1",
     "react-redux": "^7.2.5",
     "react-router-dom": "^5.3.3",
-    "react-scripts": "^4.0.3",
+    "react-scripts": "^5.0.1",
     "react-toastify": "^8.2.0",
     "recharts": "^2.1.4",
     "redux": "^4.1.1",
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.3.0",
+    "sass": "^1.60.0",
     "stringify-object": "^4.0.1",
     "url-join": "^4.0.1",
     "web-vitals": "^0.2.4",
-    "xlsx": "^0.18.5",
-    "sass": "^1.60.0",
-    "@babel/plugin-transform-runtime": "^7.15.0",
-    "@babel/preset-env": "^7.15.6"
+    "xlsx": "^0.18.5"
   },
   "scripts": {
-    "start": "PORT=$PORT_FE react-scripts start --openssl-legacy-provider",
-    "build": "react-scripts build",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
     "build:staging": "env-cmd -f .env.staging npm run build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "dev": "concurrently -k -n COMPILER,NODEMON -c yellow,blue \"tsc -w\" \"nodemon -w dist -q dist/index.js\""
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
-      "react-app/jest"
+      "react-app/jest",
+      "plugin:@next/next/recommended"
     ]
   },
   "browserslist": {
@@ -88,8 +89,11 @@
     ]
   },
   "devDependencies": {
+    "@next/eslint-plugin-next": "^13.4.2",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.1.1",
+    "@types/node": "^20.1.7",
+    "@types/react": "^17.0.2",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.7",
     "check-prop-types": "^1.1.2",
     "concurrently": "^6.2.2",
