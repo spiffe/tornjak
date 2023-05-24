@@ -60,7 +60,7 @@ container-backend: bin/tornjak-backend
 container-backend-push: container-tornjak-backend
 	docker push ${CONTAINER_BACKEND_LOCAL_TAG}
 
-container-manager: bin/tornjak-manager #ui-manager
+container-manager: bin/tornjak-manager
 	docker build --no-cache -f Dockerfile.tornjak-manager --build-arg version=$(VERSION) \
 	--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_MANAGER_LOCAL_TAG} .
 
