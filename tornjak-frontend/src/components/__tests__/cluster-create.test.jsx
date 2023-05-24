@@ -27,22 +27,16 @@ describe("Cluster Create Component", () => {
     it("Should Create Cluster", () => {
         const instance = wrapper.instance()
 
-        it("Manual", () => {
-            fireEvent.change(screen.getByRole("cluster-type"), {selectedItem: "----Select this option and Enter Custom Cluster Type Below----"})
-        })
+        instance.onChangeClusterName({target: {value: "Name"}})
+        instance.onChangeManualClusterType({target: {value: "Type"}})
+        instance.onChangeClusterDomainName({target: {value: "Domain"}})
+        instance.onChangeClusterManagedBy({target: {value: "Managed By"}})
 
-        it("Not manual", () => {
-            fireEvent.change(screen.getByRole("cluster-type"), {selectedItem: ""})
-        })
+        wrapper.find("form").simulate("submit")
 
-        afterEach(async () => {
-            fireEvent.click(screen.getByRole("create-cluster-button"))
-
-            await waitFor(() => {
-                const notification = screen.getByRole("alert")
-                const [ caption ] = notification.getElementsByClassName("bx--toast-notification__caption")
-                expect(caption.textContent).toBe("Cluster type cannot be empty.")
-            })
-        })
+        expect(wrapper.state("clusterName")).toBe("Name")
+        expect(wrapper.state("clusterType")).toBe("Type")
+        expect(wrapper.state("clusterDomainName")).toBe("Domain")
+        expect(wrapper.state("clusterManagedBy")).toBe("Managed By")
     })
 })
