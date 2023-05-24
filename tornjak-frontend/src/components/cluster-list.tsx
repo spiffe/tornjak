@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import IsManager from './is_manager';
 import Table from "tables/clusters-list-table";
 import TornjakApi from './tornjak-api-helpers';
+// import PropTypes from "prop-types"
 import {
   serverSelectedFunc,
   agentsListUpdateFunc,
@@ -86,10 +87,13 @@ class ClusterList extends Component<ClusterListProp, ClusterListState> {
   }
 
   clusterList() {
-    if (this.props.globalClustersList === undefined) return ""
-    return this.props.globalClustersList.map((currentCluster: ClustersList) => {
-      return <Cluster key={currentCluster.name} cluster={currentCluster} />
-    })
+    if (typeof this.props.globalClustersList !== 'undefined') {
+      return this.props.globalClustersList.map((currentCluster: ClustersList) => {
+        return <Cluster key={currentCluster.name} cluster={currentCluster} />;
+      })
+    } else {
+      return ""
+    }
   }
 
   render() {
@@ -128,7 +132,7 @@ class ClusterList extends Component<ClusterListProp, ClusterListState> {
 //   tornjakMessageFunc: PropTypes.func,
 //   workloadSelectorInfoFunc: PropTypes.func,
 //   agentworkloadSelectorInfoFunc: PropTypes.func,
-//   clustersListUpdateFunc: PropTypes.func,
+//   clustersListUpdateFunc: PropTypes.func
 // };
 
 const mapStateToProps = (state: RootState) => ({
@@ -140,15 +144,7 @@ const mapStateToProps = (state: RootState) => ({
 
 export default connect(
   mapStateToProps,
-  { 
-    serverSelectedFunc, 
-    agentsListUpdateFunc, 
-    tornjakServerInfoUpdateFunc,
-    serverInfoUpdateFunc, 
-    selectorInfoFunc, 
-    tornjakMessageFunc, 
-    workloadSelectorInfoFunc, 
-    agentworkloadSelectorInfoFunc, 
-    clustersListUpdateFunc 
-  }
+  { serverSelectedFunc, agentsListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessageFunc, workloadSelectorInfoFunc, agentworkloadSelectorInfoFunc, clustersListUpdateFunc }
 )(ClusterList)
+
+export { ClusterList }

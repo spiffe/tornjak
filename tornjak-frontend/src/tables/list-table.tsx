@@ -32,7 +32,7 @@ type DataTableRenderState = {
 }
 
 class DataTableRender extends React.Component<DataTableRenderProp, DataTableRenderState> {
-    
+
     constructor(props: DataTableRenderProp) {
         super(props);
         this.state = {
@@ -43,7 +43,6 @@ class DataTableRender extends React.Component<DataTableRenderProp, DataTableRend
 
     onChange(e: DataTableRenderState) {
         const {page, pageSize} = e;
-
         if (page && pageSize) {
             this.setState({page, pageSize})
         }
@@ -51,7 +50,6 @@ class DataTableRender extends React.Component<DataTableRenderProp, DataTableRend
 
     render() {
         const {page, pageSize} = this.state;
-
         return (
             <DataTable
                 isSortable
@@ -63,7 +61,6 @@ class DataTableRender extends React.Component<DataTableRenderProp, DataTableRend
                     getHeaderProps,
                     getSelectionProps,
                     onInputChange,
-                    //getPaginationProps,
                     getBatchActionProps,
                     getTableContainerProps,
                     selectedRows,
