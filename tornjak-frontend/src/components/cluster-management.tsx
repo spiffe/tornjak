@@ -188,4 +188,4 @@ export default connect(
   { clusterTypeInfoFunc, serverSelectedFunc, selectorInfoFunc, agentsListUpdateFunc, tornjakMessageFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc }
 )(ClusterManagement)
 
-export { ClusterManagement };
+export { ClusterManagement }
