@@ -19,7 +19,7 @@ import {
   tornjakServerInfoUpdateFunc,
   serverInfoUpdateFunc,
   agentworkloadSelectorInfoFunc,
-  newEntriesUpdateFunc
+  newEntriesUpdateFunc,
 } from 'redux/actions';
 import {
   EntriesList,
@@ -32,10 +32,14 @@ import {
   WorkloadSelectorInfoLabels,
 } from './types';
 import { RootState } from 'redux/reducers';
-import CreateEntryYaml from './entry-create-json';
+import EntryExpiryFeatures from './entry-expiry-features';
+import CreateEntryJson from './entry-create-json';
+import { displayError, displayResponseError } from './error-api';
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type CreateEntryProp = {
+  // entry expiry time
+  globalEntryExpiryTime: number,
   // dispatches a payload for the server selected and has a return type of void
   serverSelectedFunc: (globalServerSelected: string) => void,
   // dispatches a payload for list of agents with their metadata info as an array of AgentListType and has a return type of void
@@ -386,10 +390,10 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   }
 
   onChangeSelectorsRecommended = (selected: { selectedItems: SelectorLabels[]; } | undefined): void => {
-    if (selected === undefined) {
-      return;
-    }
-    var sid = selected.selectedItems, selectors = "", selectorsDisplay = "";
+    if (selected === undefined) return
+    
+    var sid = selected.selectedItems, selectors = "", selectorsDisplay = ""
+
     for (let i = 0; i < sid.length; i++) {
       if (i !== sid.length - 1) {
         selectors = selectors + sid[i].label + ":\n";
@@ -400,27 +404,26 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
         selectorsDisplay = selectorsDisplay + sid[i].label
       }
     }
-    if (selectorsDisplay.length === 0)
+
+    if (selectorsDisplay.length === 0) {
       selectorsDisplay = "Select Selectors"
+    }
+
     this.setState({
       selectorsRecommendationList: selectors,
       selectorsListDisplay: selectorsDisplay,
-    });
+    })
   }
 
   onChangeSelectors(e: { target: { value: string; }; }): void {
     var sid = e.target.value, selectors = "";
     selectors = sid.replace(/\n/g, ",");
-    this.setState({
-      selectors: selectors,
-    });
+    this.setState({selectors: selectors});
   }
 
   onChangeAdminFlag = (selected: boolean): void => {
     var sid = selected;
-    this.setState({
-      adminFlag: sid,
-    });
+    this.setState({adminFlag: sid,});
   }
 
   parseSpiffeId(sid: string): [boolean, string, string] {
@@ -551,34 +554,37 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     } else if (IsManager && this.state.selectedServer !== "") {
       return GetApiServerUri('/manager-api/entry/create') + "/" + this.state.selectedServer
     } else {
-      this.setState({ message: "Error: No server selected" })
+      displayError("No server selected.")
       return ""
     }
   }
 
   onSubmit(e: { preventDefault: () => void; }): void {
-    let selectorStrings: string[] = [], federatedWithList: string[] = [], dnsNamesWithList: string[] = [];
+    let selectorStrings: string[] = []
+    let federatedWithList: string[] = []
+    let dnsNamesWithList: string[] = []
+    
     e.preventDefault();
 
-    const validSpiffeId = (this.parseSpiffeId(this.state.spiffeId))[0];
-    if (!validSpiffeId) {
-      this.setState({ message: "ERROR: invalid spiffe ID specified" });
+    if (!this.parseSpiffeId(this.state.spiffeId)[0]) {
+      displayError("Invalid spiffe id.")
       return
     }
 
-    const validParentId = (this.parseSpiffeId(this.state.parentId))[0];
-    if (!validParentId) {
-      this.setState({ message: "ERROR: invalid parent ID specified" });
+    if (!this.parseSpiffeId(this.state.parentId)[0]) {
+      displayError("Invalid parent spiffe id.")
       return
     }
 
     if (this.state.selectors.length !== 0) {
       selectorStrings = this.state.selectors.split(',').map(x => x.trim())
     }
+
     if (selectorStrings.length === 0) {
-      this.setState({ message: "ERROR: Selectors cannot be empty" })
+      displayError("Selectors cannot be empty.")
       return
     }
+
     const selectorEntries = selectorStrings.map(x => x.indexOf(":") > 0 ?
       {
         "type": x.substr(0, x.indexOf(":")),
@@ -586,41 +592,44 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       } : null)
 
     if (selectorEntries.some(x => x == null || x["value"].length === 0)) {
-      this.setState({ message: "ERROR: Selectors not in the correct format should be type:value" })
+      displayError("Selectors must be formatted 'type:value'")
       return
     }
 
     if (this.state.federatesWith.length !== 0) {
       federatedWithList = this.state.federatesWith.split(',').map((x: string) => x.trim())
     }
+
     if (this.state.dnsNames.length !== 0) {
       dnsNamesWithList = this.state.dnsNames.split(',').map((x: string) => x.trim())
     }
 
     var cjtData = {
-      "entries": [{
-        "spiffe_id": {
-          "trust_domain": this.state.spiffeIdTrustDomain,
-          "path": this.state.spiffeIdPath,
+      entries: [{
+        spiffe_id: {
+          trust_domain: this.state.spiffeIdTrustDomain,
+          path: this.state.spiffeIdPath,
         },
-        "parent_id": {
-          "trust_domain": this.state.parentIdTrustDomain,
-          "path": this.state.parentIdPath,
+        parent_id: {
+          trust_domain: this.state.parentIdTrustDomain,
+          path: this.state.parentIdPath,
         },
-        "selectors": selectorEntries,
-        "admin": this.state.adminFlag,
-        "ttl": this.state.ttl,
-        "expires_at": this.state.expiresAt,
-        "downstream": this.state.downstream,
-        "federates_with": federatedWithList,
-        "dns_names": dnsNamesWithList,
+        selectors: selectorEntries,
+        admin: this.state.adminFlag,
+        ttl: this.state.ttl,
+        expires_at: this.props.globalEntryExpiryTime,
+        downstream: this.state.downstream,
+        federates_with: federatedWithList,
+        dns_names: dnsNamesWithList,
       }]
     }
 
-    let endpoint = this.getApiEntryCreateEndpoint();
+    let endpoint = this.getApiEntryCreateEndpoint()
+    
     if (endpoint === "") {
       return
     }
+
     axios.post(endpoint, cjtData)
       .then(
         res => this.setState({
@@ -629,12 +638,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           successJsonMessege: res.data.results[0].status.message
         })
       )
-      .catch(
-        err => this.setState({
-          message: "ERROR:" + err,
-          statusOK: "ERROR"
-        })
-      )
+      .catch(err => displayResponseError("Entry creation failed.", err))
   }
 
   onYAMLEntryCreate(): void {
@@ -665,14 +669,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           })
         }
       )
-      .catch(
-        err => {
-          this.setState({
-            message: "ERROR:" + err,
-            statusOK: "ERROR"
-          })
-        }
-      )
+      .catch(err => displayResponseError("Entry creation failed.", err))
   }
 
   render() {
@@ -724,7 +721,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           <AccordionItem
             title={<h5>Upload New Entry/ Entries</h5>} open>
             <div className="entry-form">
-              <CreateEntryYaml
+              <CreateEntryJson
                 ParentIdList={ParentIdList_noManualOption} />
               <br></br>
               {this.props.globalNewEntries.length === 0 &&
@@ -855,17 +852,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                       />
                     </div>
                     <div className="expiresAt-input" data-test="expiresAt-input">
-                      <NumberInput
-                        helperText="Entry expires at (seconds since Unix epoch)"
-                        id="expiresAt-input"
-                        invalidText="Number is not valid"
-                        label="Expires At"
-                        //max={100}
-                        min={0}
-                        step={1}
-                        value={0}
-                        onChange={this.onChangeExpiresAt}
-                      />
+                      <EntryExpiryFeatures />
                     </div>
                     <div className="federates-with-input-field" data-test="federates-with-input-field">
                       <TextInput
@@ -921,6 +908,7 @@ const mapStateToProps = (state: RootState) => ({
   globalSelectorInfo: state.servers.globalSelectorInfo,
   globalAgentsList: state.agents.globalAgentsList,
   globalEntriesList: state.entries.globalEntriesList,
+  globalEntryExpiryTime: state.entries.globalEntryExpiryTime,
   globalNewEntries: state.entries.globalNewEntries,
   globalServerInfo: state.servers.globalServerInfo,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
@@ -955,4 +943,4 @@ export default connect(
   { serverSelectedFunc, agentworkloadSelectorInfoFunc, selectorInfoFunc, agentsListUpdateFunc, entriesListUpdateFunc, tornjakMessageFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, newEntriesUpdateFunc }
 )(CreateEntry)
 
-export { CreateEntry };
+export { CreateEntry }

@@ -10,6 +10,7 @@ import Table from './list-table';
 import { ClustersList } from "components/types";
 import { DenormalizedRow } from "carbon-components-react";
 import { RootState } from "redux/reducers";
+import { displayResponseError } from "components/error-api";
 
 // ClusterListTable takes in 
 // listTableData: clusters data to be rendered on table
@@ -88,39 +89,32 @@ class ClustersListTable extends React.Component<ClustersListTableProp, ClustersL
     }
 
     deleteCluster(selectedRows: readonly DenormalizedRow[]) {
-        var cluster: { name: string; }[] = [], endpoint = "";
-        let promises = [];
+        var cluster: {name: string}[] = [], endpoint = ""
+        let promises = []
+
         if (IsManager) {
-            endpoint = GetApiServerUri('/manager-api/tornjak/clusters/delete') + "/" + this.props.globalServerSelected;
+            endpoint = GetApiServerUri('/manager-api/tornjak/clusters/delete') + "/" + this.props.globalServerSelected
+
         } else {
-            endpoint = GetApiServerUri('/api/tornjak/clusters/delete');
+            endpoint = GetApiServerUri('/api/tornjak/clusters/delete')
         }
-        if (selectedRows.length !== 0) {
-            for (let i = 0; i < selectedRows.length; i++) {
-                cluster[i] = { name: "" }
-                cluster[i]["name"] = selectedRows[i].cells[1].value;
-                promises.push(axios.post(endpoint, {
-                    "cluster": {
-                        "name": cluster[i].name
-                    }
-                }))
-            }
-        } else {
-            return ""
+
+        if (!selectedRows) return ""
+
+        for (let i = 0; i < selectedRows.length; i++) {
+            cluster[i] = {name: ""}
+            cluster[i].name = selectedRows[i].cells[1].value;
+            promises.push(axios.post(endpoint, {cluster: {name: cluster[i].name}}))
         }
+
         Promise.all(promises)
             .then(responses => {
-                if (this.props.globalClustersList === undefined) {
-                    return
-                }
+                if (this.props.globalClustersList === undefined) return
                 for (let i = 0; i < responses.length; i++) {
-                    this.props.clustersListUpdateFunc(this.props.globalClustersList.filter(el =>
-                        el.name !== cluster[i].name));
+                    this.props.clustersListUpdateFunc(this.props.globalClustersList.filter(el =>el.name !== cluster[i].name))
                 }
             })
-            .catch((error) => {
-                console.log(error);
-            })
+            .catch((error) => displayResponseError("Could not delete cluster.", error))
     }
 
     render() {

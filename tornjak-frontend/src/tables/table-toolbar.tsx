@@ -5,6 +5,8 @@ import { DataTable, DataTableCustomBatchActionsData, DataTableCustomBatchActions
 import { IoBan, IoDownloadOutline, IoTrashOutline } from "react-icons/io5";
 import { ReactDivAttr, ShapeOf } from "carbon-components-react/typings/shared";
 import TornjakHelper from 'components/tornjak-helper';
+import {env} from '../env';
+
 const {
     TableToolbar,
     TableToolbarSearch,
@@ -12,6 +14,8 @@ const {
     TableBatchActions,
     TableBatchAction,
 } = DataTable;
+
+const Auth_Server_Uri = env.REACT_APP_AUTH_SERVER_URI;
 
 // TableToolBar takes in 
 // onInputChange: onInputChange function for the search functionality from DataTable
@@ -51,7 +55,7 @@ class TableToolBar extends React.Component<TableToolBarProp, TableToolBarState> 
                     <TableToolbarSearch onChange={(e) => this.props.onInputChange(e)} />
                 </TableToolbarContent>
                 <TableBatchActions {...this.props.getBatchActionProps()}>
-                    {this.props.deleteEntity !== undefined && this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) &&
+                    {((this.props.deleteEntity !== undefined && this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles)) || (this.props.deleteEntity !== undefined && !Auth_Server_Uri) )&&
                         <TableBatchAction
                             renderIcon={IoTrashOutline}
                             iconDescription="Delete"
@@ -76,7 +80,7 @@ class TableToolBar extends React.Component<TableToolBarProp, TableToolBarState> 
                             Export to Json
                         </TableBatchAction>
                     }
-                    {this.props.banEntity !== undefined && this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) &&
+                    {((this.props.banEntity !== undefined && this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles)) || (this.props.banEntity !== undefined && !Auth_Server_Uri)) &&
                         <TableBatchAction
                             renderIcon={IoBan}
                             iconDescription="Ban"

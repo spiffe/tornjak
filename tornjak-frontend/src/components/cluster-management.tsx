@@ -104,16 +104,13 @@ class ClusterManagement extends Component<ClusterManagementProp, ClusterManageme
   }
 
   prepareClusterTypeList(): void {
-    let localClusterTypeList = [];
     // user prefered option
-    localClusterTypeList[0] = this.state.clusterTypeManualEntryOption;
+    let localClusterTypeList = [this.state.clusterTypeManualEntryOption]
     // cluster type list
     for (let i = 0; i < this.props.globalClusterTypeInfo.length; i++) {
-      localClusterTypeList[i + 1] = this.props.globalClusterTypeInfo[i];
+      localClusterTypeList.push(this.props.globalClusterTypeInfo[i])
     }
-    this.setState({
-      clusterTypeList: localClusterTypeList
-    });
+    this.setState({clusterTypeList: localClusterTypeList})
   }
 
   prepareAgentsList(): void {

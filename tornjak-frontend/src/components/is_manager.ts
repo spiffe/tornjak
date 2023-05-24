@@ -1,7 +1,7 @@
-require('dotenv').config();
+import {env} from '../env';
 
-// API_SERVER_URL
-console.log("IS_MANAGER:" + process.env.REACT_APP_TORNJAK_MANAGER)
-const IsManager = process.env.REACT_APP_TORNJAK_MANAGER !== undefined && process.env.REACT_APP_TORNJAK_MANAGER.toUpperCase() !== "FALSE"
+// Is Manager
+console.log("IS_MANAGER:" + env.REACT_APP_TORNJAK_MANAGER)
+const IsManager = env.REACT_APP_TORNJAK_MANAGER !== undefined && env.REACT_APP_TORNJAK_MANAGER.toUpperCase() !== "FALSE"
 
 export default IsManager

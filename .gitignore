@@ -1,4 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+.gitignore
+
+# do not ignore tornjak backend
+!tornjak-backend/
 
 # golang vendor
 vendor/
@@ -35,6 +39,9 @@ tornjak-manager
 bin/
 ui/
 ui-agent/
-agent
 node_modules/
 ui-manager/
+.idea/
+Makefile
+
+/agent

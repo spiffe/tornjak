@@ -19,14 +19,7 @@ type cliOptions struct {
 	genericOptions struct {
 		configFile  string // TODO change name
 		tornjakFile string
-	}
-	httpOptions struct {
-		listenAddr string
-		certPath   string
-		keyPath    string
-		mtlsCaPath string
-		tls        bool
-		mtls       bool
+		expandEnv   bool
 	}
 }
 
@@ -35,19 +28,24 @@ func main() {
 	app := &cli.App{
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:        "spire-config-file",
-				Aliases:     []string{"spire-config", "c"},
+				Name:        "spire-config",
 				Value:       "",
 				Usage:       "Config file path for spire server",
 				Destination: &opt.genericOptions.configFile,
 				Required:    true,
 			},
 			&cli.StringFlag {
-				Name:        "tornjak-config-file",
-				Aliases:     []string{"tornjak-config", "t"},
+				Name:        "tornjak-config",
 				Value:       "",
 				Usage:       "Config file path for tornjak server",
 				Destination: &opt.genericOptions.tornjakFile,
+				Required:    true,
+			},
+			&cli.BoolFlag {
+				Name: 	     "expandEnv",
+				Value:       false,
+				Usage:       "Expansion of variables in config files",
+				Destination: &opt.genericOptions.expandEnv,
 				Required:    false,
 			},
 		},
@@ -55,51 +53,6 @@ func main() {
 			{
 				Name:  "http",
 				Usage: "Run the tornjak http server",
-				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:        "listen-addr",
-						Value:       ":10000",
-						Usage:       "listening address for server",
-						Destination: &opt.httpOptions.listenAddr,
-						Required:    false,
-					},
-					&cli.StringFlag{
-						Name:        "cert",
-						Value:       "",
-						Usage:       "CA Cert path for TLS",
-						Destination: &opt.httpOptions.certPath,
-						Required:    false,
-					},
-					&cli.StringFlag{
-						Name:        "key",
-						Value:       "",
-						Usage:       "Key path for TLS",
-						Destination: &opt.httpOptions.keyPath,
-						Required:    false,
-					},
-					&cli.StringFlag{
-						Name:        "mtls-ca",
-						Value:       "",
-						Usage:       "CA path for mTLS CA",
-						Destination: &opt.httpOptions.mtlsCaPath,
-						Required:    false,
-					},
-					&cli.BoolFlag{
-						Name:        "tls",
-						Value:       false,
-						Usage:       "Enable TLS for http server",
-						Destination: &opt.httpOptions.tls,
-						Required:    false,
-					},
-					&cli.BoolFlag{
-						Name:        "mtls",
-						Value:       false,
-						Usage:       "Enable mTLS for http server (overwrites tls flag)",
-						Destination: &opt.httpOptions.mtls,
-						Required:    false,
-					},
-				},
-
 				Action: func(c *cli.Context) error {
 					return runTornjakCmd("http", opt)
 				},
@@ -128,7 +81,7 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 		// i.e. asks to set -config which is a different flag in tornjak
 		return errors.New("Unable to parse the config file provided")
 	}
-	tornjakConfigs, err := parseTornjakConfig(opt.genericOptions.tornjakFile)
+	tornjakConfigs, err := parseTornjakConfig(opt.genericOptions.tornjakFile, opt.genericOptions.expandEnv)
 	if err != nil {
 		return errors.Errorf("Unable to parse the tornjak config file provided %v", err)
 	}
@@ -140,7 +93,7 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 			log.Fatalf("Error: %v", err)
 		}
 		fmt.Println(serverInfo)
-		tornjakInfo, err := getTornjakConfig(opt.genericOptions.tornjakFile)
+		tornjakInfo, err := getTornjakConfig(opt.genericOptions.tornjakFile, opt.genericOptions.expandEnv)
 		if err != nil {
 			log.Fatalf("Error: %v", err)
 		}
@@ -152,13 +105,6 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 		}
 
 		apiServer := &agentapi.Server{
-			SpireServerAddr: getSocketPath(config),
-			ListenAddr:      opt.httpOptions.listenAddr,
-			CertPath:        opt.httpOptions.certPath,
-			KeyPath:         opt.httpOptions.keyPath,
-			MTlsCaPath:      opt.httpOptions.mtlsCaPath,
-			TlsEnabled:      opt.httpOptions.tls,
-			MTlsEnabled:     opt.httpOptions.mtls,
 			SpireServerInfo: serverInfo,
 			TornjakConfig:   tornjakConfigs,
 		}
@@ -201,20 +147,7 @@ func GetServerInfo(config *run.Config) (agentapi.TornjakSpireServerInfo, error) 
 	}, nil
 }
 
-func getSocketPath(config *run.Config) string {
-	socketPath := config.Server.SocketPath
-	if socketPath == "" {
-		// TODO: temporary fix for issue with socket path resolution
-		// using the defaultSocketPath in the SPIRE pkg, manually importing
-		// since it is not a public variable.
-		// https://github.com/spiffe/spire/blob/main/cmd/spire-server/cli/run/run.go#L44
-		socketPath = "/tmp/spire-server/private/api.sock"
-	}
-
-	return "unix://" + socketPath
-}
-
-func getTornjakConfig(path string) (string, error) {
+func getTornjakConfig(path string, expandEnv bool) (string, error) {
 	if path == "" {
 		return "", nil
 	}
@@ -235,11 +168,16 @@ func getTornjakConfig(path string) (string, error) {
 	}
 	data := string(byteData)
 
+	// expand environment variables if flag is set
+	if expandEnv {
+		data = os.ExpandEnv(data)
+	}
+
 	return data, nil
 }
 
 // below copied from spire/cmd/spire-server/cli/run/run.go, but with TornjakConfig
-func parseTornjakConfig(path string) (*agentapi.TornjakConfig, error) {
+func parseTornjakConfig(path string, expandEnv bool) (*agentapi.TornjakConfig, error) {
 	c := &agentapi.TornjakConfig{}
 
 	if path == "" {
@@ -247,7 +185,7 @@ func parseTornjakConfig(path string) (*agentapi.TornjakConfig, error) {
 	}
 
 	// friendly error if file is missing
-	data, err := getTornjakConfig(path)
+	data, err := getTornjakConfig(path, expandEnv)
 	if err != nil {
 		return nil, err
 	}

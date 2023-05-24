@@ -10,6 +10,7 @@ import Table from './list-table';
 import { AgentsList, AgentsWorkLoadAttestorInfo } from "components/types";
 import { DenormalizedRow } from "carbon-components-react";
 import { RootState } from "redux/reducers";
+import { displayResponseError } from "components/error-api";
 
 // AgentListTable takes in 
 // listTableData: agents data to be rendered on table
@@ -91,13 +92,16 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
     }
 
     deleteAgent(selectedRows: readonly DenormalizedRow[]) {
-        var id: { path: string; trust_domain: string; }[] = [], endpoint = "", prefix = "spiffe://";
+        var id: { path: string; trust_domain: string }[] = [], endpoint = "", prefix = "spiffe://";
         let promises = [];
+
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/agent/delete') + "/" + this.props.globalServerSelected;
+
         } else {
             endpoint = GetApiServerUri('/api/agent/delete');
         }
+
         if (selectedRows !== undefined && selectedRows.length !== 0) {
             for (let i = 0; i < selectedRows.length; i++) {
                 id[i] = { "path": "", "trust_domain": "" }
@@ -124,40 +128,33 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
                         el.id.path !== id[i].path));
                 }
             })
-            .catch((error) => {
-                console.log(error);
-            })
+            .catch((error) => displayResponseError("Could not delete agent.", error))
     }
 
     banAgent(selectedRows: readonly DenormalizedRow[]) {
-        var id: { path: string; trust_domain: string; }[] = [], i = 0, endpoint = "", prefix = "spiffe://";
+        var id: {path: string; trust_domain: string}[] = [], i = 0, endpoint = "", prefix = "spiffe://"
+
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/agent/ban') + "/" + this.props.globalServerSelected
+
         } else {
             endpoint = GetApiServerUri('/api/agent/ban')
         }
-        if (selectedRows !== undefined && selectedRows.length !== 0) {
-            for (i = 0; i < selectedRows.length; i++) {
-                id[i] = { "path": "", "trust_domain": "" }
-                id[i]["trust_domain"] = selectedRows[i].cells[1].value;
-                id[i]["path"] = selectedRows[i].cells[2].value.substr(selectedRows[i].cells[1].value.concat(prefix).length);
-                axios.post(endpoint, {
-                    "id": {
-                        "trust_domain": id[i].trust_domain,
-                        "path": id[i].path,
-                    }
+
+        if (selectedRows === undefined || !selectedRows) return ""
+
+        for (i = 0; i < selectedRows.length; i++) {
+            id[i] = {path: "", trust_domain: ""}
+            id[i].trust_domain = selectedRows[i].cells[1].value
+            id[i].path = selectedRows[i].cells[2].value.substr(selectedRows[i].cells[1].value.concat(prefix).length)
+
+            axios.post(endpoint, {id: {trust_domain: id[i].trust_domain, path: id[i].path}})
+                .then(res => {
+                    console.log(res.data)
+                    alert("Ban SUCCESS")
+                    this.componentDidMount()
                 })
-                    .then(res => {
-                        console.log(res.data)
-                        alert("Ban SUCCESS")
-                        this.componentDidMount()
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    })
-            }
-        } else {
-            return ""
+                .catch((error) => displayResponseError("Could not ban agent.", error))
         }
     }
     render() {
@@ -183,7 +180,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
                 header: 'Workload Attestor Plugin',
                 key: 'plugin',
             }
-        ];
+        ]
         return (
             <div>
                 <Table
@@ -195,7 +192,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
                     downloadEntity={undefined}
                 />
             </div>
-        );
+        )
     }
 }
 

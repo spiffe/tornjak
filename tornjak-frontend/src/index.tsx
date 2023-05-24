@@ -4,16 +4,11 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import KeycloakService from "./auth/KeycloakAuth";
+import {env} from './env';
 
-const renderApp = () =>
-  ReactDOM.render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>,
-    document.getElementById('root')
-  );
+const renderApp = () => ReactDOM.render(<App />, document.getElementById('root'));
 
-if(process.env.REACT_APP_AUTH_SERVER_URI) { // with Auth for testing purposes
+if (env.REACT_APP_AUTH_SERVER_URI) { // with Auth for testing purposes
   KeycloakService.initKeycloak(renderApp);
 } else {
   renderApp(); // without Auth

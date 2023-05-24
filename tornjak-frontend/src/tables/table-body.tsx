@@ -5,12 +5,16 @@ import { DataTable, DataTableCell, DataTableCustomSelectionData, DataTableCustom
 import WorkLoadAttestor from 'components/work-load-attestor-modal';
 import { ShapeOf } from "carbon-components-react/typings/shared";
 import TornjakHelper from 'components/tornjak-helper';
+import {env} from '../env';
+
 const {
     TableBody,
     TableRow,
     TableSelectRow,
     TableCell,
 } = DataTable;
+
+const Auth_Server_Uri = env.REACT_APP_AUTH_SERVER_URI;
 
 // Body take in 
 // entityType: type of entity 
@@ -55,7 +59,7 @@ class Body extends React.Component<BodyProp, BodyState> {
                                     cell.value)}
                             </TableCell>
                         ))}
-                        {this.props.entityType === "Agent" && this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles) &&
+                        {((this.props.entityType === "Agent" && this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles)) || (this.props.entityType === "Agent" && !Auth_Server_Uri)) &&
                             <TableCell>
                                 <div>
                                     <WorkLoadAttestor

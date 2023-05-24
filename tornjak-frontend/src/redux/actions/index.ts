@@ -35,18 +35,60 @@ import {
     ClickedDashboardTableAction,
     NewEntriesAction,
     GLOBAL_NEW_ENTRIES,
+    EntryExpiryAction,
+    GLOBAL_ENTRY_EXPIRY,
+    GLOBAL_SPIRE_HEALTH_CHECK,
+    SpireHealthCheckAction,
+    GLOBAL_SPIRE_HEALTH_CHECKING,
+    SpireHealthCheckingAction,
+    GLOBAL_SPIRE_HEALTH_CHECK_Time,
+    SpireHealthCheckTimeAction
 } from './types';
 
-import { 
-    AgentsList, 
-    AgentsWorkLoadAttestorInfo, 
-    ClustersList, 
-    EntriesList, 
-    SelectorInfoLabels, 
-    ServerInfo, 
-    TornjakServerInfo, 
-    WorkloadSelectorInfoLabels
+import {
+    AgentsList,
+    AgentsWorkLoadAttestorInfo,
+    ClustersList,
+    EntriesList,
+    SelectorInfoLabels,
+    ServerInfo,
+    TornjakServerInfo,
+    WorkloadSelectorInfoLabels,
+    SpireHealtCheckFreq
 } from 'components/types';
+
+// Expected input - spire server health check refresh rate
+// spireHealthCheckRefreshTimeFunc returns the resfresh rate of spire health check
+export function spireHealthCheckRefreshTimeFunc(globalSpireHealthTime: SpireHealtCheckFreq): ThunkAction<void, RootState, undefined, SpireHealthCheckTimeAction> {
+    return dispatch => {
+        dispatch({
+            type: GLOBAL_SPIRE_HEALTH_CHECK_Time,
+            payload: globalSpireHealthTime
+        });
+    }
+}
+
+// Expected input - spire server health check loading
+// spireHealthCheckingFunc returns the loading state
+export function spireHealthCheckingFunc(globalSpireHealthChecking: boolean): ThunkAction<void, RootState, undefined, SpireHealthCheckingAction> {
+    return dispatch => {
+        dispatch({
+            type: GLOBAL_SPIRE_HEALTH_CHECKING,
+            payload: globalSpireHealthChecking
+        });
+    }
+}
+
+// Expected input - spire server health check
+// spireHealthCheckFunc returns the status of spire health
+export function spireHealthCheckFunc(globalSpireHealthCheck: boolean): ThunkAction<void, RootState, undefined, SpireHealthCheckAction> {
+    return dispatch => {
+        dispatch({
+            type: GLOBAL_SPIRE_HEALTH_CHECK,
+            payload: globalSpireHealthCheck
+        });
+    }
+}
 
 // Expected input - whether user authenticated or not
 // isAuthenticatedUpdateFunc returns true if current user is authenticated
@@ -235,6 +277,17 @@ export function newEntriesUpdateFunc(globalNewEntries: EntriesList[]): ThunkActi
         dispatch({
             type: GLOBAL_NEW_ENTRIES,
             payload: globalNewEntries
+        });
+    }
+}
+
+// Expected input - entry expiry time
+// entryExpiryUpdateFunc returns the entry expiry time if set
+export function entryExpiryUpdateFunc(globalEntryExpiryTime: number): ThunkAction<void, RootState, undefined, EntryExpiryAction> {
+    return dispatch => {
+        dispatch({
+            type: GLOBAL_ENTRY_EXPIRY,
+            payload: globalEntryExpiryTime
         });
     }
 }

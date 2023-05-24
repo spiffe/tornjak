@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: spire-server
+  namespace: spire
+spec:
+  type: NodePort
+  ports:
+    - name: grpc
+      port: 8081
+      targetPort: 8081
+      protocol: TCP
+  selector:
+    app: spire-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tornjak-backend-http
+  namespace: spire
+spec:
+  type: NodePort
+  ports:
+    - name: tornjak-backend-http
+      port: 10000
+      targetPort: 10000
+      protocol: TCP
+  selector:
+    app: spire-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tornjak-backend-tls
+  namespace: spire
+spec:
+  type: NodePort
+  ports:
+    - name: tornjak-backend-tls
+      port: 20000
+      targetPort: 20000
+      protocol: TCP
+  selector:
+    app: spire-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tornjak-backend-mtls
+  namespace: spire
+spec:
+  type: NodePort
+  ports:
+    - name: tornjak-backend-mtls
+      port: 30000
+      targetPort: 30000
+      protocol: TCP
+  selector:
+    app: spire-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: spire
+  name: tornjak-frontend
+spec:
+  type: LoadBalancer
+  selector:
+    app: spire-server
+  ports:
+    - name: tornjak-frontend
+      port: 3000
+      targetPort: 3000

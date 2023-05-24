@@ -47,9 +47,10 @@ const styles = theme => ({
         ...theme.mixins.toolbar,
     },
     appBar: { //appbar
-        backgroundColor: 'grey',
-        marginTop: 52,
+        backgroundColor: 'lightgrey',
+        marginTop: 48,
         zIndex: 2,
+        height: 80,
         transition: theme.transitions.create(['width', 'margin'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
@@ -71,10 +72,13 @@ const styles = theme => ({
     },
     title: {
         flexGrow: 1,
+        color: 'black',
+        marginTop: 20
     },
     drawerPaper: { //dashboard side drawer on open
         position: 'relative',
         whiteSpace: 'nowrap',
+        marginLeft: -20,
         zIndex: 1,
         width: drawerWidth,
         height: drawerHeight,
@@ -113,6 +117,12 @@ const styles = theme => ({
     fixedHeight: {
         height: 370, //height of piechart container
     },
+    menuIcon: {
+        color: "black", //height of piechart container
+    },
+    drawerdivider: {
+        marginTop: 16,
+    }
 });
 
 class DashboardDrawer extends React.Component {
@@ -149,7 +159,9 @@ class DashboardDrawer extends React.Component {
                             onClick={this.handleDrawerOpen}
                             className={clsx(classes.menuButton, this.state.open && classes.menuButtonHidden)}
                         >
-                            <MenuIcon />
+                            <MenuIcon
+                                className={classes.menuIcon}
+                                color="inherit" />
                         </IconButton>
                         <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
                             Tornjak Dashboard
@@ -168,7 +180,8 @@ class DashboardDrawer extends React.Component {
                             <ChevronLeftIcon />
                         </IconButton>
                     </div>
-                    <Divider />
+                    <Divider 
+                        className={classes.drawerdivider}/>
                     <List>
                         <div>
                             <ListItem

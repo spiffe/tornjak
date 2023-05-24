@@ -18,6 +18,12 @@ import TornjakDashBoard from "./components/dashboard/tornjak-dashboard";
 import DashboardDetailsRender from 'components/dashboard/dashboard-details-render';
 import RenderOnAdminRole from 'components/RenderOnAdminRole'
 import './App.css';
+import 'react-toastify/dist/ReactToastify.css';
+import SpireHealthCheck from 'components/spire-health-check';
+import {env} from './env';
+
+// to enable SPIRE health check component
+const spireHealthCheck = (env.REACT_APP_SPIRE_HEALTH_CHECK_ENABLE === 'true') ?? false; // defualt value false
 
 function App() {
     return (
@@ -28,6 +34,11 @@ function App() {
                         <div className="nav-comp">
                             <NavigationBar />
                         </div>
+                        {spireHealthCheck &&
+                            <div>
+                                <SpireHealthCheck />
+                            </div>
+                        }
                         <div className="rest-body">
                             <SelectServer />
                             <br />
@@ -57,7 +68,7 @@ function App() {
                 </Router>
             </Provider>
         </div>
-    );
+    )
 }
 
-export default App;
+export default App

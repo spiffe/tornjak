@@ -16,11 +16,7 @@ import {
   clustersListUpdateFunc,
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
-import {
-  ClustersList,
-  ServerInfo,
-  TornjakServerInfo,
-} from './types'
+import { ClustersList, ServerInfo, TornjakServerInfo } from './types'
 
 type ClusterListProp = {
   // dispatches a payload for list of clusters with their metadata info as an array of ClustersList Type and has a return type of void
