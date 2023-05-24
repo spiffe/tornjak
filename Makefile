@@ -1,13 +1,13 @@
-.PHONY: ui vendor build container-tornjak-backend-spire container-manager container-manager-push push container-frontend container-frontend-push container-tornjak-backend container-tornjak-backend-push
+.PHONY: ui vendor build container-manager container-manager-push push container-frontend container-frontend-push container-tornjak-backend container-tornjak-backend-push
 
 VERSION=$(shell cat version.txt)
 GITHUB_SHA="$(shell git rev-parse HEAD 2>/dev/null)"
 
 ## when containers are built, they are tagged with these
-CONTAINER_TORNJAK_TAG ?= tsidentity/tornjak:$(VERSION)
-CONTAINER_BACKEND_TAG ?= tsidentity/tornjak-backend:$(VERSION)
-CONTAINER_FRONTEND_TAG ?= tsidentity/tornjak-frontend:$(VERSION)
-CONTAINER_MANAGER_TAG ?= tsidentity/tornjak-manager:$(VERSION)
+CONTAINER_TORNJAK_LOCAL_TAG ?= tsidentity/tornjak:$(VERSION)
+CONTAINER_BACKEND_LOCAL_TAG ?= tsidentity/tornjak-backend:$(VERSION)
+CONTAINER_FRONTEND_LOCAL_TAG ?= tsidentity/tornjak-frontend:$(VERSION)
+CONTAINER_MANAGER_LOCAL_TAG ?= tsidentity/tornjak-manager:$(VERSION)
 
 ## `make release-*` pushes to above tag as well as below corresponding tag
 CONTAINER_TORNJAK_RELEASE_TAG ?= ghcr.io/spiffe/tornjak
@@ -54,47 +54,40 @@ vendor:
 ## Build Backend container
 container-tornjak-backend: bin/tornjak-backend
 	docker build --no-cache -f Dockerfile.backend-container --build-arg version=$(VERSION) \
-	--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_BACKEND_TAG} .
+	--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_BACKEND_LOCAL_TAG} .
 
 ## Build and push Backend to image repository
 container-tornjak-backend-push: container-tornjak-backend
-	docker push ${CONTAINER_BACKEND_TAG}
-
-container-tornjak-backend-spire: bin/tornjak-backend
-	docker build --no-cache -f Dockerfile.add-backend --build-arg version=$(VERSION) \
-	--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_BACKEND_WITH_SPIRE_TAG} .
-
-container-tornjak-backend-spire-push: container-tornjak-backend-spire
-	docker push ${CONTAINER_BACKEND_WITH_SPIRE_TAG}
+	docker push ${CONTAINER_BACKEND_LOCAL_TAG}
 
 container-manager: bin/tornjak-manager #ui-manager
 	docker build --no-cache -f Dockerfile.tornjak-manager --build-arg version=$(VERSION) \
-	--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_MANAGER_TAG} .
+	--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_MANAGER_LOCAL_TAG} .
 
 container-manager-push: container-manager
-	 docker push ${CONTAINER_MANAGER_TAG}
+	 docker push ${CONTAINER_MANAGER_LOCAL_TAG}
 
 ## Build Frontend container
 container-frontend: #ui-agent 
 	docker build --no-cache -f Dockerfile.frontend-container --build-arg version=$(VERSION) \
-	--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_FRONTEND_TAG} .
+	--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_FRONTEND_LOCAL_TAG} .
 
 ## Build and push Frontend to image repository
 compose-frontend: 
 	docker-compose -f docker-compose-frontend.yml up --build --force-recreate -d
-	docker tag tornjak-public_tornjak-frontend:latest ${CONTAINER_FRONTEND_TAG}
+	docker tag tornjak-public_tornjak-frontend:latest ${CONTAINER_FRONTEND_LOCAL_TAG}
 
 container-frontend-push: container-frontend
-	docker push ${CONTAINER_FRONTEND_TAG}
+	docker push ${CONTAINER_FRONTEND_LOCAL_TAG}
 
 ## Build tornjak container (Backend + Frontend)
 container-tornjak: bin/tornjak-backend #ui-agent
 	docker build --no-cache -f Dockerfile.tornjak-container --build-arg version=$(VERSION) \
-	--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_TAG} .
+	--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_TORNJAK_LOCAL_TAG} .
 
 ## Build and push tornjak (Backend + Frontend) to image repository
 container-tornjak-push: container-tornjak
-	docker push ${CONTAINER_TORNJAK_TAG}
+	docker push ${CONTAINER_TORNJAK_LOCAL_TAG}
 
 
 ## BEGIN RELEASES FOR GITHUB CONTAINER REGISTRY ##
@@ -102,26 +95,26 @@ container-tornjak-push: container-tornjak
 
 ## backend image
 release-tornjak-backend: container-tornjak-backend
-	docker tag ${CONTAINER_BACKEND_TAG} ${CONTAINER_BACKEND_RELEASE_TAG}:$(VERSION)
-	docker push ${CONTAINER_BACKEND_TAG}
+	docker tag ${CONTAINER_BACKEND_LOCAL_TAG} ${CONTAINER_BACKEND_RELEASE_TAG}:$(VERSION)
+	docker push ${CONTAINER_BACKEND_LOCAL_TAG}
 	docker push ${CONTAINER_BACKEND_RELEASE_TAG}:${VERSION}
 
 ## frontend image
 release-tornjak-frontend: container-frontend
-	docker tag ${CONTAINER_FRONTEND_TAG} ${CONTAINER_FRONTEND_RELEASE_TAG}:$(VERSION)
-	docker push ${CONTAINER_FRONTEND_TAG}
+	docker tag ${CONTAINER_FRONTEND_LOCAL_TAG} ${CONTAINER_FRONTEND_RELEASE_TAG}:$(VERSION)
+	docker push ${CONTAINER_FRONTEND_LOCAL_TAG}
 	docker push ${CONTAINER_FRONTEND_RELEASE_TAG}:$(VERSION)
 
 # backend + frontend image
 release-tornjak: container-tornjak
-	docker tag ${CONTAINER_TORNJAK_TAG} ${CONTAINER_TORNJAK_RELEASE_TAG}:$(VERSION)
-	docker push ${CONTAINER_TORNJAK_TAG}
+	docker tag ${CONTAINER_TORNJAK_LOCAL_TAG} ${CONTAINER_TORNJAK_RELEASE_TAG}:$(VERSION)
+	docker push ${CONTAINER_TORNJAK_LOCAL_TAG}
 	docker push ${CONTAINER_TORNJAK_RELEASE_TAG}:$(VERSION)
 
 # manager backend
 release-tornjak-manager: container-manager
-	docker tag ${CONTAINER_MANAGER_TAG} ${CONTAINER_MANAGER_RELEASE_TAG}:$(VERSION)
-	docker push ${CONTAINER_MANAGER_TAG}
+	docker tag ${CONTAINER_MANAGER_LOCAL_TAG} ${CONTAINER_MANAGER_RELEASE_TAG}:$(VERSION)
+	docker push ${CONTAINER_MANAGER_LOCAL_TAG}
 	docker push ${CONTAINER_MANAGER_RELEASE_TAG}:$(VERSION)
 
 ## END RELEASES FOR GITHUB CONTAINER REGISTRY ##
@@ -133,7 +126,7 @@ clean:
 	rm -rf ui-manager/
 
 push:
-	docker push ${CONTAINER_MANAGER_TAG}
-	docker push ${CONTAINER_BACKEND_TAG}
-	docker push ${CONTAINER_FRONTEND_TAG}
-	docker push ${CONTAINER_TORNJAK_TAG}
+	docker push ${CONTAINER_MANAGER_LOCAL_TAG}
+	docker push ${CONTAINER_BACKEND_LOCAL_TAG}
+	docker push ${CONTAINER_FRONTEND_LOCAL_TAG}
+	docker push ${CONTAINER_TORNJAK_LOCAL_TAG}
