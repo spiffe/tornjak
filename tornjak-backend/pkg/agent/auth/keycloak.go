@@ -23,7 +23,12 @@ type KeycloakVerifier struct {
 func getAuthLogic() (map[string][]string, map[string][]string) {
 	// api call matches to list of strings, representing disjunction of requirements
 	api_permissions := map[string][]string {
+		// no auth token needed
+		"/": []string{},
+
 		// viewer
+		"/api/healthcheck": []string{"admin", "viewer"},
+		"/api/debugserver": []string{"admin", "viewer"},
 		"/api/agent/list": []string{"admin", "viewer"},
 		"/api/entry/list": []string{"admin", "viewer"},
 		"/api/tornjak/serverinfo": []string{"admin", "viewer"},
@@ -139,7 +144,18 @@ func (v *KeycloakVerifier) isGoodRequest(r *http.Request, claims *KeycloakClaim)
 	return v.requestPermissible(r, permissions)
 }
 
+func (v *KeycloakVerifier) needsAuthToken(r *http.Request) bool {
+	requires := v.api_permissions[r.URL.Path]
+	return len(requires) > 0
+}
+
 func (v *KeycloakVerifier) Verify(r *http.Request) error {
+	// first check if is request does not need auth in our default policy
+	needs_auth := v.needsAuthToken(r)
+	if !needs_auth {
+		return nil
+	}
+
 	token, err := get_token(r, v.redirect)
 	if err != nil {
 		return err

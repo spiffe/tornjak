@@ -1,7 +1,7 @@
 .PHONY: ui vendor build container-manager container-manager-push push container-frontend container-frontend-push container-backend container-backend-push
 
 VERSION=$(shell cat version.txt)
-GITHUB_SHA="$(shell git rev-parse HEAD 2>/dev/null)"
+GITHUB_SHA ?= "$(shell git rev-parse HEAD 2>/dev/null)"
 
 ## This makefile uses 2 image repositories: 
 ## - DEV - tsidentity/tornjak-xx - for testing the images by Tornjak Development Team
