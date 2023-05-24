@@ -71,7 +71,8 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       .catch((error) => {
         spireHealthCheckingFunc(true);
         spireHealthCheckFunc(false);
-        logError(error)
+        //logError(error)
+        showResponseToast(error, {caption: "Could not register SPIRE healthcheck."})
       })
   }
 
