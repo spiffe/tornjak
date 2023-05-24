@@ -54,7 +54,6 @@ vendor:
 ## container-* creates an image for the component
 ## container-*-push creates an image for the component and pushes to DEV tags
 
-# Containerized components
 container-backend: bin/tornjak-backend
 	docker build --no-cache -f Dockerfile.backend-container --build-arg version=$(VERSION) \
 	--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_BACKEND_LOCAL_TAG} .

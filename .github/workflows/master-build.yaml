@@ -31,8 +31,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      # Create sha tagged image for container-agent
-      
+     
+      # set DEV tags to have GITHUB_SHA  
       - name: Set github commit id
         run: echo "GITHUB_SHA=$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set backend image name
@@ -44,7 +44,7 @@ jobs:
       - name: Set manager image name
         run: echo "CONTAINER_MANAGER_LOCAL_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-manager:$GITHUB_SHA" >> $GITHUB_ENV
 
-      # create images
+      # build and push images tagged with GITHUB_SHA, version, and latest
       - name: Build and push tornjak backend image
         run: make release-tornjak-backend
       - name: Build and push tornjak frontend image
