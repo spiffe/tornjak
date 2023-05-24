@@ -37,6 +37,7 @@ exports[`Cluster Create Component Should Render 1`] = `
             onChange={[Function]}
             placeholder="Enter CLUSTER NAME"
             required={true}
+            role="cluster-name"
           />
         </div>
         <div
@@ -56,6 +57,7 @@ exports[`Cluster Create Component Should Render 1`] = `
             label="Select Cluster Type"
             light={false}
             onChange={[Function]}
+            role="cluster-type"
             titleText="Cluster Type [*required]"
             type="default"
           />
@@ -165,5 +167,24 @@ exports[`Cluster Create Component Should Render 1`] = `
       </div>
     </form>
   </div>
+  <ToastContainer
+    autoClose={5000}
+    className="carbon-toast"
+    closeButton={[Function]}
+    closeOnClick={true}
+    containerId="notifications"
+    draggable={false}
+    draggableDirection="x"
+    draggablePercent={80}
+    hideProgressBar={false}
+    newestOnTop={false}
+    pauseOnFocusLoss={true}
+    pauseOnHover={true}
+    position="top-right"
+    role="alert"
+    rtl={false}
+    theme="light"
+    transition={[Function]}
+  />
 </div>
 `;
