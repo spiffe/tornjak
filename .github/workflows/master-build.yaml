@@ -36,13 +36,13 @@ jobs:
       - name: Set github commit id
         run: echo "GITHUB_SHA=$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set backend image name
-        run: echo "CONTAINER_BACKEND_LOCAL_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-backend:$GITHUB_SHA" >> $GITHUB_ENV
+        run: echo "CONTAINER_BACKEND_DEV_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-backend:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set frontend image name
-        run: echo "CONTAINER_FRONTEND_LOCAL_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-frontend:$GITHUB_SHA" >> $GITHUB_ENV
+        run: echo "CONTAINER_FRONTEND_DEV_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-frontend:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set Tornjak image name
-        run: echo "CONTAINER_TORNJAK_LOCAL_TAG=ghcr.io/${{ github.repository_owner }}/tornjak:$GITHUB_SHA" >> $GITHUB_ENV
+        run: echo "CONTAINER_TORNJAK_DEV_TAG=ghcr.io/${{ github.repository_owner }}/tornjak:$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set manager image name
-        run: echo "CONTAINER_MANAGER_LOCAL_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-manager:$GITHUB_SHA" >> $GITHUB_ENV
+        run: echo "CONTAINER_MANAGER_DEV_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-manager:$GITHUB_SHA" >> $GITHUB_ENV
 
       # build and push images tagged with GITHUB_SHA, version, and latest
       - name: Build and push tornjak backend image
