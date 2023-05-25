@@ -1,4 +1,4 @@
-.PHONY: ui vendor build container-manager container-manager-push push container-frontend container-frontend-push container-backend container-backend-push
+.PHONY: ui vendor build container-manager container-manager-dev-push push container-frontend container-frontend-dev-push container-backend container-backend-dev-push
 
 VERSION=$(shell cat version.txt)
 GITHUB_SHA ?= "$(shell git rev-parse HEAD 2>/dev/null)"
@@ -52,7 +52,6 @@ vendor:
 
 #### BEGIN LOCAL (DEV) CONTAINER IMAGE BUILD ####
 ## container-* creates an image for the component
-## container-*-push creates an image for the component and pushes to DEV tags
 
 container-backend: bin/tornjak-backend
 	docker build --no-cache -f Dockerfile.backend-container --build-arg version=$(VERSION) \
@@ -77,6 +76,7 @@ container-tornjak: bin/tornjak-backend
 #### END LOCAL CONTAINER IMAGE BUILD ####
 
 #### BEGIN PUSH DEV CONTAINER IMAGE ####
+## container-*-push creates an image for the component and pushes to DEV tags
 
 container-backend-dev-push: container-backend
 	docker push ${CONTAINER_BACKEND_DEV_TAG}
