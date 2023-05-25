@@ -8,7 +8,6 @@
     "@carbon/charts-react": "^0.41.80",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
-    "@material-ui/core": "^4.12.2",
     "@material-ui/data-grid": "^4.0.0-alpha.33",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.2",
