@@ -11,7 +11,7 @@
     "@material-ui/core": "^4.12.2",
     "@material-ui/data-grid": "^4.0.0-alpha.33",
     "@material-ui/icons": "^4.11.2",
-    "@mui/material": "^5.12.3",
+    "@mui/material": "^5.13.2",
     "@react-keycloak/web": "^3.4.0",
     "@redux-devtools/extension": "^3.2.5",
     "@types/carbon__icons-react": "^10.31.2",
@@ -114,7 +114,7 @@
       "!src/index.js"
     ],
     "coverageReporters": [
-      "text", 
+      "text",
       "html"
     ]
   },
