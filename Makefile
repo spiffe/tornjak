@@ -82,15 +82,23 @@ container-tornjak: bin/tornjak-backend
 
 container-backend-dev-push: container-backend
 	docker push ${CONTAINER_BACKEND_DEV_TAG}:$(VERSION)
+	docker tag ${CONTAINER_BACKEND_DEV_TAG}:$(VERSION) ${CONTAINER_BACKEND_DEV_TAG}:$(GITHUB_SHA)
+	docker push ${CONTAINER_BACKEND_DEV_TAG}:$(GITHUB_SHA)
 
 container-manager-dev-push: container-manager
 	docker push ${CONTAINER_MANAGER_DEV_TAG}:$(VERSION)
+	docker tag ${CONTAINER_MANAGER_DEV_TAG}:$(VERSION) ${CONTAINER_MANAGER_DEV_TAG}:$(GITHUB_SHA)
+	docker push ${CONTAINER_MANAGER_DEV_TAG}:$(GITHUB_SHA)
 
 container-frontend-dev-push: container-frontend
 	docker push ${CONTAINER_FRONTEND_DEV_TAG}:$(VERSION)
+	docker tag ${CONTAINER_FRONTEND_DEV_TAG}:$(VERSION) ${CONTAINER_FRONTEND_DEV_TAG}:$(GITHUB_SHA)
+	docker push ${CONTAINER_FRONTEND_DEV_TAG}:$(GITHUB_SHA)
 
 container-tornjak-dev-push: container-tornjak
 	docker push ${CONTAINER_TORNJAK_DEV_TAG}:$(VERSION)
+	docker tag ${CONTAINER_TORNJAK_DEV_TAG}:$(VERSION) ${CONTAINER_TORNJAK_DEV_TAG}:$(GITHUB_SHA)
+	docker push ${CONTAINER_TORNJAK_DEV_TAG}:$(GITHUB_SHA)
 
 dev-push: container-backend-dev-push container-manager-dev-push container-frontend-dev-push container-tornjak-dev-push
 #### END PUSH DEV CONTAINER IMAGE ####
