@@ -78,7 +78,6 @@ const styles = theme => ({
     drawerPaper: { //dashboard side drawer on open
         position: 'relative',
         whiteSpace: 'nowrap',
-        marginLeft: -20,
         zIndex: 1,
         width: drawerWidth,
         height: drawerHeight,
