@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from 'react-redux';
-import { DataGrid, GridToolbar } from "@material-ui/data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Title from '../title';
 import { Button } from '@mui/material';
 import { clickedDashboardTableFunc } from 'redux/actions';
