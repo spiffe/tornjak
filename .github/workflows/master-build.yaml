@@ -32,7 +32,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
      
-      # set DEV tags to have GITHUB_SHA  
+      # set repo and GITHUB SHA 
       - name: Set github commit id
         run: echo "GITHUB_SHA=$GITHUB_SHA" >> $GITHUB_ENV
       - name: Set release repo
