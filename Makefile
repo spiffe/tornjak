@@ -21,6 +21,7 @@ all: bin/tornjak-backend bin/tornjak-manager container-manager container-fronten
 
 #### BEGIN LOCAL EXECUTABLE BUILDS ####
 
+# build binaries for Tornjak backend (bin/tornjak-backend)
 bin/tornjak-backend: $(GO_FILES) vendor
 	# Build hack because of flake of imported go module
 	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:1.16 /bin/sh -c "go build --tags 'sqlite_json' tornjak-backend/cmd/agent/agent.go; go build --tags 'sqlite_json' -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o bin/tornjak-backend tornjak-backend/cmd/agent/agent.go"
