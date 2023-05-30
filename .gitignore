@@ -38,9 +38,8 @@ tornjak-manager
 # build artifacts
 bin/
 ui/
-ui-agent/
 node_modules/
-ui-manager/
+frontend-local-build/
 .idea/
 Makefile
 
