@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from 'tss-react/mui';
 import TableDashboard from './table/dashboard-table';
 import SpiffeHelper from '../spiffe-helper';
 import TornjakHelper from 'components/tornjak-helper';
@@ -66,6 +66,5 @@ const mapStateToProps = (state) => ({
   globalEntries: state.entries,
 })
 
-export default withStyles(styles)(
-  connect(mapStateToProps, {})(ClusterDashboardTable)
-)
+const ClusterDashboardTableStyled = withStyles(ClusterDashboardTable, styles); 
+export default connect(mapStateToProps, {})(ClusterDashboardTableStyled);

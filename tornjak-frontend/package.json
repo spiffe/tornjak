@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@babel/runtime": "^7.15.4",
+    "@babel/runtime": "^7.22.0",
     "@carbon/charts": "^0.41.80",
     "@carbon/charts-react": "^0.41.80",
     "@emotion/react": "^11.11.0",

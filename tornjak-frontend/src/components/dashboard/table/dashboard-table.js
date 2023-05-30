@@ -2,12 +2,8 @@ import React from "react";
 import { connect } from 'react-redux';
 import { DataGrid, GridToolbar } from "@material-ui/data-grid";
 import Title from '../title';
-import {
-  Button,
-} from '@material-ui/core';
-import {
-  clickedDashboardTableFunc,
-} from 'redux/actions';
+import { Button } from '@mui/material';
+import { clickedDashboardTableFunc } from 'redux/actions';
 import TornjakHelper from 'components/tornjak-helper';
 
 class TableDashboard extends React.Component {

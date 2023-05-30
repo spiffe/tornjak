@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from 'tss-react/mui';
 import renderCellExpand from './render-cell-expand';
 import TableDashboard from './table/dashboard-table';
 import SpiffeHelper from '../spiffe-helper';
@@ -75,6 +75,6 @@ const mapStateToProps = (state) => ({
   globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 })
 
-export default withStyles(styles)(
-  connect(mapStateToProps, {})(AgentDashboardTable)
-)
+
+const AgentDashboardTableStyled = withStyles(AgentDashboardTable, styles);
+export default connect(mapStateToProps, {})(AgentDashboardTableStyled);

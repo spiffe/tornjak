@@ -1,20 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import clsx from 'clsx';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from 'tss-react/mui';
 // Components
 import {
   Container,
   Grid,
-  Paper,
-} from '@material-ui/core';
+  Paper
+} from '@mui/material';
 // Pie Charts
 import AgentsPieChart from './agents-pie-chart';
 import ClustersPieChart from './clusters-pie-chart';
 // Tables
-import ClustersTable from './clusters-dashboard-table';
-import AgentsTable from './agents-dashboard-table';
-import EntriesTable from './entries-dashboard-table';
+import ClusterDashboardTableStyled from './clusters-dashboard-table';
+import AgentDashboardTableStyled from './agents-dashboard-table';
+import EntriesDashBoardTableStyled from './entries-dashboard-table';
 import IsManager from '../is_manager';
 import TornjakApi from '../tornjak-api-helpers';
 import {
@@ -30,9 +30,9 @@ import {
   clickedDashboardTableFunc,
 } from 'redux/actions';
 import SpiffeHelper from '../spiffe-helper';
-import DashboardDrawer from './dashboard-drawer';
+import DashboardDrawerStyled from './dashboard-drawer';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     marginTop: -25,
     marginLeft: -20,
@@ -59,13 +59,11 @@ const styles = theme => ({
   },
 });
 
-
 class TornjakDashboard extends React.Component {
   constructor(props) {
     super(props);
-    const { classes } = this.props;
-    this.state = {
-    };
+    const classes = withStyles.getClasses(this.props);
+    this.state = {};
     this.fixedHeightPaper = clsx(classes.paper, classes.fixedHeight)
     this.TornjakApi = new TornjakApi();
     this.SpiffeHelper = new SpiffeHelper();
@@ -120,10 +118,10 @@ class TornjakDashboard extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const classes = withStyles.getClasses(this.props);
     return (
       <div className={classes.root}>
-        <DashboardDrawer />
+        <DashboardDrawerStyled />
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           {(this.props.globalClickedDashboardTable === "" || this.props.globalClickedDashboardTable === "dashboard") &&
@@ -144,21 +142,21 @@ class TornjakDashboard extends React.Component {
                 {/* Clusters Table */}
                 <Grid item xs={12}>
                   <Paper className={classes.paper}>
-                    <ClustersTable
+                    <ClusterDashboardTableStyled
                       numRows={5} />
                   </Paper>
                 </Grid>
                 {/* Agents Table */}
                 <Grid item xs={12}>
                   <Paper className={classes.paper}>
-                    <AgentsTable
+                    <AgentDashboardTableStyled
                       numRows={5} />
                   </Paper>
                 </Grid>
                 {/* Entries Table */}
                 <Grid item xs={12}>
                   <Paper className={classes.paper}>
-                    <EntriesTable
+                    <EntriesDashBoardTableStyled
                       numRows={5} />
                   </Paper>
                 </Grid>
@@ -170,7 +168,7 @@ class TornjakDashboard extends React.Component {
               {/* Clusters Table */}
               <Grid item xs={12}>
                 <Paper className={classes.paper}>
-                  <ClustersTable
+                  <ClusterDashboardTableStyled
                     numRows={100} />
                 </Paper>
               </Grid>
@@ -181,7 +179,7 @@ class TornjakDashboard extends React.Component {
               {/* Agents Table */}
               <Grid item xs={12}>
                 <Paper className={classes.paper}>
-                  <AgentsTable
+                  <AgentDashboardTableStyled
                     numRows={100} />
                 </Paper>
               </Grid>
@@ -192,7 +190,7 @@ class TornjakDashboard extends React.Component {
               {/* Entries Table */}
               <Grid item xs={12}>
                 <Paper className={classes.paper}>
-                  <EntriesTable
+                  <EntriesDashBoardTableStyled
                     numRows={100} />
                 </Paper>
               </Grid>
@@ -214,7 +212,19 @@ const mapStateToProps = (state) => ({
   globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 })
 
-export default withStyles(styles)(connect(
+const TornjakDashboardStyled = withStyles(TornjakDashboard, styles);
+
+export default connect(
   mapStateToProps,
-  { entriesListUpdateFunc, agentsListUpdateFunc, agentworkloadSelectorInfoFunc, clustersListUpdateFunc, tornjakMessageFunc, serverInfoUpdateFunc, serverSelectedFunc, tornjakServerInfoUpdateFunc, selectorInfoFunc, clickedDashboardTableFunc }
-)(TornjakDashboard))
+  { entriesListUpdateFunc, 
+    agentsListUpdateFunc, 
+    agentworkloadSelectorInfoFunc, 
+    clustersListUpdateFunc, 
+    tornjakMessageFunc, 
+    serverInfoUpdateFunc, 
+    serverSelectedFunc, 
+    tornjakServerInfoUpdateFunc, 
+    selectorInfoFunc, 
+    clickedDashboardTableFunc }
+)(TornjakDashboardStyled);
+
