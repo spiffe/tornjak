@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  keycloak:
+    build:
+      context: ./
+      dockerfile: Dockerfile.add-keycloak
+    container_name: tornjak-keycloak
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    volumes:
+      - ./examples/realm:/opt/keycloak/data/import
