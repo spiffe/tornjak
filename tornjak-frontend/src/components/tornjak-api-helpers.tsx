@@ -213,7 +213,6 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   ) => {
     axios.get(GetApiServerUri('/api/tornjak/serverinfo'), { crossdomain: true })
       .then(response => {
-        console.log("Tornjak Server Info: ", response.data)
         tornjakServerInfoUpdateFunc(response.data)
         tornjakMessageFunc(response.statusText)
       })

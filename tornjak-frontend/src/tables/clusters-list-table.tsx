@@ -82,7 +82,6 @@ class ClustersListTable extends React.Component<ClustersListTableProp, ClustersL
             listtabledata[i]["clusterDomainName"] = listData[i].props.cluster.domainName;
             listtabledata[i]["clusterAssignedAgents"] = <pre>{JSON.stringify(listData[i].props.cluster.agentsList, null, ' ')}</pre>
         }
-        console.log(listtabledata)
         this.setState({
             listTableData: listtabledata
         })

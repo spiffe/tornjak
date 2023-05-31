@@ -106,7 +106,6 @@ class EntriesListTable extends React.Component<EntriesListTableProp, EntriesList
                     return
                 }
                 for (let i = 0; i < responses.length; i++) {
-                    console.log("Status: ", responses[i].statusText)
                     this.props.entriesListUpdateFunc(this.props.globalEntriesList.filter(el => el.id !== responses[i].data.results[0].id))
                 }
             })

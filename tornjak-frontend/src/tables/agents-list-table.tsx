@@ -150,7 +150,6 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
 
             axios.post(endpoint, {id: {trust_domain: id[i].trust_domain, path: id[i].path}})
                 .then(res => {
-                    console.log(res.data)
                     alert("Ban SUCCESS")
                     this.componentDidMount()
                 })
