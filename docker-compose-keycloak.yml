@@ -12,4 +12,4 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
     volumes:
-      - ./examples/realm:/opt/keycloak/data/import
+      - ./examples/keycloak/realm:/opt/keycloak/data/import

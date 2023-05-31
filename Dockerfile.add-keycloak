@@ -1,6 +1,6 @@
 FROM quay.io/keycloak/keycloak:19.0.1
 # copy realm json file to container
-COPY examples/realm /opt/keycloak/data/import/
+COPY examples/keycloak/realm /opt/keycloak/data/import/
 # import realm from dir
 RUN /opt/keycloak/bin/kc.sh import --dir /opt/keycloak/data/import/ --override true; exit 0
 # start the image
