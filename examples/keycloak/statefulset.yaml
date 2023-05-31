@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: keycloak-for-tornjak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  serviceName: keycloak-service
+  template:
+    metadata:
+      labels:
+        app: keycloak
+
+    spec:
+      containers:
+        - name:  keycloak
+          image: quay.io/keycloak/keycloak:19.0.1
+          imagePullPolicy: Always
+          command:
+            - /bin/sh
+            - -c
+            - |
+              /opt/keycloak/bin/kc.sh import --dir /opt/keycloak/data/import/ --override true
+              /opt/keycloak/bin/kc.sh -v start-dev
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: KEYCLOAK_ADMIN
+              value: admin
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: admin
+          volumeMounts:
+            - name: keycloak-config
+              mountPath: /opt/keycloak/data/import
+      volumes:
+        - name: keycloak-config
+          configMap:
+            name: keycloak-config
