@@ -34,4 +34,4 @@ RUN npm install --omit=dev \
     
 # fix "access denied" error when running in restricted (read-only) env
 RUN ln -s /tmp/env.js build/env.js
-ENTRYPOINT npx react-inject-env set -n /tmp/env.js && serve -s build -p $PORT_FE
+ENTRYPOINT npx react-inject-env set -n env.js && serve -s build -p $PORT_FE
