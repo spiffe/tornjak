@@ -14,7 +14,7 @@ type CreateJoinTokenProp = {
 
 type CreateJoinTokenState = {
   name: string,
-  ttl: number | string,
+  ttl: string,
   token: string,
   spiffeId: string,
   trustDomain: string,
@@ -33,7 +33,7 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
     this.onSubmit = this.onSubmit.bind(this);
     this.state = {
       name: "",
-      ttl: 500,
+      ttl: "500",
       token: "",
       spiffeId: "",
       trustDomain: "",
@@ -70,7 +70,7 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
 
   onChangeTtl(e: { target: { value: string; }; }): void {
     this.setState({
-      ttl: e.target.value ? Number(e.target.value) : String(e.target.value)
+      ttl: e.target.value 
     });
   }
 
@@ -118,15 +118,15 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
     if (this.state.ttl === "") {
       showToast({caption: "The TTL cannot be empty."})
       return
-    }
-
-    if (this.state.ttl <= 0) {
+    } else if (isNaN(Number(this.state.ttl))) {
+      showToast({caption: "The TTL must be an integer."})
+    } else if (Number(this.state.ttl) <= 0) {
       showToast({caption: "The TTL must be positive."})
       return
     }
 
     const cjtData = {
-      ttl: this.state.ttl, 
+      ttl: Number(this.state.ttl), 
       trust_domain: "", 
       path: "", 
       token: this.state.token
