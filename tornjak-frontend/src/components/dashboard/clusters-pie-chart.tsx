@@ -2,10 +2,14 @@ import React from 'react';
 import Title from './title';
 import { connect } from 'react-redux';
 import PieChart1 from "charts/PieChart";
+import { RootState } from 'redux/reducers';
 
+type ClustersPieChartProps = {
+  globalClustersList: Array<{[key:string]:any}>;
+}
 
-class ClustersPieChart extends React.Component {
-  cluster(entry) {
+class ClustersPieChart extends React.Component<ClustersPieChartProps, {}> {
+  cluster(entry: {[key:string]:any}) {
     return {
       "group": entry.name,
       "value": entry.agentsList.length
@@ -40,7 +44,7 @@ class ClustersPieChart extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: RootState) => ({
   globalClustersList: state.clusters.globalClustersList,
 })
 

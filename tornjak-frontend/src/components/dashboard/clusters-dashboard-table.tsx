@@ -1,28 +1,45 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core/styles';
+import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core/styles';
 import TableDashboard from './table/dashboard-table';
 import SpiffeHelper from '../spiffe-helper';
 import TornjakHelper from 'components/tornjak-helper';
+import { GridColDef } from '@material-ui/data-grid';
+import { AgentsReducerState, EntriesReducerState } from 'redux/actions/types';
+import { RootState } from 'redux/reducers';
+import { ClustersList } from 'components/types';
 
-const columns = [
+const columns: GridColDef[] = [
   { field: "name", headerName: "Name", width: 200 },
   { field: "created", headerName: "Created", width: 300 },
   { field: "numNodes", headerName: "Number Of Nodes", width: 300 },
   { field: "numEntries", headerName: "Number of Entries", width: 200 }
 ];
 
-const styles = theme => ({
+const styles = (theme:Theme) => createStyles({
   seeMore: {
     marginTop: theme.spacing(3),
   },
 });
 
-class ClusterDashboardTable extends React.Component {
-  constructor(props) {
+interface ClusterDashboardTableProp extends WithStyles<typeof styles> {
+  filterByCluster?:string,
+  filterByAgentId?:string,
+  globalClickedDashboardTable: string,
+  numRows: number,
+  //From Redux
+  globalClustersList: ClustersList[],
+  globalAgents: AgentsReducerState,
+  globalEntries: EntriesReducerState
+}
+
+class ClusterDashboardTable extends React.Component<ClusterDashboardTableProp> {
+  TornjakHelper: TornjakHelper;
+  SpiffeHelper: SpiffeHelper;
+  constructor(props:ClusterDashboardTableProp) {
     super(props);
-    this.SpiffeHelper = new SpiffeHelper();
-    this.TornjakHelper = new TornjakHelper();
+    this.SpiffeHelper = new SpiffeHelper({});
+    this.TornjakHelper = new TornjakHelper({});
   }
 
   clusterList() {
@@ -60,7 +77,7 @@ class ClusterDashboardTable extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state:RootState) => ({
   globalClustersList: state.clusters.globalClustersList,
   globalAgents: state.agents,
   globalEntries: state.entries,

@@ -47,7 +47,7 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
   TornjakHelper: TornjakHelper;
   constructor(props: NavigationBarProp) {
     super(props);
-    this.TornjakHelper = new TornjakHelper(props);
+    this.TornjakHelper = new TornjakHelper({});
     this.state = {};
   }
 

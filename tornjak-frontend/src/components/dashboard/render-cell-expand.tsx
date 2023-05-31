@@ -3,18 +3,25 @@ import PropTypes from 'prop-types';
 import { Popper, Typography, Paper } from '@material-ui/core';
 import Box from '@mui/material/Box';
 
-const GridCellExpand = React.memo(function GridCellExpand(props) {
+type GridCellExpandProps = {
+    width: number,
+    value: string
+}
+const GridCellExpand = React.memo(function GridCellExpand(props: GridCellExpandProps) {
     const { width, value } = props;
-    const cellValue = React.useRef(null);
+    const cellValue = React.useRef<HTMLDivElement>(null);
     const cellDiv = React.useRef(null);
-    const wrapper = React.useRef(null);
+    const wrapper = React.useRef<HTMLDivElement>(null);
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [showFullCell, setShowFullCell] = React.useState(false);
     const [showPopper, setShowPopper] = React.useState(false);
 
     const handleMouseEnter = () => {
         // const isCurrentlyOverflown = isOverflown(cellValue.current);
-        const isCurrentlyOverflown = cellValue.current.scrollHeight > cellValue.current.clientHeight || cellValue.current.scrollWidth > cellValue.current.clientWidht;
+        if (!cellValue.current) {
+            return;
+        }
+        const isCurrentlyOverflown = cellValue.current.scrollHeight > cellValue.current.clientHeight || cellValue.current.scrollWidth > cellValue.current.clientWidth;
         setShowPopper(isCurrentlyOverflown);
         setAnchorEl(cellDiv.current);
         setShowFullCell(true);
@@ -29,7 +36,7 @@ const GridCellExpand = React.memo(function GridCellExpand(props) {
             return undefined;
         }
 
-        function handleKeyDown(nativeEvent) {
+        function handleKeyDown(nativeEvent: KeyboardEvent) {
             if (nativeEvent.key === 'Escape' || nativeEvent.key === 'Esc') {
                 setShowFullCell(false);
             }
@@ -80,7 +87,7 @@ const GridCellExpand = React.memo(function GridCellExpand(props) {
                 >
                     <Paper
                         elevation={1}
-                        style={{ minHeight: wrapper.current.offsetHeight - 3 }}
+                        style={{ minHeight: wrapper.current!.offsetHeight - 3 }}
                     >
                         <Typography variant="body2" style={{ padding: 8 }}>
                             {value}
@@ -92,12 +99,11 @@ const GridCellExpand = React.memo(function GridCellExpand(props) {
     );
 });
 
-GridCellExpand.propTypes = {
-    value: PropTypes.string.isRequired,
-    width: PropTypes.number.isRequired,
-};
-
-export default function renderCellExpand(params) {
+type renderCellExpandParams = {
+    colDef: any,
+    value: Date | number | Object | string | boolean
+}
+export default function renderCellExpand(params: renderCellExpandParams) {
     return (
         <GridCellExpand
             value={params.value ? params.value.toString() : ''}
