@@ -18,8 +18,9 @@ import {
   AccessToken
 } from './types';
 import HeaderToolBar from './navbar-header-toolbar';
+import {env} from '../env';
 
-const Auth_Server_Uri = process.env.REACT_APP_AUTH_SERVER_URI;
+const Auth_Server_Uri = env.REACT_APP_AUTH_SERVER_URI;
 
 type NavigationBarProp = {
   // dispatches a payload if user is authenticated or not return type of void
@@ -66,7 +67,7 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
   }
 
   render() {
-    const isAdmin = this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles), withAuth = process.env.REACT_APP_AUTH_SERVER_URI;
+    const isAdmin = this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles), withAuth = env.REACT_APP_AUTH_SERVER_URI;
     let managerNavs;
     managerNavs =
       <div className="dropdown">

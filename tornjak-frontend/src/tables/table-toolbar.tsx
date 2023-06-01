@@ -5,6 +5,8 @@ import { DataTable, DataTableCustomBatchActionsData, DataTableCustomBatchActions
 import { IoBan, IoDownloadOutline, IoTrashOutline } from "react-icons/io5";
 import { ReactDivAttr, ShapeOf } from "carbon-components-react/typings/shared";
 import TornjakHelper from 'components/tornjak-helper';
+import {env} from '../env';
+
 const {
     TableToolbar,
     TableToolbarSearch,
@@ -13,7 +15,7 @@ const {
     TableBatchAction,
 } = DataTable;
 
-const Auth_Server_Uri = process.env.REACT_APP_AUTH_SERVER_URI;
+const Auth_Server_Uri = env.REACT_APP_AUTH_SERVER_URI;
 
 // TableToolBar takes in 
 // onInputChange: onInputChange function for the search functionality from DataTable

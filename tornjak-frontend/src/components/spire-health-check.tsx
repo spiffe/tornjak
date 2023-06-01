@@ -3,7 +3,7 @@ import './style.css';
 import { RootState } from 'redux/reducers';
 import { connect } from 'react-redux';
 import InlineLoading from 'carbon-components-react/lib/components/InlineLoading';
-import { Dropdown } from 'carbon-components-react';
+import { Dropdown, Tooltip } from 'carbon-components-react';
 import TornjakApi from './tornjak-api-helpers';
 import {
   spireHealthCheckFunc,
@@ -14,14 +14,14 @@ import { SpireHealtCheckFreq } from './types';
 
 const spireHealthCheckTimeOptions =
   [
-    '10 Seconds',
-    '30 Seconds',
-    '1 Minute',
-    '2 Minutes',
-    '5 Minutes',
-    '10 Minutes',
-    '30 Minutes',
-    '1 Hour',
+    '10 Secs',
+    '30 Secs',
+    '1 Min',
+    '2 Mins',
+    '5 Mins',
+    '10 Mins',
+    '30 Mins',
+    '1 Hr',
     '1 Day',
   ];
 
@@ -86,12 +86,12 @@ class SpireHealthCheck extends Component<SpireHealthCheckProp, SpireHealthCheckS
     const numericValue = parseInt(parts[0], 10);
     let conversionFactor;
     switch (parts[1]) {
-      case 'Minute':
-      case 'Minutes':
+      case 'Min':
+      case 'Mins':
         conversionFactor = 60;
         break;
-      case 'Hours':
-      case 'Hour':
+      case 'Hrs':
+      case 'Hr':
         conversionFactor = 60 * 60;
         break;
       case 'Days':
@@ -126,7 +126,12 @@ class SpireHealthCheck extends Component<SpireHealthCheckProp, SpireHealthCheckS
           description={success ? 'Active' : 'InActive'} />
       </div>
     return (
-      <div>
+      <div className="health-check">
+        <div className='spire-health-refresh-tooltip'>
+          <Tooltip>
+            <p className="spire-health-helper">SPIRE Health Refresh Frequency</p>
+          </Tooltip>
+        </div>
         <div className="spire-health-check-refresh-dropdown">
           <Dropdown
             ariaLabel="spire-refresh-rate-drop-down"
@@ -138,18 +143,15 @@ class SpireHealthCheck extends Component<SpireHealthCheckProp, SpireHealthCheckS
             onChange={this.onChangeSpireRefreshRate}
           />
         </div>
-        <div className="divider">
-          <span ></span>
-        </div>
-        <div>
+        <div className='health-status-check-container'>
           <div className='health-status-check-title'>
-            <h6>SPIRE Health Check : </h6>
+            <h6>SPIRE: </h6>
           </div>
           <div className='health-status-check-icon'>
             {!checking &&
               <InlineLoading
                 status="active"
-                description="Checking Status..." />
+                description="Checking" />
             }
             {checking && spireStatus}
           </div>
