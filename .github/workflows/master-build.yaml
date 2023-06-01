@@ -31,34 +31,20 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      # Create sha tagged image for container-agent
-      
-      # Deprecating the backend+spire image for now
-      # - name: Set backend-spire image name
-      #   run: echo "CONTAINER_BACKEND_WITH_SPIRE_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-backend-spire-server:$GITHUB_SHA" >> $GITHUB_ENV
+     
+      # set repo and GITHUB SHA 
       - name: Set github commit id
         run: echo "GITHUB_SHA=$GITHUB_SHA" >> $GITHUB_ENV
-      - name: Set backend image name
-        run: echo "CONTAINER_BACKEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-backend:$GITHUB_SHA" >> $GITHUB_ENV
-      - name: Set frontend image name
-        run: echo "CONTAINER_FRONTEND_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-frontend:$GITHUB_SHA" >> $GITHUB_ENV
-      - name: Set Tornjak image name
-        run: echo "CONTAINER_TAG=ghcr.io/${{ github.repository_owner }}/tornjak:$GITHUB_SHA" >> $GITHUB_ENV
-      - name: Set manager image name
-        run: echo "CONTAINER_MANAGER_TAG=ghcr.io/${{ github.repository_owner }}/tornjak-manager:$GITHUB_SHA" >> $GITHUB_ENV
+      - name: Set release repo
+        run: echo "REPO=ghcr.io/${{ github.repository_owner }}" >> $GITHUB_ENV
 
-      # create images
-      # - name: Build and push tornjak backend image
-      #   run: make container-tornjak-backend-spire-push
-      # Create tagged versioned images
-      # - name: Push artifacts for tornjak-backend-spire-multiversions
-      #   run: make release-tornjak-backend-spire-multiversions-ghcr
+      # build and push images tagged with GITHUB_SHA, version, and latest
       - name: Build and push tornjak backend image
-        run: make release-tornjak-backend-ghcr
+        run: make container-backend-push
       - name: Build and push tornjak frontend image
-        run: make release-tornjak-frontend-ghcr
-      - name: Build and push tornjak image
-        run: make release-tornjak-ghcr
+        run: make container-frontend-push
+      - name: Build and push tornjak image (frontend+backend)
+        run: make container-tornjak-push
       - name: Build and push tornjak manager image
-        run: make release-tornjak-manager-ghcr
+        run: make container-manager-push
       - run: echo "🍏 This job's status is ${{ job.status }}."
