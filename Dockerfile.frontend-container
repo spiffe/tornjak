@@ -19,6 +19,10 @@ RUN npm install --location=global serve && \
 ENV PORT_FE=3000
 EXPOSE $PORT_FE
 
+# fix "access denied" error when running in restricted (read-only) env
+RUN ln -s /tmp/env.js build/env.js
+ENTRYPOINT npx react-inject-env set -n env.js && serve -s build -p $PORT_FE
+
 # add a version link to the image description
 ARG version
 ARG github_sha
@@ -28,10 +32,3 @@ LABEL org.opencontainers.image.description="Tornjak frontend ($version): https:/
 # create env. variables with the build details
 ENV VERSION=$version
 ENV GITHUB_SHA=$github_sha
-
-RUN npm install --omit=dev \
-    npm prune --production
-    
-# fix "access denied" error when running in restricted (read-only) env
-RUN ln -s /tmp/env.js build/env.js
-ENTRYPOINT npx react-inject-env set -n env.js && serve -s build -p $PORT_FE
