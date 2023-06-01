@@ -13,6 +13,7 @@ import { RootState } from 'redux/reducers';
 
 import {
   TornjakServerInfo as TornjakServInfo,
+  DebugServerInfo
 } from './types';
 
 const pluginTagColorMapper: { [key: string]: TagTypeName | undefined; } = {
@@ -25,6 +26,8 @@ const pluginTagColorMapper: { [key: string]: TagTypeName | undefined; } = {
 }
 
 type TornjakServerInfoProp = {
+  // dispatches a payload for the debug server info of the selected server and has a return type of void
+  spireDebugServerInfoUpdateFunc: (globalDebugServerInfo: DebugServerInfo) => void,
   // dispatches a payload for the tornjak server info of the selected server and has a return type of void
   tornjakServerInfoUpdateFunc: (globalTornjakServerInfo: TornjakServInfo) => void,
   // dispatches a payload for an Error Message/ Success Message of an executed function as a string and has a return type of void
@@ -82,6 +85,7 @@ class TornjakServerInfo extends Component<TornjakServerInfoProp, TornjakServerIn
       }
     } else {
       this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
+      this.TornjakApi.populateLocalTornjakDebugServerInfo(this.props.spireDebugServerInfoUpdateFunc, this.props.tornjakMessageFunc);
     }
   }
 

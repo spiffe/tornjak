@@ -9,7 +9,8 @@ import {
   TornjakServerInfo,
   ServerInfo,
   EntriesList,
-  ClustersList
+  ClustersList,
+  DebugServerInfo
 } from './types';
 import KeycloakService from "auth/KeycloakAuth";
 import { logError } from './helpers';
@@ -204,6 +205,20 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
           verboseConfig: ""
         });
       });
+  }
+
+   // populateLocalTornjakDebugServerInfo returns the debug server info of the server in local mode
+   populateLocalTornjakDebugServerInfo = (
+    spireDebugServerInfoUpdateFunc: { (globalDebugServerInfo: DebugServerInfo): void },
+    tornjakMessageFunc: { (globalErrorMessage: string): void }
+  ) => {
+    axios.get(GetApiServerUri('/api/debugserver'), { crossdomain: true })
+      .then(response => {
+        console.log("Tornjak debug Info: ", response.data)
+        spireDebugServerInfoUpdateFunc(response.data)
+        tornjakMessageFunc(response.statusText)
+      })
+      .catch((error) => displayResponseError("Error getting debug server info.", error))
   }
 
   // populateLocalTornjakServerInfo returns the torjak server info of the server in local mode
