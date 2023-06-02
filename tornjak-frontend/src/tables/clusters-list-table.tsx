@@ -10,7 +10,7 @@ import Table from './list-table';
 import { ClustersList } from "components/types";
 import { DenormalizedRow } from "carbon-components-react";
 import { RootState } from "redux/reducers";
-import { displayResponseError } from "components/error-api";
+import { showResponseToast } from "components/error-api";
 
 // ClusterListTable takes in 
 // listTableData: clusters data to be rendered on table
@@ -82,7 +82,6 @@ class ClustersListTable extends React.Component<ClustersListTableProp, ClustersL
             listtabledata[i]["clusterDomainName"] = listData[i].props.cluster.domainName;
             listtabledata[i]["clusterAssignedAgents"] = <pre>{JSON.stringify(listData[i].props.cluster.agentsList, null, ' ')}</pre>
         }
-        console.log(listtabledata)
         this.setState({
             listTableData: listtabledata
         })
@@ -114,7 +113,7 @@ class ClustersListTable extends React.Component<ClustersListTableProp, ClustersL
                     this.props.clustersListUpdateFunc(this.props.globalClustersList.filter(el =>el.name !== cluster[i].name))
                 }
             })
-            .catch((error) => displayResponseError("Could not delete cluster.", error))
+            .catch((error) => showResponseToast(error, {caption: "Could not delete cluster."}))
     }
 
     render() {

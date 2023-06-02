@@ -160,7 +160,8 @@ class EntryExpiryFeatures extends Component<EntryExpiryProp, EntryExpiryState> {
                   placeholder="08/13/2345"
                   //pattern={["^\\d{2}/\\d{2}/\\d{4,5}$"]}
                   onChange={this.onChangeExpiresAtDate}
-                  required id={''} />
+                  id={''} 
+                />
               </div>
               <div className="expiryOption-entry">
                 <TextInput
@@ -170,7 +171,8 @@ class EntryExpiryFeatures extends Component<EntryExpiryProp, EntryExpiryState> {
                   //pattern={["^([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\d$"]}
                   onChange={this.onChangeExpiresAtTime}
                   invalidText="NotGoodTime"
-                  required id={''} />
+                  id={''} 
+                />
               </div>
             </div>
           }

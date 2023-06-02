@@ -5,7 +5,8 @@ import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import { serverSelectedFunc } from 'redux/actions';
 import { RootState } from 'redux/reducers';
-import { displayError, displayResponseError } from '../components/error-api'
+import { ToastContainer } from "react-toastify"
+import { showResponseToast, showToast } from './error-api';
 
 type CreateJoinTokenProp = {
   globalServerSelected: string,
@@ -13,7 +14,7 @@ type CreateJoinTokenProp = {
 
 type CreateJoinTokenState = {
   name: string,
-  ttl: number | string,
+  ttl: string,
   token: string,
   spiffeId: string,
   trustDomain: string,
@@ -32,7 +33,7 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
     this.onSubmit = this.onSubmit.bind(this);
     this.state = {
       name: "",
-      ttl: 500,
+      ttl: "500",
       token: "",
       spiffeId: "",
       trustDomain: "",
@@ -69,7 +70,7 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
 
   onChangeTtl(e: { target: { value: string; }; }): void {
     this.setState({
-      ttl: e.target.value ? Number(e.target.value) : String(e.target.value)
+      ttl: e.target.value 
     });
   }
 
@@ -114,13 +115,18 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
   onSubmit(e: { preventDefault: () => void; }): void {
     e.preventDefault()
 
-    if (this.state.ttl === 0) {
-      displayError("The TTL cannot be 0.")
+    if (this.state.ttl === "") {
+      showToast({caption: "The TTL cannot be empty."})
+      return
+    } else if (isNaN(Number(this.state.ttl))) {
+      showToast({caption: "The TTL must be an integer."})
+    } else if (Number(this.state.ttl) <= 0) {
+      showToast({caption: "The TTL must be positive."})
       return
     }
 
     const cjtData = {
-      ttl: this.state.ttl, 
+      ttl: Number(this.state.ttl), 
       trust_domain: "", 
       path: "", 
       token: this.state.token
@@ -130,7 +136,7 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
       const [isIdValid, trustDomain, path] = this.parseSpiffeId(this.state.spiffeId)
       
       if (!isIdValid) {
-        displayError("Invalid SPIFFE id.")
+        showToast({caption: "The SPIFFE id is invalid."})
         return
       }
 
@@ -146,7 +152,7 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
 
     axios.post(endpoint, cjtData)
       .then(res => this.setState({ message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' ') }))
-      .catch(err => displayResponseError("Agent creation failed.", err))
+      .catch(err => showResponseToast(err, {caption: "Could not create join token."}))
   }
 
   render() {
@@ -165,7 +171,6 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
           <div className="form-group">
             <label>Time to live (TTL): </label>
             <input type="number"
-              required
               className="form-control"
               value={this.state.ttl}
               onChange={this.onChangeTtl}
@@ -194,6 +199,11 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
             <input type="submit" value="Create Join Token" className="btn btn-primary" />
           </div>
         </form>
+        <ToastContainer
+          className="carbon-toast"
+          containerId="notifications"
+          draggable={false}
+        />
       </div>
     )
   }

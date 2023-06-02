@@ -38,6 +38,7 @@
     "react-toastify": "^8.2.0",
     "redux": "^4.1.1",
     "redux-thunk": "^2.3.0",
+    "stringify-object": "^4.0.1",
     "url-join": "^4.0.1",
     "web-vitals": "^0.2.4"
   },

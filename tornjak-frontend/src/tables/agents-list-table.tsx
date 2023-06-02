@@ -10,7 +10,7 @@ import Table from './list-table';
 import { AgentsList, AgentsWorkLoadAttestorInfo } from "components/types";
 import { DenormalizedRow } from "carbon-components-react";
 import { RootState } from "redux/reducers";
-import { displayResponseError } from "components/error-api";
+import { showResponseToast } from "components/error-api";
 
 // AgentListTable takes in 
 // listTableData: agents data to be rendered on table
@@ -128,7 +128,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
                         el.id.path !== id[i].path));
                 }
             })
-            .catch((error) => displayResponseError("Could not delete agent.", error))
+            .catch((error) => showResponseToast(error, {caption: "Could not delete agent."}))
     }
 
     banAgent(selectedRows: readonly DenormalizedRow[]) {
@@ -150,11 +150,10 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
 
             axios.post(endpoint, {id: {trust_domain: id[i].trust_domain, path: id[i].path}})
                 .then(res => {
-                    console.log(res.data)
                     alert("Ban SUCCESS")
                     this.componentDidMount()
                 })
-                .catch((error) => displayResponseError("Could not ban agent.", error))
+                .catch((error) => showResponseToast(error, {caption: "Could not ban agent."}))
         }
     }
     render() {

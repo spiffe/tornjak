@@ -131,6 +131,7 @@ class AgentList extends Component<AgentListProp, AgentListState> {
               {this.props.globalErrorMessage}
             </pre>
           </div>
+          
         }
         <br /><br />
         <div className="indvidual-list-table">
@@ -140,6 +141,8 @@ class AgentList extends Component<AgentListProp, AgentListState> {
     )
   }
 }
+
+
 
 const mapStateToProps = (state: RootState) => ({
   globalServerSelected: state.servers.globalServerSelected,

@@ -17,13 +17,14 @@ import {
   tornjakServerInfoUpdateFunc,
   serverInfoUpdateFunc
 } from 'redux/actions';
-import { RootState } from 'redux/reducers';
+import { RootState } from 'redux/reducers'
 import { 
   AgentLabels,
   AgentsList, 
   ServerInfo,
-  TornjakServerInfo } from './types';
-import { displayError, displayResponseError } from './error-api';
+  TornjakServerInfo 
+} from './types'
+import { showResponseToast, showToast } from './error-api';
 
 type ClusterCreateProp = {
   // dispatches a payload for the server trust domain and nodeAttestorPlugin as a ServerInfoType and has a return type of void
@@ -216,11 +217,16 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
   onSubmit(e: { preventDefault: () => void; } | undefined): void {
 
     if (e !== undefined) {
-      e.preventDefault();
+      e.preventDefault()
+    }
+
+    if (!this.state.clusterName) {
+      showToast({caption: "The cluster name cannot be empty."})
+      return
     }
 
     if ((this.state.clusterTypeManualEntry && this.state.clusterType === this.state.clusterTypeManualEntryOption) || !this.state.clusterType) {
-      displayError("Cluster type cannot be empty.")
+      showToast({caption: "The cluster type cannot be empty."})
       return
     }
 
@@ -242,12 +248,14 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
 
     axios.post(endpoint, cjtData)
       .then(
-        res => this.setState({
+        res => {
+          this.setState({
           message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
           statusOK: "OK",
         })
+      }
       )
-      .catch(err => displayResponseError("Cluster creation failed.", err))
+      .catch(err => showResponseToast(err))
   }
 
   render() {
@@ -274,7 +282,6 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
                   placeholder="Enter CLUSTER NAME"
                   onChange={this.onChangeClusterName}
                   role="cluster-name"
-                  required 
                 />
               </div>
               <div
@@ -289,7 +296,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
                   titleText="Cluster Type [*required]"
                   onChange={this.onChangeClusterType}
                   role="cluster-type"
-                  //required // typescript throws an error when enabled - need to explore more to enable feature for now "aria-required" is enabled
+                  // typescript throws an error when enabled - need to explore more to enable feature for now "aria-required" is enabled
                 />
                 <p className="cluster-helper">i.e. Kubernetes, VMs...</p>
               </div>
@@ -423,7 +430,15 @@ const mapStateToProps = (state: RootState) => ({
 
 export default connect(
   mapStateToProps,
-  { clusterTypeInfoFunc, serverSelectedFunc, selectorInfoFunc, agentsListUpdateFunc, tornjakMessageFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc }
+  { 
+    clusterTypeInfoFunc, 
+    serverSelectedFunc, 
+    selectorInfoFunc, 
+    agentsListUpdateFunc, 
+    tornjakMessageFunc, 
+    tornjakServerInfoUpdateFunc, 
+    serverInfoUpdateFunc 
+  }
 )(ClusterCreate)
 
 export { ClusterCreate }

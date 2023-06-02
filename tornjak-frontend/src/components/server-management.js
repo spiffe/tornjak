@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios'
 import GetApiServerUri from './helpers';
@@ -6,7 +6,7 @@ import IsManager from './is_manager';
 import {
   serversListUpdateFunc
 } from 'redux/actions';
-import { displayResponseError } from './error-api';
+import { showResponseToast } from './error-api';
 
 const Server = props => (
   <tr>
@@ -48,7 +48,7 @@ class ServerManagement extends Component {
           console.log(response.data);
           this.props.serversListUpdateFunc(response.data["servers"]);
       })
-      .catch((error) => displayResponseError("Could not refresh server state.", error))
+      .catch((error) => showResponseToast(error, {caption: "Could not refresh server state."}))
   }
 
   serverList() {
