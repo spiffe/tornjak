@@ -30,7 +30,7 @@ class TableDashboard extends React.Component {
         </Title>
         <Button //Selected Details Button
           href={this.TornjakHelper.detailsLink(this.state.selectedRows, title)}
-          style={{ width: 160, marginLeft: 1040, marginBottom: 20 }}
+          style={{ width: 160, marginLeft: 959, marginBottom: 20 }}
           color="primary"
           size="small"
           variant="outlined"

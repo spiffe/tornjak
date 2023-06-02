@@ -384,13 +384,13 @@
 
 .health-status-check-container {
   border: 0.1px solid black;
-  padding: 2px 10px 2px 10px;
+  padding: 3px 10px 3px 10px;
   background-color: rgb(233, 233, 233);
   display: inline-block;
   margin-left: 5px;
   position: absolute;
   top: 0;
-  margin-top: 27px;
+  margin-top: 2em;
   min-width: 157px;
 }
 

@@ -66,6 +66,7 @@ const styles = theme => ({
     },
     menuButton: { //menu button next to Tornjak Dashboard title on view
         marginRight: 35,
+        marginTop: 20
     },
     menuButtonHidden: { //menu button next to Tornjak Dashboard title on hidden
         display: 'none',
@@ -78,6 +79,7 @@ const styles = theme => ({
     drawerPaper: { //dashboard side drawer on open
         position: 'relative',
         whiteSpace: 'nowrap',
+        marginLeft: -20,
         zIndex: 1,
         width: drawerWidth,
         height: drawerHeight,
