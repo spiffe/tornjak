@@ -370,7 +370,7 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 
 Now that we have the correct deployment files, please follow the below steps to deploy Tornjak and SPIRE!
 
-NOTE: In a windows environment, you will need to replace the backslashes (\) below with backticks (`) to copy and paste into a windows terminal
+NOTE: In a windows environment, you will need to replace the backslashes (\\) below with backticks (\`) to copy and paste into a windows terminal
 ```console
 kubectl apply -f spire-namespace.yaml \
     -f server-account.yaml \
@@ -417,7 +417,7 @@ NOTE: You may initially see a `0/1` for READY status. Just wait a few minutes an
 ### Deploying the agent and creating test entries
 
 The following steps will configure and deploy the SPIRE agent. 
-NOTE: In a windows environment, you will need to replace the backslashes (\) below with backticks (`) to copy and paste into a windows terminal
+NOTE: In a windows environment, you will need to replace the backslashes (\\) below with backticks (\`) to copy and paste into a windows terminal
 ```console
 kubectl apply \
     -f agent-account.yaml \
@@ -446,7 +446,7 @@ spire-agent   1         1         1       1            1           <none>       
 
 Then, we can create a registration entry for the node. 
 
-NOTE: In a windows environment, you will need to replace the backslashes (\) below with backticks (`) to copy and paste into a windows terminal
+NOTE: In a windows environment, you will need to replace the backslashes (\\) below with backticks (\`) to copy and paste into a windows terminal
 ```console
 kubectl exec -n spire -c spire-server spire-server-0 -- \
     /opt/spire/bin/spire-server entry create \
@@ -470,7 +470,7 @@ Selector         : k8s_sat:cluster:demo-cluster
 
 And we create a registration entry for the workload registrar, specifying the workload registrar's SPIFFE ID:
 
-NOTE: In a windows environment, you will need to replace the backslashes (\) below with backticks (`) to copy and paste into a windows terminal
+NOTE: In a windows environment, you will need to replace the backslashes (\\) below with backticks (\`) to copy and paste into a windows terminal
 ```console
 kubectl exec -n spire -c spire-server spire-server-0 -- \
     /opt/spire/bin/spire-server entry create \
@@ -522,7 +522,7 @@ Let's verify that the `spire-server-0` pod is now started with the new image:
 kubectl -n spire describe pod spire-server-0 | grep "Image:"
 ```
 
-or, on Windows:
+**or**, on Windows:
 ```console
 kubectl -n spire describe pod spire-server-0 | select-string "Image:"
 ```
