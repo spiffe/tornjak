@@ -369,6 +369,7 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 ## Step 2: Deployment of SPIRE and co-located Tornjak
 
 Now that we have the correct deployment files, please follow the below steps to deploy Tornjak and SPIRE!
+
 NOTE: In a windows environment, you will need to replace the backslashes (\) below with backticks (`) to copy and paste into a windows terminal
 ```console
 kubectl apply -f spire-namespace.yaml \
@@ -410,6 +411,7 @@ kubectl get statefulset --namespace spire
 NAME           READY   AGE
 spire-server   1/1     26s
 ```
+
 NOTE: You may initially see a `0/1` for READY status. Just wait a few minutes and then try again
 
 ### Deploying the agent and creating test entries
@@ -443,6 +445,7 @@ spire-agent   1         1         1       1            1           <none>       
 ```
 
 Then, we can create a registration entry for the node. 
+
 NOTE: In a windows environment, you will need to replace the backslashes (\) below with backticks (`) to copy and paste into a windows terminal
 ```console
 kubectl exec -n spire -c spire-server spire-server-0 -- \
@@ -466,6 +469,7 @@ Selector         : k8s_sat:cluster:demo-cluster
 ```
 
 And we create a registration entry for the workload registrar, specifying the workload registrar's SPIFFE ID:
+
 NOTE: In a windows environment, you will need to replace the backslashes (\) below with backticks (`) to copy and paste into a windows terminal
 ```console
 kubectl exec -n spire -c spire-server spire-server-0 -- \
@@ -517,6 +521,7 @@ Let's verify that the `spire-server-0` pod is now started with the new image:
 ```console
 kubectl -n spire describe pod spire-server-0 | grep "Image:"
 ```
+
 or, on Windows:
 ```console
 kubectl -n spire describe pod spire-server-0 | select-string "Image:"
@@ -630,6 +635,7 @@ Then, delete the spire agent and server, along with the namespace we created:
 ```terminal
 kubectl delete namespace spire
 ```
+
 NOTE: You may need to wait a few minutes for the action to complete and the prompt to return
 
 Finally, we can delete the ClusterRole and ClusterRoleBinding:
