@@ -55,6 +55,7 @@ To obtain the relevant files, clone our git repository and cd into the correct d
 
 ```console
 git clone https://github.com/spiffe/tornjak.git
+cd tornjak
 cd docs/quickstart
 ```
 
@@ -368,7 +369,7 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 ## Step 2: Deployment of SPIRE and co-located Tornjak
 
 Now that we have the correct deployment files, please follow the below steps to deploy Tornjak and SPIRE!
-
+NOTE: In a windows environment, you will need to replace the backslashes (\) below with backticks (`) to copy and paste into a windows terminal
 ```console
 kubectl apply -f spire-namespace.yaml \
     -f server-account.yaml \
@@ -379,7 +380,6 @@ kubectl apply -f spire-namespace.yaml \
     -f server-statefulset.yaml \
     -f server-service.yaml
 ```
-
 The above command should deploy the SPIRE server with Tornjak:
 
 ```
@@ -410,11 +410,12 @@ kubectl get statefulset --namespace spire
 NAME           READY   AGE
 spire-server   1/1     26s
 ```
+NOTE: You may initially see a `0/1` for READY status. Just wait a few minutes and then try again
 
 ### Deploying the agent and creating test entries
 
 The following steps will configure and deploy the SPIRE agent. 
-
+NOTE: In a windows environment, you will need to replace the backslashes (\) below with backticks (`) to copy and paste into a windows terminal
 ```console
 kubectl apply \
     -f agent-account.yaml \
@@ -442,7 +443,7 @@ spire-agent   1         1         1       1            1           <none>       
 ```
 
 Then, we can create a registration entry for the node. 
-
+NOTE: In a windows environment, you will need to replace the backslashes (\) below with backticks (`) to copy and paste into a windows terminal
 ```console
 kubectl exec -n spire -c spire-server spire-server-0 -- \
     /opt/spire/bin/spire-server entry create \
@@ -465,7 +466,7 @@ Selector         : k8s_sat:cluster:demo-cluster
 ```
 
 And we create a registration entry for the workload registrar, specifying the workload registrar's SPIFFE ID:
-
+NOTE: In a windows environment, you will need to replace the backslashes (\) below with backticks (`) to copy and paste into a windows terminal
 ```console
 kubectl exec -n spire -c spire-server spire-server-0 -- \
     /opt/spire/bin/spire-server entry create \
@@ -490,6 +491,9 @@ Finally, here we deploy a workload container:
 ```console
 kubectl apply -f client-deployment.yaml
 ```
+```
+deployment.apps/client created
+```
 
 And also verify that the container can access the workload API UNIX domain socket:
 
@@ -512,6 +516,10 @@ Let's verify that the `spire-server-0` pod is now started with the new image:
 
 ```console
 kubectl -n spire describe pod spire-server-0 | grep "Image:"
+```
+or, on Windows:
+```console
+kubectl -n spire describe pod spire-server-0 | select-string "Image:"
 ```
 
 Should yield two lines depending on which deployment you used:
@@ -622,6 +630,7 @@ Then, delete the spire agent and server, along with the namespace we created:
 ```terminal
 kubectl delete namespace spire
 ```
+NOTE: You may need to wait a few minutes for the action to complete and the prompt to return
 
 Finally, we can delete the ClusterRole and ClusterRoleBinding:
 
