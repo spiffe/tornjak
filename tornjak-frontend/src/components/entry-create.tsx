@@ -1,7 +1,17 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
-import { Dropdown, TextInput, FilterableMultiSelect, Checkbox, TextArea, NumberInput, Accordion, AccordionItem, ToastNotification } from 'carbon-components-react';
+import { 
+  Dropdown, 
+  TextInput, 
+  FilterableMultiSelect, 
+  Checkbox, 
+  TextArea, 
+  NumberInput, 
+  Accordion, 
+  AccordionItem, 
+  ToastNotification 
+} from 'carbon-components-react';
 import {
   Button,
 } from '@mui/material';
@@ -34,7 +44,8 @@ import {
 import { RootState } from 'redux/reducers';
 import EntryExpiryFeatures from './entry-expiry-features';
 import CreateEntryJson from './entry-create-json';
-import { displayError, displayResponseError } from './error-api';
+import { ToastContainer } from "react-toastify"
+import { showResponseToast, showToast } from './error-api';
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type CreateEntryProp = {
@@ -551,12 +562,12 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   getApiEntryCreateEndpoint(): string {
     if (!IsManager) {
       return GetApiServerUri('/api/entry/create')
-    } else if (IsManager && this.state.selectedServer !== "") {
+    } 
+    if (IsManager && this.state.selectedServer !== "") {
       return GetApiServerUri('/manager-api/entry/create') + "/" + this.state.selectedServer
-    } else {
-      displayError("No server selected.")
-      return ""
-    }
+    } 
+    showToast({caption: "No server selected."})
+    return ""
   }
 
   onSubmit(e: { preventDefault: () => void; }): void {
@@ -564,15 +575,25 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     let federatedWithList: string[] = []
     let dnsNamesWithList: string[] = []
     
-    e.preventDefault();
+    e.preventDefault()
 
-    if (!this.parseSpiffeId(this.state.spiffeId)[0]) {
-      displayError("Invalid spiffe id.")
+    if (!this.state.parentId) {
+      showToast({caption: "The parent SPIFFE id cannot be empty."})
+      return
+    }
+
+    if (!this.state.spiffeId) {
+      showToast({caption: "The SPIFFE id cannot be empty."})
       return
     }
 
     if (!this.parseSpiffeId(this.state.parentId)[0]) {
-      displayError("Invalid parent spiffe id.")
+      showToast({caption: "The parent SPIFFE id is invalid."})
+      return
+    }
+
+    if (!this.parseSpiffeId(this.state.spiffeId)[0]) {
+      showToast({caption: "The SPIFFE id is invalid."})
       return
     }
 
@@ -581,7 +602,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     }
 
     if (selectorStrings.length === 0) {
-      displayError("Selectors cannot be empty.")
+      showToast({caption: "The selectors cannot be empty."})
       return
     }
 
@@ -592,7 +613,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       } : null)
 
     if (selectorEntries.some(x => x == null || x["value"].length === 0)) {
-      displayError("Selectors must be formatted 'type:value'")
+      showToast({caption: "The selectors must be formatted 'type:value'."})
       return
     }
 
@@ -638,7 +659,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           successJsonMessege: res.data.results[0].status.message
         })
       )
-      .catch(err => displayResponseError("Entry creation failed.", err))
+      .catch(err => showResponseToast(err, {caption: "Could not create entry."}))
   }
 
   onYAMLEntryCreate(): void {
@@ -669,7 +690,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           })
         }
       )
-      .catch(err => displayResponseError("Entry creation failed.", err))
+      .catch(err => showResponseToast(err, {caption: "Could not create entry from YAML."}))
   }
 
   render() {
@@ -682,7 +703,8 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
         <br /><br />
         {this.state.message !== "" &&
           <div>
-            <ToastNotification className="toast-entry-creation-notification"
+            <ToastNotification 
+              className="toast-entry-creation-notification"
               kind="info"
               iconDescription="close notification"
               subtitle={
@@ -710,11 +732,12 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                       {this.state.message}
                     </pre>
                   </div>
-                </span>}
+                </span>
+              }
               timeout={0}
               title="Entry Creation Notification"
             />
-            {window.scrollTo({ top: 0, behavior: 'smooth' })}
+            {window.scrollTo({top: 0, behavior: 'smooth'})}
           </div>
         }
         <Accordion className="accordion-entry-form">
@@ -806,7 +829,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                       this.onChangeSpiffeId(e);
                     }}
                     //onChange={this.onChangeSpiffeId}
-                    required />
+                  />
                 </div>
                 <div className="selectors-multiselect" data-test="selectors-multiselect">
                   <FilterableMultiSelect
@@ -897,6 +920,11 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
             </form>
           </AccordionItem>
         </Accordion>
+        <ToastContainer
+          className="carbon-toast"
+          containerId="notifications"
+          draggable={false}
+        />
       </div>
     )
   }
