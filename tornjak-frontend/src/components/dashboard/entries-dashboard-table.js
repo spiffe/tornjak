@@ -10,10 +10,10 @@ const columns = [
   { field: "id", headerName: "ID", width: 170, renderCell: renderCellExpand },
   { field: "spiffeid", headerName: "Name", width: 170, renderCell: renderCellExpand },
   { field: "parentId", headerName: "Parent ID", width: 170, renderCell: renderCellExpand },
-  { field: "clusterName", headerName: "Cluster Name", width: 170 },
-  { field: "entryExpireTime", headerName: "Entry Expire Time", width: 190 },
-  { field: "platformType", headerName: "Platform Type", width: 170 },
-  { field: "adminFlag", headerName: "Admin Flag", width: 150, type: 'boolean'},
+  { field: "clusterName", headerName: "Cluster Name", width: 150 },
+  { field: "entryExpireTime", headerName: "Entry Expire Time", width: 150 },
+  { field: "platformType", headerName: "Platform Type", width: 150 },
+  { field: "adminFlag", headerName: "Admin Flag", width: 125, type: 'boolean'},
 ];
 
 const styles = (theme => ({
