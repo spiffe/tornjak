@@ -1,32 +1,47 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core/styles';
+import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core/styles';
 import renderCellExpand from './render-cell-expand';
 import TableDashboard from './table/dashboard-table';
 import SpiffeHelper from '../spiffe-helper';
 import TornjakHelper from 'components/tornjak-helper';
+import { GridCellParams, GridColDef } from '@material-ui/data-grid';
+import { AgentsReducerState, EntriesReducerState } from 'redux/actions/types';
+import { RootState } from 'redux/reducers';
 
-const columns = [
-  { field: "id", headerName: "ID", width: 170, renderCell: renderCellExpand },
-  { field: "spiffeid", headerName: "Name", width: 170, renderCell: renderCellExpand },
-  { field: "parentId", headerName: "Parent ID", width: 170, renderCell: renderCellExpand },
+const columns: GridColDef[] = [
+  { field: "id", headerName: "ID", width: 170, renderCell: renderCellExpand as (params: GridCellParams)=>JSX.Element },
+  { field: "spiffeid", headerName: "Name", width: 170, renderCell: renderCellExpand as (params: GridCellParams)=>JSX.Element },
+  { field: "parentId", headerName: "Parent ID", width: 170, renderCell: renderCellExpand as (params: GridCellParams)=>JSX.Element },
   { field: "clusterName", headerName: "Cluster Name", width: 170 },
   { field: "entryExpireTime", headerName: "Entry Expire Time", width: 190 },
   { field: "platformType", headerName: "Platform Type", width: 170 },
   { field: "adminFlag", headerName: "Admin Flag", width: 150, type: 'boolean'},
 ];
 
-const styles = (theme => ({
+const styles = (theme:Theme) => createStyles({
   seeMore: {
     marginTop: theme.spacing(3),
-  },
-}));
+  }
+});
 
-class EntriesDashBoardTable extends React.Component {
-  constructor(props) {
+interface EntriesDashBoardTableProp extends WithStyles<typeof styles> {
+  filterByCluster?:string,
+  filterByAgentId?:string,
+  globalClickedDashboardTable: string,
+  numRows: number,
+  //From Redux
+  globalAgents: AgentsReducerState,
+  globalEntries: EntriesReducerState
+}
+
+class EntriesDashBoardTable extends React.Component<EntriesDashBoardTableProp> {
+  TornjakHelper: TornjakHelper;
+  SpiffeHelper: SpiffeHelper;
+  constructor(props:EntriesDashBoardTableProp) {
     super(props)
-    this.SpiffeHelper = new SpiffeHelper();
-    this.TornjakHelper = new TornjakHelper();
+    this.SpiffeHelper = new SpiffeHelper({});
+    this.TornjakHelper = new TornjakHelper({});
   }
 
   entryList() {
@@ -73,7 +88,7 @@ class EntriesDashBoardTable extends React.Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state:RootState) => ({
   globalAgents: state.agents,
   globalEntries: state.entries,
   globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
