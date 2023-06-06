@@ -19,10 +19,8 @@ RUN npm install --location=global serve && \
 ENV PORT_FE=3000
 EXPOSE $PORT_FE
 
-# fix "access denied" error when running in restricted (read-only) env
-# RUN ln -s /tmp/env.js build/env.js
-# ENTRYPOINT npx react-inject-env set -n env.js && serve -s build -p $PORT_FE
-ENTRYPOINT npx react-inject-env set && serve -s build -p $PORT_FE
+# moving env.js to fix "access denied" error when running in restricted (read-only) env
+ENTRYPOINT npx react-inject-env set -n ../../../../tmp/env.js && serve -s build -p $PORT_FE
 
 # add a version link to the image description
 ARG version
