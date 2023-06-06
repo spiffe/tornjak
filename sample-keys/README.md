@@ -1,16 +1,16 @@
-# Configuring TLS and mTLS for Tornjak
+# TLS and mTLS for Tornjak
 
 In order to enable TLS and mTLS connection for Tornjak, a server must be configured with certificate and key information. This document outlines the following steps to try out the feature:
 
 1. [Create the relevant TLS/mtls files](#create-the-relevant-tls-files)
 2. [Configure the Tornjak server](#configure-the-tornjak-server)
-3. [Make a TLS or mTLS call](#make-a-tls-or-mtls-call)
+3. [Making calls to Tornjak Backend](#making-calls-to-tornjak-backend)
 
 ## Create the relevant TLS/mTLS files
 
 The relevant certificates and keys first require a CA to sign a certificate. 
 
-Note that sample certificates and keys are included in publicly provided image `ghcr.io/spiffe/tornjak-backend` within the `sample-keys` directory. Only expand and execute the below steps to create your own local certificates and keys. 
+Note that sample certificates and keys are included in publicly provided image `ghcr.io/spiffe/tornjak-backend` within the `sample-keys` directory. The below steps are available to OPTIONALLY create your own local certificates and keys. 
 
 <details><summary><b> 🔴 [Click] Create your own CA and certificate/key pair</b></summary>
 
@@ -30,11 +30,15 @@ For example, to create a certificate to be run at the local host domain name, we
 
 which will create `client.key` and `client.crt` files that represent the key/cert pair to configure the client. 
 
+----
+
 </details>
 
 ## Configure the Tornjak server
 
-The Tornjak server configuration has separate settings for TLS and mTLS connection. Please click to expand below sections for configuring each connection type:
+The Tornjak server configuration has separate settings for TLS and mTLS connection. For full Tornjak server configuration, see [the Tornjak server configuration document](../docs/config-tornjak-server.md). 
+
+Please click to expand below sections for configuring each connection type.  These sample paths assume that the relevant certificates and keys are located within `sample-keys/` as is in the default container image. To use custom keys, you will need to edit the paths. 
 
 <details><summary><b> 🔴 [Click] TLS configuration</b></summary>
 
@@ -53,7 +57,7 @@ server {
 }
 ```
 
-If the previous command created `client.key` and `client.crt` and placed them in the `sample-keys` directory, we would use the above configuration to configure TLS. 
+----
 
 </details>
 
@@ -75,25 +79,33 @@ server {
 }
 ```
 
-If the previous command created `client.key` and `client.crt` and placed them in the `sample-keys` directory, we would use the above configuration to configure mTLS. 
+----
 
 </details>
 
-## Make a TLS or mTLS call
+## Making calls to Tornjak Backend
 
 Once configured with the certificates, we can make curl commands to the Tornjak server. 
 
-### Make a TLS call
-
-In order to make a TLS call, we must have access to the same root CA certificate, and we can execute the following curl command:
+In order to make these calls, we require the rootCA certificates and some certificate/key pair signed by the rootCA. We can get these in the Tornjak repo:
 
 ```
-curl --cacert CA/rootCA.crt https://<Tornjak_TLS_endpoint>
+git clone https://github.com/spiffe/tornjak.git
+git checkout v1.3
+cd tornjak/sample-keys
+```
+
+### Make a TLS call
+
+In order to make a TLS call, we require the rootCA certificate so that the client can validate the Tornjak certificate. We can execute the following curl command to the Tornjak server with it:
+
+```
+curl --cacert rootCA.crt https://<Tornjak_TLS_endpoint>
 ```
 
 ### Make a mTLS call
 
-In order to make an mTLS call, we must have access to the same root CA certificate, and we can execute the following curl command:
+In order to make an mTLS call, we require the rootCA certificate that signs the Tornjak certificate, as well as an additional certificate/key pair for the Tornjak server to validate. Then, we can execute the following curl command:
 
 ```
 curl --cacert CA/rootCA.crt --key client.key --cert client.crt https://<Tornjak_mTLS_endpoint>
