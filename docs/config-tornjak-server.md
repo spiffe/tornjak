@@ -67,6 +67,8 @@ We have three connection types that can be opened by the server simultaneously: 
 
 If a specific section is omitted or not enabled, that connection will not be created. If all are omitted or disabled, the program will exit immediately with an appropriate error log. 
 
+For examples on enabling TLS and mTLS connections, please see [our TLS and mTLS documentation](../sample-keys/README.md). 
+
 ## About Tornjak plugins
 
 ### Plugin types
