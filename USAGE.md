@@ -10,6 +10,14 @@ NOTE: Previously, we had images placing the Tornjak backend and SPIRE server in 
 
 Pre-built images can be found at the above links. To decide which tag to use, typically choose a release from [this page](https://github.com/spiffe/tornjak/releases) and choose the corresponding tag. For example, if you are interested in release `tornjak-1.0.2`, then choose image tag `v1.0.2`.
 
+### Compatibility Table
+
+Please see below for compatibility charts of SPIRE server versions with Tornjak:
+
+| Tornjak version        | SPIRE Server version |
+| :--------------------- | :------------------- |
+| v1.1.x, v1.2.x, v1.3.x | v1.1.x, v1.2.x, v1.3.x, v1.4.x |
+
 ## Tornjak Backend
 
 This is meant to be deployed where it can access a SPIRE server. To run, the container has three arguments:

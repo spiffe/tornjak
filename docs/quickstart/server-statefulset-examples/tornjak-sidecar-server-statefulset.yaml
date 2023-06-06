@@ -51,7 +51,7 @@ spec:
             periodSeconds: 5
         ### 👈 BEGIN ADDITIONAL CONTAINER ###
         - name: tornjak
-          image: ghcr.io/spiffe/tornjak:latest
+          image: ghcr.io/spiffe/tornjak:v1.2.2
           imagePullPolicy: Always
           args:
             - --spire-config
