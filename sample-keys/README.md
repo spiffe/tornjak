@@ -10,7 +10,9 @@ In order to enable TLS and mTLS connection for Tornjak, a server must be configu
 
 The relevant certificates and keys first require a CA to sign a certificate. 
 
-Note that sample certificates and keys are included in publicly provided images `ghcr.io/spiffe/tornjak-backend` within the `sample-keys` directory. To try TLS and mTLS, these steps can be skipped. 
+Note that sample certificates and keys are included in publicly provided image `ghcr.io/spiffe/tornjak-backend` within the `sample-keys` directory. Only expand and execute the below steps to create your own local certificates and keys. 
+
+<details><summary><b> 🔴 [Click] Create your own CA and certificate/key pair</b></summary>
 
 ### Create a CA
 
@@ -28,9 +30,13 @@ For example, to create a certificate to be run at the local host domain name, we
 
 which will create `client.key` and `client.crt` files that represent the key/cert pair to configure the client. 
 
+</details>
+
 ## Configure the Tornjak server
 
-### TLS configuration
+The Tornjak server configuration has separate settings for TLS and mTLS connection. Please click to expand below sections for configuring each connection type:
+
+<details><summary><b> 🔴 [Click] TLS configuration</b></summary>
 
 The TLS configuration requires a certificate and key pair. This is formatted like so:
 
@@ -49,7 +55,9 @@ server {
 
 If the previous command created `client.key` and `client.crt` and placed them in the `sample-keys` directory, we would use the above configuration to configure TLS. 
 
-### mTLS configuration
+</details>
+
+<details><summary><b> 🔴 [Click] mTLS configuration</b></summary>
 
 The mTLS configuration requires a certificate and key pair, along with a CA certificate to verify client requests. The mTLS configuration is formatted like so: 
 
@@ -68,6 +76,8 @@ server {
 ```
 
 If the previous command created `client.key` and `client.crt` and placed them in the `sample-keys` directory, we would use the above configuration to configure mTLS. 
+
+</details>
 
 ## Make a TLS or mTLS call
 
