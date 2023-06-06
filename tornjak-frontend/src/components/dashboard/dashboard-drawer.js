@@ -80,6 +80,7 @@ const styles = theme => ({
         position: 'relative',
         whiteSpace: 'nowrap',
         marginLeft: -20,
+        top: 10,
         zIndex: 1,
         width: drawerWidth,
         height: drawerHeight,

@@ -6,7 +6,9 @@ import { withStyles } from 'tss-react/mui';
 import {
   Container,
   Grid,
-  Paper
+  Paper,
+  ThemeProvider,
+  createTheme
 } from '@mui/material';
 // Pie Charts
 import AgentsPieChart from './agents-pie-chart';
@@ -32,6 +34,16 @@ import {
 import SpiffeHelper from '../spiffe-helper';
 import DashboardDrawerStyled from './dashboard-drawer';
 
+const theme = createTheme({
+  typography: {
+  body1: {
+    fontFamily: "'IBM Plex Sans', 'Helvetica Neue', 'Arial', sans-serif",
+    letterSpacing: .16,
+    fontSize: "0.875rem",
+    lineHeight: 1
+  }
+}});
+
 const styles = (theme) => ({
   root: {
     marginTop: -25,
@@ -52,7 +64,8 @@ const styles = (theme) => ({
     display: 'flex',
     overflow: 'auto',
     flexDirection: 'column',
-    marginBottom: 20
+    marginBottom: 20,
+    marginTop: 10
   },
   fixedHeight: {
     height: 370, //height of piechart container
@@ -120,84 +133,86 @@ class TornjakDashboard extends React.Component {
   render() {
     const classes = withStyles.getClasses(this.props);
     return (
-      <div className={classes.root}>
-        <DashboardDrawerStyled />
-        <main className={classes.content}>
-          <div className={classes.appBarSpacer} />
-          {(this.props.globalClickedDashboardTable === "" || this.props.globalClickedDashboardTable === "dashboard") &&
-            <Container maxWidth="lg" className={classes.container}>
-              <Grid container spacing={3}>
-                {/* Pie Chart Clusters */}
-                <Grid item xs={6}>
-                  <Paper className={this.fixedHeightPaper}>
-                    <ClustersPieChart />
-                  </Paper>
+      <ThemeProvider theme={theme} >
+        <div className={classes.root}>
+          <DashboardDrawerStyled />
+          <main className={classes.content}>
+            <div className={classes.appBarSpacer} />
+            {(this.props.globalClickedDashboardTable === "" || this.props.globalClickedDashboardTable === "dashboard") &&
+              <Container maxWidth="lg" className={classes.container}>
+                <Grid container spacing={3}>
+                  {/* Pie Chart Clusters */}
+                  <Grid item xs={6}>
+                    <Paper className={this.fixedHeightPaper}>
+                      <ClustersPieChart />
+                    </Paper>
+                  </Grid>
+                  {/* Pie Chart Agents*/}
+                  <Grid item xs={6}>
+                    <Paper className={this.fixedHeightPaper}>
+                      <AgentsPieChart />
+                    </Paper>
+                  </Grid>
+                  {/* Clusters Table */}
+                  <Grid item xs={12}>
+                    <Paper className={classes.paper}>
+                      <ClusterDashboardTableStyled
+                        numRows={5} />
+                    </Paper>
+                  </Grid>
+                  {/* Agents Table */}
+                  <Grid item xs={12}>
+                    <Paper className={classes.paper}>
+                      <AgentDashboardTableStyled
+                        numRows={5} />
+                    </Paper>
+                  </Grid>
+                  {/* Entries Table */}
+                  <Grid item xs={12}>
+                    <Paper className={classes.paper}>
+                      <EntriesDashBoardTableStyled
+                        numRows={5} />
+                    </Paper>
+                  </Grid>
                 </Grid>
-                {/* Pie Chart Agents*/}
-                <Grid item xs={6}>
-                  <Paper className={this.fixedHeightPaper}>
-                    <AgentsPieChart />
-                  </Paper>
-                </Grid>
+              </Container>
+            }
+            {(this.props.globalClickedDashboardTable === "clusters") &&
+              <Container maxWidth="lg" className={classes.container}>
                 {/* Clusters Table */}
                 <Grid item xs={12}>
                   <Paper className={classes.paper}>
                     <ClusterDashboardTableStyled
-                      numRows={5} />
+                      numRows={100} />
                   </Paper>
                 </Grid>
+              </Container>
+            }
+            {(this.props.globalClickedDashboardTable === "agents") &&
+              <Container maxWidth="lg" className={classes.container}>
                 {/* Agents Table */}
                 <Grid item xs={12}>
                   <Paper className={classes.paper}>
                     <AgentDashboardTableStyled
-                      numRows={5} />
+                      numRows={100} />
                   </Paper>
                 </Grid>
+              </Container>
+            }
+            {(this.props.globalClickedDashboardTable === "entries") &&
+              <Container maxWidth="lg" className={classes.container}>
                 {/* Entries Table */}
                 <Grid item xs={12}>
                   <Paper className={classes.paper}>
                     <EntriesDashBoardTableStyled
-                      numRows={5} />
+                      numRows={100} />
                   </Paper>
                 </Grid>
-              </Grid>
-            </Container>
-          }
-          {(this.props.globalClickedDashboardTable === "clusters") &&
-            <Container maxWidth="lg" className={classes.container}>
-              {/* Clusters Table */}
-              <Grid item xs={12}>
-                <Paper className={classes.paper}>
-                  <ClusterDashboardTableStyled
-                    numRows={100} />
-                </Paper>
-              </Grid>
-            </Container>
-          }
-          {(this.props.globalClickedDashboardTable === "agents") &&
-            <Container maxWidth="lg" className={classes.container}>
-              {/* Agents Table */}
-              <Grid item xs={12}>
-                <Paper className={classes.paper}>
-                  <AgentDashboardTableStyled
-                    numRows={100} />
-                </Paper>
-              </Grid>
-            </Container>
-          }
-          {(this.props.globalClickedDashboardTable === "entries") &&
-            <Container maxWidth="lg" className={classes.container}>
-              {/* Entries Table */}
-              <Grid item xs={12}>
-                <Paper className={classes.paper}>
-                  <EntriesDashBoardTableStyled
-                    numRows={100} />
-                </Paper>
-              </Grid>
-            </Container>
-          }
-        </main>
-      </div>
+              </Container>
+            }
+          </main>
+        </div>
+      </ThemeProvider>
     )
   }
 }
