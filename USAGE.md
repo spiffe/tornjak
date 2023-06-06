@@ -14,9 +14,9 @@ Pre-built images can be found at the above links. To decide which tag to use, ty
 
 Please see below for compatibility charts of SPIRE server versions with Tornjak:
 
-| Tornjak version | SPIRE Server version |
-| :-------------- | :------------------- |
-| v1.1.x, v1.2.x  | v1.1.x, v1.2.x, v1.3.x, v1.4.x |
+| Tornjak version        | SPIRE Server version |
+| :--------------------- | :------------------- |
+| v1.1.x, v1.2.x, v1.3.x | v1.1.x, v1.2.x, v1.3.x, v1.4.x |
 
 ## Tornjak Backend
 
