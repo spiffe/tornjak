@@ -61,7 +61,7 @@ docker run -p 3000:3000 -d -e REACT_APP_API_SERVER_URI='http://localhost:10000' 
 `
 ```
 
-This will start a Tornjak server on `http://localhost:3000`
+This will start a Tornjak frontend on `http://localhost:3000`
 Please be patient, as it might take a few minutes to compile and start the server.
 
 For a cloud deployment change the URLs accordingly using the cloud provider ingress.
