@@ -43,7 +43,7 @@ as detailed in
 with more details on the general configuration 
 [here](https://github.com/spiffe/tornjak/blob/main/docs/config-tornjak-agent.md). 
 
-1. Configure Tornjak Frontend
+1. **Configure Tornjak Frontend**
 Finally, the Frontend must be deployed and configured to obtain access tokens from this auth server. 
 This can be done locally with the environment variable 
 `REACT_APP_AUTH_SERVER_URI`:
