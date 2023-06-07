@@ -1,22 +1,39 @@
 import React from "react";
 import { connect } from 'react-redux';
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import Title from '../title';
 import { Button } from '@mui/material';
 import { clickedDashboardTableFunc } from 'redux/actions';
 import TornjakHelper from 'components/tornjak-helper';
+import { RootState } from "redux/reducers";
 
-class TableDashboard extends React.Component {
-  constructor(props) {
+type TableDashboardProp = {
+  // dispatches a payload for the clicked table in a dashboard as a string and has a return type of void
+  clickedDashboardTableFunc: (globalClickedDashboardTable: string) => void,
+  // the clicked dashboard table
+  globalClickedDashboardTable: string,
+  numRows: number,
+  title: string,
+  columns: GridColDef[],
+  data: {[key:string]:any}[]
+}
+
+type TableDashboardState = {
+  selectedRows: string
+}
+
+class TableDashboard extends React.Component<TableDashboardProp, TableDashboardState> {
+  TornjakHelper: TornjakHelper;
+  constructor(props: TableDashboardProp) {
     super(props);
     this.state = {
-      selectedRows: [],
+      selectedRows: "",
     };
-    this.TornjakHelper = new TornjakHelper();
+    this.TornjakHelper = new TornjakHelper({});
   }
 
   render() {
-    const { numRows, data, columns, title } = this.props;
+    const { data, columns, title } = this.props;
     return (
       <React.Fragment>
         <Title>
@@ -48,14 +65,12 @@ class TableDashboard extends React.Component {
           <DataGrid
             rows={data}
             columns={columns}
-            pageSize={numRows}
-            rowsPerPageOptions={[numRows]}
             autoHeight={true}
-            onSelectionModelChange={(newSelection) =>{
-              this.setState({ selectedRows: newSelection[0] })
+            onRowSelectionModelChange={(newSelection) =>{
+              if (newSelection[0]) this.setState({ selectedRows: newSelection[0].toString() })
             }}
-            components={{
-              Toolbar: GridToolbar,
+            slots={{
+              toolbar: GridToolbar,
             }}
           />
         </div>
@@ -64,7 +79,7 @@ class TableDashboard extends React.Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state:RootState) => ({
   globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 })
 

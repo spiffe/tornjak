@@ -5,28 +5,35 @@ import renderCellExpand from './render-cell-expand';
 import TableDashboard from './table/dashboard-table';
 import SpiffeHelper from '../spiffe-helper';
 import TornjakHelper from 'components/tornjak-helper';
+import { AgentsReducerState, EntriesReducerState } from 'redux/actions/types';
+import { RootState } from 'redux/reducers';
+import { GridCellParams, GridColDef } from '@mui/x-data-grid';
 
-const columns = [
-  { field: "spiffeid", headerName: "Name", flex: 1, renderCell: renderCellExpand },
+const columns: GridColDef[] = [
+  { field: "spiffeid", headerName: "Name", flex: 1, renderCell: renderCellExpand as (params: GridCellParams)=>JSX.Element },
   { field: "clusterName", headerName: "Cluster Name", width: 190 },
   { field: "numEntries", headerName: "Number of Entries", width: 200 },
   { field: "status", headerName: "Status", width: 120 },
   { field: "platformType", headerName: "Platform Type", width: 170 },
 ];
 
-const styles = theme => ({
-  seeMore: {
-    marginTop: theme.spacing(3),
-  },
-});
+interface AgentDashboardTableProp {
+  filterByCluster?:string,
+  filterByAgentId?:string,
+  globalClickedDashboardTable: string,
+  numRows: number,
+  //From Redux
+  globalAgents: AgentsReducerState,
+  globalEntries: EntriesReducerState
+}
 
-class AgentDashboardTable extends React.Component {
-  constructor(props) {
+class AgentDashboardTable extends React.Component<AgentDashboardTableProp> {
+  TornjakHelper: TornjakHelper;
+  SpiffeHelper: SpiffeHelper;
+  constructor(props: AgentDashboardTableProp) {
     super(props);
-    this.state = {
-    };
-    this.SpiffeHelper = new SpiffeHelper();
-    this.TornjakHelper = new TornjakHelper();
+    this.SpiffeHelper = new SpiffeHelper({});
+    this.TornjakHelper = new TornjakHelper({});
   }
 
   agentList() {
@@ -69,12 +76,22 @@ class AgentDashboardTable extends React.Component {
 
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state:RootState) => ({
   globalAgents: state.agents,
   globalEntries: state.entries,
   globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 })
 
 
-const AgentDashboardTableStyled = withStyles(AgentDashboardTable, styles);
+const AgentDashboardTableStyled = withStyles(
+  AgentDashboardTable,
+  (theme: { spacing: (arg0: number) => any; }) => ({
+    root: {
+      seeMore: {
+        marginTop: theme.spacing(3),
+      },
+    }
+  })
+);
+
 export default connect(mapStateToProps, {})(AgentDashboardTableStyled);

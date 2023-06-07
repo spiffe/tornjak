@@ -144,3 +144,8 @@ export interface AccessToken {
   sub: string; // to whom this entity refers to
   typ: string; // type of token
 }
+
+export type PieChartEntry = {
+  group: string,
+  value: number
+}
