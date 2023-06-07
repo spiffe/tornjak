@@ -33,7 +33,7 @@ User management requires the following:
 We have experimented extensively with the open source Keycloak Auth Server. 
 Specifically, it is very easy to set up a Tornjak secured by Keycloak today, by following these steps: 
 
-1. Configure Auth Server
+1. **Configure Auth Server**
 To configure the Auth Server, please see our [Medium blog](https://medium.com/universal-workload-identity/step-by-step-guide-to-setup-keycloak-configuration-for-tornjak-dbe5c3049034) for a walkthrough on configuring the Auth Server. For more in-depth documentation on this setup, please see [this document on Keycloak configuration](./keycloak-configuration.md).
 
 1. Enable User Management for Tornjak Backend
