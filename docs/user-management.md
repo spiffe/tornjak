@@ -36,7 +36,7 @@ Specifically, it is very easy to set up a Tornjak secured by Keycloak today, by 
 1. **Configure Auth Server**
 To configure the Auth Server, please see our [Medium blog](https://medium.com/universal-workload-identity/step-by-step-guide-to-setup-keycloak-configuration-for-tornjak-dbe5c3049034) for a walkthrough on configuring the Auth Server. For more in-depth documentation on this setup, please see [this document on Keycloak configuration](./keycloak-configuration.md).
 
-1. Enable User Management for Tornjak Backend
+1. **Enable User Management for Tornjak Backend**
 Once the Auth Server is set up, we can deploy the Tornjak Backend to require access tokens from our Auth Server, 
 as detailed in 
 [this followup Medium blog](https://medium.com/universal-workload-identity/guide-to-integrating-tornjak-with-keycloak-for-access-control-to-spire-40a3d5ee5f5a), 
