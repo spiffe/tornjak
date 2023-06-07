@@ -66,6 +66,6 @@ Please be patient, as it might take a few minutes to compile and start the serve
 
 For a cloud deployment change the URLs accordingly using the cloud provider ingress.
 
-Given the Auth Server configuration above, we have `an admin` and `a viewer` user type. 
+Given the Auth Server configuration above, we have an `admin` and a `viewer` user type. 
 An Admin User has an admin level privileges allowing create, configure, and delete operations. 
 The Viewer User has a restricted access for the Tornjak UI, allowing only read and list operations.  
