@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core/styles';
+import { withStyles } from 'tss-react/mui';
 import renderCellExpand from './render-cell-expand';
 import TableDashboard from './table/dashboard-table';
 import SpiffeHelper from '../spiffe-helper';
 import TornjakHelper from 'components/tornjak-helper';
-import { GridCellParams, GridColDef } from '@material-ui/data-grid';
+import { GridCellParams, GridColDef } from '@mui/x-data-grid';
 import { AgentsReducerState, EntriesReducerState } from 'redux/actions/types';
 import { RootState } from 'redux/reducers';
 
@@ -13,19 +13,13 @@ const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 170, renderCell: renderCellExpand as (params: GridCellParams)=>JSX.Element },
   { field: "spiffeid", headerName: "Name", width: 170, renderCell: renderCellExpand as (params: GridCellParams)=>JSX.Element },
   { field: "parentId", headerName: "Parent ID", width: 170, renderCell: renderCellExpand as (params: GridCellParams)=>JSX.Element },
-  { field: "clusterName", headerName: "Cluster Name", width: 170 },
-  { field: "entryExpireTime", headerName: "Entry Expire Time", width: 190 },
-  { field: "platformType", headerName: "Platform Type", width: 170 },
-  { field: "adminFlag", headerName: "Admin Flag", width: 150, type: 'boolean'},
+  { field: "clusterName", headerName: "Cluster Name", width: 150 },
+  { field: "entryExpireTime", headerName: "Entry Expire Time", width: 150 },
+  { field: "platformType", headerName: "Platform Type", width: 150 },
+  { field: "adminFlag", headerName: "Admin Flag", width: 125, type: 'boolean'},
 ];
 
-const styles = (theme:Theme) => createStyles({
-  seeMore: {
-    marginTop: theme.spacing(3),
-  }
-});
-
-interface EntriesDashBoardTableProp extends WithStyles<typeof styles> {
+interface EntriesDashBoardTableProp {
   filterByCluster?:string,
   filterByAgentId?:string,
   globalClickedDashboardTable: string,
@@ -94,6 +88,16 @@ const mapStateToProps = (state:RootState) => ({
   globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 })
 
-export default withStyles(styles)(
-  connect(mapStateToProps, {})(EntriesDashBoardTable)
-)
+const EntriesDashBoardTableStyled = withStyles(
+  EntriesDashBoardTable,
+  (theme: { spacing: (arg0: number) => any; }) => ({
+    root: {
+      seeMore: {
+        marginTop: theme.spacing(3),
+      },
+    }
+  })
+);
+
+export default connect(mapStateToProps, {})(EntriesDashBoardTableStyled);
+

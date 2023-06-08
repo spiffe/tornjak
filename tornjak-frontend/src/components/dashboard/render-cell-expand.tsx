@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Popper, Typography, Paper } from '@material-ui/core';
-import Box from '@mui/material/Box';
+import { Popper, Typography, Paper, Box } from '@mui/material';
 
 type GridCellExpandProps = {
     width: number,

@@ -1,10 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core/styles';
+import { withStyles } from 'tss-react/mui';
 import TableDashboard from './table/dashboard-table';
 import SpiffeHelper from '../spiffe-helper';
 import TornjakHelper from 'components/tornjak-helper';
-import { GridColDef } from '@material-ui/data-grid';
+import { GridColDef } from '@mui/x-data-grid';
 import { AgentsReducerState, EntriesReducerState } from 'redux/actions/types';
 import { RootState } from 'redux/reducers';
 import { ClustersList } from 'components/types';
@@ -16,13 +16,7 @@ const columns: GridColDef[] = [
   { field: "numEntries", headerName: "Number of Entries", width: 200 }
 ];
 
-const styles = (theme:Theme) => createStyles({
-  seeMore: {
-    marginTop: theme.spacing(3),
-  },
-});
-
-interface ClusterDashboardTableProp extends WithStyles<typeof styles> {
+interface ClusterDashboardTableProp {
   filterByCluster?:string,
   filterByAgentId?:string,
   globalClickedDashboardTable: string,
@@ -83,6 +77,15 @@ const mapStateToProps = (state:RootState) => ({
   globalEntries: state.entries,
 })
 
-export default withStyles(styles)(
-  connect(mapStateToProps, {})(ClusterDashboardTable)
-)
+const ClusterDashboardTableStyled = withStyles(
+  ClusterDashboardTable,
+  (theme: { spacing: (arg0: number) => any; }) => ({
+    root: {
+      seeMore: {
+        marginTop: theme.spacing(3),
+      },
+    }
+  })
+); 
+
+export default connect(mapStateToProps, {})(ClusterDashboardTableStyled);

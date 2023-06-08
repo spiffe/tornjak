@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import clsx from 'clsx';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from 'tss-react/mui';
 // Components
 import {
     CssBaseline,
@@ -16,14 +16,14 @@ import {
     ListItemIcon,
     ListItemText,
     ListSubheader,
-} from '@material-ui/core';
+} from '@mui/material';
 // Icons
-import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import PeopleIcon from '@material-ui/icons/People';
-import BarChartIcon from '@material-ui/icons/BarChart';
-import LayersIcon from '@material-ui/icons/Layers';
+import MenuIcon from '@mui/icons-material/Menu';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import PeopleIcon from '@mui/icons-material/People';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import LayersIcon from '@mui/icons-material/Layers';
 import {
     clickedDashboardTableFunc,
 } from 'redux/actions';
@@ -66,6 +66,7 @@ const styles = theme => ({
     },
     menuButton: { //menu button next to Tornjak Dashboard title on view
         marginRight: 35,
+        marginTop: 20
     },
     menuButtonHidden: { //menu button next to Tornjak Dashboard title on hidden
         display: 'none',
@@ -79,6 +80,7 @@ const styles = theme => ({
         position: 'relative',
         whiteSpace: 'nowrap',
         marginLeft: -20,
+        top: 10,
         zIndex: 1,
         width: drawerWidth,
         height: drawerHeight,
@@ -146,7 +148,7 @@ class DashboardDrawer extends React.Component {
     }
 
     render() {
-        const { classes } = this.props;
+        const classes = withStyles.getClasses(this.props);
         return (
             <div>
                 <CssBaseline />
@@ -239,6 +241,5 @@ const mapStateToProps = (state) => ({
     globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 })
 
-export default withStyles(styles)(
-    connect(mapStateToProps, { clickedDashboardTableFunc })(DashboardDrawer)
-)
+const DashboardDrawerStyled = withStyles(DashboardDrawer, styles);
+export default connect(mapStateToProps, { clickedDashboardTableFunc })(DashboardDrawerStyled);

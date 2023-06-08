@@ -1,13 +1,9 @@
 import React from "react";
 import { connect } from 'react-redux';
-import { DataGrid, GridColDef, GridToolbar } from "@material-ui/data-grid";
+import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import Title from '../title';
-import {
-  Button,
-} from '@material-ui/core';
-import {
-  clickedDashboardTableFunc,
-} from 'redux/actions';
+import { Button } from '@mui/material';
+import { clickedDashboardTableFunc } from 'redux/actions';
 import TornjakHelper from 'components/tornjak-helper';
 import { RootState } from "redux/reducers";
 
@@ -37,7 +33,7 @@ class TableDashboard extends React.Component<TableDashboardProp, TableDashboardS
   }
 
   render() {
-    const { numRows, data, columns, title } = this.props;
+    const { data, columns, title } = this.props;
     return (
       <React.Fragment>
         <Title>
@@ -51,7 +47,7 @@ class TableDashboard extends React.Component<TableDashboardProp, TableDashboardS
         </Title>
         <Button //Selected Details Button
           href={this.TornjakHelper.detailsLink(this.state.selectedRows, title)}
-          style={{ width: 160, marginLeft: 1040, marginBottom: 20 }}
+          style={{ width: 160, marginLeft: 959, marginBottom: 20 }}
           color="primary"
           size="small"
           variant="outlined"
@@ -69,14 +65,12 @@ class TableDashboard extends React.Component<TableDashboardProp, TableDashboardS
           <DataGrid
             rows={data}
             columns={columns}
-            pageSize={numRows}
-            rowsPerPageOptions={[numRows]}
             autoHeight={true}
-            onSelectionModelChange={(newSelection) =>{
-              this.setState({ selectedRows: newSelection[0].toString() })
+            onRowSelectionModelChange={(newSelection) =>{
+              if (newSelection[0]) this.setState({ selectedRows: newSelection[0].toString() })
             }}
-            components={{
-              Toolbar: GridToolbar,
+            slots={{
+              toolbar: GridToolbar,
             }}
           />
         </div>

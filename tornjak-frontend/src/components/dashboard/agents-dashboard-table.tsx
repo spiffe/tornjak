@@ -1,13 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { withStyles, WithStyles, Theme, createStyles } from '@material-ui/core';
+import { withStyles } from 'tss-react/mui';
 import renderCellExpand from './render-cell-expand';
 import TableDashboard from './table/dashboard-table';
 import SpiffeHelper from '../spiffe-helper';
 import TornjakHelper from 'components/tornjak-helper';
 import { AgentsReducerState, EntriesReducerState } from 'redux/actions/types';
 import { RootState } from 'redux/reducers';
-import { GridCellParams, GridColDef } from '@material-ui/data-grid';
+import { GridCellParams, GridColDef } from '@mui/x-data-grid';
 
 const columns: GridColDef[] = [
   { field: "spiffeid", headerName: "Name", flex: 1, renderCell: renderCellExpand as (params: GridCellParams)=>JSX.Element },
@@ -17,12 +17,7 @@ const columns: GridColDef[] = [
   { field: "platformType", headerName: "Platform Type", width: 170 },
 ];
 
-const styles = (theme:Theme) => createStyles({
-  seeMore: {marginTop: theme.spacing(3)}
-});
-
-
-interface AgentDashboardTableProp extends WithStyles<typeof styles> {
+interface AgentDashboardTableProp {
   filterByCluster?:string,
   filterByAgentId?:string,
   globalClickedDashboardTable: string,
@@ -87,6 +82,16 @@ const mapStateToProps = (state:RootState) => ({
   globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 })
 
-export default withStyles(styles)(
-  connect(mapStateToProps, {})(AgentDashboardTable)
-)
+
+const AgentDashboardTableStyled = withStyles(
+  AgentDashboardTable,
+  (theme: { spacing: (arg0: number) => any; }) => ({
+    root: {
+      seeMore: {
+        marginTop: theme.spacing(3),
+      },
+    }
+  })
+);
+
+export default connect(mapStateToProps, {})(AgentDashboardTableStyled);
