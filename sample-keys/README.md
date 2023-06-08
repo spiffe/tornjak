@@ -20,7 +20,7 @@ Run `./create-ca.sh` to create a CA. It will put the necessary cert and key file
 
 ### Signing a cert
 
-Certificates are required for TLS and mTLS connectiosn with the Tornjak server. To create and sign a certificate run `./create-cert.sh <domain name> <name>`. 
+Certificates are required for TLS and mTLS connections with the Tornjak server. To create and sign a certificate run `./create-cert.sh <domain name> <name>`. 
 
 For example, to create a certificate to be run at the local host domain name, we can run: 
 
