@@ -28,6 +28,8 @@ const pluginTagColorMapper: { [key: string]: TagTypeName | undefined; } = {
 type TornjakServerInfoProp = {
   // dispatches a payload for the debug server info of the selected server and has a return type of void
   spireDebugServerInfoUpdateFunc: (globalDebugServerInfo: DebugServerInfo) => void,
+  // tornjak server debug info of the selected server
+  globalDebugServerInfo: DebugServerInfo,
   // dispatches a payload for the tornjak server info of the selected server and has a return type of void
   tornjakServerInfoUpdateFunc: (globalTornjakServerInfo: TornjakServInfo) => void,
   // dispatches a payload for an Error Message/ Success Message of an executed function as a string and has a return type of void
@@ -45,27 +47,31 @@ type TornjakServerInfoState = {}
 const PluginTags = (props: { names: string[], type: string }) => (
   <p>{props.names.map((v: string) => <Tag type={pluginTagColorMapper[props.type]} >{props.type + ": " + v}</Tag>)}</p>
 )
-const TornjakServerInfoDisplay = (props: { tornjakServerInfo: TornjakServInfo }) => (
+const TornjakServerInfoDisplay = (props: { tornjakServerInfo: TornjakServInfo, tornjakDebugInfo: DebugServerInfo }) => (
   <Accordion>
     <AccordionItem title="Trust Domain" open>
       <p>
-        {props.tornjakServerInfo.trustDomain}
+        {props.tornjakDebugInfo.svid_chain[0].id.trust_domain}
       </p>
     </AccordionItem>
     <AccordionItem title="Plugins" open>
-      <table>
-        {
-          (props.tornjakServerInfo.plugins &&
-            Object.entries(props.tornjakServerInfo.plugins).map(([key, value]) =>
-              <tr key={key + ":" + value}><PluginTags type={key} names={value} /></tr>)
-          )
-        }
-      </table>
+      {(props.tornjakServerInfo && Object.keys(props.tornjakServerInfo).length !== 0) && (
+        <table>
+          {
+            (props.tornjakServerInfo.plugins &&
+              Object.entries(props.tornjakServerInfo.plugins).map(([key, value]) =>
+                <tr key={key + ":" + value}><PluginTags type={key} names={value} /></tr>)
+            )
+          }
+        </table>
+      )}
     </AccordionItem>
     <AccordionItem title="Verbose Config (click to expand)">
-      <pre>
-        {props.tornjakServerInfo.verboseConfig}
-      </pre>
+      {(props.tornjakServerInfo && Object.keys(props.tornjakServerInfo).length !== 0) && (
+        <pre>
+          {props.tornjakServerInfo.verboseConfig}
+        </pre>
+      )}
     </AccordionItem>
   </Accordion>
 )
@@ -101,11 +107,14 @@ class TornjakServerInfo extends Component<TornjakServerInfoProp, TornjakServerIn
     if (!this.props.globalTornjakServerInfo || Object.keys(this.props.globalTornjakServerInfo).length === 0) {
       return ""
     } else {
-      return <TornjakServerInfoDisplay tornjakServerInfo={this.props.globalTornjakServerInfo} />
+      return <TornjakServerInfoDisplay
+        tornjakServerInfo={this.props.globalTornjakServerInfo}
+        tornjakDebugInfo={this.props.globalDebugServerInfo} />
     }
   }
 
   render() {
+    console.log("hi", this.props.globalDebugServerInfo.svid_chain[0].id.trust_domain)
     return (
       <div>
         <h3>Server Info</h3>
@@ -128,6 +137,7 @@ const mapStateToProps = (state: RootState) => ({
   globalServerInfo: state.servers.globalServerInfo,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
   globalErrorMessage: state.tornjak.globalErrorMessage,
+  globalDebugServerInfo: state.servers.globalDebugServerInfo,
 })
 
 export default connect(

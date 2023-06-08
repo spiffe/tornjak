@@ -218,7 +218,9 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
         spireDebugServerInfoUpdateFunc(response.data)
         tornjakMessageFunc(response.statusText)
       })
-      .catch((error) => displayResponseError("Error getting debug server info.", error))
+      .catch((error) => {
+        logError(error);
+      })
   }
 
   // populateLocalTornjakServerInfo returns the torjak server info of the server in local mode

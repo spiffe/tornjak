@@ -14,6 +14,7 @@ import {
   workloadSelectorInfoFunc,
   agentworkloadSelectorInfoFunc,
   clusterTypeInfoFunc,
+  spireDebugServerInfoUpdateFunc
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
 import { 
@@ -23,10 +24,13 @@ import {
   ServerInfo,
   TornjakServerInfo,
   WorkloadSelectorInfoLabels,
+  DebugServerInfo
 } from './types';
 //import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type AgentListProp = {
+  // dispatches a payload for the debug server info of the selected server and has a return type of void
+  spireDebugServerInfoUpdateFunc: (globalDebugServerInfo: DebugServerInfo) => void,
   // dispatches a payload for list of available cluster types as array of strings and has a return type of void
   clusterTypeInfoFunc: (globalClusterTypeInfo: string[]) => void,  
   // dispatches a payload for list of available selectors and their options as an object and has a return type of void
@@ -91,6 +95,7 @@ class AgentList extends Component<AgentListProp, AgentListState> {
       this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
       this.TornjakApi.populateLocalAgentsUpdate(this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
       this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
+      this.TornjakApi.populateLocalTornjakDebugServerInfo(this.props.spireDebugServerInfoUpdateFunc, this.props.tornjakMessageFunc);
       if (this.props.globalTornjakServerInfo && Object.keys(this.props.globalTornjakServerInfo).length) {
         this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
       }
@@ -178,7 +183,8 @@ export default connect(
     tornjakMessageFunc, 
     workloadSelectorInfoFunc, 
     agentworkloadSelectorInfoFunc, 
-    clusterTypeInfoFunc 
+    clusterTypeInfoFunc,
+    spireDebugServerInfoUpdateFunc 
   }
 ) (AgentList)
 
