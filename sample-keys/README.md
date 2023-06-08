@@ -17,6 +17,7 @@ Note that sample certificates and keys are included in publicly provided image `
 
 ### Create a CA
 
+You can bring your own CA to use for signing the certificates. Replace the CA and key in `CA/` directory with yours.
 Otherwise, delete the content of current `CA/` directory and run `./create-ca.sh` script to create a CA. It will put the necessary cert and key files in the `CA/` directory. 
 
 ### Signing a cert
