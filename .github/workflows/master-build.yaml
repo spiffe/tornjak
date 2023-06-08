@@ -4,7 +4,6 @@ on:
     branches:
     - main
     - v1.2
-    - fixing-access-denied-env-injection-error-addindex
 jobs:
   tornjak-build:
     runs-on: ubuntu-latest
