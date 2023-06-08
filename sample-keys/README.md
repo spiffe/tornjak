@@ -1,5 +1,6 @@
 # TLS and mTLS for Tornjak
 
+This document describes steps required for enabling TLS (Transport Layer Security) and/or mTLS (mutualTLS) communication with Tornjak. By default, the Tornjak image already contains sample certificates and keys to demonstrate the functionality of the secure connection. These keys are included for illustrative purpose only, and they should not be used in production deployments. 
 In order to enable TLS and mTLS connection for Tornjak, a server must be configured with certificate and key information. This document outlines the following steps to try out the feature:
 
 1. [Create the relevant TLS/mtls files](#create-the-relevant-tls-files)
