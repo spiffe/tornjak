@@ -114,6 +114,8 @@ Additionally, the client will call with their own certificate/key pair that must
 
 </details>
 
+Once configured, be sure that the relevant certificates and keys are delivered to the Tornjak container if you are using your own certificates and keys. This can be done via secret as documented in [additional notes](#delivering-files-via-secret).
+
 ## Making calls to Tornjak Backend
 
 Once configured with the certificates, we can make curl commands to the Tornjak server. 
@@ -122,7 +124,6 @@ In order to make these calls in our simple usecase, we require the rootCA certif
 
 ```
 git clone https://github.com/spiffe/tornjak.git
-git checkout v1.3
 cd tornjak/sample-keys
 ```
 
@@ -131,7 +132,7 @@ cd tornjak/sample-keys
 In TLS connection, only the server's certificate is verified by the client caller. In our example, we can make a curl command with the rootCA certificate that signed the Tornjak server certificate so that the client can validate the server's certificate:
 
 ```
-curl --cacert rootCA.crt https://<Tornjak_TLS_endpoint>
+curl --cacert CA/rootCA.crt https://<Tornjak_TLS_endpoint>
 ```
 
 ### Make a mTLS call
@@ -148,6 +149,8 @@ Note that we are using the same certificate/key pair as the Tornjak server. Howe
 
 ## Additional Notes
 
+### Delivering files via secret
+
 Note that to properly use this feature in production-level environment, the keys and certs should not be the given sample keys and certificates published in the `tornjak-backend` image. Instead, one could configure the Tornjak server with a secret. For example:
 
 ```
@@ -158,3 +161,5 @@ kubectl -n tornjak create secret generic tornjak-certs \
 ```
 
 using your own key and certificate. 
+
+Once this is done, you may mount the secret to the container at the paths configured in [the Tornjak config file](#configure-the-tornjak-server). 
