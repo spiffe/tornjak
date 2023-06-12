@@ -40,7 +40,7 @@ bin/
 ui/
 node_modules/
 frontend-local-build/
-.idea/
+.idea
 Makefile
 
 /agent
