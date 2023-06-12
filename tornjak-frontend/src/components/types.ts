@@ -81,6 +81,28 @@ export interface EntriesList {
 export type link = string;
 
 // servers
+export interface DebugServerInfo {
+  svid_chain: [
+        {
+            id: {
+                trust_domain: string,
+                path: string
+            },
+            expires_at: number,
+            subject: string
+        },
+        {
+            id: {
+                trust_domain: string
+            },
+            expires_at: number,
+            subject: string
+        }
+    ],
+    uptime: number,
+    federated_bundles_count: number
+}
+
 export interface TornjakServerInfo {
   // Plugins for tornjak server info
   plugins: {
