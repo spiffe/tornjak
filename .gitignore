@@ -5,7 +5,7 @@
 !tornjak-backend/
 
 # golang vendor
-vendor/
+vendor
 
 # dependencies
 tornjak-frontend/node_modules
@@ -36,11 +36,14 @@ agentlocaldb
 tornjak-manager
 
 # build artifacts
-bin/
-ui/
-node_modules/
-frontend-local-build/
+bin
+ui
+frontend-local-build
 .idea
-Makefile
+
+# accidental local builds
+node_modules
+package.json
+package-lock.json
 
 /agent
