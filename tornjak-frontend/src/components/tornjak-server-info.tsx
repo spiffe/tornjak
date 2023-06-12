@@ -15,6 +15,7 @@ import {
   TornjakServerInfo as TornjakServInfo,
   DebugServerInfo,
 } from './types';
+import { InlineNotification } from 'carbon-components-react';
 
 const pluginTagColorMapper: { [key: string]: TagTypeName | undefined; } = {
   "NodeAttestor": "red",
@@ -45,7 +46,11 @@ type TornjakServerInfoProp = {
 type TornjakServerInfoState = {}
 
 const PluginTags = (props: { names: string[], type: string }) => (
-  <p>{props.names.map((v: string) => <Tag type={pluginTagColorMapper[props.type]} >{props.type + ": " + v}</Tag>)}</p>
+  <>
+    {props.names.map((value: string) =>
+      <Tag key={value} type={pluginTagColorMapper[props.type]}>{props.type + ": " + value}</Tag>
+    )}
+  </>
 )
 const TornjakServerInfoDisplay = (props: { tornjakServerInfo: TornjakServInfo, tornjakDebugInfo: DebugServerInfo }) => (
   <Accordion>
@@ -55,23 +60,54 @@ const TornjakServerInfoDisplay = (props: { tornjakServerInfo: TornjakServInfo, t
       </p>
     </AccordionItem>
     <AccordionItem title="Plugins" open>
-    {(props.tornjakServerInfo && Object.keys(props.tornjakServerInfo).length !== 0) && (
-        <table>
-          {
-            (props.tornjakServerInfo.plugins &&
-              Object.entries(props.tornjakServerInfo.plugins).map(([key, value]) =>
-                <tr key={key + ":" + value}><PluginTags type={key} names={value} /></tr>)
-            )
-          }
-        </table>
-      )}
+      {(props.tornjakServerInfo && Object.keys(props.tornjakServerInfo).length !== 0)
+        ? (
+          <table>
+            <tbody>
+              {
+                (props.tornjakServerInfo.plugins &&
+                  Object.entries(props.tornjakServerInfo.plugins).map(([key, value]) =>
+                    <tr key={key + ":" + value}>
+                      <td>
+                        <PluginTags type={key} names={value} />
+                      </td>
+                    </tr>)
+                )
+              }
+            </tbody>
+          </table>
+        )
+        :
+        (
+          <div>
+            <InlineNotification
+              kind="warning"
+              hideCloseButton
+              lowContrast
+              title="No Plugin Info Provided from server"
+            />
+          </div>
+        )
+      }
     </AccordionItem>
     <AccordionItem title="Verbose Config (click to expand)">
-    {(props.tornjakServerInfo && Object.keys(props.tornjakServerInfo).length !== 0) && (
-        <pre>
-          {props.tornjakServerInfo.verboseConfig}
-        </pre>
-      )}
+      {(props.tornjakServerInfo && Object.keys(props.tornjakServerInfo).length !== 0)
+        ? (
+          <pre>
+            {props.tornjakServerInfo.verboseConfig}
+          </pre>
+        )
+        : (
+          <div>
+            <InlineNotification
+              kind="warning"
+              hideCloseButton
+              lowContrast
+              title="No Server Config Provided from server"
+            />
+          </div>
+        )
+      }
     </AccordionItem>
   </Accordion>
 )
@@ -104,7 +140,7 @@ class TornjakServerInfo extends Component<TornjakServerInfoProp, TornjakServerIn
   }
 
   tornjakServerInfo() {
-    if (!this.props.globalTornjakServerInfo || Object.keys(this.props.globalTornjakServerInfo).length === 0) {
+    if (!this.props.globalDebugServerInfo || Object.keys(this.props.globalDebugServerInfo).length === 0) {
       return ""
     } else {
       return <TornjakServerInfoDisplay

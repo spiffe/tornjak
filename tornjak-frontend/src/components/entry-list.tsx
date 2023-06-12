@@ -11,10 +11,14 @@ import {
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 import { RootState } from 'redux/reducers';
 import {
-  EntriesList, TornjakServerInfo
+  EntriesList, 
+  TornjakServerInfo,
+  DebugServerInfo,
 } from './types'
 
 type EntryListProp = {
+  // tornjak server debug info of the selected server
+  globalDebugServerInfo: DebugServerInfo,
   // dispatches a payload for the server selected and has a return type of void
   serverSelectedFunc: (globalServerSelected: string) => void,
   // dispatches a payload for list of entries with their metadata info as an array of EntriesListType and has a return type of void
@@ -69,7 +73,7 @@ class EntryList extends Component<EntryListProp, EntryListState> {
         this.TornjakApi.populateEntriesUpdate(this.props.globalServerSelected, this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
       }
     } else {
-      if (prevProps.globalTornjakServerInfo !== this.props.globalTornjakServerInfo) {
+      if (prevProps.globalDebugServerInfo !== this.props.globalDebugServerInfo) {
         this.TornjakApi.populateLocalEntriesUpdate(this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
       }
     }
@@ -108,6 +112,7 @@ const mapStateToProps = (state: RootState) => ({
   globalEntriesList: state.entries.globalEntriesList,
   globalErrorMessage: state.tornjak.globalErrorMessage,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
+  globalDebugServerInfo: state.servers.globalDebugServerInfo,
 })
 
 // Note: Needed for UI testing - will be removed after

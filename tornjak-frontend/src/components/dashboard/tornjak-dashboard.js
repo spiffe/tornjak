@@ -120,7 +120,7 @@ class TornjakDashboard extends React.Component {
         this.TornjakApi.populateTornjakAgentInfo(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc, { "agents": this.agentSpiffeids() });
       }
     } else {
-      if (prevProps.globalTornjakServerInfo !== this.props.globalTornjakServerInfo) {
+      if (prevProps.globalDebugServerInfo !== this.props.globalDebugServerInfo) {
         this.TornjakApi.populateLocalAgentsUpdate(this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
         this.TornjakApi.populateLocalEntriesUpdate(this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
         this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc)
@@ -225,6 +225,7 @@ const mapStateToProps = (state) => ({
   globalAgents: state.agents,
   globalEntries: state.entries.globalEntriesList,
   globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
+  globalDebugServerInfo: state.servers.globalDebugServerInfo,
 })
 
 const TornjakDashboardStyled = withStyles(TornjakDashboard, styles);

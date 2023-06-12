@@ -15,10 +15,17 @@ import {
 } from 'redux/actions';
 
 import { RootState } from 'redux/reducers';
-import { AgentsList, ServerInfo, TornjakServerInfo } from './types';
+import { 
+    AgentsList, 
+    ServerInfo, 
+    TornjakServerInfo,
+    DebugServerInfo,
+} from './types';
 import { showResponseToast } from './error-api';
 
 type SelectServerProp = {
+    // tornjak server debug info of the selected server
+    globalDebugServerInfo: DebugServerInfo,
     // dispatches a payload for the list of available servers and their basic info as array of strings and has a return type of void
     serversListUpdateFunc: (globalServersList: Array<string>) => void,
     // dispatches a payload for the server selected in the redux state as a string and has a return type of void
@@ -65,7 +72,7 @@ class SelectServer extends Component<SelectServerProp, SelectServerState> {
             if ((this.props.globalServerSelected !== "") && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
                 this.TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
             }
-            if ((this.props.globalTornjakServerInfo && Object.keys(this.props.globalTornjakServerInfo).length) && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
+            if ((this.props.globalDebugServerInfo && Object.keys(this.props.globalDebugServerInfo).length) && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
                 this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
                 this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc)
             }
@@ -153,6 +160,7 @@ const mapStateToProps = (state: RootState) => ({
     globalServersList: state.servers.globalServersList,
     globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
     globalErrorMessage: state.tornjak.globalErrorMessage,
+    globalDebugServerInfo: state.servers.globalDebugServerInfo,
 })
 
 export default connect(
