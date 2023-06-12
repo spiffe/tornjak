@@ -31,6 +31,5 @@ ENV GITHUB_SHA=$github_sha
 RUN mkdir -p /opt/spire
 
 COPY bin/tornjak-backend /opt/spire/tornjak-backend
-COPY sample-keys /opt/spire/sample-keys
 COPY run_tornjak.sh /opt/spire/run_tornjak.sh
 COPY --from=build /usr/src/app ./
