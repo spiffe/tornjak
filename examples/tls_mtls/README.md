@@ -4,14 +4,14 @@ This document describes steps required for enabling TLS (Transport Layer Securit
 
 To enable TLS and mTLS connection for Tornjak, a server must be configured with the proper certificate and key information. This document outlines the following steps to try out the feature:
 
-1. [Deliver relevant certificate/key pair to Tornjak container](#deliver-relevant-certificate-key-pair-to-tornjak-container)
-2. [Configure the Tornjak server](#configure-the-tornjak-server)
-3. [Make calls to the Tornjak Backend](#making-calls-to-the-tornjak-backend)
-4. [Create your own TLS/mTLS files](#create-your-own-tls-mtls-files)
+1. [Deliver relevant certificate/key pair to Tornjak container](#step-1-deliver-relevant-certificatekey-pair-to-tornjak-container)
+2. [Configure the Tornjak server](#step-2-configure-the-tornjak-server)
+3. [Make calls to the Tornjak Backend](#step-3-make-calls-to-the-tornjak-backend)
+4. [Create your own TLS/mTLS files](#step-4-create-your-own-tlsmtls-files)
 
-### Prerequesites
+### Prerequisites
 
-You must have an instance of Tornjak deployed. If this is not done yet, please follow our [quickstart tutorial]() to deploy your instance of Tornjak. We recommend deploying the backend-only version of Tornjak. 
+You must have an instance of Tornjak deployed. If this is not done yet, please follow our [quickstart tutorial](../../docs/quickstart) to deploy your instance of Tornjak. We recommend deploying the backend-only version of Tornjak. 
 
 ## Step 1: Deliver relevant certificate/key pair to Tornjak container
 
@@ -31,32 +31,106 @@ For mTLS, we additionally need to deliver the CA certificate of the caller to th
 We can do this via secret and volume mount. First, to create the secret, we can use the dedicated [TLS secret type](https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets):
 
 ```
-kubectl create secret tls tornjak-server-tls \
+kubectl create secret tls -n spire tornjak-server-tls \
   --cert=server.crt \
-  --key=server.key
+  --key=server.key 
 ```
 
 Now we can see the secret has been created here:
 
 ```
-kubectl get secret
+kubectl describe secret -n spire tornjak-server-tls
 ```
 
-To make the secret accessible to the Tornjak container, we must create a volume for the secret and mount the volume to the container. 
+```
+Name:         tornjak-server-tls
+Namespace:    default
+Labels:       <none>
+Annotations:  <none>
 
-< TODO > discuss changes to server statefulset file. 
+Type:  kubernetes.io/tls
+
+Data
+====
+tls.crt:  1558 bytes
+tls.key:  1675 bytes
+```
+
+To make the secret accessible to the Tornjak container, we must create a volume for the secret and mount the volume to the container. In the case of the quickstart, for example, we would edit the `server-statefulset.yaml` file to create the secret volume and mount. 
+
+For the secret created above, we can modify the statefulset deployment. One example for modifying the quickstart deployment can be found in the current directory at server-statefulset-tls.yaml. 
+
+```
+cat server-statefulset-tls.yaml
+```
+
+```
+...
+volumeMounts:
+...
+  - name: tls-volume
+    mountPath: /opt/spire/server
+...
+volumes:
+...
+  - name: tls-volume
+    secret:
+      secretName: tornjak-server-tls
+```
+
+Apply the same changes to your deployment, attaching the secret volumeMount to the Tornjak container. For the quickstart, we can simply apply the file and view the files in the container:
+
+```
+kubectl apply -f server-statefulset-tls.yaml
+kubectl exec -n spire spire-server-0 -c tornjak-backend -- ls server
+```
+
+```
+tls.cert
+tls.key
+```
 
 ### Deliver the CA certificate to Tornjak (mTLS only)
 
 For mTLS we will additionally need to deliver a CA certificate to the Tornjak container. The process is the same. First we create the secret:
 
 ```
-kubectl create secret ...
+kubectl create secret generic -n spire tornjak-user-certs \
+  --from-file=CA-user/rootCA.crt
 ```
 
-And then we mount the secret to the Tornjak container via volume mount:
+Then we mount the secret to the Tornjak container via volume mount, as in the previous secret volume mount, retaining the previous modifications: 
 
-< TODO > discuss changes to server statefulset file
+```
+...
+volumeMounts:
+...
+  - name: tls-volume
+    mountPath: /opt/spire/server
+  - name: user-cas
+    mountPath: /opt/spire/users
+...
+volumes:
+...
+  - name: tls-volume
+    secret:
+      secretName: tornjak-server-tls
+  - name: user-cas
+    secret: 
+      secretName: tornjak-user-certs
+
+```
+
+Apply the same changes to your deployment, attaching the secret volumeMount to the Tornjak container. For the quickstart, we can simply apply the file and view the files in the container:
+
+```
+kubectl apply -f server-statefulset-mtls.yaml
+kubectl exec -n spire spire-server-0 -c tornjak-backend -- ls users
+```
+
+```
+rootCA.crt
+```
 
 ----
 
@@ -64,7 +138,7 @@ And then we mount the secret to the Tornjak container via volume mount:
 
 Now that we have mounted the relevant files in step 1, we must configure the Tornjak server to read these files in and create a TLS and/or mTLS connection. First, we will edit the Tornjak configmap to configure these connections, then we can apply the configmap. 
 
-More details on the configmap can be found [in our config documentation](). 
+More details on the configmap can be found [in our config documentation](../../docs/config-tornjak-server.md). 
 
 One Tornjak server can open three connections simultaneously: HTTP, TLS, and mTLS, and at least one must be enabled. To configure each of the TLS and mTLS, expand below sections. 
 
@@ -78,16 +152,16 @@ server {
   tls {
     enabled = true
     port = 20000                 # container port for TLS connection
-    cert = "sample-keys/client.crt" # TLS cert <TODO check paths>
-    key = "sample-keys/client.key"  # TLS key
+    cert = "server/tls.crt" # TLS cert <TODO check paths>
+    key = "server/tls.key"  # TLS key
   }
   ...
 }
 ```
 
-In the above configuration, we create TLS connection at `localhost:20000` that uses certificate key pair at paths `` and `` respectively. 
+In the above configuration, we create TLS connection at `localhost:20000` that uses certificate key pair at paths `server/tls.cert` and `server/tls.key` respectively. An example of the TLS configuration is found in the current directory at `tornjak-configmap.yaml`.  
 
-A call to this port will require a CA that can verify the `cert/key` pair given. 
+A call to this port will require a CA that can verify the `cert/key` pair given. We can see that making a curl command to this port will create an error. First port-forward this connection to `localhost:20000`
 
 </details>
 
@@ -101,15 +175,15 @@ server {
   mtls {
     enabled = true
     port = 30000                  # container port for mTLS connection
-    cert = "sample-keys/client.crt"  # mTLS cert
-    key = "sample-keys/client.key"   # mTLS key
-    ca = "sample-keys/CA/rootCA.pem" # mTLS CA <TODO check paths>
+    cert = "server/tls.crt"  # mTLS cert
+    key = "server/tls.key"   # mTLS key
+    ca = "users/rootCA.crt"  # mTLS CA 
   }
   ...
 }
 ```
 
-The above configuration enables mTLS at `localhost:30000` that uses certificate/key pair at paths `TODO` and `TODO` respectively.  It verifies caller certificate/key pairs with ca certificate at path `TODO`. 
+The above configuration enables mTLS at `localhost:30000` that uses certificate/key pair at paths `server/tls.crt` and `server/tls.key` respectively.  It verifies caller certificate/key pairs with ca certificate at path `server/CA/rootCA.pem`. An example of the TLS configuration is found in the current directory at `tornjak-configmap.yaml`.  
 
 A call to this port requires a CA that can verify the `cert/key` pair given, as well as a cert/key pair signed by the CA with the `ca` certificate. 
 
@@ -118,19 +192,44 @@ A call to this port requires a CA that can verify the `cert/key` pair given, as 
 Once your desired configurations are set, we can apply the configmap and restart the Tornjak server to make these changes:
 
 ```
-kubectl apply TODO
-kubectl delete po TODO
+kubectl apply -f tornjak-configmap.yaml
+kubectl delete po -n spire spire-server-0
 ``` 
 
 Now if we take a look at the logs, you can see the relevant connections have been opened!
 
 ```
-kubectl logs TODO
+kubectl logs -n spire spire-server-0 -c tornjak-backend
 ```
+
+If we try to open the service to `localhost:20000`: 
+
+```
+kubectl -n spire port-forward spire-server-0 20000:20000
+```
+
+Then attempt curl command:
+
+```
+curl https://localhost:20000
+```
+
+```
+curl: (60) SSL certificate problem: unable to get local issuer certificate
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the web page mentioned above.
+```
+
+We see we rightfully get an error, as the caller has not provided the necessary information to verify the connection. 
+
+We will show how to make a proper curl command in the next section. 
 
 ----
 
-## Making calls to the Tornjak Backend
+## Step 3: Make calls to the Tornjak Backend
 
 Now that we have opened TLS and mTLS connection, we may make calls. You will need the url to access the endpoints.  If you have deployed locally on Minikube, as in the quickstart, you will need to port-forward the container to localhost. 
 
@@ -139,7 +238,11 @@ Now that we have opened TLS and mTLS connection, we may make calls. You will nee
 In order to make a TLS call we need only a CA certificate that can validate the certificate/key pair given to Tornjak in step 1.  In our case, we can use the certificate within `CA-server`:
 
 ```
-curl --cacert CA/rootCA.crt https://<Tornjak_TLS_endpoint> <TODO>
+curl --cacert CA-server/rootCA.crt https://<Tornjak_TLS_endpoint>
+```
+
+```
+"Welcome to the Tornjak Backend!"
 ```
 
 ### Make an mTLS call
@@ -149,12 +252,12 @@ In order to make a TLS call we need only a CA certificate that can validate the 
 Additionally, we must have a certificate/key pair locally that was signed by the CA certificate given to the Tornjak server when configuring mTLS.  In our case, we can use the certificate/key pair `user.crt` and `user.key`: 
 
 ```
-curl --cacert CA/rootCA.crt --key client.key --cert client.crt https://<Tornjak_mTLS_endpoint> <TODO>
+curl --cacert CA-server/rootCA.crt --key user.key --cert user.crt https://<Tornjak_mTLS_endpoint> 
 ```
 
 -----
 
-## Create your own TLS/mTLS files
+## Step 4: Create your own TLS/mTLS files
 
 All of the above can be demonstrated with our given sample-keys. However, to create your own sample certificates and keys, we have provided several scripts.  
 
