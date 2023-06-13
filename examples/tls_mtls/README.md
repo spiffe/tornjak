@@ -1,6 +1,16 @@
 # TLS and mTLS for Tornjak
 
-This document describes steps required for enabling TLS (Transport Layer Security) and/or mTLS (mutualTLS) communication with Tornjak. We provide sample keys and certificates in this directory for illustrative purpose only. They should not be used in production deployments. **You should always use your own Root SSL certificate issued by your own Certificate Authority**. Once HTTPS access is well-tested, HTTP access should be disabled. 
+This document describes steps required for enabling TLS (Transport Layer Security) and/or mTLS (mutualTLS) communication with Tornjak. 
+
+When TLS is enabled, client can verify the identity of the Tornjak server, and the communication between them is encrypted. 
+
+When mTLS is enabled, both client and server can verify the identity of each other, while keeping the communication secure. 
+
+We provide sample keys and certificates in this directory for illustrative purpose only. They should not be used in production deployments. 
+
+**You should always use your own Root SSL certificate issued by your own Certificate Authority**. 
+
+Once HTTPS access is well-tested and it works as expected, the HTTP access should be disabled. 
 
 To enable TLS and mTLS connection for Tornjak, a server must be configured with the proper certificate and key information. This document outlines the following steps to try out the feature:
 
