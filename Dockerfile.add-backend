@@ -1,8 +1,8 @@
 FROM ghcr.io/spiffe/spire-server:1.1.3
 ENTRYPOINT ["/opt/spire/run_server.sh"]
 RUN apk add curl
-COPY bin/tornjak-backend tornjak-backend
 COPY sample-keys sample-keys
+COPY bin/tornjak-backend tornjak-backend
 # Add init
 COPY run_server.sh run_server.sh
 

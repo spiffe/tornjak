@@ -4,7 +4,6 @@ RUN mkdir -p /opt/spire
 WORKDIR /opt/spire
 ENTRYPOINT ["/opt/spire/run_backend.sh"]
 
-COPY sample-keys sample-keys
 # Add init
 COPY run_backend.sh run_backend.sh
 COPY bin/tornjak-backend tornjak-backend
