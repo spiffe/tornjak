@@ -164,7 +164,7 @@ One Tornjak server can open three connections simultaneously: HTTP, TLS, and mTL
 
 To learn about the configurations each of the TLS and mTLS, expand below sections. 
 
-<details><summary><b> 🔴 [Click] Configuring TLS connection </b></summary>b
+<details><summary><b> 🔴 [Click] Configuring TLS connection </b></summary>
 
 The TLS configuration requires the port number on which to open the connection and the paths to the certificate and key pair as delivered in step 1. We can simply add a section under the `server{}` section of the configuration. This is formatted like so:
 
