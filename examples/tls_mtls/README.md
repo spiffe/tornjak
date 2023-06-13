@@ -267,41 +267,30 @@ In general, for any entity that will be verified with a certificate/key pair, yo
 
 ### Create the CA
 
-You can bring your own CA to use for signing the certificates. Replace the CA and key in `CA/` directory with yours.
+You can bring your own CA to use for signing the certificates. Simply place the relevant `rootCA.crt` and `rootCA.key` into a directory and skip to the next step. 
 
-Otherwise, to manually create your own certificate/key pair for a CA, delete the content of current `CA/` directory and see the commands in the `create-ca.sh` script:
-
-```
-cat create-ca.sh 
-```
+Otherwise, to manually create your own self-signed certificate/key pair for a CA, run the `create-ca.sh` script. This script takes in the argument for the directory name. To create a CA at directory `CA-test`, run the following command:
 
 ```
-#!/bin/bash
-mkdir -p CA
-# create key
-openssl genrsa -out CA/rootCA.key 4096
-
-# create certificate based on key
-# the CA subject is Acme Inc. Organization
-openssl req -x509 -subj "/C=US/ST=CA/O=Acme, Inc./CN=example.com" -new -nodes -key CA/rootCA.key -sha256 -days 3650 -out CA/rootCA.crt
+./create-ca.sh CA-test 
 ```
 
-The commands here create a key and certificate for Acme Inc. You may customize the `-subj` flag. 
-
-Then, when you run `./create-ca.sh` script to create a CA. It will put the necessary cert (`rootCA.crt`) and key (`rootCA.key`) files in the `CA/` directory. Be sure to verify these files exist before moving on!
+It will put the necessary cert (`rootCA.crt`) and key (`rootCA.key`) files in the `CA-test/` directory. Be sure to verify these files exist before moving on!
 
 ### Signing a cert
 
-Certificates are required for TLS and mTLS connections with the Tornjak server. To create and sign a certificate run `./create-cert.sh <domain name> <name>`. 
+Certificates are required for TLS and mTLS connections with the Tornjak server. To create and sign a certificate run `./create-cert.sh <domain name> <name> <ca_dir>`. 
 
-For example, to create a certificate to be run at the `localhost` domain name, we can run: 
+For example, to create a certificate to be run at the `localhost` domain name, we can run:
 
 ```
-./create-cert.sh localhost client
+./create-cert.sh localhost client CA-test
 ```
 
-which will create `client.key` and `client.crt` files that represent the key/cert pair to configure the client. 
+which will create `client.key` and `client.crt` files that represent the key/cert pair to configure the client, and are signed by the files in `CA-test`
 
 ----
+
+To create all relevant files, you will need a certificate-key pair for the Tornjak server, and a certificate-key pair for each caller, with the CA certificate for each. 
 
 Once the above files are created, you may follow through steps 1-3 in the tutorial to ensure the flow works end-to-end!
