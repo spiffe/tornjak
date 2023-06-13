@@ -140,9 +140,11 @@ Now that we have mounted the relevant files in step 1, we must configure the Tor
 
 More details on the configmap can be found [in our config documentation](../../docs/config-tornjak-server.md). 
 
-One Tornjak server can open three connections simultaneously: HTTP, TLS, and mTLS, and at least one must be enabled. To configure each of the TLS and mTLS, expand below sections. 
+One Tornjak server can open three connections simultaneously: HTTP, TLS, and mTLS, and at least one must be enabled. A configuration that opens all three is provided in [the configmap in this directory](./tornjak-configmap.yaml)
 
-<details><summary><b> 🔴 [Click] Configure TLS connection </b></summary>
+To learn about the configurations each of the TLS and mTLS, expand below sections. 
+
+<details><summary><b> 🔴 [Click] Configuring TLS connection </b></summary>b
 
 The TLS configuration requires the port number on which to open the connection and the paths to the certificate and key pair as delivered in step 1. We can simply add a section under the `server{}` section of the configuration. This is formatted like so:
 
@@ -165,7 +167,7 @@ A call to this port will require a CA that can verify the `cert/key` pair given.
 
 </details>
 
-<details><summary><b> 🔴 [Click] Configure mTLS connection </b></summary>
+<details><summary><b> 🔴 [Click] Configuring mTLS connection </b></summary>
 
 The mTLS configuration, much like the TLS configuration, requires the port number on which to open the connection, the paths to the certificate and key pair as delivered in step 1, and a CA for verifying calls to this connection.  We can simply add a section under the `server{}` section of the configuration.  This is formatted like so: 
 
@@ -189,7 +191,7 @@ A call to this port requires a CA that can verify the `cert/key` pair given, as 
 
 </details>
 
-Once your desired configurations are set, we can apply the configmap and restart the Tornjak server to make these changes:
+If your desired configurations are set in the `tornjak-configmap.yaml` file, we can apply the configmap and restart the Tornjak server to make these changes:
 
 ```
 kubectl apply -f tornjak-configmap.yaml

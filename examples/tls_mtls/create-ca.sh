@@ -1,6 +1,14 @@
 #!/bin/bash
-mkdir -p CA
-nameCA="CA/rootCA"
+
+function usage {
+	echo "Takes in CA directory name (1)"
+	exit 1
+}
+[[ -z $1 ]] && usage
+export CA_DIR=$1
+
+mkdir -p ${CA_DIR}
+nameCA="${CA_DIR}/rootCA"
 keyCA="$nameCA.key"
 # create key
 [[ ! -f "$keyCA" ]] && openssl genrsa -out "$keyCA" 4096
