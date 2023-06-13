@@ -34,7 +34,7 @@ cd tornjak/examples/tls_mtls
 
 For both TLS and mTLS, we will need to deliver a certificate/key pair to the server. In this directory are the respective files `server.crt` and `server.key`. These files have been signed by the self-signed CA in the `CA-server` directory. They will be delivered to the caller when establishing a connection so that the caller may verify the certificate. 
 
-For mTLS, we additionally need to deliver the CA certificate of the caller to the server so that the server may verify the caller certificate. The relevant file can be found in `CA-caller/rootCA.crt`
+For mTLS, we additionally need to deliver the CA certificate of the caller to the server so that the server may verify the caller certificate. The relevant file can be found in `CA-user/rootCA.crt`
 
 ### Deliver the certificate/key pair to Tornjak (TLS and mTLS)
 
@@ -64,6 +64,13 @@ Data
 ====
 tls.crt:  1558 bytes
 tls.key:  1675 bytes
+```
+
+We can also debug the existing secret by decoding the secret content:
+
+```
+kubectl -n spire get secret tornjak-server-tls -o jsonpath='{.data}' | jq -r '."tls.crt"' | base64 --decode
+kubectl -n spire get secret tornjak-server-tls -o jsonpath='{.data}' | jq -r '."tls.key"' | base64 --decode
 ```
 
 To make the secret accessible to the Tornjak container, we must create a volume for the secret and mount the volume to the container. In the case of the quickstart, for example, we would edit the `server-statefulset.yaml` file to create the secret volume and mount. 
@@ -128,6 +135,9 @@ volumes:
   - name: user-cas
     secret: 
       secretName: tornjak-user-certs
+      items: 
+        - key: rootCA.crt
+          path: userCA.crt
 
 ```
 
@@ -139,7 +149,7 @@ kubectl exec -n spire spire-server-0 -c tornjak-backend -- ls users
 ```
 
 ```
-rootCA.crt
+userCA.crt
 ```
 
 ----
@@ -189,7 +199,7 @@ server {
     port = 30000                  # container port for mTLS connection
     cert = "server/tls.crt"  # mTLS cert
     key = "server/tls.key"   # mTLS key
-    ca = "users/rootCA.crt"  # mTLS CA 
+    ca = "users/userCA.crt"  # mTLS CA 
   }
   ...
 }

@@ -89,6 +89,9 @@ spec:
         - name: user-cas                    # 👈 mTLS CA SECRET VOLUME
           secret:                           # 👈 mTLS CA SECRET VOLUME
             secretName: tornjak-user-certs  # 👈 mTLS CA SECRET VOLUME
+            items:
+              - key: rootCA.crt
+                path: userCA.crt
   volumeClaimTemplates:
     - metadata:
         name: spire-data
