@@ -271,7 +271,7 @@ curl --cacert CA-server/rootCA.crt https://<Tornjak_TLS_endpoint>
 
 In order to make a TLS call we need only a CA certificate that can validate the certificate/key pair given to Tornjak in step 1.  In our case, we can use the certificate within `CA-server`.  
 
-Additionally, we must have a certificate/key pair locally that was signed by the CA certificate given to the Tornjak server when configuring mTLS.  In our case, we can use the certificate/key pair `user.crt` and `user.key`: 
+Additionally, we must have a certificate/key pair locally that was signed by the CA certificate given to the Tornjak server via `tornjak-user-certs` secret when configuring mTLS.  In our case, we can use the certificate/key pair `user.crt` and `user.key`: 
 
 ```
 curl --cacert CA-server/rootCA.crt --key user.key --cert user.crt https://<Tornjak_mTLS_endpoint> 
