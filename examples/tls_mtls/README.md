@@ -109,7 +109,7 @@ tls.key
 
 ### Deliver the CA certificate to Tornjak (mTLS only)
 
-For mTLS we will additionally need to deliver a CA certificate to the Tornjak container. The process is the same. First we create the secret:
+For mTLS we will additionally need to deliver a user CA certificate to the Tornjak container. Currently it is found at `CA-user/rootCA.crt`. The process is the same. First we create the secret:
 
 ```
 kubectl create secret generic -n spire tornjak-user-certs \
@@ -141,7 +141,7 @@ volumes:
 
 ```
 
-Apply the same changes to your deployment, attaching the secret volumeMount to the Tornjak container. For the quickstart, we can simply apply the file and view the files in the container:
+Apply the same changes to your deployment, attaching the secret volumeMount to the Tornjak container. For the quickstart, we can simply apply the file in this directory `server-statefulset-mtls.yaml` and view the files in the container:
 
 ```
 kubectl apply -f server-statefulset-mtls.yaml
