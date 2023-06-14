@@ -60,7 +60,7 @@ const TornjakServerInfoDisplay = (props: { tornjakServerInfo: TornjakServInfo, t
       </p>
     </AccordionItem>
     <AccordionItem title="Plugins" open>
-      {(props.tornjakServerInfo && Object.keys(props.tornjakServerInfo).length !== 0)
+      {(props.tornjakServerInfo.trustDomain !== "" && props.tornjakServerInfo.verboseConfig !== "")
         ? (
           <table>
             <tbody>
@@ -84,14 +84,14 @@ const TornjakServerInfoDisplay = (props: { tornjakServerInfo: TornjakServInfo, t
               kind="warning"
               hideCloseButton
               lowContrast
-              title="No Plugin Info Provided from server"
+              title="Note: No Plugin Info Provided from server. Tornjak Backend does not have access to SPIRE config!"
             />
           </div>
         )
       }
     </AccordionItem>
     <AccordionItem title="Verbose Config (click to expand)">
-      {(props.tornjakServerInfo && Object.keys(props.tornjakServerInfo).length !== 0)
+      {(props.tornjakServerInfo.trustDomain !== "" && props.tornjakServerInfo.verboseConfig !== "")
         ? (
           <pre>
             {props.tornjakServerInfo.verboseConfig}
@@ -103,7 +103,7 @@ const TornjakServerInfoDisplay = (props: { tornjakServerInfo: TornjakServInfo, t
               kind="warning"
               hideCloseButton
               lowContrast
-              title="No Server Config Provided from server"
+              title="Note: No Server Config Provided from server. Tornjak Backend does not have access to SPIRE config!"
             />
           </div>
         )
