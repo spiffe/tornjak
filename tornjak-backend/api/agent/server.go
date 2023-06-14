@@ -461,8 +461,10 @@ func (s *Server) tornjakGetServerInfo(w http.ResponseWriter, r *http.Request) {
 
 	ret, err := s.GetTornjakServerInfo(input)
 	if err != nil {
+		// The only error currently is when serverinfo is empty
+		// This is not a serious error and should return 204 for no content
 		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
+		retError(w, emsg, http.StatusNoContent)
 		return
 	}
 
@@ -540,7 +542,6 @@ func (s *Server) GetRouter() (*mux.Router) {
 	// SPIRE server healthcheck
 	rtr.HandleFunc("/api/debugserver", s.debugServer)
 	rtr.HandleFunc("/api/healthcheck", s.healthcheck)
-	rtr.HandleFunc("/api/debugserver", s.debugServer)
 
 	// Agents
 	rtr.HandleFunc("/api/agent/list", s.agentList)

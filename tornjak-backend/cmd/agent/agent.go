@@ -32,7 +32,7 @@ func main() {
 				Value:       "",
 				Usage:       "Config file path for spire server",
 				Destination: &opt.genericOptions.configFile,
-				Required:    true,
+				Required:    false,
 			},
 			&cli.StringFlag {
 				Name:        "tornjak-config",
@@ -75,12 +75,21 @@ func main() {
 
 func runTornjakCmd(cmd string, opt cliOptions) error {
 	// parse configs
-	config, err := run.ParseFile(opt.genericOptions.configFile, false)
-	if err != nil {
-		// Hide internal error since it is specific to arguments of originating library
-		// i.e. asks to set -config which is a different flag in tornjak
-		return errors.New("Unable to parse the config file provided")
+	spire_config_file := opt.genericOptions.configFile
+	var serverInfo = agentapi.TornjakSpireServerInfo{}
+	if spire_config_file != "" { // SPIRE config given
+		config, err := run.ParseFile(spire_config_file, false)
+		if err != nil {
+			// Hide internal error since it is specific to arguments of originating library
+			// i.e. asks to set -config which is different flag in Tornjak
+			return errors.New("Unable to parse the config file provided")
+		}
+		serverInfo, err = GetServerInfo(config)
+		if err != nil {
+			log.Fatalf("Error: %v", err)
+		}
 	}
+
 	tornjakConfigs, err := parseTornjakConfig(opt.genericOptions.tornjakFile, opt.genericOptions.expandEnv)
 	if err != nil {
 		return errors.Errorf("Unable to parse the tornjak config file provided %v", err)
@@ -88,21 +97,17 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 
 	switch cmd {
 	case "serverinfo":
-		serverInfo, err := GetServerInfo(config)
-		if err != nil {
-			log.Fatalf("Error: %v", err)
+		if serverInfo.TrustDomain == "" {
+			fmt.Println("No SPIRE config provided to Tornjak")
+		} else {
+			fmt.Println(serverInfo)
 		}
-		fmt.Println(serverInfo)
 		tornjakInfo, err := getTornjakConfig(opt.genericOptions.tornjakFile, opt.genericOptions.expandEnv)
 		if err != nil {
 			log.Fatalf("Error: %v", err)
 		}
 		fmt.Println(tornjakInfo)
 	case "http":
-		serverInfo, err := GetServerInfo(config)
-		if err != nil {
-			log.Fatalf("Error: %v", err)
-		}
 
 		apiServer := &agentapi.Server{
 			SpireServerInfo: serverInfo,
