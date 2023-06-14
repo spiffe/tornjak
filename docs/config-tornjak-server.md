@@ -16,7 +16,7 @@ The following flags are available for all tornjak-agent commands:
 
 | Command                | Action                             | Default | Required |
 |:-----------------------|:-----------------------------------|:--------| :--------|
-| `--spire-config`       | Config file path for SPIRE server  |         | true     |
+| `--spire-config`       | Config file path for SPIRE server  |         | false    |
 | `--tornjak-config`     | Config file path for Tornjak agent |         | true     |
 | `--expandEnv`          | If flag included, expand environment variables in Tornjak config | false   | false    |
 

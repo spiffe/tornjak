@@ -24,12 +24,12 @@ This is meant to be deployed where it can access a SPIRE server. To run, the con
 
 | Flag                   | Description                                                 | Default | Arguments | Required |
 |:-----------------------|:------------------------------------------------------------|:--------|:----------|:---------|
-| `--spire-config`       | Config file path for SPIRE server                           |         | `<path>`  | true     |
+| `--spire-config`       | Config file path for SPIRE server                           |         | `<path>`  | false    |
 | `--tornjak-config`     | Config file path for Tornjak (see our [configuration reference](./docs/config-tornjak-agent.md)) | | `<path>` | true |
 | `--expandEnv`          | If included, expand environment variables in Tornjak config | False   |           | false    |
 
 ```
-docker run -p 10000:10000 ghcr.io/spiffe/tornjak-backend:latest -c <SPIRE CONFIG PATH> -t <TORNJAK CONFIG PATH> -expandEnv
+docker run -p 10000:10000 ghcr.io/spiffe/tornjak-backend:latest --spire-config <SPIRE CONFIG PATH> --tornjak-config <TORNJAK CONFIG PATH> -expandEnv
 ```
 
 The above command creates a container listening at http://localhost:10000 for Tornjak API calls. Note that the config files must be accessible from INSIDE the container. Also note, this expands the container's environment variables in the Tornjak config map. 
@@ -73,7 +73,7 @@ This container may be used as an alternative to having a frontend and backend co
 An example command:
 
 ```
-docker run -p 10000:10000 -p 3000:8080 -e REACT_APP_API_SERVER_URI='http://localhost:10000' -e PORT_FE-8080 -e PORT_BE-10000 ghcr.io/spiffe/tornjak:latest -c <SPIRE CONFIG PATH> -t <TORNJAK CONFIG PATH>
+docker run -p 10000:10000 -p 3000:8080 -e REACT_APP_API_SERVER_URI='http://localhost:10000' -e PORT_FE-8080 -e PORT_BE-10000 ghcr.io/spiffe/tornjak:latest --spire-config <SPIRE CONFIG PATH> --tornjak-config <TORNJAK CONFIG PATH>
 ```
 
 The above command creates a UI available at `http://localhost:3000` forwarded from container port `8080`. It is listening to the Tornjak backend at `http://localhost:10000`, as given by the `REACT_APP_API_SERVER_URI` value. At the same time, the container is exposing port `10000` for the backend, which reads the SPIRE config and Tornjak config at `<SPIRE CONFIG PATH>` and `<TORNJAK CONFIG PATH>` respectively. 
