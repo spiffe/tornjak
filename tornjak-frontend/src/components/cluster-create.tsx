@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
-import { Dropdown, TextInput, FilterableMultiSelect, TextArea } from 'carbon-components-react';
+import { Dropdown, TextInput, FilterableMultiSelect, TextArea, InlineNotification } from 'carbon-components-react';
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
@@ -18,11 +18,11 @@ import {
   serverInfoUpdateFunc
 } from 'redux/actions';
 import { RootState } from 'redux/reducers'
-import { 
+import {
   AgentLabels,
-  AgentsList, 
+  AgentsList,
   ServerInfo,
-  TornjakServerInfo 
+  TornjakServerInfo
 } from './types'
 import { showResponseToast, showToast } from './error-api';
 
@@ -215,18 +215,17 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
   }
 
   onSubmit(e: { preventDefault: () => void; } | undefined): void {
-
     if (e !== undefined) {
       e.preventDefault()
     }
 
     if (!this.state.clusterName) {
-      showToast({caption: "The cluster name cannot be empty."})
+      showToast({ caption: "The cluster name cannot be empty." })
       return
     }
 
     if ((this.state.clusterTypeManualEntry && this.state.clusterType === this.state.clusterTypeManualEntryOption) || !this.state.clusterType) {
-      showToast({caption: "The cluster type cannot be empty."})
+      showToast({ caption: "The cluster type cannot be empty." })
       return
     }
 
@@ -250,12 +249,16 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
       .then(
         res => {
           this.setState({
-          message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
-          statusOK: "OK",
-        })
-      }
+            message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
+            statusOK: "OK",
+          })
+        }
       )
       .catch(err => showResponseToast(err))
+    //scroll to bottom of page after submission  
+    setTimeout(() => {
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+    }, 100);
   }
 
   render() {
@@ -296,7 +299,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
                   titleText="Cluster Type [*required]"
                   onChange={this.onChangeClusterType}
                   role="cluster-type"
-                  // typescript throws an error when enabled - need to explore more to enable feature for now "aria-required" is enabled
+                // typescript throws an error when enabled - need to explore more to enable feature for now "aria-required" is enabled
                 />
                 <p className="cluster-helper">i.e. Kubernetes, VMs...</p>
               </div>
@@ -364,18 +367,35 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
               <div className="form-group" data-test="create-cluster-button">
                 <input type="submit" value="Create Cluster" className="btn btn-primary" />
               </div>
-              <div data-test="success-message">
+              <div>
                 {this.state.statusOK === "OK" &&
-                  <p className="success-message">--CLUSTER SUCCESSFULLY CREATED--</p>
+                  <InlineNotification
+                    kind="success"
+                    hideCloseButton
+                    title="CLUSTER SUCCESSFULLY CREATED"
+                    subtitle={
+                      <div className="toast-messege" data-test="alert-primary">
+                        <pre className="toast-messege-color">
+                          {this.state.message}
+                        </pre>
+                      </div>
+                    }
+                  />
                 }
                 {(this.state.statusOK === "ERROR") &&
-                  <p className="failed-message">--CLUSTER CREATION FAILED--</p>
+                  <InlineNotification
+                    kind="error"
+                    hideCloseButton
+                    title="CLUSTER CREATION FAILED"
+                    subtitle={
+                      <div className="toast-messege" data-test="alert-primary">
+                        <pre className="toast-messege-color">
+                          {this.state.message}
+                        </pre>
+                      </div>
+                    }
+                  />
                 }
-              </div>
-              <div className="alert-primary" data-test="alert-primary" role="alert">
-                <pre>
-                  {this.state.message}
-                </pre>
               </div>
             </div>
           </form>
@@ -430,14 +450,14 @@ const mapStateToProps = (state: RootState) => ({
 
 export default connect(
   mapStateToProps,
-  { 
-    clusterTypeInfoFunc, 
-    serverSelectedFunc, 
-    selectorInfoFunc, 
-    agentsListUpdateFunc, 
-    tornjakMessageFunc, 
-    tornjakServerInfoUpdateFunc, 
-    serverInfoUpdateFunc 
+  {
+    clusterTypeInfoFunc,
+    serverSelectedFunc,
+    selectorInfoFunc,
+    agentsListUpdateFunc,
+    tornjakMessageFunc,
+    tornjakServerInfoUpdateFunc,
+    serverInfoUpdateFunc
   }
 )(ClusterCreate)
 

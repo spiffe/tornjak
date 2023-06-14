@@ -7,7 +7,8 @@ import {
     GLOBAL_WORKLOAD_SELECTOR_INFO,
     GLOBAL_SPIRE_HEALTH_CHECK,
     GLOBAL_SPIRE_HEALTH_CHECKING,
-    GLOBAL_SPIRE_HEALTH_CHECK_Time,
+    GLOBAL_SPIRE_HEALTH_CHECK_TIME,
+    GLOBAL_DEBUG_SERVER_INFO,
     ServersReducerState,
     ServersAction,
 } from '../actions/types';
@@ -24,7 +25,28 @@ const initialState: ServersReducerState = {
     globalSpireHealthChecking: false,
     globalSpireHealthTime: {
         SpireHealtCheckTime: 120,
-        SpireHealtCheckFreqDisplay: '2 Mins',
+        SpireHealthCheckFreqDisplay: '2 Mins',
+    },
+    globalDebugServerInfo: {
+        "svid_chain": [
+            {
+                "id": {
+                    "trust_domain": "",
+                    "path": ""
+                },
+                "expires_at": 0,
+                "subject": ""
+            },
+            {
+                "id": {
+                    "trust_domain": ""
+                },
+                "expires_at": 0,
+                "subject": ""
+            }
+        ],
+        "uptime": 0,
+        "federated_bundles_count": 0
     },
 };
 
@@ -70,10 +92,15 @@ export default function serversReducer(state: ServersReducerState = initialState
                 ...state,
                 globalSpireHealthChecking: action.payload
             };
-        case GLOBAL_SPIRE_HEALTH_CHECK_Time:
+        case GLOBAL_SPIRE_HEALTH_CHECK_TIME:
             return {
                 ...state,
                 globalSpireHealthTime: action.payload
+            };
+        case GLOBAL_DEBUG_SERVER_INFO:
+            return {
+                ...state,
+                globalDebugServerInfo: action.payload
             };
         default:
             return state;

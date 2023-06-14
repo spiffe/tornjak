@@ -9,14 +9,15 @@ import {
   TornjakServerInfo,
   ServerInfo,
   EntriesList,
-  ClustersList
+  ClustersList,
+  DebugServerInfo
 } from './types';
 import KeycloakService from "auth/KeycloakAuth";
 import { showResponseToast } from './error-api';
 // const Auth_Server_Uri = process.env.REACT_APP_AUTH_SERVER_URI;
 // import { logError } from './helpers';
 // import { displayResponseError } from './error-api';
-import {env} from '../env';
+import { env } from '../env';
 const Auth_Server_Uri = env.REACT_APP_AUTH_SERVER_URI;
 
 type TornjakApiProp = {}
@@ -56,8 +57,8 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
 
   // spireHealthCheck returns the health of the SPIRE server
   spireHealthCheck = (
-    spireHealthCheckFunc: {(globalSpireHealthCheck: boolean): void;},
-    spireHealthCheckingFunc: {(globalSpireHealthChecking: boolean): void;},
+    spireHealthCheckFunc: { (globalSpireHealthCheck: boolean): void; },
+    spireHealthCheckingFunc: { (globalSpireHealthChecking: boolean): void; },
   ) => {
     spireHealthCheckingFunc(false);
     axios.get(GetApiServerUri("/api/healthcheck"), { crossdomain: true })
@@ -72,7 +73,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
         spireHealthCheckingFunc(true);
         spireHealthCheckFunc(false);
         //logError(error)
-        showResponseToast(error, {caption: "Could not register SPIRE healthcheck."})
+        showResponseToast(error, { caption: "Could not register SPIRE healthcheck." })
       })
   }
 
@@ -85,7 +86,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       }
       )
       .catch((error) => {
-        showResponseToast(error, {caption: "Could not register selectors."})
+        showResponseToast(error, { caption: "Could not register selectors." })
       })
   }
 
@@ -95,7 +96,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
     axios.post(GetApiServerUri('/api/tornjak/selectors/register'), wLoadAttdata)
       .then(res => refreshLocalSelectorsState(agentworkloadSelectorInfoFunc))
       .catch((error) => {
-        showResponseToast(error, {caption: "Could not register local selectors."})
+        showResponseToast(error, { caption: "Could not register local selectors." })
       })
   }
   // refreshSelectorsState returns the list agent's with their workload plugin info for the selected server in manager mode
@@ -124,7 +125,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       .then(response => {
         agentworkloadSelectorInfoFunc(response.data["agents"]);
       })
-      .catch((error) => showResponseToast(error, {caption: "Could not refresh selector state."}))
+      .catch((error) => showResponseToast(error, { caption: "Could not refresh selector state." }))
   }
   // refreshLocalSelectorsState returns the list agent's with their workload plugin info for the local server
   // [
@@ -151,7 +152,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
         console.log(response.data)
         agentworkloadSelectorInfoFunc(response.data["agents"])
       })
-      .catch((error) => showResponseToast(error, {caption: "Could not refresh local selector states."}))
+      .catch((error) => showResponseToast(error, { caption: "Could not refresh local selector states." }))
   }
 
   // populateTornjakAgentInfo returns tornjak info of requested agents including cluster name and selector
@@ -165,7 +166,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       .then(response => {
         agentworkloadSelectorInfoFunc(response.data["agents"]);
       })
-      .catch((error) => showResponseToast(error, {caption: "Could not populate tornjak agent info."}))
+      .catch((error) => showResponseToast(error, { caption: "Could not populate tornjak agent info." }))
   }
 
   // populateLocalTornjakAgentInfo returns tornjak info of requested agents including cluster name and selector
@@ -177,7 +178,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       .then(response => {
         agentworkloadSelectorInfoFunc(response.data["agents"])
       })
-      .catch((error) => showResponseToast(error, {caption: "Could not populate local tornjak agent info."}))
+      .catch((error) => showResponseToast(error, { caption: "Could not populate local tornjak agent info." }))
   }
 
   // populateTornjakServerInfo returns the tornjak server info of the selected server in manager mode
@@ -191,7 +192,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
         tornjakServerInfoUpdateFunc(response.data)
         tornjakMessageFunc(response.statusText)
       }).catch(error => {
-        showResponseToast(error, {caption: "Could not populate tornjak server info."})
+        showResponseToast(error, { caption: "Could not populate tornjak server info." })
         tornjakServerInfoUpdateFunc({
           plugins: {
             DataStore: [],
@@ -206,6 +207,21 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       });
   }
 
+  // populateLocalTornjakDebugServerInfo returns the debug server info of the server in local mode
+  populateLocalTornjakDebugServerInfo = (
+    spireDebugServerInfoUpdateFunc: { (globalDebugServerInfo: DebugServerInfo): void },
+    tornjakMessageFunc: { (globalErrorMessage: string): void }
+  ) => {
+    axios.get(GetApiServerUri('/api/debugserver'), { crossdomain: true })
+      .then(response => {
+        spireDebugServerInfoUpdateFunc(response.data)
+        tornjakMessageFunc(response.statusText)
+      })
+      .catch((error) => {
+        showResponseToast(error, { caption: "Could not populate tornjak debug info." })
+      })
+  }
+
   // populateLocalTornjakServerInfo returns the torjak server info of the server in local mode
   populateLocalTornjakServerInfo = (
     tornjakServerInfoUpdateFunc: { (globalTornjakServerInfo: TornjakServerInfo): void },
@@ -213,10 +229,18 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   ) => {
     axios.get(GetApiServerUri('/api/tornjak/serverinfo'), { crossdomain: true })
       .then(response => {
-        tornjakServerInfoUpdateFunc(response.data)
-        tornjakMessageFunc(response.statusText)
+        if (response.status === 200) {
+          tornjakServerInfoUpdateFunc(response.data)
+          tornjakMessageFunc(response.statusText)
+        }
+        else {
+          tornjakMessageFunc(response.statusText)
+        }
       })
-      .catch((error) => showResponseToast(error, {caption: "Could not populate local tornjak server info."}))
+      .catch((error) => {
+          showResponseToast(error, { caption: "Could not populate local tornjak server info." })
+          tornjakMessageFunc(error.response.statusText)
+      })
   }
 
   // populateServerInfo returns the server trust domain and nodeAttestorPlugin
@@ -254,7 +278,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       }).catch(error => {
         entriesListUpdateFunc([]);
         tornjakMessageFunc("Error retrieving " + serverName + " : " + error + (typeof (error.response) !== "undefined" ? ":" + error.response.data : ""));
-        showResponseToast(error, {caption: "Could not populate entries."})
+        showResponseToast(error, { caption: "Could not populate entries." })
       })
   }
 
@@ -269,7 +293,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
         }
         tornjakMessageFunc(response.statusText);
       }).catch(error => {
-        showResponseToast(error, {caption: "Could not populate local entries."})
+        showResponseToast(error, { caption: "Could not populate local entries." })
         entriesListUpdateFunc([])
         tornjakMessageFunc(error.message)
       })
@@ -286,7 +310,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
         } else { agentsListUpdateFunc(response.data["agents"]); }
         tornjakMessageFunc(response.statusText);
       }).catch(error => {
-        showResponseToast(error, {caption: "Could not populate agents."})
+        showResponseToast(error, { caption: "Could not populate agents." })
         agentsListUpdateFunc([]);
         tornjakMessageFunc("Error retrieving " + serverName + " : " + error.message);
       });
@@ -306,7 +330,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
         tornjakMessageFunc(response.statusText);
       })
       .catch((error) => {
-        showResponseToast(error, {caption: "Could not populate local agents."})
+        showResponseToast(error, { caption: "Could not populate local agents." })
         agentsListUpdateFunc([]);
         tornjakMessageFunc("Error retrieving: " + error.message);
       })
@@ -321,7 +345,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
         clustersListUpdateFunc(response.data["clusters"]);
         tornjakMessageFunc(response.statusText);
       }).catch(error => {
-        showResponseToast(error, {caption: "Could not populate clusters."})
+        showResponseToast(error, { caption: "Could not populate clusters." })
         clustersListUpdateFunc([]);
         tornjakMessageFunc("Error retrieving " + serverName + " : " + error.message);
       });
@@ -338,7 +362,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
         tornjakMessageFunc(response.statusText)
       })
       .catch((error) => {
-        showResponseToast(error, {caption: "Could not populate local clusters."})
+        showResponseToast(error, { caption: "Could not populate local clusters." })
         clustersListUpdateFunc([])
         tornjakMessageFunc("Error retrieving: " + error.message)
       })
