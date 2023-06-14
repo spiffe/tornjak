@@ -461,8 +461,9 @@ func (s *Server) tornjakGetServerInfo(w http.ResponseWriter, r *http.Request) {
 
 	ret, err := s.GetTornjakServerInfo(input)
 	if err != nil {
-		// The only error currently is when serverinfo is empty
-		// This is not a serious error and should return 204 for no content
+		// The error occurs only when serverinfo is empty
+		// This indicates --spire-config not passed
+		// return 204 for no content
 		emsg := fmt.Sprintf("Error: %v", err.Error())
 		retError(w, emsg, http.StatusNoContent)
 		return
