@@ -25,7 +25,7 @@ const initialState: ServersReducerState = {
     globalSpireHealthChecking: false,
     globalSpireHealthTime: {
         SpireHealtCheckTime: 120,
-        SpireHealtCheckFreqDisplay: '2 Mins',
+        SpireHealthCheckFreqDisplay: '2 Mins',
     },
     globalDebugServerInfo: {
         "svid_chain": [

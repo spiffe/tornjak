@@ -10,7 +10,7 @@ import {
   spireHealthCheckingFunc,
   spireHealthCheckRefreshTimeFunc
 } from 'redux/actions';
-import { SpireHealtCheckFreq } from './types';
+import { SpireHealthCheckFreq } from './types';
 
 const spireHealthCheckTimeOptions =
   [
@@ -35,9 +35,9 @@ type SpireHealthCheckProp = {
   // the loading state of SPIRE health
   globalSpireHealthChecking: boolean,
   // the resfresh rate of spire health check
-  spireHealthCheckRefreshTimeFunc: (globalSpireHealthTime: SpireHealtCheckFreq) => void,
+  spireHealthCheckRefreshTimeFunc: (globalSpireHealthTime: SpireHealthCheckFreq) => void,
   // dispatches a payload for the resfresh rate of spire health check as a number and has a return type of void
-  globalSpireHealthTime: SpireHealtCheckFreq
+  globalSpireHealthTime: SpireHealthCheckFreq
 }
 
 type SpireHealthCheckState = {
@@ -112,7 +112,7 @@ class SpireHealthCheck extends Component<SpireHealthCheckProp, SpireHealthCheckS
     var seconds = this.convertDurationToSeconds(sid);
     var refreshRateFreq = {
       SpireHealtCheckTime: seconds,
-      SpireHealtCheckFreqDisplay: sid
+      SpireHealthCheckFreqDisplay: sid
     }
     this.props.spireHealthCheckRefreshTimeFunc(refreshRateFreq)
   }
@@ -137,8 +137,8 @@ class SpireHealthCheck extends Component<SpireHealthCheckProp, SpireHealthCheckS
             ariaLabel="spire-refresh-rate-drop-down"
             id="spire-refresh-rate-drop-down"
             items={spireHealthCheckTimeOptions}
-            defaultValue={this.props.globalSpireHealthTime.SpireHealtCheckFreqDisplay}
-            label={this.props.globalSpireHealthTime.SpireHealtCheckFreqDisplay}
+            defaultValue={this.props.globalSpireHealthTime.SpireHealthCheckFreqDisplay}
+            label={this.props.globalSpireHealthTime.SpireHealthCheckFreqDisplay}
             titleText="Refresh Rate"
             onChange={this.onChangeSpireRefreshRate}
           />

@@ -8,7 +8,7 @@ import {
     ServerInfo,
     TornjakServerInfo,
     WorkloadSelectorInfoLabels,
-    SpireHealtCheckFreq,
+    SpireHealthCheckFreq,
     DebugServerInfo
 } from "components/types";
 
@@ -109,7 +109,7 @@ export interface ServersReducerState {
     globalWorkloadSelectorInfo: WorkloadSelectorInfoLabels,
     globalSpireHealthCheck: boolean,
     globalSpireHealthChecking: boolean,
-    globalSpireHealthTime: SpireHealtCheckFreq,
+    globalSpireHealthTime: SpireHealthCheckFreq,
     globalDebugServerInfo: DebugServerInfo,
 }
 
@@ -144,7 +144,7 @@ export interface SpireHealthCheckingAction extends Action<typeof GLOBAL_SPIRE_HE
 }
 
 export interface SpireHealthCheckTimeAction extends Action<typeof GLOBAL_SPIRE_HEALTH_CHECK_TIME> {
-    payload: SpireHealtCheckFreq;
+    payload: SpireHealthCheckFreq;
 }
 
 export interface DebugServerInfoAction extends Action<typeof GLOBAL_DEBUG_SERVER_INFO> {

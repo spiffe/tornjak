@@ -153,7 +153,7 @@ class TornjakServerInfo extends Component<TornjakServerInfoProp, TornjakServerIn
     return (
       <div>
         <h3>Server Info</h3>
-        {this.props.globalErrorMessage !== "OK" &&
+        {this.props.globalErrorMessage !== "OK" && this.props.globalErrorMessage !== "No Content" &&
           <div className="alert-primary" role="alert">
             <pre>
               {this.props.globalErrorMessage}

@@ -81,6 +81,7 @@ export interface EntriesList {
 export type link = string;
 
 // servers
+// TODO: Adjust debug server info type definition in case of nested spire, can have more than two svids
 export interface DebugServerInfo {
   svid_chain: [
         {
@@ -121,9 +122,9 @@ export interface ServerInfo {
   nodeAttestorPlugin: string; // Node Attestor Plugin of server
 }
 
-export interface SpireHealtCheckFreq {
+export interface SpireHealthCheckFreq {
   SpireHealtCheckTime: number; // Spire health check time
-  SpireHealtCheckFreqDisplay: string; // SPIRE health check dropdown display/ for persistence
+  SpireHealthCheckFreqDisplay: string; // SPIRE health check dropdown display/ for persistence
 }
 
 // tornjak 
