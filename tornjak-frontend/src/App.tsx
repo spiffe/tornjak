@@ -1,4 +1,3 @@
-import React from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
 import store from 'redux/store';
 import IsManager from './components/is_manager';
@@ -14,7 +13,7 @@ import EntryList from "./components/entry-list";
 import EntryCreate from "./components/entry-create";
 import ServerManagement from "./components/server-management";
 import TornjakServerInfo from "./components/tornjak-server-info";
-import TornjakDashBoard from "./components/dashboard/tornjak-dashboard";
+import TornjakDashBoardStyled from "./components/dashboard/tornjak-dashboard";
 import DashboardDetailsRender from 'components/dashboard/dashboard-details-render';
 import RenderOnAdminRole from 'components/RenderOnAdminRole'
 import './App.css';
@@ -53,7 +52,7 @@ function App() {
                                 <Route path="/cluster/clustermanagement" exact component={ClusterManagement} />
                             </RenderOnAdminRole>
                             <Route path="/tornjak/serverinfo" exact component={TornjakServerInfo} />
-                            <Route path="/tornjak/dashboard" exact component={TornjakDashBoard} />
+                            <Route path="/tornjak/dashboard" exact component={TornjakDashBoardStyled} />
                             <Route
                                 path="/tornjak/dashboard/details/:entity"
                                 render={(props) => (<DashboardDetailsRender {...props} params={props.match.params} />)}

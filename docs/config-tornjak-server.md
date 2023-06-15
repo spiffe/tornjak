@@ -16,7 +16,7 @@ The following flags are available for all tornjak-agent commands:
 
 | Command                | Action                             | Default | Required |
 |:-----------------------|:-----------------------------------|:--------| :--------|
-| `--spire-config`       | Config file path for SPIRE server  |         | true     |
+| `--spire-config`       | Config file path for SPIRE server  |         | false    |
 | `--tornjak-config`     | Config file path for Tornjak agent |         | true     |
 | `--expandEnv`          | If flag included, expand environment variables in Tornjak config | false   | false    |
 
@@ -66,6 +66,8 @@ server {
 We have three connection types that can be opened by the server simultaneously: HTTP, TLS, and mTLS. At least one must be enabled, or the program will exit immediately. If one connection crashes, the error is logged, and the others will still run. When all crash, the Tornjak server exits and the container terminates.
 
 If a specific section is omitted or not enabled, that connection will not be created. If all are omitted or disabled, the program will exit immediately with an appropriate error log. 
+
+For examples on enabling TLS and mTLS connections, please see [our TLS and mTLS documentation](../sample-keys/README.md). 
 
 ## About Tornjak plugins
 

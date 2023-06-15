@@ -1,8 +1,7 @@
-import React from 'react';
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import IsManager from '../is_manager';
-import DashboardDetails from './dashboard-details';
+import DashboardDetailsStyled from './dashboard-details';
 import TornjakHelper from '../tornjak-helper';
 import TornjakApi from '../tornjak-api-helpers';
 import {
@@ -32,7 +31,7 @@ class DashboardDetailsRender extends Component {
 
     componentDidMount() {
         const { params } = this.props;
-        if (this.props.globalTornjakServerInfo === "" || this.props.globalServerInfo === undefined) {
+        if (this.props.globalDebugServerInfo === "") {
             if (IsManager) {
                 if (this.props.globalServerSelected !== "") {
                     this.props.clickedDashboardTableFunc(params.entity + "details");
@@ -61,7 +60,7 @@ class DashboardDetailsRender extends Component {
     render() {
         const { params } = this.props;
         return (
-            <DashboardDetails selectedData={this.TornjakHelper.detailsDataParse(params, this.props)} />
+            <DashboardDetailsStyled selectedData={this.TornjakHelper.detailsDataParse(params, this.props)} />
         );
     }
 }
@@ -73,9 +72,21 @@ const mapStateToProps = (state) => ({
     globalAgentsList: state.agents.globalAgentsList,
     globalEntriesList: state.entries.globalEntriesList,
     globalAgentsWorkLoadAttestorInfo: state.agents.globalAgentsWorkLoadAttestorInfo,
+    globalDebugServerInfo: state.servers.globalDebugServerInfo,
 })
 
 export default connect(
     mapStateToProps,
-    { serverSelectedFunc, clustersListUpdateFunc, agentsListUpdateFunc, entriesListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessageFunc, workloadSelectorInfoFunc, agentworkloadSelectorInfoFunc, clusterTypeInfoFunc, clickedDashboardTableFunc }
-)(DashboardDetailsRender)
+    { serverSelectedFunc, 
+      clustersListUpdateFunc, 
+      agentsListUpdateFunc, 
+      entriesListUpdateFunc, 
+      tornjakServerInfoUpdateFunc, 
+      serverInfoUpdateFunc, 
+      selectorInfoFunc, 
+      tornjakMessageFunc, 
+      workloadSelectorInfoFunc, 
+      agentworkloadSelectorInfoFunc, 
+      clusterTypeInfoFunc, 
+      clickedDashboardTableFunc }
+)(DashboardDetailsRender);

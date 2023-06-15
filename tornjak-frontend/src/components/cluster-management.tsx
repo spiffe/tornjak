@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { Tabs, Tab } from 'carbon-components-react';
 import ClusterCreate from './cluster-create';
 import ClusterEdit from './cluster-edit';
@@ -20,11 +20,15 @@ import {
   AgentLabels,
   AgentsList,
   ServerInfo,
-  TornjakServerInfo
+  TornjakServerInfo,
+  DebugServerInfo
 } from './types'
+import { toast } from 'react-toastify';
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type ClusterManagementProp = {
+  // tornjak server debug info of the selected server
+  globalDebugServerInfo: DebugServerInfo,
   // dispatches a payload for list of agents with their metadata info as an array of AgentListType and has a return type of void
   agentsListUpdateFunc: (globalAgentsList: AgentsList[]) => void,
   // dispatches a payload for an Error Message/ Success Message of an executed function as a string and has a return type of void
@@ -93,11 +97,11 @@ class ClusterManagement extends Component<ClusterManagementProp, ClusterManageme
       if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
         this.setState({ selectedServer: this.props.globalServerSelected });
       }
-      if (prevProps.globalServerInfo !== this.props.globalServerInfo) {
+      if (prevProps.globalDebugServerInfo !== this.props.globalDebugServerInfo) {
         this.prepareAgentsList();
       }
     } else {
-      if (prevProps.globalServerInfo !== this.props.globalServerInfo) {
+      if (prevProps.globalDebugServerInfo !== this.props.globalDebugServerInfo) {
         this.prepareAgentsList();
       }
     }
@@ -129,13 +133,19 @@ class ClusterManagement extends Component<ClusterManagementProp, ClusterManageme
     });
   }
 
+  handleTabSelect(): void {
+    toast.dismiss()
+  }
+
   render() {
     return (
       <div className="cluster-management-tabs" data-test="cluster-management">
-        <Tabs scrollIntoView={false} >
-          <Tab className="cluster-management-tab1"
+        <Tabs scrollIntoView={false}>
+          <Tab 
+            className="cluster-management-tab1"
             id="tab-1"
             label="Create Cluster"
+            onClick={this.handleTabSelect}
           >
             <ClusterCreate
               clusterTypeList={this.state.clusterTypeList}
@@ -145,6 +155,7 @@ class ClusterManagement extends Component<ClusterManagementProp, ClusterManageme
           <Tab
             id="tab-2"
             label="Edit Cluster"
+            onClick={this.handleTabSelect}
           >
             <ClusterEdit
               clusterTypeList={this.state.clusterTypeList}
@@ -181,6 +192,7 @@ const mapStateToProps = (state: RootState) => ({
   globalServerInfo: state.servers.globalServerInfo,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
   globalErrorMessage: state.tornjak.globalErrorMessage,
+  globalDebugServerInfo: state.servers.globalDebugServerInfo,
 })
 
 export default connect(
@@ -188,4 +200,4 @@ export default connect(
   { clusterTypeInfoFunc, serverSelectedFunc, selectorInfoFunc, agentsListUpdateFunc, tornjakMessageFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc }
 )(ClusterManagement)
 
-export { ClusterManagement };
+export { ClusterManagement }

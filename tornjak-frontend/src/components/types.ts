@@ -81,6 +81,29 @@ export interface EntriesList {
 export type link = string;
 
 // servers
+// TODO: Adjust debug server info type definition in case of nested spire, can have more than two svids
+export interface DebugServerInfo {
+  svid_chain: [
+        {
+            id: {
+                trust_domain: string,
+                path: string
+            },
+            expires_at: number,
+            subject: string
+        },
+        {
+            id: {
+                trust_domain: string
+            },
+            expires_at: number,
+            subject: string
+        }
+    ],
+    uptime: number,
+    federated_bundles_count: number
+}
+
 export interface TornjakServerInfo {
   // Plugins for tornjak server info
   plugins: {
@@ -99,9 +122,9 @@ export interface ServerInfo {
   nodeAttestorPlugin: string; // Node Attestor Plugin of server
 }
 
-export interface SpireHealtCheckFreq {
+export interface SpireHealthCheckFreq {
   SpireHealtCheckTime: number; // Spire health check time
-  SpireHealtCheckFreqDisplay: string; // SPIRE health check dropdown display/ for persistence
+  SpireHealthCheckFreqDisplay: string; // SPIRE health check dropdown display/ for persistence
 }
 
 // tornjak 
@@ -143,4 +166,9 @@ export interface AccessToken {
   sid: string; // unique session identifier of a user on a browser or a device
   sub: string; // to whom this entity refers to
   typ: string; // type of token
+}
+
+export type PieChartEntry = {
+  group: string,
+  value: number
 }

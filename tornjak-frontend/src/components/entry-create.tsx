@@ -1,10 +1,20 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
-import { Dropdown, TextInput, FilterableMultiSelect, Checkbox, TextArea, NumberInput, Accordion, AccordionItem, ToastNotification } from 'carbon-components-react';
+import { 
+  Dropdown, 
+  TextInput, 
+  FilterableMultiSelect, 
+  Checkbox, 
+  TextArea, 
+  NumberInput, 
+  Accordion, 
+  AccordionItem, 
+  ToastNotification 
+} from 'carbon-components-react';
 import {
   Button,
-} from '@material-ui/core';
+} from '@mui/material';
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
@@ -30,14 +40,18 @@ import {
   SelectorLabels,
   SelectorInfoLabels,
   WorkloadSelectorInfoLabels,
+  DebugServerInfo
 } from './types';
 import { RootState } from 'redux/reducers';
 import EntryExpiryFeatures from './entry-expiry-features';
 import CreateEntryJson from './entry-create-json';
-import { displayError, displayResponseError } from './error-api';
+import { ToastContainer } from "react-toastify"
+import { showResponseToast, showToast } from './error-api';
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type CreateEntryProp = {
+  // tornjak server debug info of the selected server
+  globalDebugServerInfo: DebugServerInfo,
   // entry expiry time
   globalEntryExpiryTime: number,
   // dispatches a payload for the server selected and has a return type of void
@@ -193,7 +207,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
         this.setState({ selectedServer: this.props.globalServerSelected });
       }
 
-      if (prevProps.globalServerInfo !== this.props.globalServerInfo) {
+      if (prevProps.globalDebugServerInfo !== this.props.globalDebugServerInfo) {
         if (this.props.globalAgentsList !== undefined && this.props.globalEntriesList !== undefined) {
           this.prepareParentIdAgentsList();
         }
@@ -211,7 +225,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
         this.prepareSelectorsList();
       }
     } else {
-      if (prevProps.globalServerInfo !== this.props.globalServerInfo) {
+      if (prevProps.globalDebugServerInfo !== this.props.globalDebugServerInfo) {
         if (this.props.globalAgentsList !== undefined && this.props.globalEntriesList !== undefined) {
           this.prepareParentIdAgentsList();
         }
@@ -234,11 +248,11 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   prepareParentIdAgentsList(): void {
     var idx = 0, prefix = "spiffe://";
     let localAgentsIdList: string[] = [], localAgentsIdList_noManualOption: string[] = [];
-    if (Object.keys(this.props.globalServerInfo).length === 0) { return }
+    if (Object.keys(this.props.globalDebugServerInfo).length === 0) { return }
     //user prefered option
     localAgentsIdList[0] = this.state.parentIdManualEntryOption;
     //default option
-    localAgentsIdList[1] = prefix + this.props.globalServerInfo.trustDomain + "/spire/server";
+    localAgentsIdList[1] = prefix + this.props.globalDebugServerInfo.svid_chain[0].id.trust_domain + "/spire/server";
 
     //agents
     let agentEntriesDict: { [key: string]: EntriesList[]; } | undefined = this.SpiffeHelper.getAgentsEntries(this.props.globalAgentsList, this.props.globalEntriesList)
@@ -274,16 +288,16 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   }
 
   prepareSelectorsList(): void {
-    if (this.props.globalServerInfo === undefined || this.props.globalAgentsList === undefined || this.props.globalEntriesList === undefined) {
+    if (this.props.globalDebugServerInfo === undefined || this.props.globalAgentsList === undefined || this.props.globalEntriesList === undefined) {
       return
     }
     var prefix = "spiffe://", agentSelectorSet = false;
     var parentId = this.state.parentId;
-    if (this.props.globalServerInfo !== undefined) {
-      var defaultServer = prefix + this.props.globalServerInfo.trustDomain + "/spire/server";
+    if (this.props.globalDebugServerInfo !== undefined) {
+      var defaultServer = prefix + this.props.globalDebugServerInfo.svid_chain[0].id.trust_domain + "/spire/server";
       var globalAgentsWorkLoadAttestorInfo = this.props.globalAgentsWorkLoadAttestorInfo;
       if (parentId === defaultServer) {
-        if (Object.keys(this.props.globalServerInfo).length === 0) { return }
+        if (Object.keys(this.props.globalDebugServerInfo).length === 0) { return }
         let serverNodeAtt = this.props.globalServerInfo.nodeAttestorPlugin;
         if (serverNodeAtt === "aws_iid") {
           this.setState({
@@ -551,12 +565,12 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   getApiEntryCreateEndpoint(): string {
     if (!IsManager) {
       return GetApiServerUri('/api/entry/create')
-    } else if (IsManager && this.state.selectedServer !== "") {
+    } 
+    if (IsManager && this.state.selectedServer !== "") {
       return GetApiServerUri('/manager-api/entry/create') + "/" + this.state.selectedServer
-    } else {
-      displayError("No server selected.")
-      return ""
-    }
+    } 
+    showToast({caption: "No server selected."})
+    return ""
   }
 
   onSubmit(e: { preventDefault: () => void; }): void {
@@ -564,15 +578,25 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     let federatedWithList: string[] = []
     let dnsNamesWithList: string[] = []
     
-    e.preventDefault();
+    e.preventDefault()
 
-    if (!this.parseSpiffeId(this.state.spiffeId)[0]) {
-      displayError("Invalid spiffe id.")
+    if (!this.state.parentId) {
+      showToast({caption: "The parent SPIFFE id cannot be empty."})
+      return
+    }
+
+    if (!this.state.spiffeId) {
+      showToast({caption: "The SPIFFE id cannot be empty."})
       return
     }
 
     if (!this.parseSpiffeId(this.state.parentId)[0]) {
-      displayError("Invalid parent spiffe id.")
+      showToast({caption: "The parent SPIFFE id is invalid."})
+      return
+    }
+
+    if (!this.parseSpiffeId(this.state.spiffeId)[0]) {
+      showToast({caption: "The SPIFFE id is invalid."})
       return
     }
 
@@ -581,7 +605,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     }
 
     if (selectorStrings.length === 0) {
-      displayError("Selectors cannot be empty.")
+      showToast({caption: "The selectors cannot be empty."})
       return
     }
 
@@ -592,7 +616,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       } : null)
 
     if (selectorEntries.some(x => x == null || x["value"].length === 0)) {
-      displayError("Selectors must be formatted 'type:value'")
+      showToast({caption: "The selectors must be formatted 'type:value'."})
       return
     }
 
@@ -638,7 +662,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           successJsonMessege: res.data.results[0].status.message
         })
       )
-      .catch(err => displayResponseError("Entry creation failed.", err))
+      .catch(err => showResponseToast(err, {caption: "Could not create entry."}))
   }
 
   onYAMLEntryCreate(): void {
@@ -669,7 +693,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           })
         }
       )
-      .catch(err => displayResponseError("Entry creation failed.", err))
+      .catch(err => showResponseToast(err, {caption: "Could not create entry from YAML."}))
   }
 
   render() {
@@ -682,7 +706,8 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
         <br /><br />
         {this.state.message !== "" &&
           <div>
-            <ToastNotification className="toast-entry-creation-notification"
+            <ToastNotification 
+              className="toast-entry-creation-notification"
               kind="info"
               iconDescription="close notification"
               subtitle={
@@ -710,11 +735,12 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                       {this.state.message}
                     </pre>
                   </div>
-                </span>}
+                </span>
+              }
               timeout={0}
               title="Entry Creation Notification"
             />
-            {window.scrollTo({ top: 0, behavior: 'smooth' })}
+            {window.scrollTo({top: 0, behavior: 'smooth'})}
           </div>
         }
         <Accordion className="accordion-entry-form">
@@ -806,7 +832,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                       this.onChangeSpiffeId(e);
                     }}
                     //onChange={this.onChangeSpiffeId}
-                    required />
+                  />
                 </div>
                 <div className="selectors-multiselect" data-test="selectors-multiselect">
                   <FilterableMultiSelect
@@ -897,6 +923,11 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
             </form>
           </AccordionItem>
         </Accordion>
+        <ToastContainer
+          className="carbon-toast"
+          containerId="notifications"
+          draggable={false}
+        />
       </div>
     )
   }
@@ -915,6 +946,7 @@ const mapStateToProps = (state: RootState) => ({
   globalErrorMessage: state.tornjak.globalErrorMessage,
   globalWorkloadSelectorInfo: state.servers.globalWorkloadSelectorInfo,
   globalAgentsWorkLoadAttestorInfo: state.agents.globalAgentsWorkLoadAttestorInfo,
+  globalDebugServerInfo: state.servers.globalDebugServerInfo,
 })
 
 // Note: Needed for UI testing - will be removed after

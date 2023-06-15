@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
-import { Dropdown, TextInput, FilterableMultiSelect, TextArea } from 'carbon-components-react';
+import { Dropdown, TextInput, FilterableMultiSelect, TextArea, InlineNotification } from 'carbon-components-react';
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
@@ -23,10 +23,13 @@ import {
   AgentsList,
   ClustersList,
   ServerInfo,
-} from './types'
-import { displayError, displayResponseError } from './error-api';
+  DebugServerInfo,
+} from './types';
+import { showResponseToast, showToast } from './error-api';
 
 type ClusterEditProp = {
+  // tornjak server debug info of the selected server
+  globalDebugServerInfo: DebugServerInfo,
   // dispatches a payload for list of clusters with their metadata info as an array of ClustersList Type and has a return type of void
   clustersListUpdateFunc: (globalClustersList: ClustersList[]) => void,
   // dispatches a payload for the tornjak error messsege and has a return type of void
@@ -116,7 +119,7 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
   componentDidUpdate(prevProps: ClusterEditProp) {
     if (IsManager) {
       if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
-        this.setState({selectedServer: this.props.globalServerSelected})
+        this.setState({ selectedServer: this.props.globalServerSelected })
       }
     }
     if (prevProps.globalClustersList !== this.props.globalClustersList || prevProps.globalAgentsList !== this.props.globalAgentsList) {
@@ -126,12 +129,12 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
 
   prepareClusterNameList(): void {
     var clusters = this.props.globalClustersList
-    if (clusters === undefined || this.props.globalServerInfo === undefined || Object.keys(this.props.globalServerInfo).length === 0) return
+    if (clusters === undefined || this.props.globalDebugServerInfo === undefined || Object.keys(this.props.globalDebugServerInfo).length === 0) return
     let localClusterNameList = []
     for (let i = 0; i < clusters.length; i++) {
       localClusterNameList[i] = clusters[i].name
     }
-    this.setState({clusterNameList: localClusterNameList})
+    this.setState({ clusterNameList: localClusterNameList })
   }
 
   onChangeClusterNameList = (selected: { selectedItem: string }): void => {
@@ -173,18 +176,11 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
       assignedAgentsListDisplay: assignedAgentsDisplay, //agents list text box display
       agentsListSelected: agentsListSelected, //initial selected agents
     });
-    return
   }
 
-  onChangeClusterName(e: { target: { value: string; }; } | undefined): void {
-    if (e === undefined) {
-      return;
-    }
-    var sid = e.target.value;
-    this.setState({
-      clusterName: sid
-    });
-    return
+  onChangeClusterName(e: { target: { value: string } } | undefined): void {
+    if (e === undefined) return
+    this.setState({ clusterName: e.target.value })
   }
 
   onChangeClusterType = (selected: { selectedItem: string }): void => {
@@ -214,19 +210,19 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
 
   onChangeManualClusterType(e: { target: { value: string; }; } | undefined): void {
     if (e === undefined) return
-    this.setState({clusterType: e.target.value})
+    this.setState({ clusterType: e.target.value })
   }
 
   onChangeClusterDomainName(e: { target: { value: string; }; } | undefined): void {
     if (e === undefined) return
     var sid = e.target.value
-    this.setState({clusterDomainName: sid})
+    this.setState({ clusterDomainName: sid })
   }
 
   onChangeClusterManagedBy(e: { target: { value: string; }; } | undefined): void {
     if (e === undefined) return
     var sid = e.target.value
-    this.setState({clusterManagedBy: sid})
+    this.setState({ clusterManagedBy: sid })
   }
 
   onChangeAgentsList = (selected: { selectedItems: AgentLabels[]; } | undefined): void => {
@@ -262,32 +258,37 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
   getApiEntryCreateEndpoint(): string {
     if (!IsManager) {
       return GetApiServerUri('/api/tornjak/clusters/edit')
-    } 
+    }
     if (IsManager && this.state.selectedServer !== "") {
       return GetApiServerUri('/manager-api/tornjak/clusters/edit') + "/" + this.state.selectedServer
-    } 
+    }
     this.setState({ message: "Error: No server selected" })
     return ""
   }
 
-  onSubmit(e: {preventDefault: () => void} | undefined): void {
+  onSubmit(e: { preventDefault: () => void } | undefined): void {
 
     if (e !== undefined) {
       e.preventDefault()
     }
 
-    if (this.state.clusterTypeManualEntry && this.state.clusterType === this.state.clusterTypeManualEntryOption) {
-      displayError("Cluster type cannot be empty.")
-      return
-    }
-
     if (!this.state.originalClusterName) {
-      displayError("Please select an existing cluster.")
+      showToast({ caption: "Please select an existing cluster." })
       return
     }
 
     if (!this.state.clusterName) {
-      displayError("Cluster name cannot be empty.")
+      showToast({ caption: "The new cluster name cannot be empty." })
+      return
+    }
+
+    if (this.state.clusterTypeManualEntry && this.state.clusterType === this.state.clusterTypeManualEntryOption) {
+      showToast({ caption: "The cluster type cannot be empty." })
+      return
+    }
+
+    if (!this.state.clusterName) {
+      showToast({ caption: "The cluster name cannot be empty." })
       return
     }
 
@@ -315,8 +316,13 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
           statusOK: "OK"
         })
       )
-      .catch(err => displayResponseError("Could not edit cluster.", err))
+      .catch(err => showResponseToast(err))
 
+    //scroll to bottom of page after submission  
+    setTimeout(() => {
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+    }, 100);
+    
     if (IsManager) {
       if (this.props.globalServerSelected !== "" && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
         this.TornjakApi.populateClustersUpdate(this.props.globalServerSelected, this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
@@ -345,7 +351,6 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
                 label="Select Cluster"
                 titleText="Choose Cluster [*required]"
                 onChange={this.onChangeClusterNameList}
-              //required 
               />
               <p className="cluster-helper">i.e. Choose Cluster Name To Edit</p>
             </div>
@@ -361,7 +366,7 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
                 placeholder="Edit CLUSTER NAME"
                 defaultValue={this.state.clusterName}
                 onChange={this.onChangeClusterName}
-                required />
+              />
             </div>
             <div
               className="clustertype-drop-down"
@@ -375,7 +380,6 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
                 selectedItem={this.state.clusterType}
                 titleText="Edit Cluster Type"
                 onChange={this.onChangeClusterType}
-              //required 
               />
               <p className="cluster-helper">i.e. Kubernetes, VMs...</p>
             </div>
@@ -451,18 +455,35 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
             <div className="form-group" data-test="cluster-edit-button">
               <input type="submit" value="Edit Cluster" className="btn btn-primary" />
             </div>
-            <div data-test="success-message">
+            <div>
               {this.state.statusOK === "OK" &&
-                <p className="success-message">--CLUSTER SUCCESSFULLY EDITED--</p>
+                <InlineNotification
+                  kind="success"
+                  hideCloseButton
+                  title="CLUSTER SUCCESSFULLY EDITED"
+                  subtitle={
+                    <div className="toast-messege" data-test="alert-primary">
+                      <pre className="toast-messege-color">
+                        {this.state.message}
+                      </pre>
+                    </div>
+                  }
+                />
               }
               {(this.state.statusOK === "ERROR") &&
-                <p className="failed-message">--CLUSTER EDIT FAILED--</p>
+                <InlineNotification
+                  kind="error"
+                  hideCloseButton
+                  title="CLUSTER EDIT FAILED"
+                  subtitle={
+                    <div className="toast-messege" data-test="alert-primary">
+                      <pre className="toast-messege-color">
+                        {this.state.message}
+                      </pre>
+                    </div>
+                  }
+                />
               }
-            </div>
-            <div className="alert-primary" role="alert">
-              <pre>
-                {this.state.message}
-              </pre>
             </div>
           </div>
         </form>
@@ -515,6 +536,7 @@ const mapStateToProps = (state: RootState) => ({
   globalErrorMessage: state.tornjak.globalErrorMessage,
   globalWorkloadSelectorInfo: state.servers.globalWorkloadSelectorInfo,
   globalAgentsWorkLoadAttestorInfo: state.agents.globalAgentsWorkLoadAttestorInfo,
+  globalDebugServerInfo: state.servers.globalDebugServerInfo,
 })
 
 export default connect(

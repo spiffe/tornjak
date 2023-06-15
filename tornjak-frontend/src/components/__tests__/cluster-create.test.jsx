@@ -1,9 +1,8 @@
 import { ClusterCreate } from "../../components/cluster-create"
-import { configure } from "enzyme"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react"
+import { shallow, configure } from "enzyme"
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17"
 
-configure({adapter: new Adapter()})
+configure({ adapter: new Adapter() })
 
 const props = {
     serverInfoUpdateFunc: jest.fn(), 
@@ -19,36 +18,25 @@ const props = {
 }
 
 describe("Cluster Create Component", () => {
+    const wrapper = shallow(<ClusterCreate {...props} />)
 
-    beforeEach(() => {
-        render(<ClusterCreate {...props} />)
+    it("Should Render", () => {
+        expect(wrapper).toMatchSnapshot()
     })
 
-    describe("Cluster type cannot be empty.", () => {
+    it("Should Create Cluster", () => {
+        const instance = wrapper.instance()
 
-        /*
-        if ((this.state.clusterTypeManualEntry && this.state.clusterType === this.state.clusterTypeManualEntryOption) || !this.state.clusterType) {
-      displayError("Cluster type cannot be empty.")
-      return
-    }
-        */
+        instance.onChangeClusterName({target: {value: "Name"}})
+        instance.onChangeManualClusterType({target: {value: "Type"}})
+        instance.onChangeClusterDomainName({target: {value: "Domain"}})
+        instance.onChangeClusterManagedBy({target: {value: "Managed By"}})
 
-        it("Manual", () => {
-            fireEvent.change(screen.getByRole("cluster-type"), {selectedItem: "----Select this option and Enter Custom Cluster Type Below----"})
-        })
+        wrapper.find("form").simulate("submit")
 
-        it("Not manual", () => {
-            fireEvent.change(screen.getByRole("cluster-type"), {selectedItem: ""})
-        })
-
-        afterEach(async () => {
-            fireEvent.click(screen.getByRole("create-cluster-button"))
-
-            await waitFor(() => {
-                const notification = screen.getByRole("error")
-                const [ caption ] = notification.getElementsByClassName("bx--toast-notification__caption")
-                expect(caption.textContent).toBe("Cluster type cannot be empty.")
-            })
-        })
+        expect(wrapper.state("clusterName")).toBe("Name")
+        expect(wrapper.state("clusterType")).toBe("Type")
+        expect(wrapper.state("clusterDomainName")).toBe("Domain")
+        expect(wrapper.state("clusterManagedBy")).toBe("Managed By")
     })
 })

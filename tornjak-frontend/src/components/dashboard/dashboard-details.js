@@ -1,13 +1,13 @@
 import React from "react";
 import { connect } from "react-redux";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles } from "tss-react/mui";
 // Components
-import { Container, Grid, Paper } from "@material-ui/core";
+import { Container, Grid, Paper } from "@mui/material";
 // Tables
-import ClustersTable from "./clusters-dashboard-table";
-import AgentsTable from "./agents-dashboard-table";
-import EntriesTable from "./entries-dashboard-table";
-import DashboardDrawer from "./dashboard-drawer";
+import ClusterDashboardTableStyled from "./clusters-dashboard-table";
+import AgentDashboardTableStyled from "./agents-dashboard-table";
+import EntriesDashBoardTableStyled from "./entries-dashboard-table";
+import DashboardDrawerStyled from "./dashboard-drawer";
 
 const styles = (theme) => ({
   root: {
@@ -97,10 +97,11 @@ class DashboardDetails extends React.Component {
 
   render() {
     const { selectedDataKey } = this.state;
-    const { classes, selectedData } = this.props;
+    const classes = withStyles.getClasses(this.props);
+    const { selectedData } = this.props;
     return (
       <div className={classes.root}>
-        <DashboardDrawer />
+        <DashboardDrawerStyled />
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           {selectedData.length !== 0 && !selectedData[0] && (
@@ -133,7 +134,7 @@ class DashboardDetails extends React.Component {
                       {/* Agents Table */}
                       <Grid item xs={12}>
                         <Paper className={classes.paper}>
-                          <AgentsTable
+                          <AgentDashboardTableStyled
                             numRows={100}
                             filterByCluster={selectedDataKey["agentsFilter"]}
                           />
@@ -144,7 +145,7 @@ class DashboardDetails extends React.Component {
                       {/* Entries Table */}
                       <Grid item xs={12}>
                         <Paper className={classes.paper}>
-                          <EntriesTable
+                          <EntriesDashBoardTableStyled
                             numRows={100}
                             filterByCluster={selectedDataKey["entriesFilter"]}
                           />
@@ -185,7 +186,7 @@ class DashboardDetails extends React.Component {
                       {/* Clusters Table */}
                       <Grid item xs={12}>
                         <Paper className={classes.paper}>
-                          <ClustersTable
+                          <ClusterDashboardTableStyled
                             numRows={100}
                             filterByCluster={selectedDataKey["clustersFilter"]}
                           />
@@ -196,7 +197,7 @@ class DashboardDetails extends React.Component {
                       {/* Entries Table */}
                       <Grid item xs={12}>
                         <Paper className={classes.paper}>
-                          <EntriesTable
+                          <EntriesDashBoardTableStyled
                             numRows={100}
                             filterByAgentId={selectedDataKey["entriesFilter"]}
                           />
@@ -247,7 +248,7 @@ class DashboardDetails extends React.Component {
                       {/* Clusters Table */}
                       <Grid item xs={12}>
                         <Paper className={classes.paper}>
-                          <ClustersTable
+                          <ClusterDashboardTableStyled
                             numRows={100}
                             filterByCluster={selectedDataKey["clustersFilter"]}
                           />
@@ -258,7 +259,7 @@ class DashboardDetails extends React.Component {
                       {/* Agents Table */}
                       <Grid item xs={12}>
                         <Paper className={classes.paper}>
-                          <AgentsTable
+                          <AgentDashboardTableStyled
                             numRows={100}
                             filterByAgentId={selectedDataKey["agentsFilter"]}
                           />
@@ -273,7 +274,7 @@ class DashboardDetails extends React.Component {
                   {/* Clusters Table */}
                   <Grid item xs={12}>
                     <Paper className={classes.paper}>
-                      <ClustersTable 
+                      <ClusterDashboardTableStyled
                         numRows={100}
                         filterByCluster={selectedDataKey["clustersFilter"]} 
                       />
@@ -286,7 +287,7 @@ class DashboardDetails extends React.Component {
                   {/* Agents Table */}
                   <Grid item xs={12}>
                     <Paper className={classes.paper}>
-                      <AgentsTable 
+                      <AgentDashboardTableStyled 
                         numRows={100} 
                         filterByAgentId={selectedDataKey["agentsFilter"]}
                         filterByCluster={selectedDataKey["agentsFilter"]}
@@ -300,7 +301,7 @@ class DashboardDetails extends React.Component {
                   {/* Entries Table */}
                   <Grid item xs={12}>
                     <Paper className={classes.paper}>
-                      <EntriesTable 
+                      <EntriesDashBoardTableStyled 
                         numRows={100}
                         filterByAgentId={selectedDataKey["entriesFilter"]}
                         filterByCluster={selectedDataKey["entriesFilter"]}
@@ -321,6 +322,6 @@ const mapStateToProps = (state) => ({
   globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 });
 
-export default withStyles(styles)(
-  connect(mapStateToProps, {})(DashboardDetails)
-);
+const DashboardDetailsStyled = withStyles(DashboardDetails, styles);
+export default connect(mapStateToProps, {})(DashboardDetailsStyled);
+
