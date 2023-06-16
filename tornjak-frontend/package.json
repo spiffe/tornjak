@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "@babel/runtime": "^7.22.0",
-    "@carbon/charts": "^0.41.80",
-    "@carbon/charts-react": "^0.41.80",
+    "@carbon/charts": "^1.8.0",
+    "@carbon/charts-react": "^1.8.0",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.11.16",

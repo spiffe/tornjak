@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Title from './title';
 import PieChart1 from "charts/PieChart";
 import SpiffeHelper from '../spiffe-helper'
 import { AgentsList, EntriesList } from 'components/types';
@@ -68,13 +67,13 @@ class AgentsPieChart extends React.Component<AgentsPieChartProp> {
     var groups = this.agentList()
     return (
       <React.Fragment>
-        <Title>Number of Workloads per Agent</Title>
         {groups.length === 0 &&
           <p className="no-data">No Data To Display</p>
         }
         {groups.length !== 0 &&
         <PieChart1
             data={groups}
+            title='Number of Workloads per Agent'
         />
         }
       </React.Fragment>

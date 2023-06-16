@@ -1,6 +1,7 @@
 import React from "react";
 import { PieChart } from "@carbon/charts-react";
 import "@carbon/charts/styles.css";
+import "@carbon/styles/css/styles.css";
 import { connect } from 'react-redux';
 import { RootState } from "redux/reducers";
 import { Alignments, LegendPositions, PieChartOptions } from "@carbon/charts/interfaces";
@@ -8,7 +9,8 @@ import { PieChartEntry } from "components/types";
 
 
 type PieChartProps = {
-  data: PieChartEntry[]
+  data: PieChartEntry[],
+  title: string
 }
 
 type PieChartState = {
@@ -20,6 +22,7 @@ class PieChart1 extends React.Component<PieChartProps, PieChartState> {
     super(props);
     this.state = {
       options: {
+        title: props.title,
         resizable: true,
         height: "300px",
         legend: {
