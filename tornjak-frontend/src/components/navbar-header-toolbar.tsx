@@ -1,7 +1,5 @@
-import React, { Component } from 'react';
-import {
-    HeaderGlobalAction,
-} from "carbon-components-react/lib/components/UIShell";
+import { Component } from 'react';
+import { HeaderGlobalAction } from "carbon-components-react";
 import { UserAvatar20, Notification20, Search20 } from "@carbon/icons-react";
 import KeycloakService from "auth/KeycloakAuth";
 import {env} from '../env';
