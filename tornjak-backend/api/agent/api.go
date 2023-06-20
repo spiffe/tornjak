@@ -209,6 +209,9 @@ type GetTornjakServerInfoRequest struct{}
 type GetTornjakServerInfoResponse TornjakSpireServerInfo
 
 func (s *Server) GetTornjakServerInfo(inp GetTornjakServerInfoRequest) (*GetTornjakServerInfoResponse, error) {
+	if s.SpireServerInfo.TrustDomain == "" {
+		return nil, errors.New("No SPIRE config provided to Tornjak")
+	}
 	return (*GetTornjakServerInfoResponse)(&s.SpireServerInfo), nil
 }
 

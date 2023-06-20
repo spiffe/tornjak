@@ -13,7 +13,9 @@ import { RootState } from 'redux/reducers';
 
 import {
   TornjakServerInfo as TornjakServInfo,
+  DebugServerInfo,
 } from './types';
+import { InlineNotification } from 'carbon-components-react';
 
 const pluginTagColorMapper: { [key: string]: TagTypeName | undefined; } = {
   "NodeAttestor": "red",
@@ -25,6 +27,10 @@ const pluginTagColorMapper: { [key: string]: TagTypeName | undefined; } = {
 }
 
 type TornjakServerInfoProp = {
+  // dispatches a payload for the debug server info of the selected server and has a return type of void
+  spireDebugServerInfoUpdateFunc: (globalDebugServerInfo: DebugServerInfo) => void,
+  // tornjak server debug info of the selected server
+  globalDebugServerInfo: DebugServerInfo,
   // dispatches a payload for the tornjak server info of the selected server and has a return type of void
   tornjakServerInfoUpdateFunc: (globalTornjakServerInfo: TornjakServInfo) => void,
   // dispatches a payload for an Error Message/ Success Message of an executed function as a string and has a return type of void
@@ -40,29 +46,68 @@ type TornjakServerInfoProp = {
 type TornjakServerInfoState = {}
 
 const PluginTags = (props: { names: string[], type: string }) => (
-  <p>{props.names.map((v: string) => <Tag type={pluginTagColorMapper[props.type]} >{props.type + ": " + v}</Tag>)}</p>
+  <>
+    {props.names.map((value: string) =>
+      <Tag key={value} type={pluginTagColorMapper[props.type]}>{props.type + ": " + value}</Tag>
+    )}
+  </>
 )
-const TornjakServerInfoDisplay = (props: { tornjakServerInfo: TornjakServInfo }) => (
+const TornjakServerInfoDisplay = (props: { tornjakServerInfo: TornjakServInfo, tornjakDebugInfo: DebugServerInfo }) => (
   <Accordion>
     <AccordionItem title="Trust Domain" open>
       <p>
-        {props.tornjakServerInfo.trustDomain}
+        {props.tornjakDebugInfo.svid_chain[0].id.trust_domain}
       </p>
     </AccordionItem>
     <AccordionItem title="Plugins" open>
-      <table>
-        {
-          (props.tornjakServerInfo.plugins &&
-            Object.entries(props.tornjakServerInfo.plugins).map(([key, value]) =>
-              <tr key={key + ":" + value}><PluginTags type={key} names={value} /></tr>)
-          )
-        }
-      </table>
+      {(props.tornjakServerInfo.trustDomain !== "" && props.tornjakServerInfo.verboseConfig !== "")
+        ? (
+          <table>
+            <tbody>
+              {
+                (props.tornjakServerInfo.plugins &&
+                  Object.entries(props.tornjakServerInfo.plugins).map(([key, value]) =>
+                    <tr key={key + ":" + value}>
+                      <td>
+                        <PluginTags type={key} names={value} />
+                      </td>
+                    </tr>)
+                )
+              }
+            </tbody>
+          </table>
+        )
+        :
+        (
+          <div>
+            <InlineNotification
+              kind="warning"
+              hideCloseButton
+              lowContrast
+              title="Note: No Plugin Info Provided from server. Tornjak Backend does not have access to SPIRE config!"
+            />
+          </div>
+        )
+      }
     </AccordionItem>
     <AccordionItem title="Verbose Config (click to expand)">
-      <pre>
-        {props.tornjakServerInfo.verboseConfig}
-      </pre>
+      {(props.tornjakServerInfo.trustDomain !== "" && props.tornjakServerInfo.verboseConfig !== "")
+        ? (
+          <pre>
+            {props.tornjakServerInfo.verboseConfig}
+          </pre>
+        )
+        : (
+          <div>
+            <InlineNotification
+              kind="warning"
+              hideCloseButton
+              lowContrast
+              title="Note: No Server Config Provided from server. Tornjak Backend does not have access to SPIRE config!"
+            />
+          </div>
+        )
+      }
     </AccordionItem>
   </Accordion>
 )
@@ -82,6 +127,7 @@ class TornjakServerInfo extends Component<TornjakServerInfoProp, TornjakServerIn
       }
     } else {
       this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
+      this.TornjakApi.populateLocalTornjakDebugServerInfo(this.props.spireDebugServerInfoUpdateFunc, this.props.tornjakMessageFunc);
     }
   }
 
@@ -94,10 +140,12 @@ class TornjakServerInfo extends Component<TornjakServerInfoProp, TornjakServerIn
   }
 
   tornjakServerInfo() {
-    if (!this.props.globalTornjakServerInfo || Object.keys(this.props.globalTornjakServerInfo).length === 0) {
+    if (!this.props.globalDebugServerInfo || Object.keys(this.props.globalDebugServerInfo).length === 0) {
       return ""
     } else {
-      return <TornjakServerInfoDisplay tornjakServerInfo={this.props.globalTornjakServerInfo} />
+      return <TornjakServerInfoDisplay
+        tornjakServerInfo={this.props.globalTornjakServerInfo}
+        tornjakDebugInfo={this.props.globalDebugServerInfo} />
     }
   }
 
@@ -105,7 +153,7 @@ class TornjakServerInfo extends Component<TornjakServerInfoProp, TornjakServerIn
     return (
       <div>
         <h3>Server Info</h3>
-        {this.props.globalErrorMessage !== "OK" &&
+        {this.props.globalErrorMessage !== "OK" && this.props.globalErrorMessage !== "No Content" &&
           <div className="alert-primary" role="alert">
             <pre>
               {this.props.globalErrorMessage}
@@ -124,6 +172,7 @@ const mapStateToProps = (state: RootState) => ({
   globalServerInfo: state.servers.globalServerInfo,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
   globalErrorMessage: state.tornjak.globalErrorMessage,
+  globalDebugServerInfo: state.servers.globalDebugServerInfo,
 })
 
 export default connect(

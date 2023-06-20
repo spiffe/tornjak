@@ -31,7 +31,7 @@ class DashboardDetailsRender extends Component {
 
     componentDidMount() {
         const { params } = this.props;
-        if (this.props.globalTornjakServerInfo === "" || this.props.globalServerInfo === undefined) {
+        if (this.props.globalDebugServerInfo === "") {
             if (IsManager) {
                 if (this.props.globalServerSelected !== "") {
                     this.props.clickedDashboardTableFunc(params.entity + "details");
@@ -72,6 +72,7 @@ const mapStateToProps = (state) => ({
     globalAgentsList: state.agents.globalAgentsList,
     globalEntriesList: state.entries.globalEntriesList,
     globalAgentsWorkLoadAttestorInfo: state.agents.globalAgentsWorkLoadAttestorInfo,
+    globalDebugServerInfo: state.servers.globalDebugServerInfo,
 })
 
 export default connect(

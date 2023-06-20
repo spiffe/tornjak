@@ -2,7 +2,7 @@
 FROM node:16-alpine3.14 AS build
 WORKDIR /usr/src/app
 COPY tornjak-frontend .
-RUN npm install --omit=dev && \
+RUN npm install && \
     npm run build
 
 ## Runtime stage
@@ -12,7 +12,8 @@ COPY --from=build /usr/src/app/build ./build
 COPY --from=build /usr/src/app/.env.prod .
 
 # Install serve package and react-inject-env
-RUN npm install --location=global serve && \
+RUN npm install -g npm@9.7.1 && \
+    npm install --location=global serve && \
     npm install react-inject-env
     
 # Set dynamic port, defualt 3000
