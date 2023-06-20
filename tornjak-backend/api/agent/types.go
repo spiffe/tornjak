@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/spiffe/spire/pkg/common/catalog"
 	"github.com/hashicorp/hcl/hcl/ast"
 )
 
@@ -18,7 +17,7 @@ type TornjakSpireServerInfo struct {
 
 type TornjakConfig struct {
 	Server  *serverConfig `hcl:"server"`
-	Plugins ast.Node      `hcl:"plugins"`
+	Plugins *ast.Node     `hcl:"plugins"`
 }
 
 /* Server configuration*/

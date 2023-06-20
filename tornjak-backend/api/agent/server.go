@@ -18,9 +18,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
+	"github.com/hashicorp/hcl/hcl/token"
 	"github.com/pkg/errors"
 
-	"github.com/spiffe/spire/pkg/common/catalog"
 	auth "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/auth"
 	agentdb "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/db"
 )
@@ -38,6 +38,16 @@ type Server struct {
 	// Plugins
 	Db            agentdb.AgentDB
 	Auth          auth.Auth
+}
+
+// config type, as defined by SPIRE
+// we mirror the SPIRE config as set in SPIRE v1.6.4
+type hclPluginConfig struct {
+	PluginCmd      string   `hcl:"plugin_cmd"`
+	PluginArgs     []string `hcl:"plugin_args"`
+	PluginChecksum string   `hcl:"plugin_checksum"`
+	PluginData     ast.Node `hcl:"plugin_data"`
+	Enabled        *bool    `hcl:"enabled"`
 }
 
 func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
@@ -748,16 +758,38 @@ func (s *Server) HandleRequests() {
 	
 }
 
-// getPluginConfig returns first plugin configuration
-func getPluginConfig(plugin map[string]catalog.HCLPluginConfig) (string, ast.Node, error) {
-	for k, d := range plugin {
-		return k, d.PluginData, nil
+func stringFromToken(keyToken token.Token) (string, error) {
+	switch keyToken.Type {
+	case token.STRING, token.IDENT:
+	default:
+		return "", fmt.Errorf("expected STRING or IDENT but got %s", keyToken.Type)
 	}
-	return "", nil, errors.New("No plugin data found")
+	value := keyToken.Value()
+	stringValue, ok := value.(string)
+	if !ok {
+		// purely defensive
+		return "", fmt.Errorf("expected %T but got %T", stringValue, value)
+	}
+	return stringValue, nil
+}
+
+// getPluginConfig returns first plugin configuration
+func getPluginConfig(plugin *ast.ObjectItem) (string, ast.Node, error) {
+	// extract plugin name and value
+	pluginName, err := stringFromToken(plugin.Keys[1].Token)
+	if err != nil {
+		return "", nil, fmt.Errorf("invalid plugin type name %q: %w", plugin.Keys[1].Token.Text, err)
+	}
+	// extract data
+	var hclPluginConfig hclPluginConfig
+	if err := hcl.DecodeObject(&hclPluginConfig, plugin.Val); err != nil {
+		return "", nil, fmt.Errorf("failed to decode plugin config for %q: %w", pluginName, err)
+	}
+	return pluginName, hclPluginConfig.PluginData, nil
 }
 
 // NewAgentsDB returns a new agents DB, given a DB connection string
-func NewAgentsDB(dbPlugin map[string]catalog.HCLPluginConfig) (agentdb.AgentDB, error) {
+func NewAgentsDB(dbPlugin *ast.ObjectItem) (agentdb.AgentDB, error) {
 	key, data, err := getPluginConfig(dbPlugin)
 	if err != nil { // db is required config
 		return nil, errors.New("Required DataStore plugin not configured")
@@ -795,7 +827,7 @@ func NewAgentsDB(dbPlugin map[string]catalog.HCLPluginConfig) (agentdb.AgentDB, 
 }
 
 // NewAuth returns a new Auth
-func NewAuth(authPlugin map[string]catalog.HCLPluginConfig) (auth.Auth, error) {
+func NewAuth(authPlugin *ast.ObjectItem) (auth.Auth, error) {
 	key, data, err := getPluginConfig(authPlugin)
 	if err != nil { // default used, no error
 		verifier := auth.NewNullVerifier()
@@ -859,16 +891,41 @@ func (s *Server) Configure() error {
 	
 	/*  Configure Plugins  */
 	pluginConfigs := *s.TornjakConfig.Plugins
-	// configure datastore
-	s.Db, err = NewAgentsDB(pluginConfigs["DataStore"])
-	if err != nil {
-		return errors.Errorf("Cannot configure datastore plugin: %v", err)
+	pluginList, ok := pluginConfigs.(*ast.ObjectList)
+	if !ok {
+		return fmt.Errorf("expected plugins node type %T but got %T", pluginList, pluginConfigs)
 	}
-	// configure auth
-	s.Auth, err = NewAuth(pluginConfigs["UserManagement"])
-	if err != nil {
-		return errors.Errorf("Cannot configure auth plugin: %v", err)
+
+	// iterate over plugin list
+
+	for _, pluginObject := range pluginList.Items {
+		if len(pluginObject.Keys) != 2 {
+			return fmt.Errorf("plugin item expected to have two keys (type then name)")
+		}
+
+		pluginType, err := stringFromToken(pluginObject.Keys[0].Token)
+		if err != nil {
+			return fmt.Errorf("invalid plugin type key %q: %w", pluginObject.Keys[0].Token.Text, err)
+		}
+
+		// create plugin component based on type
+		switch pluginType {
+			// configure datastore
+			case "DataStore":
+				s.Db, err = NewAgentsDB(pluginObject)
+				if err != nil {
+					return errors.Errorf("Cannot configure datastore plugin: %v", err)
+				}
+			// configure auth
+			case "UserManagement":
+				s.Auth, err = NewAuth(pluginObject)
+				if err != nil {
+					return errors.Errorf("Cannot configure auth plugin: %v", err)
+				}
+		}
+		// TODO Handle when multiple plugins configured
 	}
+
 	return nil
 }
 
