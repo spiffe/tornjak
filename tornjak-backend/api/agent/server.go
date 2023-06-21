@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -636,7 +635,7 @@ func (s *Server) HandleRequests() {
 			}
 			addr := fmt.Sprintf(":%d", listenPort)
 			// Create a CA certificate pool and add cert.pem to it
-			caCert, err := ioutil.ReadFile(certPath)
+			caCert, err := os.ReadFile(certPath)
 			if err != nil {
 				err = errors.Errorf("%s server: CA pool error: %v", tlsType, err)
 				errChannel <- err
@@ -649,7 +648,7 @@ func (s *Server) HandleRequests() {
 			tlsConfig := &tls.Config{
 				ClientCAs: caCertPool,
 			}
-			tlsConfig.BuildNameToCertificate()
+			//tlsConfig.BuildNameToCertificate()
 
 			// Create a Server instance to listen on port 8443 with the TLS config
 			server := &http.Server{
@@ -692,7 +691,7 @@ func (s *Server) HandleRequests() {
 			}
 			addr := fmt.Sprintf(":%d", listenPort)
 			// Create a CA certificate pool and add cert.pem to it
-			caCert, err := ioutil.ReadFile(certPath)
+			caCert, err := os.ReadFile(certPath)
 			if err != nil {
 				err = errors.Errorf("%s server: CA pool error: %v", tlsType, err)
 				errChannel <- err
@@ -707,7 +706,7 @@ func (s *Server) HandleRequests() {
 				errChannel <- err
 				return
 			}
-			mTLSCaCert, err := ioutil.ReadFile(caPath)
+			mTLSCaCert, err := os.ReadFile(caPath)
 			if err != nil {
 				err = errors.Errorf("%s server: Could not read file %s: %v", tlsType, caPath, err)
 				errChannel <- err
@@ -721,7 +720,7 @@ func (s *Server) HandleRequests() {
 				ClientCAs: caCertPool,
 			}
 			mtlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
-			mtlsConfig.BuildNameToCertificate()
+			//mtlsConfig.BuildNameToCertificate()
 
 			// Create a Server instance to listen on port 8443 with the TLS config
 			server := &http.Server{
@@ -900,7 +899,12 @@ func (s *Server) Configure() error {
 	
 	/*  Configure Plugins  */
 	// configure defaults for optional plugins, reconfigured if given
+	// TODO maybe we should not have this step at all
+	// This is a temporary work around for optional plugin configs
 	err = s.ConfigureDefaults()
+	if err != nil {
+		return errors.Errorf("Tornjak Config error: %v", err)
+	}
 
 	pluginConfigs := *s.TornjakConfig.Plugins
 	pluginList, ok := pluginConfigs.(*ast.ObjectList)

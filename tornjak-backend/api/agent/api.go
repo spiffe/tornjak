@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	grpc "google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"google.golang.org/grpc/health/grpc_health_v1"
 	debugServer "github.com/spiffe/spire-api-sdk/proto/spire/api/server/debug/v1"
@@ -21,7 +22,7 @@ type HealthcheckResponse grpc_health_v1.HealthCheckResponse
 func (s *Server) SPIREHealthcheck(inp HealthcheckRequest) (*HealthcheckResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	inpReq := grpc_health_v1.HealthCheckRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +43,7 @@ type DebugServerResponse debugServer.GetInfoResponse
 func (s *Server) DebugServer(inp DebugServerRequest) (*DebugServerResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	inpReq := debugServer.GetInfoRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +65,7 @@ type ListAgentsResponse agent.ListAgentsResponse
 func (s *Server) ListAgents(inp ListAgentsRequest) (*ListAgentsResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	inpReq := agent.ListAgentsRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +85,7 @@ type BanAgentRequest agent.BanAgentRequest
 func (s *Server) BanAgent(inp BanAgentRequest) error { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	inpReq := agent.BanAgentRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}
@@ -104,7 +105,7 @@ type DeleteAgentRequest agent.DeleteAgentRequest
 func (s *Server) DeleteAgent(inp DeleteAgentRequest) error { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	inpReq := agent.DeleteAgentRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}
@@ -125,7 +126,7 @@ type CreateJoinTokenResponse types.JoinToken
 func (s *Server) CreateJoinToken(inp CreateJoinTokenRequest) (*CreateJoinTokenResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	inpReq := agent.CreateJoinTokenRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +149,7 @@ type ListEntriesResponse entry.ListEntriesResponse
 func (s *Server) ListEntries(inp ListEntriesRequest) (*ListEntriesResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	inpReq := entry.ListEntriesRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +170,7 @@ type BatchCreateEntryResponse entry.BatchCreateEntryResponse
 func (s *Server) BatchCreateEntry(inp BatchCreateEntryRequest) (*BatchCreateEntryResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	inpReq := entry.BatchCreateEntryRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +191,7 @@ type BatchDeleteEntryResponse entry.BatchDeleteEntryResponse
 func (s *Server) BatchDeleteEntry(inp BatchDeleteEntryRequest) (*BatchDeleteEntryResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	inpReq := entry.BatchDeleteEntryRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
