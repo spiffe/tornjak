@@ -795,12 +795,15 @@ func NewAgentsDB(dbPlugin *ast.ObjectItem) (agentdb.AgentDB, error) {
 		return nil, errors.New("Required DataStore plugin not configured")
 	}
 
+	fmt.Printf("DATASTORE KEY AND DATA: %s ,  %+v\n", key, data)
+
 	switch key {
 	case "sql":
 		// check if data is defined
 		if data == nil {
 			return nil, errors.New("SQL DataStore plugin ('config > plugins > DataStore sql > plugin_data') not populated")
 		}
+		fmt.Printf("SQL DATASTORE DATA: %+v\n", data)
 
 		// TODO can probably add this to config
 		expBackoff := backoff.NewExponentialBackOff()
@@ -828,11 +831,11 @@ func NewAgentsDB(dbPlugin *ast.ObjectItem) (agentdb.AgentDB, error) {
 
 // NewAuth returns a new Auth
 func NewAuth(authPlugin *ast.ObjectItem) (auth.Auth, error) {
-	key, data, err := getPluginConfig(authPlugin)
-	if err != nil { // default used, no error
+	key, data, _ := getPluginConfig(authPlugin)
+	/*if err != nil { // default used, no error
 		verifier := auth.NewNullVerifier()
 		return verifier, nil
-	}
+	}*/
 
 	switch key {
 	case "KeycloakAuth":
@@ -878,6 +881,12 @@ func (s *Server) VerifyConfiguration() error {
 	return nil
 }
 
+func (s *Server) ConfigureDefaults() error {
+	// no authorization is a default
+	s.Auth = auth.NewNullVerifier()
+	return nil
+}
+
 func (s *Server) Configure() error {
 	// Verify Config
 	err := s.VerifyConfiguration()
@@ -890,6 +899,9 @@ func (s *Server) Configure() error {
 	s.SpireServerAddr = serverConfig.SPIRESocket // for convenience
 	
 	/*  Configure Plugins  */
+	// configure defaults for optional plugins, reconfigured if given
+	err = s.ConfigureDefaults()
+
 	pluginConfigs := *s.TornjakConfig.Plugins
 	pluginList, ok := pluginConfigs.(*ast.ObjectList)
 	if !ok {
@@ -898,7 +910,11 @@ func (s *Server) Configure() error {
 
 	// iterate over plugin list
 
+	fmt.Printf("pluginlist: %+v\n", pluginList.Items)
+
 	for _, pluginObject := range pluginList.Items {
+		fmt.Printf("pluginItem: %+v\n", pluginObject)
+
 		if len(pluginObject.Keys) != 2 {
 			return fmt.Errorf("plugin item expected to have two keys (type then name)")
 		}
@@ -907,6 +923,8 @@ func (s *Server) Configure() error {
 		if err != nil {
 			return fmt.Errorf("invalid plugin type key %q: %w", pluginObject.Keys[0].Token.Text, err)
 		}
+
+		fmt.Printf("pluginType: %s\n", pluginType)
 
 		// create plugin component based on type
 		switch pluginType {
