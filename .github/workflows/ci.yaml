@@ -19,7 +19,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.29
+          version: v1.53
           args: --timeout 5m
       - name: Run make all
         run: make all
