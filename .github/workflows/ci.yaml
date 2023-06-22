@@ -20,7 +20,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.53
-          args: --timeout 5m
+          args: --timeout 7m
       - name: Run make all
         run: make all
       - run: echo "🍏 This job's status is ${{ job.status }}."
