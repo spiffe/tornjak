@@ -40,11 +40,11 @@ jobs:
 
       # build and push images tagged with GITHUB_SHA, version, and latest
       - name: Build and push tornjak backend image
-        run: make container-backend-push
+        run: make release-backend
       - name: Build and push tornjak frontend image
-        run: make container-frontend-push
+        run: make release-frontend
       - name: Build and push tornjak image (frontend+backend)
-        run: make container-tornjak-push
+        run: make release-tornjak
       - name: Build and push tornjak manager image
-        run: make container-manager-push
+        run: make release-manager
       - run: echo "🍏 This job's status is ${{ job.status }}."

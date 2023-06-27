@@ -1,5 +1,3 @@
-.PHONY: ui vendor build container-manager container-manager-push push container-frontend container-frontend-push container-backend container-backend-push
-
 VERSION=$(shell cat version.txt)
 GITHUB_SHA ?= "$(shell git rev-parse HEAD 2>/dev/null)"
 
@@ -12,93 +10,119 @@ CONTAINER_BACKEND_TAG ?= $(REPO)/tornjak-backend
 CONTAINER_FRONTEND_TAG ?= $(REPO)/tornjak-frontend
 CONTAINER_MANAGER_TAG ?= $(REPO)/tornjak-manager
 
-## `make release-*` pushes to DEV tag as well as below corresponding RELEASE tag
-## used by Github
+BINARIES=tornjak-backend tornjak-manager
+IMAGES=$(BINARIES) tornjak-frontend tornjak
 
-GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
+GO_VERSION ?= 1.20
 
-all: bin/tornjak-backend bin/tornjak-manager container-manager container-frontend container-backend container-tornjak
+all: build-binaries images ## Builds both binaries and images (default task)
 
-#### BEGIN LOCAL EXECUTABLE BUILDS ####
+.PHONY: help
+help: ## Display this help.
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-# build binaries for Tornjak backend (bin/tornjak-backend)
-bin/tornjak-backend: $(GO_FILES) vendor
+PHONY: clean
+clean: ## Cleanup local build outputs
+	rm -rf bin/
+	rm -rf tornjak-frontend/build
+	rm -rf frontend-local-build/
+
+##@ Dependencies:
+
+PHONY: download
+download: ## Download go modules
+	@echo Downloading go modules…
+	@go mod download
+
+PHONY: tidy
+tidy: download ## Tidy go modules
+	@echo Tidying go modules…
+	@go mod tidy
+
+PHONY: vendor
+vendor: tidy ## Vendor go modules
+	@echo Vendoring go modules…
+	@go mod vendor
+
+##@ Build:
+
+PHONY: build-binaries
+build-binaries: $(addprefix bin/,$(BINARIES)) ## Build bin/tornjak-backend and bin/tornjak-manager binaries
+
+bin/tornjak-backend: tornjak-backend/cmd/agent vendor ## Build tornjak-backend binary
 	# Build hack because of flake of imported go module
-	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:1.20 /bin/sh -c "go build --tags 'sqlite_json' tornjak-backend/cmd/agent/agent.go; go build --tags 'sqlite_json' -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o bin/tornjak-backend tornjak-backend/cmd/agent/agent.go"
+	docker run --rm -v "${PWD}":/app -w /app -e GOOS=linux -e GOARCH=amd64 golang:$(GO_VERSION) \
+		/bin/sh -c "go build --tags 'sqlite_json' ./$<; go build --tags 'sqlite_json' -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o $@ ./$<"
 
-# build binary for Tornjak manager backend (bin/tornjak-manager)
-bin/tornjak-manager: $(GO_FILES) vendor
+bin/tornjak-manager: tornjak-backend/cmd/manager vendor ## Build bin/tornjak-manager binary
 	# Build hack because of flake of imported go module
-	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:1.16 /bin/sh -c "go build --tags 'sqlite_json' -o tornjak-manager tornjak-backend/cmd/manager/manager.go; go build --tags 'sqlite_json' -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o bin/tornjak-manager tornjak-backend/cmd/manager/manager.go"
+	docker run --rm -v "${PWD}":/app -w /app -e GOOS=linux -e GOARCH=amd64 golang:$(GO_VERSION) \
+		/bin/sh -c "go build --tags 'sqlite_json' -o tornjak-manager ./$<; go build --tags 'sqlite_json' -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o $@ ./$<"
 
-# build Tornjak frontend binaries
-frontend-local-build:
+frontend-local-build: ## Build tornjak-frontend
 	npm install --prefix tornjak-frontend
 	rm -rf tornjak-frontend/build
 	npm run build --prefix tornjak-frontend
 	rm -rf frontend-local-build
 	cp -r tornjak-frontend/build frontend-local-build
 
-vendor:
-	go mod tidy
-	go mod vendor
+##@ Containter images:
 
-#### END LOCAL EXECUTABLE BUILDS ####
+.PHONY: images
+images: $(addprefix image-,$(IMAGES)) ## Build all images
 
-
-#### BEGIN LOCAL CONTAINER IMAGE BUILD ####
-## container-* creates an image for the component
-
-container-backend: bin/tornjak-backend
+.PHONY: image-tornjak-backend
+image-tornjak-backend: bin/tornjak-backend ## Build image for bin/tornjak-backend 
 	docker build --no-cache -f Dockerfile.backend-container --build-arg version=$(VERSION) \
-		--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_BACKEND_TAG}:$(VERSION) .
+		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_BACKEND_TAG):$(VERSION) .
 
-container-manager: bin/tornjak-manager
+.PHONY: image-tornjak-manager
+image-tornjak-manager: bin/tornjak-manager ## Build image for bin/tornjak-manager 
 	docker build --no-cache -f Dockerfile.tornjak-manager --build-arg version=$(VERSION) \
-		--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_MANAGER_TAG}:$(VERSION) .
+		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_MANAGER_TAG):$(VERSION) .
 
-container-frontend: 
+.PHONY: image-tornjak-frontend
+image-tornjak-frontend: ## Build image for tornjak-frontend 
 	docker build --no-cache -f Dockerfile.frontend-container --build-arg version=$(VERSION) \
-		--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_FRONTEND_TAG}:$(VERSION) .
+		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_FRONTEND_TAG):$(VERSION) .
 
-compose-frontend: 
-	docker-compose -f docker-compose-frontend.yml up --build --force-recreate -d
-	docker tag tornjak-public_tornjak-frontend:latest ${CONTAINER_FRONTEND_TAG}:$(VERSION)
-
-container-tornjak: bin/tornjak-backend
+.PHONY: image-tornjak
+image-tornjak: bin/tornjak-backend ## Build image for bin/tornjak-backend and tornjak-frontend bundled in single image
 	docker build --no-cache -f Dockerfile.tornjak-container --build-arg version=$(VERSION) \
-		--build-arg github_sha=$(GITHUB_SHA) -t ${CONTAINER_TORNJAK_TAG}:$(VERSION) .
+		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_TORNJAK_TAG):$(VERSION) .
 
-#### END LOCAL CONTAINER IMAGE BUILD ####
+##@ Run:
 
-#### BEGIN PUSH ONTAINER IMAGE ####
-## container-*-push creates an image for the component and pushes to repo
+.PHONY: compose-frontend
+compose-frontend: ## Run frontend using docker-compose
+	docker-compose -f docker-compose-frontend.yml up --build --force-recreate -d
+	docker tag tornjak-public_tornjak-frontend:latest $(CONTAINER_FRONTEND_TAG):$(VERSION)
 
-container-backend-push: container-backend
-	docker push ${CONTAINER_BACKEND_TAG}:$(VERSION)
-	docker tag ${CONTAINER_BACKEND_TAG}:$(VERSION) ${CONTAINER_BACKEND_TAG}:$(GITHUB_SHA)
-	docker push ${CONTAINER_BACKEND_TAG}:$(GITHUB_SHA)
+##@ Release:
 
-container-manager-push: container-manager
-	docker push ${CONTAINER_MANAGER_TAG}:$(VERSION)
-	docker tag ${CONTAINER_MANAGER_TAG}:$(VERSION) ${CONTAINER_MANAGER_TAG}:$(GITHUB_SHA)
-	docker push ${CONTAINER_MANAGER_TAG}:$(GITHUB_SHA)
+.PHONY: release-images
+release-images: $(addprefix release-,$(IMAGES)) ## Release all images
 
-container-frontend-push: container-frontend
-	docker push ${CONTAINER_FRONTEND_TAG}:$(VERSION)
-	docker tag ${CONTAINER_FRONTEND_TAG}:$(VERSION) ${CONTAINER_FRONTEND_TAG}:$(GITHUB_SHA)
-	docker push ${CONTAINER_FRONTEND_TAG}:$(GITHUB_SHA)
+.PHONY: release-tornjak-backend
+release-tornjak-backend: image-tornjak-backend ## Release tornjak-backend image
+	docker push $(CONTAINER_BACKEND_TAG):$(VERSION)
+	docker tag $(CONTAINER_BACKEND_TAG):$(VERSION) $(CONTAINER_BACKEND_TAG):$(GITHUB_SHA)
+	docker push $(CONTAINER_BACKEND_TAG):$(GITHUB_SHA)
 
-container-tornjak-push: container-tornjak
-	docker push ${CONTAINER_TORNJAK_TAG}:$(VERSION)
-	docker tag ${CONTAINER_TORNJAK_TAG}:$(VERSION) ${CONTAINER_TORNJAK_TAG}:$(GITHUB_SHA)
-	docker push ${CONTAINER_TORNJAK_TAG}:$(GITHUB_SHA)
+.PHONY: release-tornjak-manager
+release-tornjak-manager: image-tornjak-manager ## Release tornjak-manager image
+	docker push $(CONTAINER_MANAGER_TAG):$(VERSION)
+	docker tag $(CONTAINER_MANAGER_TAG):$(VERSION) $(CONTAINER_MANAGER_TAG):$(GITHUB_SHA)
+	docker push $(CONTAINER_MANAGER_TAG):$(GITHUB_SHA)
 
-dev-push: container-backend-push container-manager-push container-frontend-push container-tornjak-push
-#### END PUSH CONTAINER IMAGE ####
+.PHONY: release-tornjak-frontend
+release-tornjak-frontend: image-tornjak-frontend ## Release tornjak-frontend image
+	docker push $(CONTAINER_FRONTEND_TAG):$(VERSION)
+	docker tag $(CONTAINER_FRONTEND_TAG):$(VERSION) $(CONTAINER_FRONTEND_TAG):$(GITHUB_SHA)
+	docker push $(CONTAINER_FRONTEND_TAG):$(GITHUB_SHA)
 
-clean:
-	rm -rf bin/
-	rm -rf tornjak-frontend/build
-	rm -rf frontend-local-build/
-
+.PHONY: release-tornjak
+release-tornjak: image-tornjak ## Release tornjak image (bundling frontend and backend)
+	docker push $(CONTAINER_TORNJAK_TAG):$(VERSION)
+	docker tag $(CONTAINER_TORNJAK_TAG):$(VERSION) $(CONTAINER_TORNJAK_TAG):$(GITHUB_SHA)
+	docker push $(CONTAINER_TORNJAK_TAG):$(GITHUB_SHA)
