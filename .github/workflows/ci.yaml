@@ -27,10 +27,11 @@ jobs:
           node-version: '15'
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v3.6.0
         with:
           version: v1.53
           args: --timeout 7m
+
       - name: Run make all
         run: make all
 
