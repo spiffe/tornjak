@@ -126,7 +126,7 @@ func GetServerInfo(config *run.Config) (agentapi.TornjakSpireServerInfo, error) 
 		return agentapi.TornjakSpireServerInfo{}, errors.New("config plugins map should not be nil")
 	}
 
-	pluginConfigs, err := catalog.PluginConfigsFromHCL(*config.Plugins)
+	pluginConfigs, err := catalog.PluginConfigsFromHCLNode(config.Plugins)
 	if err != nil {
 		return agentapi.TornjakSpireServerInfo{}, errors.Errorf("Unable to parse plugin HCL: %v", err)
 	}
