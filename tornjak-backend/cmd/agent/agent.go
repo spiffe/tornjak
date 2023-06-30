@@ -7,12 +7,12 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/hashicorp/hcl"
 	"github.com/pkg/errors"
 	"github.com/spiffe/spire/cmd/spire-server/cli/run"
 	"github.com/spiffe/spire/pkg/common/catalog"
 	agentapi "github.com/spiffe/tornjak/tornjak-backend/api/agent"
 	"github.com/urfave/cli/v2"
-	"github.com/hashicorp/hcl"
 )
 
 type cliOptions struct {
@@ -34,15 +34,15 @@ func main() {
 				Destination: &opt.genericOptions.configFile,
 				Required:    false,
 			},
-			&cli.StringFlag {
+			&cli.StringFlag{
 				Name:        "tornjak-config",
 				Value:       "",
 				Usage:       "Config file path for tornjak server",
 				Destination: &opt.genericOptions.tornjakFile,
 				Required:    true,
 			},
-			&cli.BoolFlag {
-				Name: 	     "expandEnv",
+			&cli.BoolFlag{
+				Name:        "expandEnv",
 				Value:       false,
 				Usage:       "Expansion of variables in config files",
 				Destination: &opt.genericOptions.expandEnv,

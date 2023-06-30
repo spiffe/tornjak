@@ -1,54 +1,54 @@
 package auth
 
 import (
-	"os"
 	"fmt"
-	"strings"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 	//"encoding/json"
 
-	"github.com/pkg/errors"
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/MicahParks/keyfunc"
+	"github.com/golang-jwt/jwt/v4"
+	"github.com/pkg/errors"
 )
 
 type KeycloakVerifier struct {
-	jwks *keyfunc.JWKS
-	redirect string
+	jwks            *keyfunc.JWKS
+	redirect        string
 	api_permissions map[string][]string
-	role_mappings map[string][]string
+	role_mappings   map[string][]string
 }
 
 func getAuthLogic() (map[string][]string, map[string][]string) {
 	// api call matches to list of strings, representing disjunction of requirements
-	api_permissions := map[string][]string {
+	api_permissions := map[string][]string{
 		// no auth token needed
 		"/": []string{},
 
 		// viewer
-		"/api/healthcheck": []string{"admin", "viewer"},
-		"/api/debugserver": []string{"admin", "viewer"},
-		"/api/agent/list": []string{"admin", "viewer"},
-		"/api/entry/list": []string{"admin", "viewer"},
-		"/api/tornjak/serverinfo": []string{"admin", "viewer"},
+		"/api/healthcheck":            []string{"admin", "viewer"},
+		"/api/debugserver":            []string{"admin", "viewer"},
+		"/api/agent/list":             []string{"admin", "viewer"},
+		"/api/entry/list":             []string{"admin", "viewer"},
+		"/api/tornjak/serverinfo":     []string{"admin", "viewer"},
 		"/api/tornjak/selectors/list": []string{"admin", "viewer"},
-		"/api/tornjak/agents/list": []string{"admin", "viewer"},
-		"/api/tornjak/clusters/list": []string{"admin", "viewer"},
+		"/api/tornjak/agents/list":    []string{"admin", "viewer"},
+		"/api/tornjak/clusters/list":  []string{"admin", "viewer"},
 		// admin
-		"/api/agent/ban": []string{"admin"},
-		"/api/agent/delete": []string{"admin"},
-		"/api/agent/createjointoken": []string{"admin"},
-		"/api/entry/create": []string{"admin"},
-		"/api/entry/delete": []string{"admin"},
+		"/api/agent/ban":                  []string{"admin"},
+		"/api/agent/delete":               []string{"admin"},
+		"/api/agent/createjointoken":      []string{"admin"},
+		"/api/entry/create":               []string{"admin"},
+		"/api/entry/delete":               []string{"admin"},
 		"/api/tornjak/selectors/register": []string{"admin"},
-		"/api/tornjak/clusters/create": []string{"admin"},
-		"/api/tornjak/clusters/edit": []string{"admin"},
-		"/api/tornjak/clusters/delete": []string{"admin"},
+		"/api/tornjak/clusters/create":    []string{"admin"},
+		"/api/tornjak/clusters/edit":      []string{"admin"},
+		"/api/tornjak/clusters/delete":    []string{"admin"},
 	}
-	role_mappings := map[string][]string {
+	role_mappings := map[string][]string{
 		"tornjak-viewer-realm-role": []string{"viewer"},
-		"tornjak-admin-realm-role": []string{"admin"},
+		"tornjak-admin-realm-role":  []string{"admin"},
 	}
 	return api_permissions, role_mappings
 }
@@ -87,7 +87,7 @@ func NewKeycloakVerifier(httpjwks bool, jwksURL string, redirectURL string) (*Ke
 		return nil, err
 	}
 	api_permissions, role_mappings := getAuthLogic()
-	return &KeycloakVerifier {
+	return &KeycloakVerifier{
 		jwks:            jwks,
 		redirect:        redirectURL,
 		api_permissions: api_permissions,
@@ -124,8 +124,6 @@ func (v *KeycloakVerifier) getPermissions(jwt_roles []string) map[string]bool {
 	return permissions
 }
 
-
-
 func (v *KeycloakVerifier) requestPermissible(r *http.Request, permissions map[string]bool) bool {
 	requires := v.api_permissions[r.URL.Path]
 	for _, req := range requires {
@@ -134,12 +132,12 @@ func (v *KeycloakVerifier) requestPermissible(r *http.Request, permissions map[s
 		}
 	}
 	return false
-	
+
 }
 
 func (v *KeycloakVerifier) isGoodRequest(r *http.Request, claims *KeycloakClaim) bool {
 	roles := claims.RealmAccess.Roles
-	
+
 	permissions := v.getPermissions(roles)
 	return v.requestPermissible(r, permissions)
 }
@@ -160,7 +158,7 @@ func (v *KeycloakVerifier) Verify(r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	
+
 	// parse token
 	claims := &KeycloakClaim{}
 	jwt_token, err := jwt.ParseWithClaims(token, claims, v.jwks.Keyfunc)
@@ -177,6 +175,6 @@ func (v *KeycloakVerifier) Verify(r *http.Request) error {
 	if !v.isGoodRequest(r, claims) {
 		return errors.New("Unauthorized request")
 	}
-	
+
 	return nil
 }
