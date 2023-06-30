@@ -4,23 +4,39 @@ jobs:
   tornjak-build:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Show trigger info
+        run: |
+          cat <<EOF >>"${GITHUB_STEP_SUMMARY}"
+          # Workflow job info
+
+          - 🎉 The job was automatically triggered by a ${{ github.event_name }} event.
+          - 🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!
+          - 🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}.
+          EOF
+
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.5.3
+
       - name: Install Golang
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4.0.1
         with:
           go-version: '1.20'
-      - uses: actions/setup-node@v2
+
+      - uses: actions/setup-node@v3.6.0
         with:
           node-version: '15'
+
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v3.6.0
         with:
           version: v1.53
           args: --timeout 7m
+
       - name: Run make all
         run: make all
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+      - name: Print job result
+        run: |
+          cat <<EOF >>"${GITHUB_STEP_SUMMARY}"
+          - 🍏 This job's status is ${{ job.status }}.
+          EOF
