@@ -28,6 +28,9 @@ jobs:
           check-latest: true
           cache: true
 
+      - name: Download modules
+        run: go mod download
+
       - uses: actions/setup-node@v3.6.0
         with:
           node-version: '18'
