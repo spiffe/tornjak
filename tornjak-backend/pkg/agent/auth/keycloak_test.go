@@ -3,16 +3,16 @@ package auth
 import (
 	//"github.com/pkg/errors"
 	"bytes"
-	"testing"
-	"fmt"
-	"flag"
 	"encoding/json"
+	"flag"
+	"fmt"
 	"net/http"
-
+	"testing"
 	//"github.com/spiffe/tornjak/tornjak-backend/pkg/agent/types"
 )
 
 var jwksURL string
+
 func init() {
 	flag.StringVar(&jwksURL, "jwksURL", "", "JWKS Url")
 }
@@ -55,7 +55,7 @@ func TestNewKeycloakVerifier(t *testing.T) {
 
 func TestGetToken(t *testing.T) {
 	// sample request with token
-	request_body, err := json.Marshal(map[string]string {
+	request_body, err := json.Marshal(map[string]string{
 		"name": "nobody",
 	})
 	if err != nil {
@@ -93,4 +93,3 @@ func TestGetToken(t *testing.T) {
 		t.Fatalf("ERROR: could not obtain access token from request with bearer token: %s", token)
 	}
 }
-

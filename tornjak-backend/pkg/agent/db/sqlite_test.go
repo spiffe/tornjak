@@ -188,7 +188,8 @@ func TestSelectorDB(t *testing.T) {
 
 // TestClusterCreate checks edge cases involving CreateClusterEntry
 // Uses functions NewLocalSqliteDB, db.GetClusters, db.CreateClusterEntry,
-//                db.GetAgentClusterName, db.GetClusterAgents
+//
+//	db.GetAgentClusterName, db.GetClusterAgents
 func TestClusterCreate(t *testing.T) {
 	cleanup()
 	defer cleanup()
@@ -385,7 +386,8 @@ func TestClusterCreate(t *testing.T) {
 
 // TestClusterEdit checks edge cases involving EditClusterEntry
 // uses NewLocalSqliteDB, db.CreateClusterEntry, db.EditClusterEntry,
-//      db.GetAgentClusterName, db.GetClusterAgents
+//
+//	db.GetAgentClusterName, db.GetClusterAgents
 func TestClusterEdit(t *testing.T) {
 	defer cleanup()
 	expBackoff := backoff.NewExponentialBackOff()
@@ -611,7 +613,8 @@ func TestClusterEdit(t *testing.T) {
 
 // TestClusterDelete checks edge cases on DeleteClusterEntry
 // uses NewLocalSqliteDB, db.GetClusters, db.CreateClusterEntry, db.EditClusterEntry
-//      db.DeleteClusterEntry, db.GetAgentClusterName, db.GetClusterAgents
+//
+//	db.DeleteClusterEntry, db.GetAgentClusterName, db.GetClusterAgents
 func TestClusterDelete(t *testing.T) {
 	defer cleanup()
 	expBackoff := backoff.NewExponentialBackOff()

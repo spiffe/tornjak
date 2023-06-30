@@ -35,8 +35,8 @@ type Server struct {
 	TornjakConfig *TornjakConfig
 
 	// Plugins
-	Db            agentdb.AgentDB
-	Auth          auth.Auth
+	Db   agentdb.AgentDB
+	Auth auth.Auth
 }
 
 // config type, as defined by SPIRE
@@ -112,7 +112,6 @@ func (s *Server) debugServer(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
-
 
 func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
 	var input ListAgentsRequest
@@ -543,7 +542,7 @@ func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) GetRouter() (*mux.Router) {
+func (s *Server) GetRouter() *mux.Router {
 	rtr := mux.NewRouter()
 
 	// Home
@@ -593,7 +592,7 @@ func (s *Server) HandleRequests() {
 	if err != nil {
 		log.Fatal("Cannot Configure: ", err)
 	}
-	
+
 	numPorts := 0
 	errChannel := make(chan error, 3)
 	rtr := s.GetRouter()
@@ -668,7 +667,7 @@ func (s *Server) HandleRequests() {
 				errChannel <- err
 				return
 			}
-			
+
 			err = server.ListenAndServeTLS(certPath, keyPath)
 			err = errors.Errorf("%s server: Error serving: %v", tlsType, err)
 			errChannel <- err
@@ -751,10 +750,10 @@ func (s *Server) HandleRequests() {
 
 	// as errors come in, read them, and block
 	for i := 0; i < numPorts; i++ {
-		err := <- errChannel
+		err := <-errChannel
 		log.Printf("%v", err)
 	}
-	
+
 }
 
 func stringFromToken(keyToken token.Token) (string, error) {
@@ -869,7 +868,7 @@ func (s *Server) VerifyConfiguration() error {
 	}
 
 	serverConfig := s.TornjakConfig.Server
-	if (serverConfig.HttpConfig == nil && serverConfig.TlsConfig == nil && serverConfig.MtlsConfig == nil) {
+	if serverConfig.HttpConfig == nil && serverConfig.TlsConfig == nil && serverConfig.MtlsConfig == nil {
 		return errors.New("'config > server' must have at least one of HTTP, TLS, or mTLS sections defined")
 	}
 
@@ -896,7 +895,7 @@ func (s *Server) Configure() error {
 	/*  Configure Server  */
 	serverConfig := s.TornjakConfig.Server
 	s.SpireServerAddr = serverConfig.SPIRESocket // for convenience
-	
+
 	/*  Configure Plugins  */
 	// configure defaults for optional plugins, reconfigured if given
 	// TODO maybe we should not have this step at all

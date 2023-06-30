@@ -7,11 +7,11 @@ import (
 	grpc "google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"google.golang.org/grpc/health/grpc_health_v1"
-	debugServer "github.com/spiffe/spire-api-sdk/proto/spire/api/server/debug/v1"
 	agent "github.com/spiffe/spire-api-sdk/proto/spire/api/server/agent/v1"
+	debugServer "github.com/spiffe/spire-api-sdk/proto/spire/api/server/debug/v1"
 	entry "github.com/spiffe/spire-api-sdk/proto/spire/api/server/entry/v1"
 	types "github.com/spiffe/spire-api-sdk/proto/spire/api/types"
+	"google.golang.org/grpc/health/grpc_health_v1"
 
 	tornjakTypes "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/types"
 )
@@ -57,7 +57,6 @@ func (s *Server) DebugServer(inp DebugServerRequest) (*DebugServerResponse, erro
 
 	return (*DebugServerResponse)(resp), nil
 }
-
 
 type ListAgentsRequest agent.ListAgentsRequest
 type ListAgentsResponse agent.ListAgentsResponse
