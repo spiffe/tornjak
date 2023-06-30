@@ -32,6 +32,9 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Download modules
+        run: go mod download
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3.6.0
         with:
