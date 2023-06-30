@@ -37,8 +37,11 @@ jobs:
           version: v1.53
           args: --timeout 7m
 
-      - name: Run make all
-        run: make all
+      - name: Build binaries
+        run: make binaries
+
+      - name: Build images
+        run: make images
 
       - name: Print job result
         run: |
