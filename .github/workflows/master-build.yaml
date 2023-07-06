@@ -60,16 +60,16 @@ jobs:
 
       # build and push images tagged with GITHUB_SHA, version, and latest
       - name: Build and push tornjak backend image
-        run: make release-backend
+        run: make release-tornjak-backend
 
       - name: Build and push tornjak frontend image
-        run: make release-frontend
+        run: make release-tornjak-frontend
 
       - name: Build and push tornjak image (frontend+backend)
         run: make release-tornjak
 
       - name: Build and push tornjak manager image
-        run: make release-manager
+        run: make release-tornjak-manager
 
       - name: Print job result
         run: |
