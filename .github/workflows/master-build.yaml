@@ -24,11 +24,19 @@ jobs:
       - name: Install Golang
         uses: actions/setup-go@v4.0.1
         with:
-          go-version: '1.20'
+          go-version-file: go.mod
+          check-latest: true
+          cache: true
+
+      - name: Download modules
+        run: go mod download
 
       - uses: actions/setup-node@v3.6.0
         with:
           node-version: '18'
+
+      - name: Download modules
+        run: go mod download
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3.6.0
@@ -52,16 +60,16 @@ jobs:
 
       # build and push images tagged with GITHUB_SHA, version, and latest
       - name: Build and push tornjak backend image
-        run: make container-backend-push
+        run: make release-backend
 
       - name: Build and push tornjak frontend image
-        run: make container-frontend-push
+        run: make release-frontend
 
       - name: Build and push tornjak image (frontend+backend)
-        run: make container-tornjak-push
+        run: make release-tornjak
 
       - name: Build and push tornjak manager image
-        run: make container-manager-push
+        run: make release-manager
 
       - name: Print job result
         run: |
