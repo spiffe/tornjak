@@ -38,8 +38,8 @@ type HTTPConfig struct {
 }
 
 type HTTPSConfig struct {
-	*HTTPConfig
-	TLS TLSConfig `hcl:"tls"`
+	ListenPort int `hcl:"port"`
+	TLS        TLSConfig `hcl:"tls"`
 }
 
 type TLSConfig struct {

@@ -13,9 +13,9 @@ data:
 
       # configure HTTP connection to Tornjak server
       http {
-        enabled = true
-        port = 10000 # opens at port 10000
+        port = 10080 # opens at port 10080
       }
+
     }
 
     plugins {
