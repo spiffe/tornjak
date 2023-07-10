@@ -622,8 +622,8 @@ func (s *Server) HandleRequests() {
 		log.Print("WARNING: Please consider configuring HTTPS to ensure traffic is running on encrypted endpoint!")
 	}
 
+	numPorts = 1
 	go func() {
-		numPorts += 1
 		addr := fmt.Sprintf(":%d", serverConfig.HTTPConfig.ListenPort)
 		fmt.Printf("Starting to listen on %s...\n", addr)
 		err := http.ListenAndServe(addr, httpHandler)
@@ -633,8 +633,8 @@ func (s *Server) HandleRequests() {
 	}()
 
 	if serverConfig.HTTPSConfig != nil {
+		numPorts += 1
 		go func() {
-			numPorts += 1
 			if serverConfig.HTTPSConfig.ListenPort == 0 {
 				serverConfig.HTTPSConfig.ListenPort = 443
 			}
@@ -706,8 +706,6 @@ func NewAgentsDB(dbPlugin *ast.ObjectItem) (agentdb.AgentDB, error) {
 	if err != nil { // db is required config
 		return nil, errors.New("Required DataStore plugin not configured")
 	}
-
-	fmt.Printf("DATASTORE KEY AND DATA: %s ,  %+v\n", key, data)
 
 	switch key {
 	case "sql":
@@ -822,11 +820,7 @@ func (s *Server) Configure() error {
 
 	// iterate over plugin list
 
-	fmt.Printf("pluginlist: %+v\n", pluginList.Items)
-
 	for _, pluginObject := range pluginList.Items {
-		fmt.Printf("pluginItem: %+v\n", pluginObject)
-
 		if len(pluginObject.Keys) != 2 {
 			return fmt.Errorf("plugin item expected to have two keys (type then name)")
 		}
@@ -835,8 +829,6 @@ func (s *Server) Configure() error {
 		if err != nil {
 			return fmt.Errorf("invalid plugin type key %q: %w", pluginObject.Keys[0].Token.Text, err)
 		}
-
-		fmt.Printf("pluginType: %s\n", pluginType)
 
 		// create plugin component based on type
 		switch pluginType {
