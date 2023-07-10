@@ -42,14 +42,14 @@ server {
     spire_socket_path = "unix:///tmp/spire-server/private/api.sock" # socket to communicate with SPIRE server
 
     http { # required block
-	    port = 10080 # if HTTP enabled, opens HTTP listen port at container port 10000
+	    port = 10080 # if HTTP enabled, opens HTTP listen port at container port 10080
     }
 
     https {
-        port = 10443 # if enabled, opens TLS listen port at container port 20000
+        port = 10443 # if enabled, opens HTTPS listen port at container port 10443
         cert = "sample-keys/tls.pem" # path of certificate for TLS
         key = "sample-keys/key.pem" # path of keys for TLS
-        ca = "sample-keys/rootCA.pem"
+        ca = "sample-keys/userCA.pem" # [optional, enables mTLS] User CA 
     }
 
 }
