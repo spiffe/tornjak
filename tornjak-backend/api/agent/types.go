@@ -39,25 +39,23 @@ type HTTPConfig struct {
 
 type HTTPSConfig struct {
 	ListenPort int `hcl:"port"`
-	TLS        TLSConfig `hcl:"tls"`
+	Cert	   string `hcl:"cert"`
+	Key 	   string `hcl:"key"`
+	ClientCA   string `hcl:"client_ca"`
 }
 
-type TLSConfig struct {
-	Cert     string `hcl:"cert"`
-	Key      string `hcl:"key"`
-	ClientCA string `hcl:"client_ca"`
-}
+func (h HTTPSConfig) Parse() (*tls.Config, error) {
+	serverCertPath := h.Cert
+	serverKeyPath := h.Key
+	clientCAPath := h.ClientCA
 
-func (t TLSConfig) Parse() (*tls.Config, error) {
-	serverCertPath := t.Cert
-	serverKeyPath := t.Key
-	clientCAPath := t.ClientCA
+	mtls := (clientCAPath != "")
 
 	if _, err := os.Stat(serverCertPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("server cert path: %w", err)
+		return nil, fmt.Errorf("server cert path '%s': %w", serverCertPath, err)
 	}
 	if _, err := os.Stat(serverKeyPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("server key path: %w", err)
+		return nil, fmt.Errorf("server key path '%s': %w", serverKeyPath, err)
 	}
 
 	// Create a CA certificate pool and add cert.pem to it
@@ -68,19 +66,25 @@ func (t TLSConfig) Parse() (*tls.Config, error) {
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(serverCert)
 
-	// add mTLS CA path to cert pool as well
-	if _, err := os.Stat(clientCAPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("server file does not exist %s", clientCAPath)
+	if mtls {
+		// add mTLS CA path to cert pool as well
+		if _, err := os.Stat(clientCAPath); os.IsNotExist(err) {
+			return nil, fmt.Errorf("server file does not exist %s", clientCAPath)
+		}
+		clientCA, err := os.ReadFile(clientCAPath)
+		if err != nil {
+			return nil, fmt.Errorf("server: could not read file %s: %w", clientCAPath, err)
+		}
+		caCertPool.AppendCertsFromPEM(clientCA)
 	}
-	clientCA, err := os.ReadFile(clientCAPath)
-	if err != nil {
-		return nil, fmt.Errorf("server: could not read file %s: %w", clientCAPath, err)
-	}
-	caCertPool.AppendCertsFromPEM(clientCA)
 
 	// Create the TLS Config with the CA pool and enable Client certificate validation
 	tlsConfig := &tls.Config{
 		ClientCAs: caCertPool,
+	}
+
+	if mtls {
+		tlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
 	}
 	//tlsConfig.BuildNameToCertificate()
 

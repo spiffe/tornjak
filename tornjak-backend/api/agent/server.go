@@ -612,9 +612,9 @@ func (s *Server) HandleRequests() {
 	var httpHandler http.Handler = http.HandlerFunc(redirectHTTP)
 	serverConfig := s.TornjakConfig.Server
 	if serverConfig.HTTPConfig == nil {
-		serverConfig.HTTPConfig = &HTTPConfig{
-			ListenPort: 80,
-		}
+		err = fmt.Errorf("HTTP Config error: no port configured")
+		errChannel <- err
+		return
 	}
 
 	if serverConfig.HTTPSConfig == nil {
@@ -636,9 +636,12 @@ func (s *Server) HandleRequests() {
 		numPorts += 1
 		go func() {
 			if serverConfig.HTTPSConfig.ListenPort == 0 {
-				serverConfig.HTTPSConfig.ListenPort = 443
+				// Fail because this is required field in this section
+				err = fmt.Errorf("HTTPS Config error: no port configured")
+				errChannel <- err
+				return
 			}
-			tls := serverConfig.HTTPSConfig.TLS
+			tls := serverConfig.HTTPSConfig
 			tlsConfig, err := tls.Parse()
 			if err != nil {
 				err = fmt.Errorf("failed parsing tls: %w", err)
