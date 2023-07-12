@@ -582,21 +582,22 @@ func (s *Server) GetRouter() http.Handler {
 	return rtr
 }
 
-func redirectHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *Server) redirectHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" && r.Method != "HEAD" {
 		http.Error(w, "Use HTTPS", http.StatusBadRequest)
 		return
 	}
-	target := "https://" + stripPort(r.Host) + r.URL.RequestURI()
+	target := "https://" + s.stripPort(r.Host) + r.URL.RequestURI()
 	http.Redirect(w, r, target, http.StatusFound)
 }
 
-func stripPort(hostport string) string {
+func (s *Server) stripPort(hostport string) string {
 	host, _, err := net.SplitHostPort(hostport)
 	if err != nil {
 		return hostport
 	}
-	return net.JoinHostPort(host, "443")
+	addr := fmt.Sprintf("%d", s.TornjakConfig.Server.HTTPSConfig.ListenPort)
+	return net.JoinHostPort(host, addr)
 }
 
 // HandleRequests connects api links with respective functions
@@ -607,9 +608,9 @@ func (s *Server) HandleRequests() {
 		log.Fatal("Cannot Configure: ", err)
 	}
 
-	numPorts := 0 // TODO: replace with workerGroup for thread safety
+	// TODO: replace with workerGroup for thread safety
 	errChannel := make(chan error, 2)
-	var httpHandler http.Handler = http.HandlerFunc(redirectHTTP)
+	
 	serverConfig := s.TornjakConfig.Server
 	if serverConfig.HTTPConfig == nil {
 		err = fmt.Errorf("HTTP Config error: no port configured")
@@ -617,23 +618,15 @@ func (s *Server) HandleRequests() {
 		return
 	}
 
-	if serverConfig.HTTPSConfig == nil {
-		httpHandler = s.GetRouter()
+	// default router does not redirect
+	httpHandler := s.GetRouter()
+	numPorts := 1
+
+	if serverConfig.HTTPSConfig == nil { // warn when HTTPS not configured
 		log.Print("WARNING: Please consider configuring HTTPS to ensure traffic is running on encrypted endpoint!")
-	}
-
-	numPorts = 1
-	go func() {
-		addr := fmt.Sprintf(":%d", serverConfig.HTTPConfig.ListenPort)
-		fmt.Printf("Starting to listen on %s...\n", addr)
-		err := http.ListenAndServe(addr, httpHandler)
-		if err != nil {
-			errChannel <- err
-		}
-	}()
-
-	if serverConfig.HTTPSConfig != nil {
+	} else {
 		numPorts += 1
+
 		go func() {
 			if serverConfig.HTTPSConfig.ListenPort == 0 {
 				// Fail because this is required field in this section
@@ -664,7 +657,20 @@ func (s *Server) HandleRequests() {
 				errChannel <- err
 			}
 		}()
+
+		// set http handler to reroute
+		httpHandler = http.HandlerFunc(s.redirectHTTP)
+
 	}
+
+	go func() {
+		addr := fmt.Sprintf(":%d", serverConfig.HTTPConfig.ListenPort)
+		fmt.Printf("Starting to listen on %s...\n", addr)
+		err := http.ListenAndServe(addr, httpHandler)
+		if err != nil {
+			errChannel <- err
+		}
+	}()
 
 	// as errors come in, read them, and block
 	for i := 0; i < numPorts; i++ {
