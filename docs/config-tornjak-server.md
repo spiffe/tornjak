@@ -42,7 +42,7 @@ server {
     spire_socket_path = "unix:///tmp/spire-server/private/api.sock" # socket to communicate with SPIRE server
 
     http { # required block
-	    port = 10000 # if HTTP enabled, opens HTTP listen port at container port 10080
+	    port = 10000 # if HTTP enabled, opens HTTP listen port at container port 10000
     }
 
     https { # optional, recommended block
@@ -55,9 +55,9 @@ server {
 }
 ```
 
-We have two connection types that can be opened by the server simultaneously: HTTP and HTTPS. HTTP is always enabled, and requires a port configuration.  The HTTPS connection is optional, but recommended for production use case.  When HTTPS is enabled, the HTTP connection will redirect to the HTTPS URL. 
+We have two connection types that are opened by the server simultaneously: HTTP and HTTPS. HTTP is always operational.  The optional HTTPS connection is recommended for production use case.  When HTTPS is configured, the HTTP connection will redirect to the HTTPS (port and service). 
 
-Under the HTTPS block, the fields `port`, `cert`, and `key` are required and enable TLS connection.  To enable mTLS, you must additionally include the `client_ca` field. 
+Under the HTTPS block, the fields `port`, `cert`, and `key` are required to enable TLS connection.  To enable the mutual TLS (mTLS), you must additionally include the `client_ca` field, so the verification can be done bi-directionally. 
 
 For examples on enabling TLS and mTLS connections, please see [our TLS and mTLS documentation](../sample-keys/README.md). 
 

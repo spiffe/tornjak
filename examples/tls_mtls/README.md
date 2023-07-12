@@ -160,7 +160,7 @@ Now that we have mounted the relevant files in step 1, we must configure the Tor
 
 More details on the configmap can be found [in our config documentation](../../docs/config-tornjak-server.md). 
 
-One Tornjak server can open two connections simultaneously: HTTP and HTTPS. HTTP is always enabled, and when HTTPS is enabled, the HTTP port reroutes to the HTTPS URL. A configuration that enables TLS is provided in [the configmap in this directory](./tornjak-configmap.yaml). 
+One Tornjak server opens two connections simultaneously: HTTP and HTTPS. HTTP is always enabled, and when HTTPS is enabled, the HTTP port reroutes to the HTTPS port. A configuration that enables TLS is provided in [the configmap](./tornjak-configmap.yaml). 
 
 To learn about the configurations each of the TLS and mTLS, expand below sections. 
 
@@ -195,9 +195,9 @@ server {
   ...
   https {
     port = 10443             # container port for mTLS connection
-    cert = "server/tls.crt"  # mTLS cert
-    key = "server/tls.key"   # mTLS key
-    ca = "users/userCA.crt"  # mTLS CA [Removing this line creates a TLS connection]
+    cert = "server/tls.crt"  # TLS cert
+    key = "server/tls.key"   # TLS key
+    ca = "users/userCA.crt"  # user CA for mTLS [Removing this line creates a TLS connection]
   }
   ...
 }
@@ -255,7 +255,7 @@ Now that we have opened TLS and mTLS connection, we may make calls. You will nee
 
 ### Redirect from HTTP Port
 
-Notice that with this new configuration, a curl command to the HTTP port gives the URL of the HTTPS port:
+Notice that with this new configuration, a `curl` command to the HTTP port returns a permanent redirect to the URL of the HTTPS port:
 
 ```
 curl http://<Tornjak_HTTPS_endpoint>
