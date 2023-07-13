@@ -636,14 +636,14 @@ func (s *Server) HandleRequests() {
 
 		if serverConfig.HTTPSConfig.ListenPort == 0 {
 			// Fail because this is required field in this section
-			err = fmt.Errorf("HTTPS Config error: no port configured. Starting insecure HTTP connection at %s...", serverConfig.HTTPConfig.ListenPort)
+			err = fmt.Errorf("HTTPS Config error: no port configured. Starting insecure HTTP connection at %d...", serverConfig.HTTPConfig.ListenPort)
 			errChannel <- err
 			httpHandler = s.GetRouter()
 			canStartHTTPS = false
 		} else {
 			tlsConfig, err = httpsConfig.Parse()
 			if err != nil {
-				err = fmt.Errorf("failed parsing HTTPS config: %w. Starting insecure HTTP connection at %s...", err, serverConfig.HTTPConfig.ListenPort)
+				err = fmt.Errorf("failed parsing HTTPS config: %w. Starting insecure HTTP connection at %d...", err, serverConfig.HTTPConfig.ListenPort)
 				errChannel <- err
 				httpHandler = s.GetRouter()
 				canStartHTTPS = false
