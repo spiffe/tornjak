@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"crypto/tls"
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/gorilla/mux"
@@ -627,40 +628,46 @@ func (s *Server) HandleRequests() {
 	} else {
 		numPorts += 1
 
-		go func() {
-			if serverConfig.HTTPSConfig.ListenPort == 0 {
-				// Fail because this is required field in this section
-				err = fmt.Errorf("HTTPS Config error: no port configured")
-				errChannel <- err
-				return
-			}
-			tls := serverConfig.HTTPSConfig
-			tlsConfig, err := tls.Parse()
-			if err != nil {
-				err = fmt.Errorf("failed parsing tls: %w", err)
-				errChannel <- err
-				return
-			}
-
-			addr := fmt.Sprintf(":%d", serverConfig.HTTPSConfig.ListenPort)
-			// Create a Server instance to listen on port 8443 with the TLS config
-			server := &http.Server{
-				Handler:   s.GetRouter(),
-				Addr:      addr,
-				TLSConfig: tlsConfig,
-			}
-
-			fmt.Printf("Starting https on %s...\n", addr)
-			err = server.ListenAndServeTLS(tls.Cert, tls.Key)
-			if err != nil {
-				err = fmt.Errorf("server error serving on https: %w", err)
-				errChannel <- err
-			}
-		}()
-
-		// set http handler to reroute
 		httpHandler = http.HandlerFunc(s.redirectHTTP)
+		canStartHTTPS := true
+		httpsConfig := serverConfig.HTTPSConfig
+		var tlsConfig *tls.Config
 
+
+		if serverConfig.HTTPSConfig.ListenPort == 0 {
+			// Fail because this is required field in this section
+			err = fmt.Errorf("HTTPS Config error: no port configured. Starting insecure HTTP connection at %s...", serverConfig.HTTPConfig.ListenPort)
+			errChannel <- err
+			httpHandler = s.GetRouter()
+			canStartHTTPS = false
+		} else {
+			tlsConfig, err = httpsConfig.Parse()
+			if err != nil {
+				err = fmt.Errorf("failed parsing HTTPS config: %w. Starting insecure HTTP connection at %s...", err, serverConfig.HTTPConfig.ListenPort)
+				errChannel <- err
+				httpHandler = s.GetRouter()
+				canStartHTTPS = false
+			}
+		}
+
+		if canStartHTTPS {
+			go func() {
+				addr := fmt.Sprintf(":%d", serverConfig.HTTPSConfig.ListenPort)
+				// Create a Server instance to listen on port 8443 with the TLS config
+				server := &http.Server{
+					Handler:   s.GetRouter(),
+					Addr:      addr,
+					TLSConfig: tlsConfig,
+				}
+
+				fmt.Printf("Starting https on %s...\n", addr)
+				err = server.ListenAndServeTLS(httpsConfig.Cert, httpsConfig.Key)
+				if err != nil {
+					err = fmt.Errorf("server error serving on https: %w", err)
+					errChannel <- err
+				}
+			}()
+		}
 	}
 
 	go func() {
