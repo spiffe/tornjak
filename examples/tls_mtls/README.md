@@ -160,7 +160,7 @@ Now that we have mounted the relevant files in step 1, we must configure the Tor
 
 More details on the configmap can be found [in our config documentation](../../docs/config-tornjak-server.md). 
 
-One Tornjak server can open three connections simultaneously: HTTP, TLS, and mTLS, and at least one must be enabled. A configuration that opens all three is provided in [the configmap in this directory](./tornjak-configmap.yaml)
+One Tornjak server opens two connections simultaneously: HTTP and HTTPS. HTTP is always enabled, and when HTTPS is enabled, the HTTP port reroutes to the HTTPS port. A configuration that enables TLS is provided in [the configmap](./tornjak-configmap.yaml). 
 
 To learn about the configurations each of the TLS and mTLS, expand below sections. 
 
@@ -171,17 +171,16 @@ The TLS configuration requires the port number on which to open the connection a
 ```
 server {
   ...
-  tls {
-    enabled = true
-    port = 20000                 # container port for TLS connection
-    cert = "server/tls.crt" # TLS cert <TODO check paths>
+  https {
+    port = 10443            # container port for TLS connection
+    cert = "server/tls.crt" # TLS cert
     key = "server/tls.key"  # TLS key
   }
   ...
 }
 ```
 
-In the above configuration, we create TLS connection at `localhost:20000` that uses certificate key pair at paths `server/tls.cert` and `server/tls.key` respectively. An example of the TLS configuration is found in the current directory at `tornjak-configmap.yaml`.  
+In the above configuration, we create TLS connection at `localhost:10443` that uses certificate key pair at paths `server/tls.cert` and `server/tls.key` respectively. An example of the TLS configuration is found in the current directory at `tornjak-configmap.yaml`.  
 
 A call to this port will require a CA that can verify the `cert/key` pair given. We can see that making a curl command to this port will create an error. First port-forward this connection to `localhost:20000`
 
@@ -194,18 +193,17 @@ The mTLS configuration, much like the TLS configuration, requires the port numbe
 ```
 server {
   ...
-  mtls {
-    enabled = true
-    port = 30000                  # container port for mTLS connection
-    cert = "server/tls.crt"  # mTLS cert
-    key = "server/tls.key"   # mTLS key
-    ca = "users/userCA.crt"  # mTLS CA 
+  https {
+    port = 10443             # container port for mTLS connection
+    cert = "server/tls.crt"  # TLS cert
+    key = "server/tls.key"   # TLS key
+    ca = "users/userCA.crt"  # user CA for mTLS [Removing this line creates a TLS connection]
   }
   ...
 }
 ```
 
-The above configuration enables mTLS at `localhost:30000` that uses certificate/key pair at paths `server/tls.crt` and `server/tls.key` respectively.  It verifies caller certificate/key pairs with ca certificate at path `server/CA/rootCA.pem`. An example of the TLS configuration is found in the current directory at `tornjak-configmap.yaml`.  
+The above configuration enables mTLS at `localhost:10443` that uses certificate/key pair at paths `server/tls.crt` and `server/tls.key` respectively.  It verifies caller certificate/key pairs with ca certificate at path `server/CA/rootCA.pem`. An example of the TLS configuration is found in the current directory at `tornjak-configmap.yaml`.  
 
 A call to this port requires a CA that can verify the `cert/key` pair given, as well as a cert/key pair signed by the CA with the `ca` certificate. 
 
@@ -224,16 +222,16 @@ Now if we take a look at the logs, you can see the relevant connections have bee
 kubectl logs -n spire spire-server-0 -c tornjak-backend
 ```
 
-If we try to open the service to `localhost:20000`: 
+If we try to open the service to `localhost:10443`: 
 
 ```
-kubectl -n spire port-forward spire-server-0 20000:20000
+kubectl -n spire port-forward spire-server-0 10443:10443
 ```
 
 Then attempt curl command:
 
 ```
-curl https://localhost:20000
+curl https://localhost:10443
 ```
 
 ```
@@ -254,6 +252,19 @@ We will show how to make a proper curl command in the next section.
 ## Step 3: Make calls to the Tornjak Backend
 
 Now that we have opened TLS and mTLS connection, we may make calls. You will need the url to access the endpoints.  If you have deployed locally on Minikube, as in the quickstart, you will need to port-forward the container to localhost. 
+
+### Redirect from HTTP Port
+
+Notice that with this new configuration, a `curl` command to the HTTP port returns a permanent redirect to the URL of the HTTPS port:
+
+```
+curl http://<Tornjak_HTTPS_endpoint>
+```
+
+```
+<a href="https://localhost:10443/">Found</a>.
+```
+
 
 ### Make a TLS call
 

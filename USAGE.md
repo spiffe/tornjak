@@ -17,6 +17,7 @@ Please see below for compatibility charts of SPIRE server versions with Tornjak:
 | Tornjak version        | SPIRE Server version |
 | :--------------------- | :------------------- |
 | v1.1.x, v1.2.x, v1.3.x | v1.1.x, v1.2.x, v1.3.x, v1.4.x |
+| v1.4.x                 | v1.5.x, v1.6.x, v1.7.x |
 
 ## Tornjak Backend
 
