@@ -34,7 +34,7 @@ cd tornjak/examples/tls_mtls
 
 For both TLS and mTLS, we will need to deliver a certificate/key pair to the server. In this directory are the respective files `server.crt` and `server.key`. These files have been signed by the self-signed CA in the `CA-server` directory. They will be delivered to the caller when establishing a connection so that the caller may verify the certificate. 
 
-For mTLS, we additionally need to deliver the CA certificate of the caller to the server so that the server may verify the caller certificate. The relevant file can be found in `CA-user/rootCA.crt`
+For mTLS, we additionally need to deliver the CA certificate of the caller to the server so that the server may verify the caller certificate. The relevant file can be found in `CA-client/rootCA.crt`
 
 ### Deliver the certificate/key pair to Tornjak (TLS and mTLS)
 
@@ -109,11 +109,11 @@ tls.key
 
 ### Deliver the CA certificate to Tornjak (mTLS only)
 
-For mTLS we will additionally need to deliver a user CA certificate to the Tornjak container. Currently it is found at `CA-user/rootCA.crt`. The process is the same. First we create the secret:
+For mTLS we will additionally need to deliver a client CA certificate to the Tornjak container. Currently it is found at `CA-client/rootCA.crt`. The process is the same. First we create the secret:
 
 ```
-kubectl create secret generic -n spire tornjak-user-certs \
-  --from-file=CA-user/rootCA.crt
+kubectl create secret generic -n spire tornjak-client-certs \
+  --from-file=CA-client/rootCA.crt
 ```
 
 Then we mount the secret to the Tornjak container via volume mount, as in the previous secret volume mount, retaining the previous modifications: 
@@ -124,20 +124,20 @@ volumeMounts:
 ...
   - name: tls-volume
     mountPath: /opt/spire/server
-  - name: user-cas
-    mountPath: /opt/spire/users
+  - name: client-cas
+    mountPath: /opt/spire/clients
 ...
 volumes:
 ...
   - name: tls-volume
     secret:
       secretName: tornjak-server-tls
-  - name: user-cas
+  - name: client-cas
     secret: 
-      secretName: tornjak-user-certs
+      secretName: tornjak-client-certs
       items: 
         - key: rootCA.crt
-          path: userCA.crt
+          path: clientCA.crt
 
 ```
 
@@ -145,11 +145,11 @@ Apply the same changes to your deployment, attaching the secret volumeMount to t
 
 ```
 kubectl apply -f server-statefulset-mtls.yaml
-kubectl exec -n spire spire-server-0 -c tornjak-backend -- ls users
+kubectl exec -n spire spire-server-0 -c tornjak-backend -- ls clients
 ```
 
 ```
-userCA.crt
+clientCA.crt
 ```
 
 ----
@@ -197,7 +197,7 @@ server {
     port = 10443             # container port for mTLS connection
     cert = "server/tls.crt"  # TLS cert
     key = "server/tls.key"   # TLS key
-    ca = "users/userCA.crt"  # user CA for mTLS [Removing this line creates a TLS connection]
+    ca = "clients/clientCA.crt"  # client CA for mTLS [Removing this line creates a TLS connection]
   }
   ...
 }
@@ -282,10 +282,10 @@ curl --cacert CA-server/rootCA.crt https://<Tornjak_TLS_endpoint>
 
 In order to make a TLS call we need only a CA certificate that can validate the certificate/key pair given to Tornjak in step 1.  In our case, we can use the certificate within `CA-server`.  
 
-Additionally, we must have a certificate/key pair locally that was signed by the CA certificate given to the Tornjak server via `tornjak-user-certs` secret when configuring mTLS.  In our case, we can use the certificate/key pair `user.crt` and `user.key`: 
+Additionally, we must have a certificate/key pair locally that was signed by the CA certificate given to the Tornjak server via `tornjak-client-ca` secret when configuring mTLS.  In our case, we can use the certificate/key pair `client.crt` and `client.key`: 
 
 ```
-curl --cacert CA-server/rootCA.crt --key user.key --cert user.crt https://<Tornjak_mTLS_endpoint> 
+curl --cacert CA-server/rootCA.crt --key client.key --cert client.crt https://<Tornjak_mTLS_endpoint> 
 ```
 
 -----
