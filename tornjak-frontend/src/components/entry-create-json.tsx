@@ -52,7 +52,8 @@ type CreateEntryJsonState = {
     parentIdPath: string,
     parentId: string,
     selectorsList: string,
-    ttl: number,
+    jwt_svid_ttl: number,
+    x509_svid_ttl: number,
     expiresAt: number,
     federatesWith: string,
     dnsNames: string,
@@ -80,7 +81,8 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
         this.handleChange = this.handleChange.bind(this);
         this.setSelectedEntriesIds = this.setSelectedEntriesIds.bind(this);
         this.onChangeSelectors = this.onChangeSelectors.bind(this);
-        this.onChangeTtl = this.onChangeTtl.bind(this);
+        this.onChangex509Ttl = this.onChangex509Ttl.bind(this);
+        this.onChangeJwtTtl = this.onChangeJwtTtl.bind(this);
         this.onChangeExpiresAt = this.onChangeExpiresAt.bind(this);
         this.onChangeFederatesWith = this.onChangeFederatesWith.bind(this);
         this.onChangeDnsNames = this.onChangeDnsNames.bind(this);
@@ -102,7 +104,8 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                 spiffe_id: { trust_domain: "", path: "" },
                 parent_id: { trust_domain: "", path: "" },
                 selectors: [],
-                ttl: 0,
+                jwt_svid_ttl: 0,
+                x509_svid_ttl: 0,
                 federates_with: [],
                 admin: false,
                 downstream: false,
@@ -121,7 +124,8 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
             parentIdPath: "",
             parentId: "",
             selectorsList: "",
-            ttl: 0,
+            x509_svid_ttl: 0,
+            jwt_svid_ttl: 0,
             expiresAt: 0,
             federatesWith: "",
             dnsNames: "",
@@ -258,7 +262,8 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
             parentIdTrustDomain: parentId_trustDomain,
             parentIdPath: parentId_path,
             selectorsList: selectorsWithNewline,
-            ttl: localNewEntry.ttl,
+            x509_svid_ttl: localNewEntry.x509_svid_ttl,
+            jwt_svid_ttl: localNewEntry.jwt_svid_ttl,
             expiresAt: localNewEntry.expires_at,
             federatesWith: federates_with,
             dnsNames: dns_names,
@@ -333,13 +338,16 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
         entriesToUpload[selectedEntryId]["parent_id"]["trust_domain"] = this.state.parentIdTrustDomain;
         entriesToUpload[selectedEntryId]["parent_id"]["path"] = this.state.parentIdPath;
         entriesToUpload[selectedEntryId]["selectors"] = selectorEntries;
-        if (this.state.ttl !== undefined) {
-            entriesToUpload[selectedEntryId]["ttl"] = this.state.ttl;
+        if (this.state.jwt_svid_ttl !== undefined) {
+            entriesToUpload[selectedEntryId]["jwt_svid_ttl"] = this.state.jwt_svid_ttl;
         }
-        if (this.state.ttl !== undefined) {
-            entriesToUpload[selectedEntryId]["expires_at"] = this.state.expiresAt;
+        if (this.state.x509_svid_ttl !== undefined) {
+            entriesToUpload[selectedEntryId]["x509_svid_ttl"] = this.state.x509_svid_ttl;
         }
         if (this.state.expiresAt !== undefined) {
+            entriesToUpload[selectedEntryId]["expires_at"] = this.state.expiresAt;
+        }
+        if (federatedWithList !== undefined) {
             entriesToUpload[selectedEntryId]["federates_with"] = federatedWithList;
         }
         if (this.state.dnsNames.length !== 0) {
@@ -361,7 +369,8 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
             parentId: "",
             spiffeId: "",
             selectorsList: "",
-            ttl: 0,
+            x509_svid_ttl: 0,
+            jwt_svid_ttl: 0,
             expiresAt: 0,
             federatesWith: "",
             dnsNames: "",
@@ -412,9 +421,16 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
     }
 
     // TODO(mamy-CS): e - any for now will be explicitly typed
-    onChangeTtl(e: any): void {
+    onChangeJwtTtl(e: any): void {
         this.setState({
-            ttl: Number(e.target.value)
+            jwt_svid_ttl: Number(e.target.value)
+        });
+    }
+
+    // TODO(mamy-CS): e - any for now will be explicitly typed
+    onChangex509Ttl(e: any): void {
+        this.setState({
+            x509_svid_ttl: Number(e.target.value)
         });
     }
 
@@ -463,7 +479,8 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
             parentId: "",
             spiffeId: "",
             selectorsList: "",
-            ttl: 0,
+            x509_svid_ttl: 0,
+            jwt_svid_ttl: 0,
             expiresAt: 0,
             federatesWith: "",
             dnsNames: "",
@@ -792,15 +809,28 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                                                 <legend className="bx--label">Advanced</legend>
                                                 <div className="ttl-input" data-test="ttl-input">
                                                     <NumberInput
-                                                        helperText="Ttl for identities issued for this entry (In seconds)"
+                                                        helperText="x509 SVID Ttl for identities issued for this entry (In seconds) Overrides JWT TTL if set"
                                                         id="ttl-input"
                                                         invalidText="Number is not valid"
-                                                        label="Time to Leave (Ttl)"
+                                                        label="x509 Time to Leave (Ttl)"
                                                         //max={100}
                                                         min={0}
                                                         step={1}
-                                                        value={this.state.ttl}
-                                                        onChange={this.onChangeTtl}
+                                                        value={this.state.x509_svid_ttl}
+                                                        onChange={this.onChangex509Ttl}
+                                                    />
+                                                </div>
+                                                <div className="ttl-input" data-test="ttl-input">
+                                                    <NumberInput
+                                                        helperText="JWT SVID ttl for identities issued for this entry (In seconds) "
+                                                        id="ttl-input"
+                                                        invalidText="Number is not valid"
+                                                        label="JWT Time to Leave (Ttl)"
+                                                        //max={100}
+                                                        min={0}
+                                                        step={1}
+                                                        value={this.state.jwt_svid_ttl}
+                                                        onChange={this.onChangeJwtTtl}
                                                     />
                                                 </div>
                                                 <div className="expiresAt-input" data-test="expiresAt-input">

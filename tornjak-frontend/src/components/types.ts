@@ -61,7 +61,8 @@ export interface EntriesList {
   // node attestation. Otherwise, these selectors represent those produced by
   // workload attestation.
   selectors: Array<Selector>;
-  ttl: number; // The time to live for identities issued for this entry (in seconds).
+  jwt_svid_ttl: number; // time to live for JWT SVID in seconds
+  x509_svid_ttl: number; // time to live for x509-SVID in seconds
   federates_with: string[]; // The names of trust domains the identity described by this entry federates with
   // Whether or not the identity described by this entry is an administrative
   // workload. Administrative workloads are granted additional access to
