@@ -13,7 +13,7 @@ data:
 
       # configure HTTP connection to Tornjak server
       http {
-        port = 10080 # opens at port 10080
+        port = 10000 # opens at port 10080
       }
 
     }
