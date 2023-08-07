@@ -34,38 +34,30 @@ Runs the tornjak server.
 The Tornjak config that is passed in must follow a specific format. Examples of this format can be found [below](#sample-configuration-files). In general, it is split into the `server` section with [general Tornjak server configs](#general-tornjak-server-configs), and the `plugins` section. 
 
 ## General Tornjak Server Configs
-The server config will contain information for the three potential connections: HTTP, TLS, and mTLS. See below for sample configuration:
+The server config will contain information for the two potential connections: HTTP and HTTPS. HTTPS can be configured to follow TLS or mTLS protocol. See below for sample configuration:
 
 ```hcl
 server {
 
     spire_socket_path = "unix:///tmp/spire-server/private/api.sock" # socket to communicate with SPIRE server
 
-    http {
-        enabled = true # if true, opens HTTP. if false, no HTTP connection opened
-	    port = "10000" # if HTTP enabled, opens HTTP listen port at container port 10000
+    http { # required block
+	    port = 10000 # if HTTP enabled, opens HTTP listen port at container port 10000
     }
 
-    tls {
-        enabled = true # if true, opens TLS. if false, no TLS connection opened
-        port = "20000" # if enabled, opens TLS listen port at container port 20000
+    https { # optional, recommended block
+        port = 10443 # if enabled, opens HTTPS listen port at container port 10443
         cert = "sample-keys/tls.pem" # path of certificate for TLS
         key = "sample-keys/key.pem" # path of keys for TLS
+        client_ca = "sample-keys/userCA.pem" # [optional, enables mTLS] User CA 
     }
 
-    mtls {
-        enabled = true # if true, opens mTLS. if false, no mTLS connection opened
-        port = "30000" # if enabled, opens mTLS listen port at container port 30000
-        cert = "sample-keys/tls.pem" # path of certificate for mTLS
-        key = "sample-keys/key.pem" # path of keys for mTLS
-        ca = "sample-keys/rootCA.pem" # path of CA for mTLS
-    }
 }
 ```
 
-We have three connection types that can be opened by the server simultaneously: HTTP, TLS, and mTLS. At least one must be enabled, or the program will exit immediately. If one connection crashes, the error is logged, and the others will still run. When all crash, the Tornjak server exits and the container terminates.
+We have two connection types that are opened by the server simultaneously: HTTP and HTTPS. HTTP is always operational.  The optional HTTPS connection is recommended for production use case.  When HTTPS is configured, the HTTP connection will redirect to the HTTPS (port and service). 
 
-If a specific section is omitted or not enabled, that connection will not be created. If all are omitted or disabled, the program will exit immediately with an appropriate error log. 
+Under the HTTPS block, the fields `port`, `cert`, and `key` are required to enable TLS connection.  To enable the mutual TLS (mTLS), you must additionally include the `client_ca` field, so the verification can be done bi-directionally. 
 
 For examples on enabling TLS and mTLS connections, please see [our TLS and mTLS documentation](../sample-keys/README.md). 
 

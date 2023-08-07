@@ -13,23 +13,14 @@ data:
 
       # configure HTTP connection to Tornjak server
       http {
-        enabled = true
         port = 10000 # opens at port 10000
       }
 
-      tls {
-        enabled = true
-        port = 20000
+      https {
+        port = 10443
         cert = "server/tls.crt"
         key = "server/tls.key"
-      }
-
-      mtls {
-        enabled = true
-        port = 30000
-        cert = "server/tls.crt"
-        key = "server/tls.key"
-        ca = "users/rootCA.crt"
+        # client_ca = "users/rootCA.crt"
       }
     }
 

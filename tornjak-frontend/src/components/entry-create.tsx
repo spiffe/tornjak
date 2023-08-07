@@ -105,7 +105,8 @@ type CreateEntryState = {
   selectors: string,
   selectorsRecommendationList: string,
   adminFlag: boolean,
-  ttl: number,
+  jwt_svid_ttl: number,
+  x509_svid_ttl: number,
   expiresAt: number,
   dnsNames: string,
   federatesWith: string,
@@ -139,7 +140,8 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     this.prepareParentIdAgentsList = this.prepareParentIdAgentsList.bind(this);
     this.prepareSelectorsList = this.prepareSelectorsList.bind(this);
     this.onChangeSelectorsRecommended = this.onChangeSelectorsRecommended.bind(this);
-    this.onChangeTtl = this.onChangeTtl.bind(this);
+    this.onChangeJwtTtl = this.onChangeJwtTtl.bind(this);
+    this.onChangex509Ttl = this.onChangex509Ttl.bind(this);
     this.onChangeExpiresAt = this.onChangeExpiresAt.bind(this);
     this.onChangeFederatesWith = this.onChangeFederatesWith.bind(this);
     this.onChangeDownStream = this.onChangeDownStream.bind(this);
@@ -161,7 +163,8 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       selectors: "",
       selectorsRecommendationList: "",
       adminFlag: false,
-      ttl: 0,
+      x509_svid_ttl: 0,
+      jwt_svid_ttl: 0,
       expiresAt: 0,
       dnsNames: "",
       federatesWith: "",
@@ -363,9 +366,15 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   }
 
   // TODO(mamy-CS): e - any for now will be explicitly typed on currently open entry create PR
-  onChangeTtl(e: any): void {
+  onChangex509Ttl(e: any): void {
     this.setState({
-      ttl: Number(e.target.value)
+      x509_svid_ttl: Number(e.target.value)
+    });
+  }
+
+  onChangeJwtTtl(e: any): void {
+    this.setState({
+      jwt_svid_ttl: Number(e.target.value)
     });
   }
 
@@ -640,7 +649,8 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
         },
         selectors: selectorEntries,
         admin: this.state.adminFlag,
-        ttl: this.state.ttl,
+        x509_svid_ttl: this.state.x509_svid_ttl,
+        jwt_svid_ttl: this.state.jwt_svid_ttl,
         expires_at: this.props.globalEntryExpiryTime,
         downstream: this.state.downstream,
         federates_with: federatedWithList,
@@ -864,19 +874,32 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                 <div className="advanced">
                   <fieldset className="bx--fieldset">
                     <legend className="bx--label">Advanced</legend>
-                    <div className="ttl-input" data-test="ttl-input">
-                      <NumberInput
-                        helperText="Ttl for identities issued for this entry (In seconds)"
-                        id="ttl-input"
-                        invalidText="Number is not valid"
-                        label="Time to Leave (Ttl)"
-                        //max={100}
-                        min={0}
-                        step={1}
-                        value={0}
-                        onChange={this.onChangeTtl}
-                      />
-                    </div>
+                      <div className="ttl-input" data-test="ttl-input">
+                        <NumberInput
+                            helperText="x509 SVID Ttl for identities issued for this entry (In seconds) Overrides JWT TTL if set"
+                            id="ttl-input"
+                            invalidText="Number is not valid"
+                            label="x509 Time to Leave (Ttl)"
+                            //max={100}
+                            min={0}
+                            step={1}
+                            value={this.state.x509_svid_ttl}
+                            onChange={this.onChangex509Ttl}
+                        />
+                      </div>
+                      <div className="ttl-input" data-test="ttl-input">
+                        <NumberInput
+                            helperText="JWT SVID ttl for identities issued for this entry (In seconds) "
+                            id="ttl-input"
+                            invalidText="Number is not valid"
+                            label="JWT Time to Leave (Ttl)"
+                            //max={100}
+                            min={0}
+                            step={1}
+                            value={this.state.jwt_svid_ttl}
+                            onChange={this.onChangeJwtTtl}
+                        />
+                      </div>
                     <div className="expiresAt-input" data-test="expiresAt-input">
                       <EntryExpiryFeatures />
                     </div>
