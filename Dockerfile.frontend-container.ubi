@@ -1,0 +1,40 @@
+## Build stage
+FROM registry.access.redhat.com/ubi8/nodejs-18:latest AS build
+WORKDIR /opt/app-root/src
+COPY --chown=1001:0 tornjak-frontend .
+RUN npm install && \
+    npm run build
+
+## Runtime stage
+FROM registry.access.redhat.com/ubi8/nodejs-18-minimal:latest AS runtime
+WORKDIR /opt/app-root/src
+COPY --from=build --chown=1001:0 /opt/app-root/src/build ./build
+COPY --from=build --chown=1001:0 /opt/app-root/src/.env.prod .
+
+# Install serve package and react-inject-env
+RUN npm install -g npm@9.7.1 && \
+    npm install --location=global serve && \
+    npm install react-inject-env
+
+# Update permissions after build
+USER 0
+RUN chmod -R g+rw  /opt/app-root/src
+USER 1001
+
+    
+# Set dynamic port, defualt 3000
+ENV PORT_FE=3000
+EXPOSE $PORT_FE
+
+# moving env.js to fix "access denied" error when running in restricted (read-only) env
+ENTRYPOINT npx react-inject-env set -n tmp/env.js && serve -s build -p $PORT_FE
+
+# add a version link to the image description
+ARG version
+ARG github_sha
+LABEL org.opencontainers.image.description="Tornjak frontend ($version): https://github.com/spiffe/tornjak/releases/tag/$version" \
+      org.opencontainers.image.source="https://github.com/spiffe/tornjak" \
+      org.opencontainers.image.documentation="https://github.com/spiffe/tornjak/tree/main/docs" 
+# create env. variables with the build details
+ENV VERSION=$version
+ENV GITHUB_SHA=$github_sha
