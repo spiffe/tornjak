@@ -65,6 +65,10 @@ jobs:
       # build and push UBI images
       - name: Add ubi prefix
         run: echo "IMAGE_TAG_PREFIX=ubi-"
+      - name: Set frontend Dockerfile
+        run: echo "DOCKERFILE_FRONTEND=Dockerfile.frontend-container.ubi"
+      - name: Set backend Dockerfile
+        run: echo "DOCKERFILE_BACKEND=Dockerfile.backend-container.ubi"
 
       - name: Build and push UBI images
         run: make release-images
