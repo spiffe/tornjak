@@ -9,9 +9,14 @@ CONTAINER_TORNJAK_TAG ?= $(REPO)/tornjak
 CONTAINER_BACKEND_TAG ?= $(REPO)/tornjak-backend
 CONTAINER_FRONTEND_TAG ?= $(REPO)/tornjak-frontend
 CONTAINER_MANAGER_TAG ?= $(REPO)/tornjak-manager
+IMAGE_TAG_PREFIX ?= 
+
+## dockerfile for each container default to alpine base image
+DOCKERFILE_BACKEND ?= Dockerfile.backend-container
+DOCKERFILE_FRONTEND ?= Dockerfile.frontend-container
 
 BINARIES=tornjak-backend tornjak-manager
-IMAGES=$(BINARIES) tornjak-frontend tornjak
+IMAGES=$(BINARIES) tornjak-frontend 
 
 GO_VERSION ?= 1.20
 
@@ -75,23 +80,18 @@ images: $(addprefix image-,$(IMAGES)) ## Build all images
 
 .PHONY: image-tornjak-backend
 image-tornjak-backend: bin/tornjak-backend ## Build image for bin/tornjak-backend 
-	docker build --no-cache -f Dockerfile.backend-container --build-arg version=$(VERSION) \
-		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_BACKEND_TAG):$(VERSION) .
+	docker build --no-cache -f $(DOCKERFILE_BACKEND) --build-arg version=$(VERSION) \
+		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_BACKEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) .
 
 .PHONY: image-tornjak-manager
 image-tornjak-manager: bin/tornjak-manager ## Build image for bin/tornjak-manager 
 	docker build --no-cache -f Dockerfile.tornjak-manager --build-arg version=$(VERSION) \
-		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_MANAGER_TAG):$(VERSION) .
+		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_MANAGER_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) .
 
 .PHONY: image-tornjak-frontend
 image-tornjak-frontend: ## Build image for tornjak-frontend 
-	docker build --no-cache -f Dockerfile.frontend-container --build-arg version=$(VERSION) \
-		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_FRONTEND_TAG):$(VERSION) .
-
-.PHONY: image-tornjak
-image-tornjak: bin/tornjak-backend ## Build image for bin/tornjak-backend and tornjak-frontend bundled in single image
-	docker build --no-cache -f Dockerfile.tornjak-container --build-arg version=$(VERSION) \
-		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_TORNJAK_TAG):$(VERSION) .
+	docker build --no-cache -f $(DOCKERFILE_FRONTEND) --build-arg version=$(VERSION) \
+		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) .
 
 ##@ Run:
 
@@ -107,24 +107,18 @@ release-images: $(addprefix release-,$(IMAGES)) ## Release all images
 
 .PHONY: release-tornjak-backend
 release-tornjak-backend: image-tornjak-backend ## Release tornjak-backend image
-	docker push $(CONTAINER_BACKEND_TAG):$(VERSION)
-	docker tag $(CONTAINER_BACKEND_TAG):$(VERSION) $(CONTAINER_BACKEND_TAG):$(GITHUB_SHA)
-	docker push $(CONTAINER_BACKEND_TAG):$(GITHUB_SHA)
+	docker push $(CONTAINER_BACKEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION)
+	docker tag $(CONTAINER_BACKEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) $(CONTAINER_BACKEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
+	docker push $(CONTAINER_BACKEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
 
 .PHONY: release-tornjak-manager
 release-tornjak-manager: image-tornjak-manager ## Release tornjak-manager image
-	docker push $(CONTAINER_MANAGER_TAG):$(VERSION)
-	docker tag $(CONTAINER_MANAGER_TAG):$(VERSION) $(CONTAINER_MANAGER_TAG):$(GITHUB_SHA)
-	docker push $(CONTAINER_MANAGER_TAG):$(GITHUB_SHA)
+	docker push $(CONTAINER_MANAGER_TAG):$(IMAGE_TAG_PREFIX)$(VERSION)
+	docker tag $(CONTAINER_MANAGER_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) $(CONTAINER_MANAGER_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
+	docker push $(CONTAINER_MANAGER_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
 
 .PHONY: release-tornjak-frontend
 release-tornjak-frontend: image-tornjak-frontend ## Release tornjak-frontend image
-	docker push $(CONTAINER_FRONTEND_TAG):$(VERSION)
-	docker tag $(CONTAINER_FRONTEND_TAG):$(VERSION) $(CONTAINER_FRONTEND_TAG):$(GITHUB_SHA)
-	docker push $(CONTAINER_FRONTEND_TAG):$(GITHUB_SHA)
-
-.PHONY: release-tornjak
-release-tornjak: image-tornjak ## Release tornjak image (bundling frontend and backend)
-	docker push $(CONTAINER_TORNJAK_TAG):$(VERSION)
-	docker tag $(CONTAINER_TORNJAK_TAG):$(VERSION) $(CONTAINER_TORNJAK_TAG):$(GITHUB_SHA)
-	docker push $(CONTAINER_TORNJAK_TAG):$(GITHUB_SHA)
+	docker push $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION)
+	docker tag $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
+	docker push $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
