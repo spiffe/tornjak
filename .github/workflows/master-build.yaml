@@ -64,11 +64,11 @@ jobs:
 
       # build and push UBI images
       - name: Add ubi prefix
-        run: echo "IMAGE_TAG_PREFIX=ubi-"
+        run: echo "IMAGE_TAG_PREFIX=ubi-" >> $GITHUB_ENV
       - name: Set frontend Dockerfile
-        run: echo "DOCKERFILE_FRONTEND=Dockerfile.frontend-container.ubi"
+        run: echo "DOCKERFILE_FRONTEND=Dockerfile.frontend-container.ubi" >> $GITHUB_ENV
       - name: Set backend Dockerfile
-        run: echo "DOCKERFILE_BACKEND=Dockerfile.backend-container.ubi"
+        run: echo "DOCKERFILE_BACKEND=Dockerfile.backend-container.ubi" >> $GITHUB_ENV
 
       - name: Build and push UBI images
         run: make release-images
