@@ -59,17 +59,19 @@ jobs:
         run: echo "REPO=ghcr.io/${{ github.repository_owner }}" >> $GITHUB_ENV
 
       # build and push images tagged with GITHUB_SHA, version, and latest
-      - name: Build and push tornjak backend image
-        run: make release-tornjak-backend
+      - name: Build and push tornjak images
+        run: make release-images
 
-      - name: Build and push tornjak frontend image
-        run: make release-tornjak-frontend
+      # build and push UBI images
+      - name: Add ubi prefix
+        run: echo "IMAGE_TAG_PREFIX=ubi-"
+      - name: Set frontend Dockerfile
+        run: echo "DOCKERFILE_FRONTEND=Dockerfile.frontend-container.ubi"
+      - name: Set backend Dockerfile
+        run: echo "DOCKERFILE_BACKEND=Dockerfile.backend-container.ubi"
 
-      - name: Build and push tornjak image (frontend+backend)
-        run: make release-tornjak
-
-      - name: Build and push tornjak manager image
-        run: make release-tornjak-manager
+      - name: Build and push UBI images
+        run: make release-images
 
       - name: Print job result
         run: |
