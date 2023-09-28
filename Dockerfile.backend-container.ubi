@@ -13,7 +13,23 @@ ARG version
 ARG github_sha
 LABEL org.opencontainers.image.description="Tornjak backend ($version): https://github.com/spiffe/tornjak/releases/tag/$version" \
       org.opencontainers.image.source="https://github.com/spiffe/tornjak" \
-      org.opencontainers.image.documentation="https://github.com/spiffe/tornjak/tree/main/docs" 
+      org.opencontainers.image.documentation="https://github.com/spiffe/tornjak/tree/main/docs"
+# replace UBI labels
+LABEL architecture="amd64" \
+      build-date="" \
+      description="Tornjak Backend" \ 
+      io.k8s.description="Tornjak Backend" \
+      io.k8s.display-name="tornjak-backend" \
+      maintainer="" \
+      name="spiffe/tornjak-backend" \
+      release="$version" \
+      summary="Tornjak backend UBI image" \
+      url="" \
+      vcs-ref="" \
+      vcs-type="" \
+      vendor="" \
+      version="$version"
+
 # create env. variables with the build details
 ENV VERSION=$version
 ENV GITHUB_SHA=$github_sha
