@@ -26,7 +26,7 @@ ENTRYPOINT npx react-inject-env set -n tmp/env.js && serve -s build -p $PORT_FE
 # add a version link to the image description
 ARG version
 ARG github_sha
-LABEL org.opencontainers.image.description="Tornjak frontend ($version): https://github.com/spiffe/tornjak/releases/tag/$version" \
+LABEL org.opencontainers.image.description="Tornjak frontend ($version) Alpine based image: https://github.com/spiffe/tornjak/releases/tag/$version" \
       org.opencontainers.image.source="https://github.com/spiffe/tornjak" \
       org.opencontainers.image.documentation="https://github.com/spiffe/tornjak/tree/main/docs"
 # additional labels
