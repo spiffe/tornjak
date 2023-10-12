@@ -11,7 +11,7 @@ COPY bin/tornjak-backend tornjak-backend
 # add a version link to the image description
 ARG version
 ARG github_sha
-LABEL org.opencontainers.image.description="Tornjak backend ($version): https://github.com/spiffe/tornjak/releases/tag/$version" \
+LABEL org.opencontainers.image.description="Tornjak backend ($version) Alpine based image: https://github.com/spiffe/tornjak/releases/tag/$version" \
       org.opencontainers.image.source="https://github.com/spiffe/tornjak" \
       org.opencontainers.image.documentation="https://github.com/spiffe/tornjak/tree/main/docs"
 
