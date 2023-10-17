@@ -19,7 +19,7 @@ jobs:
           EOF
 
       - name: Check out repository code
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@v4.1.1
 
       - name: Install Golang
         uses: actions/setup-go@v4.1.0
