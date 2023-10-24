@@ -56,12 +56,12 @@ vendor: tidy ## Vendor go modules
 PHONY: binaries
 binaries: $(addprefix bin/,$(BINARIES)) ## Build bin/tornjak-backend and bin/tornjak-manager binaries
 
-bin/tornjak-backend: tornjak-backend/cmd/agent $(GO_FILES) | vendor ## Build tornjak-backend binary
+bin/tornjak-backend: cmd/agent $(GO_FILES) | vendor ## Build tornjak-backend binary
 	# Build hack because of flake of imported go module
 	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:$(GO_VERSION) \
 		/bin/sh -c "go build --tags 'sqlite_json' -o agent ./$</main.go; go build --tags 'sqlite_json' -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o $@ ./$</main.go"
 
-bin/tornjak-manager: tornjak-backend/cmd/manager $(GO_FILES) | vendor ## Build bin/tornjak-manager binary
+bin/tornjak-manager: cmd/manager $(GO_FILES) | vendor ## Build bin/tornjak-manager binary
 	# Build hack because of flake of imported go module
 	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:$(GO_VERSION) \
 		/bin/sh -c "go build --tags 'sqlite_json' -o tornjak-manager ./$</main.go; go build --tags 'sqlite_json' -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o $@ ./$</main.go"
@@ -97,7 +97,7 @@ image-tornjak-frontend: ## Build image for tornjak-frontend
 
 .PHONY: compose-frontend
 compose-frontend: ## Run frontend using docker-compose
-	docker-compose -f docker-compose-frontend.yml up --build --force-recreate -d
+	docker-compose -f examples/docker-compose/frontend.yml up --build --force-recreate -d
 	docker tag tornjak-public_tornjak-frontend:latest $(CONTAINER_FRONTEND_TAG):$(VERSION)
 
 ##@ Release:
