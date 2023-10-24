@@ -1,7 +1,7 @@
 package managerapi
 
 import (
-	managertypes "github.com/spiffe/tornjak/tornjak-backend/pkg/manager/types"
+	managertypes "github.com/spiffe/tornjak/pkg/manager/types"
 
 	"github.com/pkg/errors"
 	//types "github.com/spiffe/spire/proto/spire/types"

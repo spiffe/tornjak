@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	managerapi "github.com/spiffe/tornjak/tornjak-backend/api/manager"
+	managerapi "github.com/spiffe/tornjak/api/manager"
 )
 
 func main() {

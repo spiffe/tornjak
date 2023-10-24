@@ -9,7 +9,7 @@ import (
 
 	"github.com/cenkalti/backoff/v4"
 
-	"github.com/spiffe/tornjak/tornjak-backend/pkg/agent/types"
+	"github.com/spiffe/tornjak/pkg/agent/types"
 )
 
 func cleanup() {
