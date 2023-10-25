@@ -13,12 +13,12 @@ require (
 	github.com/spiffe/spire v1.6.4
 	github.com/spiffe/spire-api-sdk v1.2.5-0.20230413135745-699e242b965d
 	github.com/urfave/cli/v2 v2.3.0
-	google.golang.org/grpc v1.55.0
+	google.golang.org/grpc v1.56.3
 )
 
 require (
 	cloud.google.com/go v0.110.0 // indirect
-	cloud.google.com/go/compute v1.19.0 // indirect
+	cloud.google.com/go/compute v1.19.1 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v1.0.0 // indirect
 	cloud.google.com/go/kms v1.10.1 // indirect
