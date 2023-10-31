@@ -13,7 +13,7 @@ IMAGE_TAG_PREFIX ?=
 
 ## dockerfile for each container default to alpine base image
 DOCKERFILE_BACKEND ?= Dockerfile.backend-container
-DOCKERFILE_FRONTEND ?= Dockerfile.frontend-container
+DOCKERFILE_FRONTEND ?= frontend/Dockerfile.frontend-container
 
 BINARIES=tornjak-backend tornjak-manager
 IMAGES=$(BINARIES) tornjak-frontend 
@@ -68,10 +68,10 @@ bin/tornjak-manager: cmd/manager $(GO_FILES) | vendor ## Build bin/tornjak-manag
 
 frontend-local-build: ## Build tornjak-frontend
 	npm install --prefix tornjak-frontend
-	rm -rf tornjak-frontend/build
+	rm -rf frontend/build
 	npm run build --prefix tornjak-frontend
 	rm -rf frontend-local-build
-	cp -r tornjak-frontend/build frontend-local-build
+	cp -r frontend/build frontend-local-build
 
 ##@ Container images:
 
