@@ -9,7 +9,7 @@ import {
     Link,
     Dropdown
 } from 'carbon-components-react';
-import { Launch16, NextOutline16 } from '@carbon/icons-react';
+import { Launch, NextOutline } from '@carbon/icons-react';
 import { connect } from 'react-redux';
 import TornjakApi from './tornjak-api-helpers';
 import './style.css';
@@ -68,7 +68,7 @@ type CreateEntryJsonState = {
 const NewEntryJsonFormatLink = (props: { link: link }) => (
     <div>
         <a rel="noopener noreferrer" href={props.link} target="_blank">(Click to see new entry JSON format)</a>
-        <a rel="noopener noreferrer" href={props.link} target="_blank">{<Launch16 />}</a>
+        <a rel="noopener noreferrer" href={props.link} target="_blank">{<Launch />}</a>
     </div>
 )
 class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonState>  {
@@ -694,7 +694,7 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                                                                 className='selected-entry'
                                                                 id={entryId.spiffeId}
                                                                 href="#"
-                                                                renderIcon={NextOutline16}
+                                                                renderIcon={NextOutline}
                                                                 visited={false}
                                                                 inline
                                                                 onClick={(e) => {
@@ -711,7 +711,7 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                                                             <Link
                                                                 id={entryId.spiffeId}
                                                                 href="#"
-                                                                renderIcon={NextOutline16}
+                                                                renderIcon={NextOutline}
                                                                 onClick={(e) => {
                                                                     this.setSelectedEntriesIds(index, index, undefined);
                                                                     e.preventDefault();

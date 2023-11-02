@@ -1,5 +1,4 @@
 import React from 'react';
-import Title from './title';
 import { connect } from 'react-redux';
 import PieChart1 from "charts/PieChart";
 import { RootState } from 'redux/reducers';
@@ -30,16 +29,14 @@ class ClustersPieChart extends React.Component<ClustersPieChartProps, {}> {
     var sections = this.clusterList()
     return (
       <React.Fragment>
-        <Title>Number of Agents per Cluster</Title>
-        {(sections.length === 0 || sections.every(item => item.value === 0))
-          ? (
-            <p className="no-data">No Data To Display</p>
-          )
-          : (
-            <PieChart1
-              data={sections}
-            />
-          )
+        {sections.length === 0 &&
+          <p className="no-data">No Data To Display</p>
+        }
+        {sections.length !== 0 &&
+          <PieChart1
+            data={sections}
+            title='Number of Agents per Cluster'
+          />
         }
       </React.Fragment>
     );

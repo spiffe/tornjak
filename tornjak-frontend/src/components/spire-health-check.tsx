@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import './style.css';
 import { RootState } from 'redux/reducers';
 import { connect } from 'react-redux';
-import InlineLoading from 'carbon-components-react/lib/components/InlineLoading';
-import { Dropdown, Tooltip } from 'carbon-components-react';
+import { Dropdown, Tooltip, InlineLoading } from 'carbon-components-react';
 import TornjakApi from './tornjak-api-helpers';
 import {
   spireHealthCheckFunc,
