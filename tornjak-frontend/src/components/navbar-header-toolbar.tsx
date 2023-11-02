@@ -1,8 +1,6 @@
-import React, { Component } from 'react';
-import {
-    HeaderGlobalAction,
-} from "carbon-components-react/lib/components/UIShell";
-import { UserAvatar20, Notification20, Search20 } from "@carbon/icons-react";
+import { Component } from 'react';
+import { HeaderGlobalAction } from "carbon-components-react";
+import { UserAvatar, Notification, Search } from "@carbon/icons-react";
 import KeycloakService from "auth/KeycloakAuth";
 import {env} from '../env';
 
@@ -25,7 +23,7 @@ class HeaderToolBar extends Component<HeaderToolBarProp, HeaderToolBarState> {
                     <div className="user-dropdown">
                         <HeaderGlobalAction
                             aria-label="User">
-                            <UserAvatar20 />
+                            <UserAvatar />
                         </HeaderGlobalAction>
                         <div className="user-dropdown-content">
                             {KeycloakService.isLoggedIn() && (
@@ -43,12 +41,12 @@ class HeaderToolBar extends Component<HeaderToolBarProp, HeaderToolBarState> {
                 <HeaderGlobalAction
                     aria-label="Notifications"
                     onClick={() => { alert("This is a place holder, functionality to be implemented on future work!") }}>
-                    <Notification20 />
+                    <Notification />
                 </HeaderGlobalAction>
                 <HeaderGlobalAction
                     aria-label="Search"
                     onClick={() => { alert("This is a place holder, functionality to be implemented on future work!") }}>
-                    <Search20 />
+                    <Search />
                 </HeaderGlobalAction>
 
             </div>
