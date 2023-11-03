@@ -10,7 +10,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 
-	"github.com/spiffe/tornjak/tornjak-backend/pkg/agent/types"
+	"github.com/spiffe/tornjak/pkg/agent/types"
 )
 
 const (

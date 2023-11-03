@@ -5,7 +5,7 @@ WORKDIR /opt/spire
 ENTRYPOINT ["/opt/spire/run_backend.sh"]
 
 # Add init
-COPY run_backend.sh run_backend.sh
+COPY scripts/run_backend.sh run_backend.sh
 COPY bin/tornjak-backend tornjak-backend
 
 # add a version link to the image description

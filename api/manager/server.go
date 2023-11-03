@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	managerdb "github.com/spiffe/tornjak/tornjak-backend/pkg/manager/db"
+	managerdb "github.com/spiffe/tornjak/pkg/manager/db"
 )
 
 var (

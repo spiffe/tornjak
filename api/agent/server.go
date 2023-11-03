@@ -20,8 +20,8 @@ import (
 	"github.com/hashicorp/hcl/hcl/token"
 	"github.com/pkg/errors"
 
-	auth "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/auth"
-	agentdb "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/db"
+	auth "github.com/spiffe/tornjak/pkg/agent/auth"
+	agentdb "github.com/spiffe/tornjak/pkg/agent/db"
 )
 
 type Server struct {

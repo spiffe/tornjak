@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/spiffe/tornjak/tornjak-backend/pkg/agent/types"
+	"github.com/spiffe/tornjak/pkg/agent/types"
 )
 
 type AgentDB interface {
