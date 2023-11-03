@@ -1,7 +1,7 @@
 ## Build stage
 FROM node:18-alpine3.14 AS build
 WORKDIR /usr/src/app
-COPY tornjak-frontend .
+COPY frontend .
 RUN npm install && \
     npm run build
 

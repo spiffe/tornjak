@@ -13,7 +13,7 @@ import (
 	types "github.com/spiffe/spire-api-sdk/proto/spire/api/types"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
-	tornjakTypes "github.com/spiffe/tornjak/tornjak-backend/pkg/agent/types"
+	tornjakTypes "github.com/spiffe/tornjak/pkg/agent/types"
 )
 
 type HealthcheckRequest grpc_health_v1.HealthCheckRequest

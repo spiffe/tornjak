@@ -1,7 +1,7 @@
 ## Build stage
 FROM registry.access.redhat.com/ubi8/nodejs-18:latest AS build
 WORKDIR /opt/app-root/src
-COPY --chown=1001:0 tornjak-frontend .
+COPY --chown=1001:0 frontend .
 RUN npm install && \
     npm run build
 
