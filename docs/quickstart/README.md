@@ -121,7 +121,9 @@ Additionally, we have sample server-statefulset files in the directory `server-s
 ### Choosing the Statefulset Deployment
 
 
-Depending on your use case, you can deploy Tornjak in different configurations. Note we have deprecated support of the use case where parts of Tornjak run on the same container as SPIRE. Currently, we support two distinct deployment schemes: 
+Depending on your use case, you can deploy Tornjak in different configurations. Note we have deprecated support of the use case where parts of Tornjak run on the same container as SPIRE. 
+
+Currently, we support two deployment schemes: 
 
 1. Only the Tornjak backend (to make Tornjak API calls)  is run as a separate container on the same pod that exposes only one port (to communicate with the Tornjak backend). It requires more deployment steps to deploy or use the frontend. However, this deployment type is fully-supported, has a smaller sidecar image without the frontend components, and ensures that the frontend and backend share no memory. 
 2. The Tornjak frontend (UI) and backend run in the same container that exposes two separate ports (one frontend and one backend). This is useful for getting started with Tornjak with minimal deployment steps. 
@@ -384,7 +386,7 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 
 Now that we have the correct deployment files, please follow the below steps to deploy Tornjak and SPIRE!
 
-NOTE: In a windows environment, you will need to replace the backslashes ( \\ ) below with backticks ( \` ) to copy and paste into a windows terminal
+NOTE: In a Windows OS environment, you will need to replace the backslashes ( \\ ) below with backticks ( \` ) to copy and paste into a Windows terminal. This doesnt apply for Mac. 
 ```console
 kubectl apply -f spire-namespace.yaml \
     -f server-account.yaml \
@@ -661,9 +663,8 @@ kubectl delete clusterrolebinding spire-server-trust-role-binding spire-agent-cl
 
 ## Troubleshooting 
 
-<details>
-<summary><b>#### Troubleshoot 1: Minikube fails to start with a Docker CLI context error</b></summary>
-<p>
+#### Troubleshoot 1: Minikube fails to start with a Docker CLI context error
+
 When running the `minikube start` command, you might encounter an error like the one below:
 
 
@@ -706,9 +707,3 @@ minikube delete
 ```console
 minikube start
 ```
-</p>
-</details>
-
-
-
-
