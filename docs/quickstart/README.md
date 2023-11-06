@@ -63,7 +63,7 @@ NAME       STATUS   ROLES    AGE   VERSION
 minikube   Ready    master   79s   v1.18.3
 ```
 
-[Troubleshoot 1: Minikube fails to start with a Docker CLI context error](#troubleshoot-1-minikube-fails-to-start-with-a-docker-cli-context-error)
+[Troubleshoot 1: Minikube fails to start with a Docker CLI context error](#troubleshooting)
 ### Obtaining the Deployment Files
 
 To obtain the relevant files, clone our git repository and cd into the correct directory:
@@ -662,8 +662,7 @@ kubectl delete clusterrolebinding spire-server-trust-role-binding spire-agent-cl
 ```
 
 ## Troubleshooting 
-
-#### Troubleshoot 1: Minikube fails to start with a Docker CLI context error
+<details><summary><b>Troubleshoot 1: Minikube fails to start with a Docker CLI context error</b></summary>
 
 When running the `minikube start` command, you might encounter an error like the one below:
 
@@ -707,3 +706,4 @@ minikube delete
 ```console
 minikube start
 ```
+</details>
