@@ -25,7 +25,7 @@ type TornjakApiState = {}
 
 if (Auth_Server_Uri) { // inject token if app is in auth mode and check token status/ refresh as needed
   axios.interceptors.request.use(
-    config => {
+    async (config: any): Promise<any> => {
       console.log("Checking token status...")
       if (KeycloakService.isLoggedIn()) {
         const setAuthorization = () => {
