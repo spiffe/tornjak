@@ -3,7 +3,7 @@ on:
   push:
     branches:
     - main
-    - v1.4
+    - v1.5
 jobs:
   tornjak-build:
     runs-on: ubuntu-latest
