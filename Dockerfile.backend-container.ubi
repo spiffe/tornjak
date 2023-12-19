@@ -1,4 +1,4 @@
-FROM alpine
+FROM registry.access.redhat.com/ubi8-micro:latest
 RUN mkdir -p /opt/spire
 
 WORKDIR /opt/spire
@@ -11,11 +11,10 @@ COPY bin/tornjak-backend tornjak-backend
 # add a version link to the image description
 ARG version
 ARG github_sha
-LABEL org.opencontainers.image.description="Tornjak backend ($version) Alpine based image: https://github.com/spiffe/tornjak/releases/tag/$version" \
+LABEL org.opencontainers.image.description="Tornjak backend ($version) UBI based image: https://github.com/spiffe/tornjak/releases/tag/$version" \
       org.opencontainers.image.source="https://github.com/spiffe/tornjak" \
       org.opencontainers.image.documentation="https://github.com/spiffe/tornjak/tree/main/docs"
-
-# Additional labels
+# replace UBI labels
 LABEL architecture="amd64" \
       build-date="" \
       description="Tornjak Backend" \ 
@@ -24,13 +23,13 @@ LABEL architecture="amd64" \
       maintainer="" \
       name="spiffe/tornjak-backend" \
       release="$version" \
-      summary="Tornjak backend image" \
+      summary="Tornjak backend UBI image" \
       url="" \
       vcs-ref="" \
       vcs-type="" \
       vendor="" \
       version="$version"
- 
+
 # create env. variables with the build details
 ENV VERSION=$version
 ENV GITHUB_SHA=$github_sha

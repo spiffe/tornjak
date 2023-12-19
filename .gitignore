@@ -8,15 +8,15 @@
 vendor
 
 # dependencies
-tornjak-frontend/node_modules
-tornjak-frontend/.pnp
-tornjak-frontend/.pnp.js
+frontend/node_modules
+frontend/.pnp
+frontend/.pnp.js
 
 # testing
-tornjak-frontend/coverage
+frontend/coverage
 
 # production
-tornjak-frontend/build
+frontend/build
 
 # misc
 .DS_Store

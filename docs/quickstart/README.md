@@ -2,20 +2,34 @@
 
 In this tutorial, we will show how to configure Tornjak with a SPIRE deployment using the SPIRE k8s quickstart tutorial. This is heavily inspired by the [SPIRE quickstart for Kubernetes](https://spiffe.io/docs/latest/try/getting-started-k8s/).
 
-This tutorial will get you up and running with a local deployment of SPIRE and Tornjak in three simple steps: setting up the deployment files, deployment, and connecting to Tornjak. 
+Before we dive into the deployment process, let’s familiarize ourselves with Tornjak and SPIRE.
+
+[SPIRE](https://github.com/spiffe/spire) (the SPIFFE Runtime Environment) is an open-source software tool that provides a way to issue and manage identities in the form of SPIFFE IDs within a distributed system. These identities are used to establish trust between software services and are based on the SPIFFE (Secure Production Identity Framework For Everyone) standards, which define a universal identity control plane for distributed systems. SPIRE provides access to the SPIFFE Workload API, which authenticates active software systems and allocates SPIFFE IDs and corresponding SVIDs to them. This process enables mutual trust establishment between two distinct workloads.
+
+Tornjak is a control plane and GUI for SPIRE, aimed at managing SPIRE deployments across multiple clusters. It provides a management plane that simplifies and centralizes the administration of SPIRE, offering an intuitive interface for defining, distributing, and visualizing SPIFFE identities across a heterogeneous environment. 
+
+This tutorial will get you up and running with a local deployment of SPIRE and Tornjak in three simple steps: 
+- Setting up the deployment files
+- Deployment
+- Connecting to Tornjak. 
 
 Contents
-- [Step 0: Requirements](#step-0-requirements)
+- [Step 0: Prerequisite](#step-0-prerequisite)
 - [Step 1: Setup Deployment files](#step-1-setup-deployment-files)
 - [Step 2: Deployment of SPIRE and co-located Tornjak](#step-2-deployment-of-spire-and-co-located-tornjak)
 - [Step 3: Configuring Access to Tornjak](#step-3-configuring-access-to-tornjak)
 - [Cleanup](#cleanup)
+- [Troubleshooting Commmon Issues](#Troubleshooting)
 
-## Step 0: Requirements
+## Step 0: Prerequisite 
 
-We tested this quickstart with the following requirements:
- - [Minikube](https://minikube.sigs.k8s.io/docs/start/) version 1.12.0
- - [Docker](https://docs.docker.com/get-docker/) version 20.10.23
+Before you begin this tutorial, make sure you have the following:
+- Minikube: Version 1.12.0 or later. [Download Minikube.](https://docs.docker.com/get-docker/)
+- Docker: Version 20.10.23 or later. [Install Docker.](https://docs.docker.com/get-docker/)
+
+Note: While we have tested this tutorial with the versions below, newer versions should also work. Ensure you're using the most recent stable releases to avoid compatibility issues.
+ - Minikube Version 1.12.0, Version 1.31.2
+ - Docker Version 20.10.23, Version 24.0.6 
 
 ## Step 1: Setup deployment files
 
@@ -49,6 +63,7 @@ NAME       STATUS   ROLES    AGE   VERSION
 minikube   Ready    master   79s   v1.18.3
 ```
 
+[Troubleshoot 1: Minikube fails to start with a Docker CLI context error](#troubleshooting)
 ### Obtaining the Deployment Files
 
 To obtain the relevant files, clone our git repository and cd into the correct directory:
@@ -59,13 +74,14 @@ cd tornjak
 cd docs/quickstart
 ```
 
-Notice, the files in this directory are largely the same files as provided by the [SPIRE quickstart for Kubernetes](https://spiffe.io/docs/latest/try/getting-started-k8s/). However, there are some minor key differences. Notice the new ConfigMap file:
+Notice, the files in this directory are largely the same files as provided by the [SPIRE quickstart for Kubernetes](https://spiffe.io/docs/latest/try/getting-started-k8s/). However, there are some minor key differences. Take note of the tornjak-configmap.yaml file, which includes configuration details for the Tornjak backend. 
+To view the configuration you can issue the following:
 
 ```console
 cat tornjak-configmap.yaml 
 ```
 
-This configmap has contents to configure the Tornjak backend: 
+Contents of the configuration for the Tornjak backend should look like:
 
 ```
 apiVersion: v1
@@ -98,14 +114,14 @@ data:
     }
 ```
 
-More information on this config file format can be found in [our config documentation](../config-tornjak-agent.md). 
+More information on this config file format can be found in [our config documentation](../config-tornjak-server.md). 
 
 Additionally, we have sample server-statefulset files in the directory `server-statefulset-examples`. We will copy one of them in depending on which deployment scheme you would like. 
 
 ### Choosing the Statefulset Deployment
 
 
-These steps will be different depending on what deployment scheme makes sense for you. Note we have deprecated support of the use case where parts of Tornjak run on the same container as SPIRE. 
+Depending on your use case, you can deploy Tornjak in different configurations. Note we have deprecated support of the use case where parts of Tornjak run on the same container as SPIRE. 
 
 Currently, we support two deployment schemes: 
 
@@ -370,7 +386,7 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 
 Now that we have the correct deployment files, please follow the below steps to deploy Tornjak and SPIRE!
 
-NOTE: In a windows environment, you will need to replace the backslashes ( \\ ) below with backticks ( \` ) to copy and paste into a windows terminal
+NOTE: In a Windows OS environment, you will need to replace the backslashes ( \\ ) below with backticks ( \` ) to copy and paste into a Windows terminal. This doesnt apply for Mac. 
 ```console
 kubectl apply -f spire-namespace.yaml \
     -f server-account.yaml \
@@ -645,4 +661,49 @@ kubectl delete clusterrole spire-server-trust-role spire-agent-cluster-role
 kubectl delete clusterrolebinding spire-server-trust-role-binding spire-agent-cluster-role-binding
 ```
 
+## Troubleshooting 
+<details><summary><b>Troubleshoot 1: Minikube fails to start with a Docker CLI context error</b></summary>
 
+When running the `minikube start` command, you might encounter an error like the one below:
+
+
+```console
+minikube start
+```
+```
+W1105 15:48:51.730095   42754 main.go:291] Unable to resolve the current Docker CLI context "default": context "default": context not found: open /Users/kidus/.docker/contexts/meta/37a8eec1ce19687d132fe29051dca629d164e2c4958ba141d5f4133a33f0688f/meta.json: no such file or directory
+😄  minikube v1.31.2 on Darwin 14.0 (arm64)
+✨  Using the docker driver based on existing profile
+
+💣  Exiting due to PROVIDER_DOCKER_NOT_RUNNING: "docker version --format <no value>-<no value>:<no value>" exit status 1: Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?
+💡  Suggestion: Start the Docker service
+📘  Documentation: https://minikube.sigs.k8s.io/docs/drivers/docker/
+```
+This typically means that Docker is not running on your machine, and since Minikube is attempting to use Docker as a driver, it's required to have Docker active.
+Solution:
+
+1. Check Docker Installation:
+-  Make sure Docker is installed on your system. If it's not installed, you can install Docker by following the instructions on the official Docker [installation guide.](https://docs.docker.com/get-docker/)
+
+2. Start Docker:
+- On macOS and Windows: Docker Desktop has a graphical interface to manage the Docker service. Open Docker Desktop to start Docker. Alternativly, run the command '''open -a Docker''''  
+3. Retry Starting Minikube:
+- After ensuring that Docker is running, you can start Minikube again using:  
+```console
+minikube start
+```
+4. Reset Configurations if Needed:
+- For Docker context issues:
+```console
+docker context ls
+docker context use default
+```
+- To reset Minikube:
+```console
+minikube delete
+```
+- followed by:
+```console
+minikube start
+```
+</details>
