@@ -17,6 +17,13 @@ GO_VERSION ?= 1.20
 
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
 
+## alternate between podman and docker as needed
+ifeq ($(shell command -v podman 2> /dev/null),)
+    CMD=$(CMD)
+else
+    CMD=podman
+endif
+
 all: binaries images ## Builds both binaries and images (default task)
 
 .PHONY: help
@@ -53,12 +60,12 @@ binaries: $(addprefix bin/,$(BINARIES)) ## Build bin/tornjak-backend and bin/tor
 
 bin/tornjak-backend: tornjak-backend/cmd/agent $(GO_FILES) | vendor ## Build tornjak-backend binary
 	# Build hack because of flake of imported go module
-	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:$(GO_VERSION) \
+	$(CMD) run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:$(GO_VERSION) \
 		/bin/sh -c "go build --tags 'sqlite_json' -o agent ./$</main.go; go build --tags 'sqlite_json' -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o $@ ./$</main.go"
 
 bin/tornjak-manager: tornjak-backend/cmd/manager $(GO_FILES) | vendor ## Build bin/tornjak-manager binary
 	# Build hack because of flake of imported go module
-	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:$(GO_VERSION) \
+	$(CMD) run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:$(GO_VERSION) \
 		/bin/sh -c "go build --tags 'sqlite_json' -o tornjak-manager ./$</main.go; go build --tags 'sqlite_json' -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o $@ ./$</main.go"
 
 frontend-local-build: ## Build tornjak-frontend
@@ -75,30 +82,30 @@ images: $(addprefix image-,$(IMAGES)) ## Build all images
 
 .PHONY: image-tornjak-backend
 image-tornjak-backend: bin/tornjak-backend ## Build image for bin/tornjak-backend 
-	docker build --no-cache -f Dockerfile.backend-container --build-arg version=$(VERSION) \
+	$(CMD) build --no-cache -f $(CMD)file.backend-container --build-arg version=$(VERSION) \
 		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_BACKEND_TAG):$(VERSION) .
 
 .PHONY: image-tornjak-manager
 image-tornjak-manager: bin/tornjak-manager ## Build image for bin/tornjak-manager 
-	docker build --no-cache -f Dockerfile.tornjak-manager --build-arg version=$(VERSION) \
+	$(CMD) build --no-cache -f $(CMD)file.tornjak-manager --build-arg version=$(VERSION) \
 		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_MANAGER_TAG):$(VERSION) .
 
 .PHONY: image-tornjak-frontend
 image-tornjak-frontend: ## Build image for tornjak-frontend 
-	docker build --no-cache -f Dockerfile.frontend-container --build-arg version=$(VERSION) \
+	$(CMD) build --no-cache -f $(CMD)file.frontend-container --build-arg version=$(VERSION) \
 		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_FRONTEND_TAG):$(VERSION) .
 
 .PHONY: image-tornjak
 image-tornjak: bin/tornjak-backend ## Build image for bin/tornjak-backend and tornjak-frontend bundled in single image
-	docker build --no-cache -f Dockerfile.tornjak-container --build-arg version=$(VERSION) \
+	$(CMD) build --no-cache -f $(CMD)file.tornjak-container --build-arg version=$(VERSION) \
 		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_TORNJAK_TAG):$(VERSION) .
 
 ##@ Run:
 
 .PHONY: compose-frontend
-compose-frontend: ## Run frontend using docker-compose
-	docker-compose -f docker-compose-frontend.yml up --build --force-recreate -d
-	docker tag tornjak-public_tornjak-frontend:latest $(CONTAINER_FRONTEND_TAG):$(VERSION)
+compose-frontend: ## Run frontend using $(CMD)-compose
+	$(CMD)-compose -f $(CMD)-compose-frontend.yml up --build --force-recreate -d
+	$(CMD) tag tornjak-public_tornjak-frontend:latest $(CONTAINER_FRONTEND_TAG):$(VERSION)
 
 ##@ Release:
 
@@ -107,24 +114,24 @@ release-images: $(addprefix release-,$(IMAGES)) ## Release all images
 
 .PHONY: release-tornjak-backend
 release-tornjak-backend: image-tornjak-backend ## Release tornjak-backend image
-	docker push $(CONTAINER_BACKEND_TAG):$(VERSION)
-	docker tag $(CONTAINER_BACKEND_TAG):$(VERSION) $(CONTAINER_BACKEND_TAG):$(GITHUB_SHA)
-	docker push $(CONTAINER_BACKEND_TAG):$(GITHUB_SHA)
+	$(CMD) push $(CONTAINER_BACKEND_TAG):$(VERSION)
+	$(CMD) tag $(CONTAINER_BACKEND_TAG):$(VERSION) $(CONTAINER_BACKEND_TAG):$(GITHUB_SHA)
+	$(CMD) push $(CONTAINER_BACKEND_TAG):$(GITHUB_SHA)
 
 .PHONY: release-tornjak-manager
 release-tornjak-manager: image-tornjak-manager ## Release tornjak-manager image
-	docker push $(CONTAINER_MANAGER_TAG):$(VERSION)
-	docker tag $(CONTAINER_MANAGER_TAG):$(VERSION) $(CONTAINER_MANAGER_TAG):$(GITHUB_SHA)
-	docker push $(CONTAINER_MANAGER_TAG):$(GITHUB_SHA)
+	$(CMD) push $(CONTAINER_MANAGER_TAG):$(VERSION)
+	$(CMD) tag $(CONTAINER_MANAGER_TAG):$(VERSION) $(CONTAINER_MANAGER_TAG):$(GITHUB_SHA)
+	$(CMD) push $(CONTAINER_MANAGER_TAG):$(GITHUB_SHA)
 
 .PHONY: release-tornjak-frontend
 release-tornjak-frontend: image-tornjak-frontend ## Release tornjak-frontend image
-	docker push $(CONTAINER_FRONTEND_TAG):$(VERSION)
-	docker tag $(CONTAINER_FRONTEND_TAG):$(VERSION) $(CONTAINER_FRONTEND_TAG):$(GITHUB_SHA)
-	docker push $(CONTAINER_FRONTEND_TAG):$(GITHUB_SHA)
+	$(CMD) push $(CONTAINER_FRONTEND_TAG):$(VERSION)
+	$(CMD) tag $(CONTAINER_FRONTEND_TAG):$(VERSION) $(CONTAINER_FRONTEND_TAG):$(GITHUB_SHA)
+	$(CMD) push $(CONTAINER_FRONTEND_TAG):$(GITHUB_SHA)
 
 .PHONY: release-tornjak
 release-tornjak: image-tornjak ## Release tornjak image (bundling frontend and backend)
-	docker push $(CONTAINER_TORNJAK_TAG):$(VERSION)
-	docker tag $(CONTAINER_TORNJAK_TAG):$(VERSION) $(CONTAINER_TORNJAK_TAG):$(GITHUB_SHA)
-	docker push $(CONTAINER_TORNJAK_TAG):$(GITHUB_SHA)
+	$(CMD) push $(CONTAINER_TORNJAK_TAG):$(VERSION)
+	$(CMD) tag $(CONTAINER_TORNJAK_TAG):$(VERSION) $(CONTAINER_TORNJAK_TAG):$(GITHUB_SHA)
+	$(CMD) push $(CONTAINER_TORNJAK_TAG):$(GITHUB_SHA)
