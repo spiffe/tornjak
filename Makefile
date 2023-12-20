@@ -28,7 +28,7 @@ ifeq ($(shell command -v podman 2> /dev/null),)
     COMPOSE=docker-compose
 else
     DOCKER=podman
-	COMPOSE="podman compose"
+    COMPOSE="podman compose"
 endif
 
 all: binaries images ## Builds both binaries and images (default task)
