@@ -98,9 +98,10 @@ image-tornjak-manager: bin/tornjak-manager ## Build image for bin/tornjak-manage
 		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_MANAGER_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) .
 
 .PHONY: image-tornjak-frontend
-image-tornjak-frontend: ## Build image for tornjak-frontend 
-	$(DOCKER) build --no-cache -f $(DOCKERFILE_FRONTEND) --build-arg version=$(VERSION) \
+image-tornjak-frontend: ## Build image for tornjak-frontend
+	$(DOCKER) build --no-cache --ulimit nofile=65535:65535 -f $(DOCKERFILE_FRONTEND) --build-arg version=$(VERSION) \
 		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) .
+## ulimit is required to eliminate podman error: "EMFILE: too many open files"
 
 ##@ Run:
 

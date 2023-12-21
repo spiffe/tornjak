@@ -20,32 +20,49 @@ Otherwise, you can follow instructions below to build Tornjak images.
 ## Build Requirements
 
 In order to build, we require the following installations:
-- [Docker](https://docs.docker.com/engine/install/) for the backend build
+
+- [docker](https://docs.docker.com/engine/install/) or [podman](https://podman.io/) for the backend build
 - [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for the frontend build if running locally
 - [Golang](https://go.dev/doc/install) is required if you would like to run the Go backends locally
 
 ## Building Executables and Images
 
+When using `podman` please extend the default resources in order to successfully build 
+Tornjak images.
+
+```console
+podman machine init
+podman machine set --cpus 4 --memory 4096
+podman machine start
+```
+
 Building Tornjak manually can be done with the Makefile. Notable make targets follow:
+
 - `make bin/tornjak-backend`: makes the Go executable of the Tornjak backend
 - `make bin/tornjak-manager`: makes the Go executable of the Tornjak manager
 - `make frontend-local-build`: makes the optimized ReactJS app locally for the Tornjak frontend. Uses environment variable configuration as in tornjak-frontend/.env
-- `make image-tornjak-backend`: containerizes Go executable of the Tornjak backend
-- `make image-tornjak-manager`:containerizes Go executable of the Tornjak manager
-- `make image-tornjak-frontend`: containerizes React JS app for the Tornjak frontend
-- `make image-tornjak`: containerizes Tornjak backend with Tornjak frontend
+- `make image-tornjak-backend`: builds image for the Tornjak backend
+- `make image-tornjak-manager`: builds image for the Tornjak manager
+- `make image-tornjak-frontend`: builds image for the Tornjak frontend
+- `make images`: builds all the above images
+- `make compose-frontend`: runs the Tornjak frontend using Docker or Podman compose
+- `make release-tornjak-backend`: publish the Tornjak backend image
+- `make release-tornjak-frontend`: publish the Tornjak frontend image
+- `make release-tornjak-manager`: publish the Tornjak manager image
+- `make release-images`: publish all the above images
 
 For usage instructions of the containers, please see our [USAGE document](./USAGE.md) to get started.
 
 ## Development
 
-We welcome all development attempst and contributions from the community. The easiest place to start is by reviewing our code architecture diagrams available in our [api documentation](./docs/tornjak-ui-api-documentation.md#11-overview).
+We welcome all development attempts and contributions from the community. The easiest place to start is by reviewing our code architecture diagrams available in our [api documentation](./docs/tornjak-ui-api-documentation.md#11-overview).
 
 ## Local testing
 
 We highly recommend starting with our [quickstart tutorial](docs/quickstart/README.md), using official images and preset configs before development. This tutorial creates a local instance of SPIRE on Minikube, adds Tornjak server, and runs a UI. 
 
 Additionally, one may test out several other features including the following:
+
 - [Running the Frontend Locally](#running-the-frontend-locally)
 - [Running the Backend Locally](#running-the-backend-locally)
 - [Running the Tornjak Manager Locally](#running-the-tornjak-manager)
@@ -79,7 +96,7 @@ Note, the above command will print out usage documentation for the server. Pleas
 
 You may run the uncontainerized Tornjak manager by locally running the following:
 
-```
+```console
 go run tornjak-backend/cmd/manager/manager.go
 ```
 
@@ -87,7 +104,7 @@ which starts listening on port 50000.
 
 To start the manager UI, run:
 
-```
+```console
 REACT_APP_API_SERVER_URI=http://localhost:50000/
 REACT_APP_TORNJAK_MANAGER=true npm start
 ```
