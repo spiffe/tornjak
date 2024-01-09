@@ -15,6 +15,7 @@ COPY --from=build /usr/src/app/.env.prod .
 RUN npm install -g npm@9.7.1 && \
     npm install --location=global serve && \
     npm install react-inject-env
+RUN mkdir build/tmp
     
 # Set dynamic port, defualt 3000
 ENV PORT_FE=3000
