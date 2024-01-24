@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { Tabs, Tab } from 'carbon-components-react';
+import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
 import ClusterCreate from './cluster-create';
 import ClusterEdit from './cluster-edit';
 import { connect } from 'react-redux';
@@ -25,7 +25,6 @@ import {
 } from './types'
 import { toast } from 'react-toastify';
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
-
 type ClusterManagementProp = {
   // tornjak server debug info of the selected server
   globalDebugServerInfo: DebugServerInfo,
@@ -37,7 +36,7 @@ type ClusterManagementProp = {
   tornjakServerInfoUpdateFunc: (globalTornjakServerInfo: TornjakServerInfo) => void,
   // dispatches a payload for the server trust domain and nodeAttestorPlugin as a ServerInfoType and has a return type of void
   serverInfoUpdateFunc: (globalServerInfo: ServerInfo) => void,
-  // the selected server for manager mode 
+  // the selected server for manager mode
   globalServerSelected: string,
   // error/ success messege returned for a specific function
   globalErrorMessage: string,
@@ -50,7 +49,6 @@ type ClusterManagementProp = {
   // list of available agents as array of AgentsListType
   globalAgentsList: AgentsList[],
 }
-
 type ClusterManagementState = {
   clusterTypeList: string[],
   agentsList: AgentLabels[],
@@ -73,7 +71,6 @@ class ClusterManagement extends Component<ClusterManagementProp, ClusterManageme
       selectedServer: "",
     }
   }
-
   componentDidMount() {
     if (IsManager) {
       if (this.props.globalServerSelected !== "" && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
@@ -91,7 +88,6 @@ class ClusterManagement extends Component<ClusterManagementProp, ClusterManageme
       this.prepareAgentsList();
     }
   }
-
   componentDidUpdate(prevProps: ClusterManagementProp, prevState: ClusterManagementState) {
     if (IsManager) {
       if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
@@ -106,7 +102,6 @@ class ClusterManagement extends Component<ClusterManagementProp, ClusterManageme
       }
     }
   }
-
   prepareClusterTypeList(): void {
     // user prefered option
     let localClusterTypeList = [this.state.clusterTypeManualEntryOption]
@@ -114,9 +109,8 @@ class ClusterManagement extends Component<ClusterManagementProp, ClusterManageme
     for (let i = 0; i < this.props.globalClusterTypeInfo.length; i++) {
       localClusterTypeList.push(this.props.globalClusterTypeInfo[i])
     }
-    this.setState({clusterTypeList: localClusterTypeList})
+    this.setState({ clusterTypeList: localClusterTypeList })
   }
-
   prepareAgentsList(): void {
     var prefix = "spiffe://";
     let localAgentsIdList: AgentLabels[] = [];
@@ -132,42 +126,49 @@ class ClusterManagement extends Component<ClusterManagementProp, ClusterManageme
       agentsList: localAgentsIdList,
     });
   }
-
   handleTabSelect(): void {
     toast.dismiss()
   }
-
   render() {
     return (
       <div className="cluster-management-tabs" data-test="cluster-management">
-        <Tabs scrollIntoView={false}>
-          <Tab 
-            className="cluster-management-tab1"
-            id="tab-1"
-            label="Create Cluster"
-            onClick={this.handleTabSelect}
-          >
-            <ClusterCreate
-              clusterTypeList={this.state.clusterTypeList}
-              agentsList={this.state.agentsList}
-            />
-          </Tab>
-          <Tab
-            id="tab-2"
-            label="Edit Cluster"
-            onClick={this.handleTabSelect}
-          >
-            <ClusterEdit
-              clusterTypeList={this.state.clusterTypeList}
-              agentsList={this.state.agentsList}
-            />
-          </Tab>
+        <Tabs>
+          <TabList aria-label='hi'>
+            <Tab
+              className="cluster-management-tab1"
+              id="tab-1"
+              // label="Create Cluster"
+              onClick={this.handleTabSelect}
+            >
+              Create Cluster
+            </Tab>
+            <Tab
+              id="tab-2"
+              // label="Edit Cluster"
+              onClick={this.handleTabSelect}
+            >
+              Edit Cluster
+            </Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <ClusterCreate
+                clusterTypeList={this.state.clusterTypeList}
+                agentsList={this.state.agentsList}
+              />
+            </TabPanel>
+            <TabPanel>
+              <ClusterEdit
+                clusterTypeList={this.state.clusterTypeList}
+                agentsList={this.state.agentsList}
+              />
+            </TabPanel>
+          </TabPanels>
         </Tabs>
       </div>
     )
   }
 }
-
 // Note: Needed for UI testing - will be removed after
 // ClusterManagement.propTypes = {
 //   globalClusterTypeInfo: PropTypes.array,
@@ -184,7 +185,6 @@ class ClusterManagement extends Component<ClusterManagementProp, ClusterManageme
 //   selectorInfoFunc: PropTypes.func,
 //   tornjakMessageFunc: PropTypes.func,
 // };
-
 const mapStateToProps = (state: RootState) => ({
   globalClusterTypeInfo: state.clusters.globalClusterTypeInfo,
   globalServerSelected: state.servers.globalServerSelected,
@@ -194,10 +194,8 @@ const mapStateToProps = (state: RootState) => ({
   globalErrorMessage: state.tornjak.globalErrorMessage,
   globalDebugServerInfo: state.servers.globalDebugServerInfo,
 })
-
 export default connect(
   mapStateToProps,
   { clusterTypeInfoFunc, serverSelectedFunc, selectorInfoFunc, agentsListUpdateFunc, tornjakMessageFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc }
 )(ClusterManagement)
-
 export { ClusterManagement }
