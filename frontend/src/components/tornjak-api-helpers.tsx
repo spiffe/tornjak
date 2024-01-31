@@ -238,8 +238,8 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
         }
       })
       .catch((error) => {
-          showResponseToast(error, { caption: "Could not populate local tornjak server info." })
-          tornjakMessageFunc(error.response.statusText)
+        showResponseToast(error, { caption: "Could not populate local tornjak server info." })
+        tornjakMessageFunc(error.response.statusText)
       })
   }
 
@@ -368,7 +368,39 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       })
   }
 
-}
+  // clusterDelete - returns success message after successful deletion of a cluster in manager mode
+  async clusterDelete(serverName: string, inputData: { cluster: { name: string; }; }, clustersListUpdateFunc: { (globalClustersList: ClustersList[]): void }, globalClustersList: any[]) {
+    const response = await axios.post(GetApiServerUri("/manager-api/tornjak/clusters/delete/") + serverName, inputData,
+      {
+        crossdomain: true,
+      })
+      .then(function (response) {
+        clustersListUpdateFunc(globalClustersList.filter(el =>
+          el.name !== inputData))
+        return response.data;
+      })
+      .catch(function (error) {
+        return error.message;
+      })
+    return response.data;
+  }
 
+  // localClusterDelete - returns success message after successful deletion of a cluster in Local mode for the server
+  async localClusterDelete(inputData: { cluster: { name: string; }; }, clustersListUpdateFunc: { (globalClustersList: ClustersList[]): void }, globalClustersList: any[]) {
+    const response = await axios.post(GetApiServerUri("/api/tornjak/clusters/delete"), inputData,
+      {
+        crossdomain: true,
+      })
+      .then(function (response) {
+        clustersListUpdateFunc(globalClustersList.filter(el =>
+          el.name !== inputData))
+        return response.data;
+      })
+      .catch(function (error) {
+        return error.message;
+      })
+    return response;
+  }
+}
 
 export default TornjakApi;

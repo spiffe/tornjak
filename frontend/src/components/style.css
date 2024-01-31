@@ -418,3 +418,11 @@
 .spire-health-helper {
   color: rgb(252, 252, 252);
 }
+
+.edit-cluster-button {
+  display: inline-block;
+}
+.delete-cluster-button {
+  width: 180px;
+  float: right;
+}
