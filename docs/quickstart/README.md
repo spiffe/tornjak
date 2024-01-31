@@ -123,142 +123,11 @@ Additionally, we have sample server-statefulset files in the directory `server-s
 
 Depending on your use case, you can deploy Tornjak in different configurations. Note we have deprecated support of the use case where parts of Tornjak run on the same container as SPIRE. 
 
-Currently, we support two deployment schemes: 
+Currently, we support the following deployment scheme: 
 
-1. Only the Tornjak backend (to make Tornjak API calls)  is run as a separate container on the same pod that exposes only one port (to communicate with the Tornjak backend). It requires more deployment steps to deploy or use the frontend. However, this deployment type is fully-supported, has a smaller sidecar image without the frontend components, and ensures that the frontend and backend share no memory. 
-2. The Tornjak frontend (UI) and backend run in the same container that exposes two separate ports (one frontend and one backend). This is useful for getting started with Tornjak with minimal deployment steps. 
+1. Only the Tornjak backend (to make Tornjak API calls)  is run as a separate container on the same pod that exposes only one port (to communicate with the Tornjak backend). This deployment type is fully-supported, has a smaller sidecar image without the frontend components, and ensures that the frontend and backend share no memory. 
 
-Choose one of the below to easily copy in the right server-statefulset file for you. 
-
-<details><summary><b> 🔴 [Click] For the deployment of the Tornjak backend (API) and frontend (UI) (our default deployment recommended to those getting started) </b></summary>
-
-This has the same architecture as deploying with just a Tornjak backend, but with an additional Tornjak frontend process deployed in the same container. This will expose two ports: one for the frontend and one for the backend. 
-
-There is an additional requirement to mount the SPIRE server socket and make it accessible to the Tornjak backend container. 
-
-The relevant file is called `tornjak-sidecar-server-statefulset.yaml` within the examples directory.  Please copy to the relevant file as follows:
-
-```console
-cp server-statefulset-examples/tornjak-sidecar-server-statefulset.yaml server-statefulset.yaml
-```
-
-The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines:
-
-```console
-cat server-statefulset.yaml 
-```
-
-```
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: spire-server
-  namespace: spire
-  labels:
-    app: spire-server
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: spire-server
-  serviceName: spire-server
-  template:
-    metadata:
-      namespace: spire
-      labels:
-        app: spire-server
-    spec:
-      serviceAccountName: spire-server
-      containers:
-        - name: spire-server
-          image: ghcr.io/spiffe/spire-server:1.4.4
-          args:
-            - -config
-            - /run/spire/config/server.conf
-          ports:
-            - containerPort: 8081
-          volumeMounts:
-            - name: spire-config
-              mountPath: /run/spire/config
-              readOnly: true
-            - name: spire-data
-              mountPath: /run/spire/data
-              readOnly: false
-            - name: socket                         # 👈 ADDITIONAL VOLUME
-              mountPath: /tmp/spire-server/private # 👈 ADDITIONAL VOLUME
-          livenessProbe:
-            httpGet:
-              path: /live
-              port: 8080
-            failureThreshold: 2
-            initialDelaySeconds: 15
-            periodSeconds: 60
-            timeoutSeconds: 3
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 5
-        ### 👈 BEGIN ADDITIONAL CONTAINER ###
-        - name: tornjak
-          image: ghcr.io/spiffe/tornjak:latest
-          imagePullPolicy: Always
-          args:
-            - -config
-            - /run/spire/config/server.conf
-            - -tornjak-config
-            - /run/spire/tornjak-config/server.conf
-          env: 
-            - name: REACT_APP_API_SERVER_URI
-              value: http://localhost:10000
-            - name: NODE_OPTIONS
-              value: --openssl-legacy-provider
-          ports:
-            - containerPort: 8081
-          volumeMounts:
-            - name: spire-config
-              mountPath: /run/spire/config
-              readOnly: true
-            - name: tornjak-config
-              mountPath: /run/spire/tornjak-config
-              readOnly: true
-            - name: spire-data
-              mountPath: /run/spire/data
-              readOnly: false
-            - name: socket
-              mountPath: /tmp/spire-server/private
-        ### 👈 END ADDITIONAL CONTAINER ###
-      volumes:
-        - name: spire-config
-          configMap:
-            name: spire-server
-        - name: tornjak-config  # 👈 ADDITIONAL VOLUME
-          configMap:            # 👈 ADDITIONAL VOLUME
-            name: tornjak-agent # 👈 ADDITIONAL VOLUME
-        - name: socket          # 👈 ADDITIONAL VOLUME
-          emptyDir: {}          # 👈 ADDITIONAL VOLUME
-  volumeClaimTemplates:
-    - metadata:
-        name: spire-data
-        namespace: spire
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 1Gi
-``` 
-
-Note that there are three key differences in the StatefulSet file from that in the SPIRE quickstart:
-
-1. There is a new container in the pod named `tornjak`. 
-   1. This container uses environment variables to configure the Frontend. 
-   1. This container uses arguments to pass arguments to the Backend. 
-2. We create a volume named tornjak-config that reads from the ConfigMap `tornjak-agent`. 
-3. We create a volume named `test-socket` so that the containers may communicate
-
-</details>
+Using the option below, easily copy in the right server-statefulset file. 
 
 <details><summary><b> 🔴 [Click] For the deployment of only the Tornjak backend (API)</b></summary>
 
@@ -584,20 +453,6 @@ This output represents the backend response. Now you should be able to make Torn
 Make sure that the backend is accessible from your browser at `http://localhost:10000`, as above, or the frontend will not work. 
 
 If you chose to deploy Tornjak with the UI, connecting to the UI is very simple. Otherwise, you can always run the UI locally and connect. See the two choices below:
-
-<details><summary> <b> 🔴 [Click] Connect to the Tornjak frontend that is deployed on Minikube </b></summary>
-
-Note that if you chose to deploy the Tornjak image that includes the frontend component, you only need to execute the following command to enable access to the frontend that is already running:
-
-```console
-kubectl -n spire port-forward spire-server-0 3000:3000
-```
-
-```
-Forwarding from 127.0.0.1:3000 -> 3000
-Forwarding from [::1]:3000 -> 3000
-```
-</details>
 
 <details><summary><b> 🔴 [Click] Run the Tornjak frontend locally</b></summary>
 
