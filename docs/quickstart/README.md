@@ -111,7 +111,7 @@ Currently, we support the following deployment scheme:
 
 1. Only the Tornjak backend (to make Tornjak API calls)  is run as a separate container on the same pod that exposes only one port (to communicate with the Tornjak backend). This deployment type is fully-supported, has a smaller sidecar image without the frontend components, and ensures that the frontend and backend share no memory. 
 
-Choose one of the below to easily copy in the right server-statefulset file for you. 
+Using the option below, easily copy in the right server-statefulset file. 
 
 <details><summary><b> 🔴 [Click] For the deployment of only the Tornjak backend (API)</b></summary>
 
