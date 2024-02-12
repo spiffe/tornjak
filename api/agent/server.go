@@ -771,6 +771,9 @@ func NewAuth(authPlugin *ast.ObjectItem) (auth.Auth, error) {
 			return nil, errors.Errorf("Couldn't parse Auth config: %v", err)
 		}
 
+		// TODO parsing authorization config
+		fmt.Println(config.AuthConfig.Name)
+
 		// create verifier TODO make json an option?
 		verifier, err := auth.NewKeycloakVerifier(true, config.JwksURL, config.RedirectURL)
 		if err != nil {
