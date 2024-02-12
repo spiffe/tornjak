@@ -97,7 +97,24 @@ type pluginDataStoreSQL struct {
 	Filename   string `json:"filename"`
 }
 
+type AuthRole struct {
+	Name string `hcl:"name,label"`
+	Desc string `hcl:"desc"`
+}
+
+type APIRoleMapping struct {
+	Name string `hcl:"name,label"`
+	AllowedRoles []string `hcl:"allowed_roles"`
+}
+
+type AuthConfig struct {
+	Name string `hcl:"name,label"`
+	AuthRoleList []AuthRole `hcl:"role,block"`
+	AuthAPIRoleMappings []APIRoleMapping `hcl:"API,block"`
+}
+
 type pluginAuthKeycloak struct {
-	JwksURL     string
-	RedirectURL string
+	JwksURL     string `hcl:"jwksURL"`
+	RedirectURL string `hcl:"redirectURL"`
+	AuthConfig  AuthConfig `hcl:"authorization"`
 }
