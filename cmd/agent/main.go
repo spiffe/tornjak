@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -9,7 +8,6 @@ import (
 
 	"github.com/hashicorp/hcl"
 	"github.com/pkg/errors"
-	"github.com/spiffe/spire/cmd/spire-server/cli/run"
 	"github.com/spiffe/spire/pkg/common/catalog"
 	agentapi "github.com/spiffe/tornjak/api/agent"
 	"github.com/urfave/cli/v2"
@@ -78,13 +76,11 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 	spire_config_file := opt.genericOptions.spireFile
 	var serverInfo = agentapi.TornjakSpireServerInfo{}
 	if spire_config_file != "" { // SPIRE config given
-		config, err := run.ParseFile(spire_config_file, false)
+		configData, err := getConfigString(spire_config_file, false)
 		if err != nil {
-			// Hide internal error since it is specific to arguments of originating library
-			// i.e. asks to set -config which is different flag in Tornjak
-			return errors.New("Unable to parse the config file provided")
+			return errors.Errorf("Could not find given SPIRE Config file: %v", err)
 		}
-		serverInfo, err = GetServerInfo(config)
+		serverInfo, err = GetServerInfo(configData)
 		if err != nil {
 			log.Fatalf("Error: %v", err)
 		}
@@ -121,7 +117,14 @@ func runTornjakCmd(cmd string, opt cliOptions) error {
 
 }
 
-func GetServerInfo(config *agentapi.SPIREConfig) (agentapi.TornjakSpireServerInfo, error) {
+func GetServerInfo(configData string) (agentapi.TornjakSpireServerInfo, error) {
+	// we extract TrustDomain and Plugin Info
+	config, err := parseSPIREConfig(configData)
+	if err != nil {
+		return agentapi.TornjakSpireServerInfo{}, errors.Errorf("Could not parse SPIRE Config: %v", err)
+	}
+
+
 	if config.Plugins == nil {
 		return agentapi.TornjakSpireServerInfo{}, errors.New("config plugins map should not be nil")
 	}
@@ -142,8 +145,7 @@ func GetServerInfo(config *agentapi.SPIREConfig) (agentapi.TornjakSpireServerInf
 
 	serverInfo += "\n\n"
 	serverInfo += "Server Info"
-	s, _ := json.MarshalIndent(config.Server, "", "\t")
-	serverInfo += string(s)
+	serverInfo += configData
 
 	return agentapi.TornjakSpireServerInfo{
 		Plugins:       pluginMap,
@@ -163,13 +165,13 @@ func getConfigString(path string, expandEnv bool) (string, error) {
 		if os.IsNotExist(err) {
 			absPath, err := filepath.Abs(path)
 			if err != nil {
-				msg := "could not determine CWD; tornjak config file not found at %s: use -tornjak-config"
+				msg := "could not determine CWD; config file not found at %s"
 				return "", fmt.Errorf(msg, path)
 			}
-			msg := "could not find tornjak config file %s: please use the -tornjak-config flag"
+			msg := "could not find config file %s"
 			return "", fmt.Errorf(msg, absPath)
 		}
-		return "", fmt.Errorf("unable to read tornjak configuration at %q: %w", path, err)
+		return "", fmt.Errorf("unable to read configuration file at %q: %w", path, err)
 	}
 	data := string(byteData)
 
@@ -181,24 +183,13 @@ func getConfigString(path string, expandEnv bool) (string, error) {
 	return data, nil
 }
 
-// this is equivalent to spire/cmd/spire-server/cli/run run.ParseFile
-// however, we use our own returned Config type to extract information
-// needed by the frontend
-func parseSPIREConfig(path string, expandEnv bool) (*agentapi.SPIREConfig, error) {
+// we use our own returned SPIRE Config type to extract information
+// needed specifically by the frontend
+func parseSPIREConfig(data string) (*agentapi.SPIREConfig, error) {
 	c := &agentapi.SPIREConfig{}
 
-	if path == "" {
-		return nil, nil
-	}
-
-	// friendly error if file is missing
-	data, err := getConfigString(path, expandEnv)
-	if err != nil {
-		return nil, err
-	}
-
 	if err := hcl.Decode(&c, data); err != nil {
-		return nil, fmt.Errorf("unable to decode tornjak configuration at %q: %w", path, err)
+		return nil, fmt.Errorf("unable to decode SPIRE configuration: %w", err)
 	}
 
 	return c, nil

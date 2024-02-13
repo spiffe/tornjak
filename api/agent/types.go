@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/hashicorp/hcl/hcl/ast"
-	"github.com/spiffe/spire/cmd/spire-server/cli/run"
 )
 
 // TornjakServerInfo provides insight into the configuration of the SPIRE server
@@ -21,9 +20,15 @@ type TornjakSpireServerInfo struct {
 	VerboseConfig string `json:"verboseConfig"`
 }
 
+// pared down version of full Server Config type spire/cmd/spire-server/cli/run
+// we curently need only extract the trust domain
+type SpireServerConfig struct {
+	TrustDomain string `hcl:"trust_domain"`
+}
+
 type SPIREConfig struct {
-	Server  *run.serverConfig
-	Plugins ast.Node
+	Server *SpireServerConfig `hcl:"server"`
+	Plugins ast.Node `hcl:"plugins"`
 }
 
 type TornjakConfig struct {
