@@ -109,12 +109,12 @@ type APIRoleMapping struct {
 
 type AuthConfig struct {
 	Name string `hcl:"name,label"`
-	AuthRoleList []AuthRole `hcl:"role,block"`
-	AuthAPIRoleMappings []APIRoleMapping `hcl:"API,block"`
+	AuthRoleList []*AuthRole `hcl:"role,block"`
+	AuthAPIRoleMappings []*APIRoleMapping `hcl:"API,block"`
 }
 
 type pluginAuthKeycloak struct {
 	JwksURL     string `hcl:"jwksURL"`
 	RedirectURL string `hcl:"redirectURL"`
-	AuthConfig  AuthConfig `hcl:"authorization"`
+	AuthConfig  *AuthConfig `hcl:"authorization,block"`
 }

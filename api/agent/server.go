@@ -772,7 +772,7 @@ func NewAuth(authPlugin *ast.ObjectItem) (auth.Auth, error) {
 		}
 
 		// TODO parsing authorization config
-		fmt.Println(config.AuthConfig.Name)
+		fmt.Printf("KEYCLOAK AUTHCONFIG NAME: %s\n", config.AuthConfig.Name)
 
 		// create verifier TODO make json an option?
 		verifier, err := auth.NewKeycloakVerifier(true, config.JwksURL, config.RedirectURL)
