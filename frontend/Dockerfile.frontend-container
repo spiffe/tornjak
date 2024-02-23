@@ -31,7 +31,7 @@ LABEL org.opencontainers.image.description="Tornjak frontend ($version) Alpine b
       org.opencontainers.image.source="https://github.com/spiffe/tornjak" \
       org.opencontainers.image.documentation="https://github.com/spiffe/tornjak/tree/main/docs"
 # additional labels
-LABEL architecture="amd64" \
+LABEL architecture="amd64,arm64" \
       build-date="" \
       description="Tornjak Frontend" \ 
       io.k8s.description="Tornjak Frontend" \

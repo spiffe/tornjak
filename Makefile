@@ -22,6 +22,9 @@ GO_VERSION ?= 1.20
 
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
 
+## multiarch images
+PLATFORMS ?= linux/amd64,linux/arm64
+
 all: binaries images ## Builds both binaries and images (default task)
 
 .PHONY: help
@@ -90,7 +93,9 @@ image-tornjak-manager: bin/tornjak-manager ## Build image for bin/tornjak-manage
 
 .PHONY: image-tornjak-frontend
 image-tornjak-frontend: ## Build image for tornjak-frontend 
-	docker build --no-cache -f $(DOCKERFILE_FRONTEND) --build-arg version=$(VERSION) \
+	docker buildx create --platform $(PLATFORMS) --name multi-platform --node multi-platform0 --driver docker-container --use
+	docker buildx build --no-cache -f $(DOCKERFILE_FRONTEND) --build-arg version=$(VERSION) \
+		--platform $(PLATFORMS) \
 		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) .
 
 ##@ Run:
