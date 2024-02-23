@@ -94,7 +94,7 @@ image-tornjak-manager: bin/tornjak-manager ## Build image for bin/tornjak-manage
 .PHONY: image-tornjak-frontend
 image-tornjak-frontend: ## Build image for tornjak-frontend 
 	docker buildx create --platform $(PLATFORMS) --name multi-platform --node multi-platform0 --driver docker-container --use
-	docker buildx build --no-cache -f $(DOCKERFILE_FRONTEND) --build-arg version=$(VERSION) \
+	docker buildx build --no-cache --load -f $(DOCKERFILE_FRONTEND) --build-arg version=$(VERSION) \
 		--platform $(PLATFORMS) \
 		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) .
 
