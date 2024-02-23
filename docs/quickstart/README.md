@@ -24,7 +24,7 @@ Contents
 ## Step 0: Prerequisite 
 
 Before you begin this tutorial, make sure you have the following:
-- Minikube: Version 1.12.0 or later. [Download Minikube.](https://docs.docker.com/get-docker/)
+- Minikube: Version 1.12.0 or later. [Download Minikube.](https://minikube.sigs.k8s.io/docs/start/)
 - Docker: Version 20.10.23 or later. [Install Docker.](https://docs.docker.com/get-docker/)
 
 Note: While we have tested this tutorial with the versions below, newer versions should also work. Ensure you're using the most recent stable releases to avoid compatibility issues.
