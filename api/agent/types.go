@@ -20,6 +20,17 @@ type TornjakSpireServerInfo struct {
 	VerboseConfig string `json:"verboseConfig"`
 }
 
+// pared down version of full Server Config type spire/cmd/spire-server/cli/run
+// we curently need only extract the trust domain
+type SpireServerConfig struct {
+	TrustDomain string `hcl:"trust_domain"`
+}
+
+type SPIREConfig struct {
+	Server *SpireServerConfig `hcl:"server"`
+	Plugins ast.Node `hcl:"plugins"`
+}
+
 type TornjakConfig struct {
 	Server  *serverConfig `hcl:"server"`
 	Plugins *ast.Node     `hcl:"plugins"`
