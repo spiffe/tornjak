@@ -94,9 +94,9 @@ image-tornjak-manager: bin/tornjak-manager ## Build image for bin/tornjak-manage
 .PHONY: image-tornjak-frontend
 image-tornjak-frontend: ## Build image for tornjak-frontend 
 	docker buildx create --platform $(PLATFORMS) --name multi-platform --node multi-platform0 --driver docker-container --use
-	docker buildx build --no-cache --load -f $(DOCKERFILE_FRONTEND) --build-arg version=$(VERSION) \
+	docker buildx build --no-cache --push -f $(DOCKERFILE_FRONTEND) --build-arg version=$(VERSION) \
 		--platform $(PLATFORMS) \
-		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) .
+		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) -t $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA) .
 
 ##@ Run:
 
@@ -124,6 +124,6 @@ release-tornjak-manager: image-tornjak-manager ## Release tornjak-manager image
 
 .PHONY: release-tornjak-frontend
 release-tornjak-frontend: image-tornjak-frontend ## Release tornjak-frontend image
-	docker push $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION)
-	docker tag $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
-	docker push $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
+#	docker push $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION)
+#	docker tag $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
+#	docker push $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
