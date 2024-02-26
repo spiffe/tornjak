@@ -65,7 +65,7 @@ jobs:
       - name: Set release repo
         run: echo "REPO=ghcr.io/${{ github.repository_owner }}" >> $GITHUB_ENV
 
-      # build and push images tagged with GITHUB_SHA, version, and latest
+      # build and push images tagged with GITHUB_SHA, version
       - name: Build and push tornjak images
         run: make release-images
 
