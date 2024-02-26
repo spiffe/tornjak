@@ -93,9 +93,7 @@ image-tornjak-manager: bin/tornjak-manager ## Build image for bin/tornjak-manage
 
 .PHONY: image-tornjak-frontend
 image-tornjak-frontend: ## Build image for tornjak-frontend 
-	docker buildx create --platform $(PLATFORMS) --name multi-platform --node multi-platform0 --driver docker-container --use
-	docker buildx build --no-cache -f $(DOCKERFILE_FRONTEND) --build-arg version=$(VERSION) \
-		--platform $(PLATFORMS) \
+	docker build --no-cache -f $(DOCKERFILE_FRONTEND) --build-arg version=$(VERSION) \
 		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) .
 
 ##@ Run:
@@ -122,8 +120,22 @@ release-tornjak-manager: image-tornjak-manager ## Release tornjak-manager image
 	docker tag $(CONTAINER_MANAGER_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) $(CONTAINER_MANAGER_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
 	docker push $(CONTAINER_MANAGER_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
 
+#.PHONY: release-tornjak-frontend
+#release-tornjak-frontend: image-tornjak-frontend ## Release tornjak-frontend image
+#	docker push $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION)
+#	docker tag $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
+#	docker push $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
+
+
+.PHONY: multiarch-container-builder
+multiarch-container-builder:
+	docker buildx create --platform $(PLATFORMS) --name multi-platform --node multi-platform0 --driver docker-container --use
+
+
 .PHONY: release-tornjak-frontend
-release-tornjak-frontend: image-tornjak-frontend ## Release tornjak-frontend image
-	docker push $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION)
-	docker tag $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
-	docker push $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
+release-tornjak-frontend: multiarch-container-builder
+	docker buildx build --no-cache -f $(DOCKERFILE_FRONTEND) --build-arg version=$(VERSION) \
+		--platform $(PLATFORMS) --push \
+		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) -t $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA) .
+
+
