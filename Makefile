@@ -82,7 +82,7 @@ frontend-local-build: ## Build tornjak-frontend
 images: $(addprefix image-,$(IMAGES)) ## Build all images
 
 .PHONY: image-tornjak-backend
-image-tornjak-backend: bin/tornjak-backend ## Build image for bin/tornjak-backend 
+image-tornjak-backend: ## Build image for bin/tornjak-backend 
 	docker build --no-cache -f $(DOCKERFILE_BACKEND) --build-arg version=$(VERSION) \
 		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_BACKEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) .
 

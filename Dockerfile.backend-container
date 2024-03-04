@@ -1,4 +1,16 @@
-FROM alpine
+FROM golang:1.20-alpine3.18 AS builder
+RUN apk add build-base
+COPY . /usr/src/myapp
+WORKDIR /usr/src/myapp
+ENV GOOS=linux
+ENV GOARCH=amd64
+ENV CGO_ENABLED=1
+
+RUN go mod download
+RUN go build --tags 'sqlite_json' -o agent ./cmd/agent/main.go
+RUN go build --tags 'sqlite_json' -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o bin/tornjak-backend ./cmd/agent/main.go
+
+FROM alpine AS runtime
 RUN mkdir -p /opt/spire
 
 WORKDIR /opt/spire
@@ -6,7 +18,7 @@ ENTRYPOINT ["/opt/spire/run_backend.sh"]
 
 # Add init
 COPY scripts/run_backend.sh run_backend.sh
-COPY bin/tornjak-backend tornjak-backend
+COPY --from=builder /usr/src/myapp/bin/tornjak-backend tornjak-backend
 
 # add a version link to the image description
 ARG version
