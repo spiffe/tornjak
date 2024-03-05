@@ -1,4 +1,23 @@
-FROM registry.access.redhat.com/ubi8-micro:latest
+# xx is helper for cross-compilation
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.3.0 AS xx
+
+FROM --platform=$BUILDPLATFORM golang:1.20-alpine3.18 AS builder
+RUN apk add build-base
+COPY . /usr/src/myapp
+WORKDIR /usr/src/myapp
+COPY --link --from=xx / /
+ARG TARGETOS
+ARG TARGETARCH
+ENV CGO_ENABLED=1
+
+RUN apk add clang lld
+RUN go mod download
+RUN xx-go --wrap
+RUN xx-apk add musl-dev gcc
+RUN if [ "$TARGETARCH" = "arm64" ]; then CC=aarch64-alpine-linux-musl; fi && \
+    go build --tags 'sqlite_json' -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o bin/tornjak-backend ./cmd/agent/main.go
+
+FROM registry.access.redhat.com/ubi8-micro:latest AS runtime
 RUN mkdir -p /opt/spire
 
 WORKDIR /opt/spire
@@ -6,7 +25,7 @@ ENTRYPOINT ["/opt/spire/run_backend.sh"]
 
 # Add init
 COPY scripts/run_backend.sh run_backend.sh
-COPY bin/tornjak-backend tornjak-backend
+COPY --from=builder /usr/src/myapp/bin/tornjak-backend tornjak-backend
 
 # add a version link to the image description
 ARG version

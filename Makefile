@@ -82,7 +82,7 @@ frontend-local-build: ## Build tornjak-frontend
 images: $(addprefix image-,$(IMAGES)) ## Build all images
 
 .PHONY: image-tornjak-backend
-image-tornjak-backend: bin/tornjak-backend ## Build image for bin/tornjak-backend 
+image-tornjak-backend: ## Build image for bin/tornjak-backend 
 	docker build --no-cache -f $(DOCKERFILE_BACKEND) --build-arg version=$(VERSION) \
 		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_BACKEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) .
 
@@ -108,12 +108,6 @@ compose-frontend: ## Run frontend using docker-compose
 .PHONY: release-images
 release-images: $(addprefix release-,$(IMAGES)) ## Release all images
 
-.PHONY: release-tornjak-backend
-release-tornjak-backend: image-tornjak-backend ## Release tornjak-backend image
-	docker push $(CONTAINER_BACKEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION)
-	docker tag $(CONTAINER_BACKEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) $(CONTAINER_BACKEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
-	docker push $(CONTAINER_BACKEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA)
-
 .PHONY: release-tornjak-manager
 release-tornjak-manager: image-tornjak-manager ## Release tornjak-manager image
 	docker push $(CONTAINER_MANAGER_TAG):$(IMAGE_TAG_PREFIX)$(VERSION)
@@ -131,11 +125,18 @@ release-tornjak-manager: image-tornjak-manager ## Release tornjak-manager image
 multiarch-container-builder:
 	docker buildx create --platform $(PLATFORMS) --name multi-platform --node multi-platform0 --driver docker-container --use
 
+.PHONY: release-tornjak-backend
+release-tornjak-backend: multiarch-container-builder ## Release tornjak-backend image
+	docker buildx build --no-cache -f $(DOCKERFILE_BACKEND) --build-arg version=$(VERSION) \
+		--platform $(PLATFORMS) --push \
+		--build-arg github_sha=$(GITHUB_SHA) \
+		-t $(CONTAINER_BACKEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) \
+		-t $(CONTAINER_BACKEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA) .
 
 .PHONY: release-tornjak-frontend
 release-tornjak-frontend: multiarch-container-builder
 	docker buildx build --no-cache -f $(DOCKERFILE_FRONTEND) --build-arg version=$(VERSION) \
 		--platform $(PLATFORMS) --push \
-		--build-arg github_sha=$(GITHUB_SHA) -t $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) -t $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA) .
-
-
+		--build-arg github_sha=$(GITHUB_SHA) \
+		-t $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) \
+		-t $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(GITHUB_SHA) .
