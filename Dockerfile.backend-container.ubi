@@ -11,7 +11,7 @@ ARG TARGETARCH
 ENV CGO_ENABLED=1
 
 RUN apk add clang lld
-RUN go mod download
+RUN make vendor
 RUN xx-go --wrap
 RUN xx-apk add musl-dev gcc
 RUN if [ "$TARGETARCH" = "arm64" ]; then CC=aarch64-alpine-linux-musl; fi && \
