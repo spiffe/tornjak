@@ -127,7 +127,7 @@ multiarch-container-builder:
 
 .PHONY: release-tornjak-backend
 release-tornjak-backend: multiarch-container-builder ## Release tornjak-backend image
-	docker buildx build --no-cache -f $(DOCKERFILE_BACKEND) --build-arg version=$(VERSION) \
+	docker buildx build -f $(DOCKERFILE_BACKEND) --build-arg version=$(VERSION) \
 		--platform $(PLATFORMS) --push \
 		--build-arg github_sha=$(GITHUB_SHA) \
 		-t $(CONTAINER_BACKEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) \
@@ -135,7 +135,7 @@ release-tornjak-backend: multiarch-container-builder ## Release tornjak-backend 
 
 .PHONY: release-tornjak-frontend
 release-tornjak-frontend: multiarch-container-builder
-	docker buildx build --no-cache -f $(DOCKERFILE_FRONTEND) --build-arg version=$(VERSION) \
+	docker buildx build -f $(DOCKERFILE_FRONTEND) --build-arg version=$(VERSION) \
 		--platform $(PLATFORMS) --push \
 		--build-arg github_sha=$(GITHUB_SHA) \
 		-t $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION) \
