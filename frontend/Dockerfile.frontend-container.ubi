@@ -1,6 +1,6 @@
 ## Build stage
 FROM node:18-alpine3.14 AS build
-WORKDIR /opt/app-root/src
+WORKDIR /usr/src/app
 COPY frontend .
 RUN npm install && \
     npm run build
@@ -8,8 +8,8 @@ RUN npm install && \
 ## Runtime stage
 FROM registry.access.redhat.com/ubi8/nodejs-18-minimal:latest AS runtime
 WORKDIR /opt/app-root/src
-COPY --from=build --chown=1001:0 /opt/app-root/src/build ./build
-COPY --from=build --chown=1001:0 /opt/app-root/src/.env.prod .
+COPY --from=build --chown=1001:0 /usr/src/app/build ./build
+COPY --from=build --chown=1001:0 /usr/src/app/.env.prod .
 
 # Install serve package and react-inject-env
 RUN npm install -g npm@9.7.1 && \
