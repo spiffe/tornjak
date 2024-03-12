@@ -1,5 +1,5 @@
 ## Build stage
-FROM registry.access.redhat.com/ubi9/nodejs-20-minimal:latest AS build
+FROM registry.access.redhat.com/ubi9/nodejs-20:latest AS build
 WORKDIR /opt/app-root/src
 COPY --chown=1001:0 frontend .
 RUN npm install && \
