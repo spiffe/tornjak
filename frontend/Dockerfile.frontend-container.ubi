@@ -1,12 +1,12 @@
 ## Build stage
-FROM registry.access.redhat.com/ubi8/nodejs-18:latest AS build
+FROM registry.access.redhat.com/ubi9/nodejs-18:latest AS build
 WORKDIR /opt/app-root/src
 COPY --chown=1001:0 frontend .
 RUN npm install && \
     npm run build
 
 ## Runtime stage
-FROM registry.access.redhat.com/ubi8/nodejs-18-minimal:latest AS runtime
+FROM registry.access.redhat.com/ubi9/nodejs-18-minimal:latest AS runtime
 WORKDIR /opt/app-root/src
 COPY --from=build --chown=1001:0 /opt/app-root/src/build ./build
 COPY --from=build --chown=1001:0 /opt/app-root/src/.env.prod .
