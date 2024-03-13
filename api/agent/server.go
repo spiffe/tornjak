@@ -75,7 +75,7 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 	ret, err := s.SPIREHealthcheck(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
+		retError(w, emsg, http.StatusInternalServerError)
 		return
 	}
 
@@ -96,7 +96,7 @@ func (s *Server) debugServer(w http.ResponseWriter, r *http.Request) {
 	ret, err := s.DebugServer(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
+		retError(w, emsg, http.StatusInternalServerError)
 		return
 	}
 
@@ -137,7 +137,7 @@ func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
 	ret, err := s.ListAgents(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
+		retError(w, emsg, http.StatusInternalServerError)
 		return
 	}
 
@@ -181,7 +181,7 @@ func (s *Server) agentBan(w http.ResponseWriter, r *http.Request) {
 	err = s.BanAgent(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error listing agents: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
+		retError(w, emsg, http.StatusInternalServerError)
 		return
 	}
 
@@ -226,7 +226,7 @@ func (s *Server) agentDelete(w http.ResponseWriter, r *http.Request) {
 	err = s.DeleteAgent(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error listing agents: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
+		retError(w, emsg, http.StatusInternalServerError)
 		return
 	}
 
@@ -267,7 +267,7 @@ func (s *Server) agentCreateJoinToken(w http.ResponseWriter, r *http.Request) {
 	ret, err := s.CreateJoinToken(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
+		retError(w, emsg, http.StatusInternalServerError)
 		return
 	}
 
@@ -308,7 +308,7 @@ func (s *Server) entryList(w http.ResponseWriter, r *http.Request) {
 	ret, err := s.ListEntries(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
+		retError(w, emsg, http.StatusInternalServerError)
 		return
 	}
 
@@ -349,7 +349,7 @@ func (s *Server) entryCreate(w http.ResponseWriter, r *http.Request) {
 	ret, err := s.BatchCreateEntry(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
+		retError(w, emsg, http.StatusInternalServerError)
 		return
 	}
 
@@ -390,7 +390,7 @@ func (s *Server) entryDelete(w http.ResponseWriter, r *http.Request) {
 	ret, err := s.BatchDeleteEntry(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
+		retError(w, emsg, http.StatusInternalServerError)
 		return
 	}
 
