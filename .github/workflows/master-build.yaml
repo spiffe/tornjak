@@ -52,7 +52,7 @@ jobs:
           args: --timeout 7m
 
       - name: Log in to GHCR.io
-        uses: docker/login-action@v3.0.0
+        uses: docker/login-action@v3.1.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
