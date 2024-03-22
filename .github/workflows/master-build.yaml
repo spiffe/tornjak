@@ -3,7 +3,7 @@ on:
   push:
     branches:
     - main
-    - v1.4
+    - v1.5
 jobs:
   tornjak-build:
     runs-on: ubuntu-latest
@@ -19,10 +19,10 @@ jobs:
           EOF
 
       - name: Check out repository code
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v4.1.2
 
       - name: Install Golang
-        uses: actions/setup-go@v4.0.1
+        uses: actions/setup-go@v5.0.0
         with:
           go-version-file: go.mod
           check-latest: true
@@ -31,21 +31,28 @@ jobs:
       - name: Download modules
         run: go mod download
 
-      - uses: actions/setup-node@v3.7.0
+      - uses: actions/setup-node@v4.0.2
         with:
           node-version: '18'
 
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      # https://github.com/docker/setup-buildx-action
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
       - name: Download modules
         run: go mod download
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3.6.0
+        uses: golangci/golangci-lint-action@v4.0.0
         with:
           version: v1.53
           args: --timeout 7m
 
       - name: Log in to GHCR.io
-        uses: docker/login-action@v2.2.0
+        uses: docker/login-action@v3.1.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -58,18 +65,20 @@ jobs:
       - name: Set release repo
         run: echo "REPO=ghcr.io/${{ github.repository_owner }}" >> $GITHUB_ENV
 
-      # build and push images tagged with GITHUB_SHA, version, and latest
-      - name: Build and push tornjak backend image
-        run: make release-tornjak-backend
+      # build and push images tagged with GITHUB_SHA, version
+      - name: Build and push tornjak images
+        run: make release-images
 
-      - name: Build and push tornjak frontend image
-        run: make release-tornjak-frontend
+      # build and push UBI images
+      - name: Add ubi prefix
+        run: echo "IMAGE_TAG_PREFIX=ubi-" >> $GITHUB_ENV
+      - name: Set frontend Dockerfile
+        run: echo "DOCKERFILE_FRONTEND=frontend/Dockerfile.frontend-container.ubi" >> $GITHUB_ENV
+      - name: Set backend Dockerfile
+        run: echo "DOCKERFILE_BACKEND=Dockerfile.backend-container.ubi" >> $GITHUB_ENV
 
-      - name: Build and push tornjak image (frontend+backend)
-        run: make release-tornjak
-
-      - name: Build and push tornjak manager image
-        run: make release-tornjak-manager
+      - name: Build and push UBI images
+        run: make release-images
 
       - name: Print job result
         run: |
