@@ -46,7 +46,7 @@ jobs:
         uses: actions/checkout@v4.1.2
 
       - name: Run build
-        uses: ./.github/actions/build.yaml
+        uses: ./.github/actions
         with:
           image-tag-prefix: ubi-
           backend-dockerfile: Dockerfile.backend-container.ubi
