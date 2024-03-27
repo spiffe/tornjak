@@ -19,7 +19,6 @@ inputs:
     default: false
 runs:
   using: "composite"
-  shell: bash
   steps:
     - name: Set image tag prefix
       shell: bash
@@ -63,13 +62,6 @@ runs:
         version: v1.53
         args: --timeout 7m
 
-    - name: Log in to GHCR.io
-      uses: docker/login-action@v3.1.0
-      with:
-        registry: ghcr.io
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-   
     # set repo and GITHUB SHA 
     - name: Set github commit id
       shell: bash
@@ -86,5 +78,6 @@ runs:
 
     # build and push images tagged with GITHUB_SHA, version
     - name: Build and push tornjak images
+      shell: bash
       run: make release-images
 
