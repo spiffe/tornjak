@@ -74,7 +74,7 @@ runs:
     - name: Override version if not official build
       shell: bash
       if: ${{ inputs.tag-version == 'false' }}
-      run: echo "VERSION=$GITHUB_SHA"
+      run: echo "VERSION=$GITHUB_SHA" >> $GITHUB_ENV
 
     # build and push images tagged with GITHUB_SHA, version
     - name: Build and push tornjak images
