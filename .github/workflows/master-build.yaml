@@ -25,10 +25,14 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Get branch name
+        id: branch_name
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+
       - name: Run build
         uses: ./.github/actions/build
-        #with:
-        #tag-version: true
+        with:
+          tag-version: ${{ contains(fromJSON('["main", "v1.6"]'), ${{ steps.branch_name.outputs.branch }}) && true || false }}
 
       - name: Print job result
         run: |
