@@ -19,6 +19,7 @@ inputs:
     default: false
 runs:
   using: "composite"
+  shell: bash
   steps:
     - name: Set image tag prefix
       run: echo "IMAGE_TAG_PREFIX=${{ inputs.image-tag-prefix }}" >> $GITHUB_ENV
