@@ -22,10 +22,13 @@ runs:
   shell: bash
   steps:
     - name: Set image tag prefix
+      shell: bash
       run: echo "IMAGE_TAG_PREFIX=${{ inputs.image-tag-prefix }}" >> $GITHUB_ENV
     - name: Set backend dockerfile
+      shell: bash
       run: echo "DOCKERFILE_BACKEND=${{ inputs.backend-dockerfile }}" >> $GITHUB_ENV
     - name: Set frontend dockerfile
+      shell: bash
       run: echo "DOCKERFILE_FRONTEND=${{ inputs.frontend-dockerfile }}" >> $GITHUB_ENV
 
     - name: Install Golang
@@ -36,6 +39,7 @@ runs:
         cache: true
 
     - name: Download modules
+      shell: bash
       run: go mod download
 
     - uses: actions/setup-node@v4.0.2
@@ -50,6 +54,7 @@ runs:
       uses: docker/setup-buildx-action@v3
       
     - name: Download modules
+      shell: bash
       run: go mod download
 
     - name: golangci-lint
@@ -67,12 +72,15 @@ runs:
    
     # set repo and GITHUB SHA 
     - name: Set github commit id
+      shell: bash
       run: echo "GITHUB_SHA=$GITHUB_SHA" >> $GITHUB_ENV      
     - name: Set release repo
+      shell: bash
       run: echo "REPO=ghcr.io/${{ github.repository_owner }}" >> $GITHUB_ENV
     # override version with GITHUB_SHA if tag-version set to false
     # this way only GITHUBSHA is tagged with this build
     - name: Override version if not official build
+      shell: bash
       if: ${{ inputs.tag-version == 'false' }}
       run: echo "VERSION=$GITHUB_SHA"
 
