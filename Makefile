@@ -1,4 +1,4 @@
-VERSION=$(shell cat version.txt)
+VERSION ?= $(shell cat version.txt)
 GITHUB_SHA ?= "$(shell git rev-parse HEAD 2>/dev/null)"
 
 ## REPO defines where to push images
