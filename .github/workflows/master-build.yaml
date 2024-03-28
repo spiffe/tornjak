@@ -1,6 +1,6 @@
 name: Tornjak Artifact push
 on:
-  push: {}
+  pull_request: {}
   workflow_dispatch: {}
 jobs:
   alpine-build:
@@ -27,7 +27,7 @@ jobs:
 
       - name: Get branch name
         id: branch_name
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_BASE_REF})"
 
       - name: Run build
         uses: ./.github/actions/build
