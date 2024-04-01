@@ -20,11 +20,17 @@ import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import SpireHealthCheck from 'components/spire-health-check';
 import {env} from './env';
+// import { useAuth } from "oidc-react";
 
 // to enable SPIRE health check component
 const spireHealthCheck = (env.REACT_APP_SPIRE_HEALTH_CHECK_ENABLE === 'true') ?? false; // defualt value false
 
 function App() {
+    // const auth = useAuth();
+    // const isAuthenticated = auth.userData?.id_token ? true : false;
+  
+    // console.log("isAuthenticated: ", isAuthenticated);
+    // console.log(auth.userData?.profile?.email)
     return (
         <div>
             <Provider store={store}>
