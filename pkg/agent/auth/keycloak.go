@@ -9,7 +9,7 @@ import (
 	//"encoding/json"
 
 	"github.com/MicahParks/keyfunc"
-	"github.com/golang-jwt/jwt/v4"
+	jwt "github.com/golang-jwt/jwt/v4"
 	"github.com/pkg/errors"
 )
 
