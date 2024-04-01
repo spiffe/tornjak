@@ -8,7 +8,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/hcl v1.0.1-0.20190430135223-99e2f22d1c94
-	github.com/mattn/go-sqlite3 v1.14.16
+	github.com/mattn/go-sqlite3 v1.14.19
 	github.com/pkg/errors v0.9.1
 	github.com/spiffe/spire v1.6.4
 	github.com/spiffe/spire-api-sdk v1.2.5-0.20230413135745-699e242b965d
