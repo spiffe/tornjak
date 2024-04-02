@@ -23,16 +23,16 @@ func init() {
 // Uses functions NewKeycloakVerfier
 func TestNewKeycloakVerifier(t *testing.T) {
 	// INIT failures
-	_, err := NewKeycloakVerifier(true, "", "testredirect")
+	_, err := NewKeycloakVerifier(true, "")
 	if err == nil {
-		t.Fatal("ERROR: successfully initialized keyfunc for empty url")
+		t.Fatal("ERROR: successfully initialized keyfunc for empty issuer url")
 	}
-	_, err = NewKeycloakVerifier(true, "invalideurl", "testredirect")
+	_, err = NewKeycloakVerifier(true, "invalid url")
 	if err == nil {
 		t.Fatal("ERROR: successfully initialized keyfunc for invalid url")
 	}
 
-	_, err = NewKeycloakVerifier(false, "", "testredirect")
+	_, err = NewKeycloakVerifier(false, "")
 	if err == nil {
 		t.Fatal("ERROR: successfully initialized keyfunc for empty jwks json")
 	}
