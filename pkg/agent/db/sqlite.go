@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cenkalti/backoff/v4"
+	backoff "github.com/cenkalti/backoff/v4"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 
