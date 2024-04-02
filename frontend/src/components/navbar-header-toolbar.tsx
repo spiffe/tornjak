@@ -1,56 +1,66 @@
-import { Component } from 'react';
 import { HeaderGlobalAction } from "carbon-components-react";
 import { UserAvatar, Notification, Search } from "@carbon/icons-react";
+import React, { useEffect } from "react";
 import KeycloakService from "auth/KeycloakAuth";
-import {env} from '../env';
+import { env } from '../env';
+import { useAuth } from "oidc-react";
 
-const Auth_Server_Uri = env.REACT_APP_AUTH_SERVER_URI;
+const withAuth = env.REACT_APP_AUTH_SERVER_URI || env.REACT_APP_DEX;
+const keycloak = env.REACT_APP_AUTH_SERVER_URI;
 
 type HeaderToolBarProp = {}
 
-type HeaderToolBarState = {}
+const HeaderToolBar: React.FC<HeaderToolBarProp> = () => {
+    const auth = useAuth();
+    const isAuthenticated = auth.userData?.id_token ? true : false;
 
-class HeaderToolBar extends Component<HeaderToolBarProp, HeaderToolBarState> {
-    constructor(props: HeaderToolBarProp) {
-        super(props);
-        this.state = {};
-    }
+    useEffect(() => {
+        if (!auth.isLoading && !isAuthenticated) {
+            auth.signIn(); // redirect user to login page after successful logout
+        }
+    });
 
-    render() {
-        return (
-            <div className='header-toolbar'>
-                {Auth_Server_Uri &&
-                    <div className="user-dropdown">
-                        <HeaderGlobalAction
-                            aria-label="User">
-                            <UserAvatar />
-                        </HeaderGlobalAction>
-                        <div className="user-dropdown-content">
-                            {KeycloakService.isLoggedIn() && (
-                                // eslint-disable-next-line
-                                <a
-                                    href="#"
-                                    className="nav-link"
-                                    onClick={() => KeycloakService.doLogout()}>
-                                    Logout {KeycloakService.getFirstName()}
-                                </a>
-                            )}
-                        </div>
+    const handleKeycloakLogout = () => {
+        KeycloakService.doLogout();
+    };
+
+    const handleDexLogOut = () => {
+        auth.signOut();
+    };
+
+    return (
+        <div className='header-toolbar'>
+            {withAuth &&
+                <div className="user-dropdown">
+                    <HeaderGlobalAction
+                        aria-label="User">
+                        <UserAvatar />
+                    </HeaderGlobalAction>
+                    <div className="user-dropdown-content">
+                        {(KeycloakService.isLoggedIn() || isAuthenticated) && (
+                            // eslint-disable-next-line
+                            <a
+                                href="#"
+                                className="nav-link"
+                                onClick={keycloak ? handleKeycloakLogout : handleDexLogOut}>
+                                Logout {keycloak ? KeycloakService.getFirstName() : auth.userData?.profile?.email}
+                            </a>
+                        )}
                     </div>
-                }
-                <HeaderGlobalAction
-                    aria-label="Notifications"
-                    onClick={() => { alert("This is a place holder, functionality to be implemented on future work!") }}>
-                    <Notification />
-                </HeaderGlobalAction>
-                <HeaderGlobalAction
-                    aria-label="Search"
-                    onClick={() => { alert("This is a place holder, functionality to be implemented on future work!") }}>
-                    <Search />
-                </HeaderGlobalAction>
+                </div>
+            }
+            <HeaderGlobalAction
+                aria-label="Notifications"
+                onClick={() => { alert("This is a place holder, functionality to be implemented on future work!") }}>
+                <Notification />
+            </HeaderGlobalAction>
+            <HeaderGlobalAction
+                aria-label="Search"
+                onClick={() => { alert("This is a place holder, functionality to be implemented on future work!") }}>
+                <Search />
+            </HeaderGlobalAction>
 
-            </div>
-        );
-    }
-}
+        </div>
+    );
+};
 export default HeaderToolBar;

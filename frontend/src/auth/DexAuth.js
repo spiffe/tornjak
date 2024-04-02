@@ -1,5 +1,4 @@
 import {env} from '../env';
-// import { useAuth } from "oidc-react";
 
 const dexConfig = {
   authority: "http://dex.dex:5556/dex",
@@ -13,17 +12,5 @@ const dexConfig = {
     window.location.replace(window.location.origin);
   },
 };
-
-// const IsAuthenticated = () => useAuth().userData?.id_token ? true : false;
-// const isAuthenticated = IsAuthenticated();
-// console.log("IsAuthenticated", isAuthenticated)
-// const DexConfig = () => {
-//     const auth = useAuth();
-//     const isAuthenticated = auth.userData?.id_token ? true : false;
-  
-//     console.log("isAuthenticated: ", isAuthenticated);
-//     return dexConfig;
-// };
-
 
 export default dexConfig;
