@@ -43,7 +43,7 @@ const HeaderToolBar: React.FC<HeaderToolBarProp> = () => {
                                 href="#"
                                 className="nav-link"
                                 onClick={keycloak ? handleKeycloakLogout : handleDexLogOut}>
-                                Logout {keycloak ? KeycloakService.getFirstName() : auth.userData?.profile?.email}
+                                Logout {keycloak ? KeycloakService.getFirstName() : auth.userData?.profile?.name}
                             </a>
                         )}
                     </div>

@@ -21,7 +21,9 @@ import HeaderToolBar from './navbar-header-toolbar';
 import { env } from '../env';
 import { useAuth } from "oidc-react";
 
-const Auth_Server_Uri = env.REACT_APP_AUTH_SERVER_URI;
+const keycloak = env.REACT_APP_AUTH_SERVER_URI;
+const dex = env.REACT_APP_DEX;
+const  withAuth = env.REACT_APP_AUTH_SERVER_URI || env.REACT_APP_DEX;
 
 type NavigationBarProp = {
   // dispatches a payload if user is authenticated or not return type of void
@@ -53,10 +55,13 @@ const NavigationBar: React.FC<NavigationBarProp> = ({
   globalClickedDashboardTable,
 }) => {
   const tornjakHelper = new TornjakHelper({});
+  const auth = useAuth();
+  const isAuthenticated = auth.userData?.id_token ? true : false;
+  const roles = (auth.userData?.profile.groups) as string[];
 
   useEffect(() => {
     const fetchData = async () => {
-      if (Auth_Server_Uri) {
+      if (keycloak) {
         isAuthenticatedUpdateFunc(KeycloakService.isLoggedIn());
         if (KeycloakService.isLoggedIn()) {
           accessTokenUpdateFunc(KeycloakService.getToken());
@@ -66,14 +71,16 @@ const NavigationBar: React.FC<NavigationBarProp> = ({
           }
         }
       }
+      if (dex) {
+        if (isAuthenticated) {
+          UserRolesUpdateFunc(roles);
+        }
+      }
     };
     fetchData();
-  }, [isAuthenticatedUpdateFunc, accessTokenUpdateFunc, UserRolesUpdateFunc]);
+  }, [isAuthenticated, roles, isAuthenticatedUpdateFunc, accessTokenUpdateFunc, UserRolesUpdateFunc]);
 
-  const isAdmin = tornjakHelper.checkRolesAdminUser(globalUserRoles);
-  const isAuthenticated = useAuth().userData?.id_token ? true : false;
-  console.log("isAuthenticated", isAuthenticated)
-  const  withAuth = env.REACT_APP_AUTH_SERVER_URI || env.REACT_APP_DEX;
+  const isAdmin = tornjakHelper.checkRolesAdminUser(globalUserRoles)
 
   let managerNavs;
   managerNavs =
@@ -127,7 +134,7 @@ return (
           >Tornjak Dashboard</a>
         </div>
         <HeaderToolBar />
-        {Auth_Server_Uri && isAdmin &&
+        {withAuth && isAdmin &&
           <div className="admin-toolbar-header">
             <h5>ADMIN PORTAL</h5>
           </div>
