@@ -765,6 +765,11 @@ func NewAuth(authPlugin *ast.ObjectItem) (auth.Auth, error) {
 
 	switch key {
 	case "KeycloakAuth":
+		// check if data is defined
+		if data == nil {
+			return nil, errors.New("KeycloakAuth UserManagement plugin ('config > plugins > UserManagement KeycloakAuth > plugin_data') no populated")
+		}
+		fmt.Printf("KeycloakAuth Usermanagement Data: %+v\n", data)
 		// decode config to struct
 		var config pluginAuthKeycloak
 		if err := hcl.DecodeObject(&config, data); err != nil {
@@ -772,7 +777,7 @@ func NewAuth(authPlugin *ast.ObjectItem) (auth.Auth, error) {
 		}
 
 		// create verifier TODO make json an option?
-		verifier, err := auth.NewKeycloakVerifier(true, config.JwksURL, config.RedirectURL)
+		verifier, err := auth.NewKeycloakVerifier(true, config.IssuerURL)
 		if err != nil {
 			return nil, errors.Errorf("Couldn't configure Auth: %v", err)
 		}
