@@ -1,7 +1,7 @@
 import Keycloak from "keycloak-js";
 import {env} from '../env';
 const keycloakConfig = {
-    "realm": env.REACT_KEYCLOAK_REALM,
+    "realm": env.REACT_APP_KEYCLOAK_REALM,
     "url": env.REACT_APP_AUTH_SERVER_URI,
     "ssl-required": "external",
     "clientId": env.REACT_APP_OIDC_CLIENT_ID,
@@ -12,7 +12,7 @@ const keycloakConfig = {
 };
 const keycloak = new Keycloak(keycloakConfig);
 const initKeycloak = (renderApp) => {
-    keycloak.init({ onLoad: 'login-required' })
+    keycloak.init({ onLoad: 'login-required', checkLoginIframe: false })
         .then((authenticated) => {
             if (authenticated) {
                 console.log("User is authenticated...Redirecting to Tornjak App!");
@@ -50,6 +50,7 @@ const KeycloakService = {
     doLogout,
     getToken,
     updateToken,
+    keycloakConfig
 };
 
 export default KeycloakService;

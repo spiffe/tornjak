@@ -23,7 +23,7 @@ import { useAuth } from "oidc-react";
 
 const keycloak = env.REACT_APP_AUTH_SERVER_URI;
 const dex = env.REACT_APP_DEX;
-const  withAuth = env.REACT_APP_AUTH_SERVER_URI || env.REACT_APP_DEX;
+const withAuth = env.REACT_APP_AUTH_SERVER_URI || env.REACT_APP_DEX;
 
 type NavigationBarProp = {
   // dispatches a payload if user is authenticated or not return type of void
