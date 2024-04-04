@@ -8,16 +8,14 @@ The configuration has the following key-value pairs:
 
 | Key         | Description                                                             | Required | 
 | ----------- | ----------------------------------------------------------------------- | -------- |
-| jwksURL     | Location of the public keys used to validate access tokens              | True     |
-| redirectuRL | Location of the redirect URL to the auth server to obtain access tokens | True     |
+| issuer      | Issuer URL for OIDC Discovery with external IAM System                  | True     |
 
 A sample configuration file for syntactic referense is below:
 
 ```hcl
     UserManagement "KeycloakAuth" {
         plugin_data {
-            jwksURL = "http://localhost:8080/jwks"
-            redirectURL = "http://localhost:10000/*"
+            issuer = "http://localhost:8080/realms/tornjak"
         }
     }
 ```

@@ -9,6 +9,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/hcl v1.0.1-0.20190430135223-99e2f22d1c94
 	github.com/mattn/go-sqlite3 v1.14.19
+	github.com/pardot/oidc v1.0.1
 	github.com/pkg/errors v0.9.1
 	github.com/spiffe/spire v1.6.4
 	github.com/spiffe/spire-api-sdk v1.2.5-0.20230413135745-699e242b965d
@@ -26,7 +27,6 @@ require (
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.3 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/hashicorp/go-hclog v1.5.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-plugin v1.4.6 // indirect

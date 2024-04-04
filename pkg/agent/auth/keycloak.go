@@ -6,8 +6,9 @@ import (
 	"os"
 	"strings"
 	"time"
-	//"encoding/json"
+	"context"
 
+	"github.com/pardot/oidc/discovery"
 	"github.com/MicahParks/keyfunc"
 	jwt "github.com/golang-jwt/jwt/v4"
 	"github.com/pkg/errors"
@@ -15,7 +16,7 @@ import (
 
 type KeycloakVerifier struct {
 	jwks            *keyfunc.JWKS
-	redirect        string
+	jwksURL         string
 	api_permissions map[string][]string
 	role_mappings   map[string][]string
 }
@@ -81,7 +82,16 @@ func getKeyFunc(httpjwks bool, jwksInfo string) (*keyfunc.JWKS, error) {
 	}
 }
 
-func NewKeycloakVerifier(httpjwks bool, jwksURL string, redirectURL string) (*KeycloakVerifier, error) {
+func NewKeycloakVerifier(httpjwks bool, issuerURL string) (*KeycloakVerifier, error) {
+	// perform OIDC discovery
+	oidcClient, err := discovery.NewClient(context.Background(), issuerURL)
+	if err != nil {
+		return nil, errors.Errorf("Could not set up OIDC Discovery client: %v", err)
+	}
+	oidcClientMetadata := oidcClient.Metadata()
+	jwksURL := oidcClientMetadata.JWKSURI
+
+	// watch JWKS
 	jwks, err := getKeyFunc(httpjwks, jwksURL)
 	if err != nil {
 		return nil, err
@@ -89,7 +99,7 @@ func NewKeycloakVerifier(httpjwks bool, jwksURL string, redirectURL string) (*Ke
 	api_permissions, role_mappings := getAuthLogic()
 	return &KeycloakVerifier{
 		jwks:            jwks,
-		redirect:        redirectURL,
+		jwksURL:         jwksURL,
 		api_permissions: api_permissions,
 		role_mappings:   role_mappings,
 	}, nil
@@ -154,7 +164,7 @@ func (v *KeycloakVerifier) Verify(r *http.Request) error {
 		return nil
 	}
 
-	token, err := get_token(r, v.redirect)
+	token, err := get_token(r, v.jwksURL)
 	if err != nil {
 		return err
 	}
