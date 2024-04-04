@@ -776,8 +776,13 @@ func NewAuth(authPlugin *ast.ObjectItem) (auth.Auth, error) {
 			return nil, errors.Errorf("Couldn't parse Auth config: %v", err)
 		}
 
+		// Log warning if audience is nil that aud claim is not checked
+		if config.Audience == "" {
+			fmt.Printf("WARNING: Auth plugin has no expected audience configured - `aud` claim will not be checked (please populate 'config > plugins > UserManagement KeycloakAuth > plugin_data > audience')")
+		}
+
 		// create verifier TODO make json an option?
-		verifier, err := auth.NewKeycloakVerifier(true, config.IssuerURL)
+		verifier, err := auth.NewKeycloakVerifier(true, config.IssuerURL, config.Audience)
 		if err != nil {
 			return nil, errors.Errorf("Couldn't configure Auth: %v", err)
 		}

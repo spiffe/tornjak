@@ -9,14 +9,15 @@ import (
 	"context"
 
 	"github.com/pardot/oidc/discovery"
-	"github.com/MicahParks/keyfunc"
-	jwt "github.com/golang-jwt/jwt/v4"
+	keyfunc "github.com/MicahParks/keyfunc/v2"
+	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/pkg/errors"
 )
 
 type KeycloakVerifier struct {
 	jwks            *keyfunc.JWKS
 	jwksURL         string
+	audience        string
 	api_permissions map[string][]string
 	role_mappings   map[string][]string
 }
@@ -82,7 +83,7 @@ func getKeyFunc(httpjwks bool, jwksInfo string) (*keyfunc.JWKS, error) {
 	}
 }
 
-func NewKeycloakVerifier(httpjwks bool, issuerURL string) (*KeycloakVerifier, error) {
+func NewKeycloakVerifier(httpjwks bool, issuerURL string, audience string) (*KeycloakVerifier, error) {
 	// perform OIDC discovery
 	oidcClient, err := discovery.NewClient(context.Background(), issuerURL)
 	if err != nil {
@@ -99,6 +100,7 @@ func NewKeycloakVerifier(httpjwks bool, issuerURL string) (*KeycloakVerifier, er
 	api_permissions, role_mappings := getAuthLogic()
 	return &KeycloakVerifier{
 		jwks:            jwks,
+		audience:        audience, 
 		jwksURL:         jwksURL,
 		api_permissions: api_permissions,
 		role_mappings:   role_mappings,
@@ -171,7 +173,8 @@ func (v *KeycloakVerifier) Verify(r *http.Request) error {
 
 	// parse token
 	claims := &KeycloakClaim{}
-	jwt_token, err := jwt.ParseWithClaims(token, claims, v.jwks.Keyfunc)
+	parserOptions := jwt.WithAudience(v.audience)
+	jwt_token, err := jwt.ParseWithClaims(token, claims, v.jwks.Keyfunc, parserOptions)
 	if err != nil {
 		return errors.Errorf("Error parsing token: %s", err.Error())
 	}
