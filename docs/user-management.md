@@ -41,7 +41,7 @@ Once the Auth Server is set up, we can deploy the Tornjak Backend to require acc
 as detailed in 
 [this followup Medium blog](https://medium.com/universal-workload-identity/guide-to-integrating-tornjak-with-keycloak-for-access-control-to-spire-40a3d5ee5f5a), 
 with more details on the general configuration 
-[here](https://github.com/spiffe/tornjak/blob/main/docs/config-tornjak-agent.md). 
+[here](https://github.com/spiffe/tornjak/blob/main/docs/config-tornjak-server.md). 
 
 1. **Configure Tornjak Frontend**
 Finally, the Frontend must be deployed and configured to obtain access tokens from this auth server. 
@@ -57,7 +57,7 @@ REACT_APP_AUTH_SERVER_URI=http://localhost:8080/ npm start
 Alternatively, we can do the same on the containerized version:
 
 ```
-docker run -p 3000:3000 -d -e REACT_APP_API_SERVER_URI='http://localhost:10000' -e REACT_APP_AUTH_SERVER_URI='http://localhost:8080' ghcr.io/spiffe/tornjak-frontend:v1.2.2
+docker run -p 3000:3000 -d -e REACT_APP_API_SERVER_URI='http://localhost:10000' -e REACT_APP_AUTH_SERVER_URI='http://localhost:8080' ghcr.io/spiffe/tornjak-frontend:v1.5.0
 `
 ```
 
