@@ -36,12 +36,25 @@ Specifically, it is very easy to set up a Tornjak secured by Keycloak today, by 
 1. **Configure Auth Server**
 To configure the Auth Server, please see our [Medium blog](https://medium.com/universal-workload-identity/step-by-step-guide-to-setup-keycloak-configuration-for-tornjak-dbe5c3049034) for a walkthrough on configuring the Auth Server. For more in-depth documentation on this setup, please see [this document on Keycloak configuration](./keycloak-configuration.md).
 
+Alternatively, see [our keycloak example](/examples/keycloak) for ready deployment files into your local Kubernetes cluster. 
+
 1. **Enable User Management for Tornjak Backend**
 Once the Auth Server is set up, we can deploy the Tornjak Backend to require access tokens from our Auth Server, 
 as detailed in 
 [this followup Medium blog](https://medium.com/universal-workload-identity/guide-to-integrating-tornjak-with-keycloak-for-access-control-to-spire-40a3d5ee5f5a), 
 with more details on the general configuration 
-[here](https://github.com/spiffe/tornjak/blob/main/docs/config-tornjak-server.md). 
+[here](/docs/config-tornjak-server.md). Most notably, populate a new plugin section for keycloak as defined [here](/docs/plugin_server_auth_keycloak.md) like so:
+```
+...
+  UserManagement "KeycloakAuth" {
+    plugin_data {
+      # issuer - Issuer URL for OIDC
+      issuer = "http://host.docker.internal:8080/realms/tornjak"
+      audience = "tornjak-backend"
+    }
+  }
+...
+```
 
 1. **Configure Tornjak Frontend**
 Finally, the Frontend must be deployed and configured to obtain access tokens from this auth server. 

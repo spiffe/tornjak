@@ -1,6 +1,6 @@
 # Server plugin: Authorization "keycloak"
 
-Please see our documentation on the [authorization feature](./feature_auth.md) for more complete details. 
+Please see our documentation on the [authorization feature](./user-management.md) for more complete details. 
 
 Note that configuring this requires the frontend to be configured to obtain access tokens at the relevant auth server. 
 
