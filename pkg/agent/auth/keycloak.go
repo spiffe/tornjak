@@ -1,16 +1,16 @@
 package auth
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
 	"strings"
 	"time"
-	"context"
 
-	"github.com/pardot/oidc/discovery"
 	keyfunc "github.com/MicahParks/keyfunc/v2"
 	jwt "github.com/golang-jwt/jwt/v5"
+	"github.com/pardot/oidc/discovery"
 	"github.com/pkg/errors"
 )
 
@@ -87,7 +87,7 @@ func NewKeycloakVerifier(httpjwks bool, issuerURL string, audience string) (*Key
 	// perform OIDC discovery
 	oidcClient, err := discovery.NewClient(context.Background(), issuerURL)
 	if err != nil {
-		return nil, errors.Errorf("Could not set up OIDC Discovery client: %v", err)
+		return nil, errors.Errorf("Could not set up OIDC Discovery client with issuer = '%s': %v", issuerURL, err)
 	}
 	oidcClientMetadata := oidcClient.Metadata()
 	jwksURL := oidcClientMetadata.JWKSURI
@@ -100,7 +100,7 @@ func NewKeycloakVerifier(httpjwks bool, issuerURL string, audience string) (*Key
 	api_permissions, role_mappings := getAuthLogic()
 	return &KeycloakVerifier{
 		jwks:            jwks,
-		audience:        audience, 
+		audience:        audience,
 		jwksURL:         jwksURL,
 		api_permissions: api_permissions,
 		role_mappings:   role_mappings,
