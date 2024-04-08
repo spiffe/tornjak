@@ -11,7 +11,6 @@ import {
 } from 'carbon-components-react';
 import { Launch, NextOutline } from '@carbon/icons-react';
 import { connect } from 'react-redux';
-import TornjakApi from './tornjak-api-helpers';
 import './style.css';
 import SpiffeHelper from './spiffe-helper';
 import {
@@ -24,6 +23,7 @@ import {
 } from './types';
 import { RootState } from 'redux/reducers';
 import { showToast } from './error-api';
+import TornjakApi from './tornjak-api-helpers';
 
 type CreateEntryJsonProp = {
     // dispatches a payload for list of new entries uploaded with their metadata info as an array of EntriesListType and has a return type of void
@@ -34,6 +34,10 @@ type CreateEntryJsonProp = {
     globalAgentsList: AgentsList[],
     // list of available parent ids
     ParentIdList: string[],
+    // whether user is authenticated or not
+    globalIsAuthenticated: boolean;
+    // updated access token
+    globalAccessToken: string | undefined;
 }
 
 type CreateEntryJsonState = {
@@ -72,11 +76,9 @@ const NewEntryJsonFormatLink = (props: { link: link }) => (
     </div>
 )
 class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonState>  {
-    TornjakApi: TornjakApi;
     SpiffeHelper: SpiffeHelper;
     constructor(props: CreateEntryJsonProp) {
         super(props);
-        this.TornjakApi = new TornjakApi(props);
         this.SpiffeHelper = new SpiffeHelper(props);
         this.handleChange = this.handleChange.bind(this);
         this.setSelectedEntriesIds = this.setSelectedEntriesIds.bind(this);
@@ -138,12 +140,15 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
         }
     }
 
-    componentDidMount() { }
+    componentDidMount() {
+        TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
+    }
 
     componentDidUpdate(prevProps: CreateEntryJsonProp, prevState: CreateEntryJsonState) {
         if (prevProps.globalAgentsList !== this.props.globalAgentsList) {
             this.props.newEntriesUpdateFunc(this.state.uploadedEntries);
         }
+        TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
     }
 
     // TODO(mamy-CS): e - any for now will be explicitly typed
@@ -182,7 +187,7 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                 // populate first entry
                 this.setSelectedEntriesIds(0, 0, parsedData.entries[0])
             } catch (e) {
-                showToast({caption: "Encountered a parse error. Is the JSON invalid?"})
+                showToast({ caption: "Encountered a parse error. Is the JSON invalid?" })
                 console.log(e)
                 this.setState({
                     parseError: true,
@@ -773,7 +778,7 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                                                 labelText="PARENT ID [*required]"
                                                 placeholder="Enter PARENT ID"
                                                 value={this.state.parentId}
-                                                onChange={(e) => {this.onChangeParentIdInput(e)}}
+                                                onChange={(e) => { this.onChangeParentIdInput(e) }}
                                             />
                                         </div>
                                         <div className="spiffeId-input-field" data-test="spiffeId-input-field">
@@ -902,6 +907,8 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
 const mapStateToProps = (state: RootState) => ({
     globalNewEntries: state.entries.globalNewEntries,
     globalAgentsList: state.agents.globalAgentsList,
+    globalIsAuthenticated: state.auth.globalIsAuthenticated,
+    globalAccessToken: state.auth.globalAccessToken,
 })
 
 export default connect(

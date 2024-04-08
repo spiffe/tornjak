@@ -1,19 +1,23 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Dropdown, TextInput, NumberInput, InlineNotification } from 'carbon-components-react';
-import TornjakApi from './tornjak-api-helpers';
 import './style.css';
 import SpiffeHelper from './spiffe-helper';
 import {
   entryExpiryUpdateFunc
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
+import TornjakApi from './tornjak-api-helpers';
 var moment = require('moment');
 const JSMaxSafeTime = 8640000000000 // In seconds - JS cannot represent times safely larger than this
 
 type EntryExpiryProp = {
   // dispatches a payload for the entry expiry time and has a return type of void
   entryExpiryUpdateFunc: (globalEntryExpiryTime: number) => void,
+  // whether user is authenticated or not
+  globalIsAuthenticated: boolean;
+  // updated access token
+  globalAccessToken: string | undefined;
 }
 
 type EntryExpiryState = {
@@ -27,11 +31,9 @@ type EntryExpiryState = {
 }
 
 class EntryExpiryFeatures extends Component<EntryExpiryProp, EntryExpiryState> {
-  TornjakApi: TornjakApi;
   SpiffeHelper: SpiffeHelper;
   constructor(props: EntryExpiryProp) {
     super(props);
-    this.TornjakApi = new TornjakApi(props);
     this.SpiffeHelper = new SpiffeHelper(props);
     this.onChangeExpiryOption = this.onChangeExpiryOption.bind(this);
     this.expiryTimeUpdate = this.expiryTimeUpdate.bind(this);
@@ -52,10 +54,12 @@ class EntryExpiryFeatures extends Component<EntryExpiryProp, EntryExpiryState> {
   }
 
   componentDidMount() {
+    TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
   }
 
   componentDidUpdate(prevProps: EntryExpiryProp, prevState: EntryExpiryState) {
     this.props.entryExpiryUpdateFunc(this.state.expiresAt);
+    TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
   }
 
   onChangeExpiryOption(e: { selectedItem: any; }) {
@@ -223,6 +227,8 @@ class EntryExpiryFeatures extends Component<EntryExpiryProp, EntryExpiryState> {
 
 
 const mapStateToProps = (state: RootState) => ({
+  globalIsAuthenticated: state.auth.globalIsAuthenticated,
+  globalAccessToken: state.auth.globalAccessToken,
 })
 
 export default connect(

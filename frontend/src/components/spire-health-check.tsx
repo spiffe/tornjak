@@ -36,7 +36,11 @@ type SpireHealthCheckProp = {
   // the resfresh rate of spire health check
   spireHealthCheckRefreshTimeFunc: (globalSpireHealthTime: SpireHealthCheckFreq) => void,
   // dispatches a payload for the resfresh rate of spire health check as a number and has a return type of void
-  globalSpireHealthTime: SpireHealthCheckFreq
+  globalSpireHealthTime: SpireHealthCheckFreq,
+  // whether user is authenticated or not
+  globalIsAuthenticated: boolean;
+  // updated access token
+  globalAccessToken: string | undefined;
 }
 
 type SpireHealthCheckState = {
@@ -45,10 +49,8 @@ type SpireHealthCheckState = {
 }
 
 class SpireHealthCheck extends Component<SpireHealthCheckProp, SpireHealthCheckState> {
-  TornjakApi: TornjakApi;
   constructor(props: SpireHealthCheckProp) {
     super(props);
-    this.TornjakApi = new TornjakApi(props);
     this.onChangeSpireRefreshRate = this.onChangeSpireRefreshRate.bind(this);
     this.state = {
       timer: null,
@@ -57,7 +59,8 @@ class SpireHealthCheck extends Component<SpireHealthCheckProp, SpireHealthCheckS
 
   componentDidMount() {
     this.startTimer();
-    this.TornjakApi.spireHealthCheck(this.props.spireHealthCheckFunc, this.props.spireHealthCheckingFunc);
+    TornjakApi.spireHealthCheck(this.props.spireHealthCheckFunc, this.props.spireHealthCheckingFunc);
+    TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
   }
 
   componentDidUpdate(prevProps: SpireHealthCheckProp, prevState: SpireHealthCheckState) {
@@ -67,8 +70,9 @@ class SpireHealthCheck extends Component<SpireHealthCheckProp, SpireHealthCheckS
     }
     if (prevState.timer !== this.state.timer) {
       // timer ended, check status of SPIRE
-      this.TornjakApi.spireHealthCheck(this.props.spireHealthCheckFunc, this.props.spireHealthCheckingFunc);
+      TornjakApi.spireHealthCheck(this.props.spireHealthCheckFunc, this.props.spireHealthCheckingFunc);
     }
+    TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
   }
 
   startTimer = () => {
@@ -164,6 +168,8 @@ const mapStateToProps = (state: RootState) => ({
   globalSpireHealthCheck: state.servers.globalSpireHealthCheck,
   globalSpireHealthChecking: state.servers.globalSpireHealthChecking,
   globalSpireHealthTime: state.servers.globalSpireHealthTime,
+  globalIsAuthenticated: state.auth.globalIsAuthenticated,
+  globalAccessToken: state.auth.globalAccessToken,
 })
 
 export default connect(

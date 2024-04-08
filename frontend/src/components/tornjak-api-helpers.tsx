@@ -1,4 +1,6 @@
 import { Component } from 'react';
+import { connect } from 'react-redux';
+import { RootState } from 'redux/reducers';
 import axios from 'axios';
 // eslint-disable-next-line
 import AxiosRequestConfig from '../../axios'
@@ -18,45 +20,68 @@ import { showResponseToast } from './error-api';
 // import { logError } from './helpers';
 // import { displayResponseError } from './error-api';
 import { env } from '../env';
-const Auth_Server_Uri = env.REACT_APP_AUTH_SERVER_URI;
+const withAuth = env.REACT_APP_AUTH_SERVER_URI || env.REACT_APP_DEX;
 
-type TornjakApiProp = {}
-type TornjakApiState = {}
-
-if (Auth_Server_Uri) { // inject token if app is in auth mode and check token status/ refresh as needed
-  axios.interceptors.request.use(
-    async (config: any): Promise<any> => {
-      console.log("Checking token status...")
-      if (KeycloakService.isLoggedIn()) {
-        const setAuthorization = () => {
-          config.headers.Authorization = `Bearer ${KeycloakService.getToken()}`;
-          return Promise.resolve(config);
-        };
-        return KeycloakService.updateToken(setAuthorization);
-      }
-    }
-  )
+type TornjakApiProp = {
+  // whether user is authenticated or not
+  globalIsAuthenticated: boolean;
+  // updated access token
+  globalAccessToken: string | undefined;
+  // updated user roles
+  globalUserRoles: string[];
 }
+type TornjakApiState = {}
 
 class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   constructor(props: TornjakApiProp) {
     super(props);
     this.state = {};
-    this.registerSelectors = this.registerSelectors.bind(this);
-    this.registerLocalSelectors = this.registerLocalSelectors.bind(this);
-    this.refreshSelectorsState = this.refreshSelectorsState.bind(this);
-    this.refreshLocalSelectorsState = this.refreshLocalSelectorsState.bind(this);
-    this.populateTornjakServerInfo = this.populateTornjakServerInfo.bind(this);
-    this.populateLocalTornjakServerInfo = this.populateLocalTornjakServerInfo.bind(this);
-    this.populateServerInfo = this.populateServerInfo.bind(this);
-    this.populateAgentsUpdate = this.populateAgentsUpdate.bind(this);
-    this.populateLocalAgentsUpdate = this.populateLocalAgentsUpdate.bind(this);
-    this.populateClustersUpdate = this.populateClustersUpdate.bind(this);
-    this.populateLocalClustersUpdate = this.populateLocalClustersUpdate.bind(this);
+    // this.registerSelectors = this.registerSelectors.bind(this);
+    // this.registerLocalSelectors = this.registerLocalSelectors.bind(this);
+    // this.refreshSelectorsState = this.refreshSelectorsState.bind(this);
+    // this.refreshLocalSelectorsState = this.refreshLocalSelectorsState.bind(this);
+    // this.populateTornjakServerInfo = this.populateTornjakServerInfo.bind(this);
+    // this.populateLocalTornjakServerInfo = this.populateLocalTornjakServerInfo.bind(this);
+    // this.populateServerInfo = this.populateServerInfo.bind(this);
+    // this.populateAgentsUpdate = this.populateAgentsUpdate.bind(this);
+    // this.populateLocalAgentsUpdate = this.populateLocalAgentsUpdate.bind(this);
+    // this.populateClustersUpdate = this.populateClustersUpdate.bind(this);
+    // this.populateLocalClustersUpdate = this.populateLocalClustersUpdate.bind(this);
+  }
+
+  // tokenAttach attaches a token if using Auth
+  static tokenAttach = (
+    globalIsAuthenticated: boolean,
+    globalAccessToken: string | undefined,
+  ) => {
+    if (withAuth) { // inject token if app is in auth mode and check token status/ refresh as needed
+      axios.interceptors.request.use(
+        async (config: any): Promise<any> => {
+          console.log("Checking token status...")
+          if (KeycloakService.isLoggedIn()) {
+            const setAuthorization = () => {
+              config.headers.Authorization = `Bearer ${KeycloakService.getToken()}`;
+              return Promise.resolve(config);
+            };
+            return KeycloakService.updateToken(setAuthorization);
+          } else if (globalIsAuthenticated) {
+            if (globalAccessToken) {
+              config.headers.Authorization = `Bearer ${globalAccessToken}`;
+            }
+            return Promise.resolve(config);
+          }
+        },
+        (error) => {
+          return Promise.reject(error);
+        }
+      )
+    } else {
+      return
+    }
   }
 
   // spireHealthCheck returns the health of the SPIRE server
-  spireHealthCheck = (
+  static spireHealthCheck = (
     spireHealthCheckFunc: { (globalSpireHealthCheck: boolean): void; },
     spireHealthCheckingFunc: { (globalSpireHealthChecking: boolean): void; },
   ) => {
@@ -77,7 +102,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       })
   }
 
-  registerSelectors = (serverName: string, wLoadAttdata: { spiffeid: string; plugin: string; },
+  static registerSelectors = (serverName: string, wLoadAttdata: { spiffeid: string; plugin: string; },
     refreshSelectorsState: { (serverName: string, agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void): void; },
     agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void) => {
     axios.post(GetApiServerUri('/manager-api/tornjak/selectors/register/') + serverName, wLoadAttdata)
@@ -90,7 +115,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       })
   }
 
-  registerLocalSelectors = (wLoadAttdata: { spiffeid: string; plugin: string; },
+  static registerLocalSelectors = (wLoadAttdata: { spiffeid: string; plugin: string; },
     refreshLocalSelectorsState: { (agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void): void; },
     agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void) => {
     axios.post(GetApiServerUri('/api/tornjak/selectors/register'), wLoadAttdata)
@@ -116,7 +141,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   //      }
   //    ]
   // ]
-  refreshSelectorsState = (serverName: string,
+  static refreshSelectorsState = (serverName: string,
     agentworkloadSelectorInfoFunc: {
       (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]): void;
       (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]): void;
@@ -144,7 +169,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   //      }
   //    ]
   // ]
-  refreshLocalSelectorsState = (agentworkloadSelectorInfoFunc: {
+  static refreshLocalSelectorsState = (agentworkloadSelectorInfoFunc: {
     (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]): void;
   }) => {
     axios.get(GetApiServerUri("/api/tornjak/selectors/list"), { crossdomain: true })
@@ -156,7 +181,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 
   // populateTornjakAgentInfo returns tornjak info of requested agents including cluster name and selector
-  populateTornjakAgentInfo = (serverName: string,
+  static populateTornjakAgentInfo = (serverName: string,
     agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void,
     inputData: string) => {
     axios.post(GetApiServerUri("/manager-api/tornjak/agents/list/") + serverName, inputData,
@@ -170,7 +195,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 
   // populateLocalTornjakAgentInfo returns tornjak info of requested agents including cluster name and selector
-  populateLocalTornjakAgentInfo = (
+  static populateLocalTornjakAgentInfo = (
     agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void,
     inputData: string
   ) => {
@@ -182,7 +207,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 
   // populateTornjakServerInfo returns the tornjak server info of the selected server in manager mode
-  populateTornjakServerInfo = (
+  static populateTornjakServerInfo = (
     serverName: string,
     tornjakServerInfoUpdateFunc: { (globalTornjakServerInfo: TornjakServerInfo): void },
     tornjakMessageFunc: { (globalErrorMessage: string): void }
@@ -208,7 +233,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 
   // populateLocalTornjakDebugServerInfo returns the debug server info of the server in local mode
-  populateLocalTornjakDebugServerInfo = (
+  static populateLocalTornjakDebugServerInfo = (
     spireDebugServerInfoUpdateFunc: { (globalDebugServerInfo: DebugServerInfo): void },
     tornjakMessageFunc: { (globalErrorMessage: string): void }
   ) => {
@@ -223,7 +248,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 
   // populateLocalTornjakServerInfo returns the torjak server info of the server in local mode
-  populateLocalTornjakServerInfo = (
+  static populateLocalTornjakServerInfo = (
     tornjakServerInfoUpdateFunc: { (globalTornjakServerInfo: TornjakServerInfo): void },
     tornjakMessageFunc: { (globalErrorMessage: string): void }
   ) => {
@@ -244,7 +269,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 
   // populateServerInfo returns the server trust domain and nodeAttestorPlugin
-  populateServerInfo = (serverInfo: TornjakServerInfo | undefined,
+  static populateServerInfo = (serverInfo: TornjakServerInfo | undefined,
     serverInfoUpdateFunc: { (globalServerInfo: ServerInfo): void; }) => {
     //node attestor plugin
     if (serverInfo === undefined || JSON.stringify(serverInfo) === '{}') {
@@ -266,7 +291,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
     serverInfoUpdateFunc(reqInfo);
   }
 
-  populateEntriesUpdate = (serverName: string,
+  static populateEntriesUpdate = (serverName: string,
     entriesListUpdateFunc: { (globalEntriesList: EntriesList[]): void; },
     tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
     axios.get(GetApiServerUri('/manager-api/entry/list/') + serverName, { crossdomain: true })
@@ -282,7 +307,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       })
   }
 
-  populateLocalEntriesUpdate = (entriesListUpdateFunc: { (globalEntriesList: EntriesList[]): void; },
+  static populateLocalEntriesUpdate = (entriesListUpdateFunc: { (globalEntriesList: EntriesList[]): void; },
     tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
     axios.get(GetApiServerUri('/api/entry/list'), { crossdomain: true })
       .then(response => {
@@ -300,7 +325,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 
   // populateAgentsUpdate returns the list of agents with their info in manager mode for the selected server
-  populateAgentsUpdate = (serverName: string,
+  static populateAgentsUpdate = (serverName: string,
     agentsListUpdateFunc: { (globalAgentsList: AgentsList[]): void; },
     tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
     axios.get(GetApiServerUri('/manager-api/agent/list/') + serverName, { crossdomain: true })
@@ -318,7 +343,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 
   // populateLocalAgentsUpdate - returns the list of agents with their info in Local mode for the server
-  populateLocalAgentsUpdate = (agentsListUpdateFunc: {
+  static populateLocalAgentsUpdate = (agentsListUpdateFunc: {
     (globalAgentsList: AgentsList[]): void;
   },
     tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
@@ -337,7 +362,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 
   // populateClustersUpdate returns the list of clusters with their info in manager mode for the selected server
-  populateClustersUpdate = (serverName: string,
+  static populateClustersUpdate = (serverName: string,
     clustersListUpdateFunc: { (globalClustersList: ClustersList[]): void; },
     tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
     axios.get(GetApiServerUri('/manager-api/tornjak/clusters/list/') + serverName, { crossdomain: true })
@@ -352,7 +377,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 
   // populateLocalClustersUpdate - returns the list of clusters with their info in Local mode for the server
-  populateLocalClustersUpdate = (
+  static populateLocalClustersUpdate = (
     clustersListUpdateFunc: { (globalClustersList: ClustersList[]): void },
     tornjakMessageFunc: { (globalErrorMessage: string): void }
   ) => {
@@ -369,7 +394,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 
   // clusterDelete - returns success message after successful deletion of a cluster in manager mode
-  async clusterDelete(serverName: string, inputData: { cluster: { name: string; }; }, clustersListUpdateFunc: { (globalClustersList: ClustersList[]): void }, globalClustersList: any[]) {
+  static async clusterDelete(serverName: string, inputData: { cluster: { name: string; }; }, clustersListUpdateFunc: { (globalClustersList: ClustersList[]): void }, globalClustersList: any[]) {
     const response = await axios.post(GetApiServerUri("/manager-api/tornjak/clusters/delete/") + serverName, inputData,
       {
         crossdomain: true,
@@ -386,7 +411,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 
   // localClusterDelete - returns success message after successful deletion of a cluster in Local mode for the server
-  async localClusterDelete(inputData: { cluster: { name: string; }; }, clustersListUpdateFunc: { (globalClustersList: ClustersList[]): void }, globalClustersList: any[]) {
+  static async localClusterDelete(inputData: { cluster: { name: string; }; }, clustersListUpdateFunc: { (globalClustersList: ClustersList[]): void }, globalClustersList: any[]) {
     const response = await axios.post(GetApiServerUri("/api/tornjak/clusters/delete"), inputData,
       {
         crossdomain: true,
@@ -403,4 +428,17 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 }
 
-export default TornjakApi;
+// export default TornjakApi;
+
+const mapStateToProps = (state: RootState) => ({
+  globalIsAuthenticated: state.auth.globalIsAuthenticated,
+  globalAccessToken: state.auth.globalAccessToken,
+  globalUserRoles: state.auth.globalUserRoles,
+});
+
+export default connect(
+  mapStateToProps,
+  {}
+)(TornjakApi);
+
+export { TornjakApi }

@@ -55,6 +55,10 @@ type AgentListProp = {
   globalTornjakServerInfo: TornjakServerInfo,  
   // list of available agents as array of AgentsListType
   globalAgentsList: AgentsList[], 
+  // whether user is authenticated or not
+  globalIsAuthenticated: boolean;
+  // updated access token
+  globalAccessToken: string | undefined;
 }
 
 type AgentListState = {
@@ -72,10 +76,8 @@ const Agent = (props: { agent: AgentsList }) => (
 )
 
 class AgentList extends Component<AgentListProp, AgentListState> {
-  TornjakApi: TornjakApi;
   constructor(props: AgentListProp) {
     super(props);
-    this.TornjakApi = new TornjakApi(props);
     this.state = {
       message: "",
     };
@@ -87,17 +89,18 @@ class AgentList extends Component<AgentListProp, AgentListState> {
     this.props.workloadSelectorInfoFunc(workloadSelectors); //set workload selector info
     if (IsManager) {
       if (this.props.globalServerSelected !== "") {
-        this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc)
-        this.TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
-        this.TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
+        TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc)
+        TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
+        TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
       }
     } else {
-      this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
-      this.TornjakApi.populateLocalAgentsUpdate(this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
-      this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
-      this.TornjakApi.populateLocalTornjakDebugServerInfo(this.props.spireDebugServerInfoUpdateFunc, this.props.tornjakMessageFunc);
+      TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
+      TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
+      TornjakApi.populateLocalAgentsUpdate(this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
+      TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
+      TornjakApi.populateLocalTornjakDebugServerInfo(this.props.spireDebugServerInfoUpdateFunc, this.props.tornjakMessageFunc);
       if (this.props.globalTornjakServerInfo && Object.keys(this.props.globalTornjakServerInfo).length) {
-        this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
+        TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
       }
     }
   }
@@ -105,13 +108,14 @@ class AgentList extends Component<AgentListProp, AgentListState> {
   componentDidUpdate(prevProps: AgentListProp) {
     if (IsManager) {
       if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
-        this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
-        this.TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
+        TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
+        TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
       }
     } else {
       if (prevProps.globalTornjakServerInfo !== this.props.globalTornjakServerInfo) {
-        this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
-        this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
+        TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
+        TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
+        TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
       }
     }
   }
@@ -154,6 +158,8 @@ const mapStateToProps = (state: RootState) => ({
   globalAgentsList: state.agents.globalAgentsList,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
   globalErrorMessage: state.tornjak.globalErrorMessage,
+  globalIsAuthenticated: state.auth.globalIsAuthenticated,
+  globalAccessToken: state.auth.globalAccessToken,
 })
 
 // Note: Needed for UI testing - will be removed after

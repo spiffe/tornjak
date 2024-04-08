@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import jwt_decode from "jwt-decode";
+// import axios from 'axios';
 import { connect } from 'react-redux';
 import IsManager from './is_manager';
 import 'carbon-components/css/carbon-components.min.css';
@@ -58,7 +59,8 @@ const NavigationBar: React.FC<NavigationBarProp> = ({
   const auth = useAuth();
   const isAuthenticated = auth.userData?.id_token ? true : false;
   const roles = (auth.userData?.profile.groups) as string[];
-
+  const accessToken = auth.userData?.access_token;
+  
   useEffect(() => {
     const fetchData = async () => {
       if (keycloak) {
@@ -72,13 +74,15 @@ const NavigationBar: React.FC<NavigationBarProp> = ({
         }
       }
       if (dex) {
+        isAuthenticatedUpdateFunc(isAuthenticated);
         if (isAuthenticated) {
           UserRolesUpdateFunc(roles);
+          accessTokenUpdateFunc(accessToken);
         }
       }
     };
     fetchData();
-  }, [isAuthenticated, roles, isAuthenticatedUpdateFunc, accessTokenUpdateFunc, UserRolesUpdateFunc]);
+  }, [isAuthenticated, roles, accessToken, isAuthenticatedUpdateFunc, accessTokenUpdateFunc, UserRolesUpdateFunc]);
 
   const isAdmin = tornjakHelper.checkRolesAdminUser(globalUserRoles)
 

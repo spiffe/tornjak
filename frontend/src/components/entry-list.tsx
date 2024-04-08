@@ -33,6 +33,10 @@ type EntryListProp = {
   globalEntriesList: EntriesList[],
   // tornjak server info of the selected server
   globalTornjakServerInfo: TornjakServerInfo,
+  // whether user is authenticated or not
+  globalIsAuthenticated: boolean;
+  // updated access token
+  globalAccessToken: string | undefined;
 }
 
 type EntryListState = {}
@@ -50,31 +54,31 @@ const Entry = (props: { entry: EntriesList }) => (
 )
 
 class EntryList extends Component<EntryListProp, EntryListState> {
-  TornjakApi: TornjakApi;
   constructor(props: EntryListProp) {
     super(props);
-    this.TornjakApi = new TornjakApi(props);
     this.state = {}
   }
 
   componentDidMount() {
     if (IsManager) {
       if (this.props.globalServerSelected !== "") {
-        this.TornjakApi.populateEntriesUpdate(this.props.globalServerSelected, this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
+        TornjakApi.populateEntriesUpdate(this.props.globalServerSelected, this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
       }
     } else {
-      this.TornjakApi.populateLocalEntriesUpdate(this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
+      TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
+      TornjakApi.populateLocalEntriesUpdate(this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
     }
   }
 
   componentDidUpdate(prevProps: EntryListProp) {
     if (IsManager) {
       if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
-        this.TornjakApi.populateEntriesUpdate(this.props.globalServerSelected, this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
+        TornjakApi.populateEntriesUpdate(this.props.globalServerSelected, this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
       }
     } else {
+      TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
       if (prevProps.globalDebugServerInfo !== this.props.globalDebugServerInfo) {
-        this.TornjakApi.populateLocalEntriesUpdate(this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
+        TornjakApi.populateLocalEntriesUpdate(this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
       }
     }
   }
@@ -113,6 +117,8 @@ const mapStateToProps = (state: RootState) => ({
   globalErrorMessage: state.tornjak.globalErrorMessage,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
   globalDebugServerInfo: state.servers.globalDebugServerInfo,
+  globalIsAuthenticated: state.auth.globalIsAuthenticated,
+  globalAccessToken: state.auth.globalAccessToken,
 })
 
 // Note: Needed for UI testing - will be removed after
