@@ -20,7 +20,7 @@ spec:
       serviceAccountName: spire-server
       containers:
         - name: spire-server
-          image: ghcr.io/spiffe/spire-server:1.4.4
+          image: ghcr.io/spiffe/spire-server:1.9.4
           args:
             - -config
             - /run/spire/config/server.conf
@@ -51,7 +51,7 @@ spec:
             periodSeconds: 5
         ### 👈 BEGIN ADDITIONAL CONTAINER ###
         - name: tornjak-backend
-          image: ghcr.io/spiffe/tornjak-backend:v1.4.2
+          image: ghcr.io/spiffe/tornjak-backend:v1.5.0
           args:
             - --spire-config
             - /run/spire/config/server.conf
