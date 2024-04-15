@@ -59,18 +59,27 @@ with more details on the general configuration
 1. **Configure Tornjak Frontend**
 Finally, the Frontend must be deployed and configured to obtain access tokens from this auth server. 
 This can be done locally with the environment variable 
-`REACT_APP_AUTH_SERVER_URI`:
+`REACT_APP_AUTH_SERVER_URI`. In addition `REACT_APP_KEYCLOAK_REALM` and `REACT_APP_OIDC_CLIENT_ID` must be set as well. 
+
+Default values are:
+
+`REACT_APP_KEYCLOAK_REALM` - 'tornjak'
+
+`REACT_APP_OIDC_CLIENT_ID` - 'tornjak'
 
 ```
 cd tornjak-frontend
 REACT_APP_API_SERVER_URI=http://localhost:10000/
+REACT_APP_KEYCLOAK_REALM=tornjak
+REACT_APP_OIDC_CLIENT_ID=tornjak
 REACT_APP_AUTH_SERVER_URI=http://localhost:8080/ npm start
 ```
 
 Alternatively, we can do the same on the containerized version:
 
 ```
-docker run -p 3000:3000 -d -e REACT_APP_API_SERVER_URI='http://localhost:10000' -e REACT_APP_AUTH_SERVER_URI='http://localhost:8080' ghcr.io/spiffe/tornjak-frontend:v1.5.0
+docker run -p 3000:3000 -d -e REACT_APP_API_SERVER_URI='http://localhost:10000' -e REACT_APP_AUTH_SERVER_URI='http://localhost:8080' -e REACT_APP_KEYCLOAK_REALM='tornjak' -e 
+REACT_APP_OIDC_CLIENT_ID='tornjak' ghcr.io/spiffe/tornjak-frontend:v1.5.0
 `
 ```
 
