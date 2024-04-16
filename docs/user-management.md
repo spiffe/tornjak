@@ -79,7 +79,7 @@ Alternatively, we can do the same on the containerized version:
 
 ```
 docker run -p 3000:3000 -d -e REACT_APP_API_SERVER_URI='http://localhost:10000' -e REACT_APP_AUTH_SERVER_URI='http://localhost:8080' -e REACT_APP_KEYCLOAK_REALM='tornjak' -e 
-REACT_APP_OIDC_CLIENT_ID='tornjak' ghcr.io/spiffe/tornjak-frontend:v1.5.0
+REACT_APP_OIDC_CLIENT_ID='tornjak' ghcr.io/spiffe/tornjak-frontend:v1.6.0
 `
 ```
 
