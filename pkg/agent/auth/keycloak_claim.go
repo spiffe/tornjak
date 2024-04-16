@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"github.com/golang-jwt/jwt/v4"
+	jwt "github.com/golang-jwt/jwt/v5"
 )
 
 type RealmAccessSubclaim struct {
@@ -10,5 +10,5 @@ type RealmAccessSubclaim struct {
 
 type KeycloakClaim struct {
 	RealmAccess RealmAccessSubclaim `json:"realm_access"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }

@@ -1,21 +1,23 @@
 package auth
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
 	"strings"
 	"time"
-	//"encoding/json"
 
-	"github.com/MicahParks/keyfunc"
-	"github.com/golang-jwt/jwt/v4"
+	keyfunc "github.com/MicahParks/keyfunc/v2"
+	jwt "github.com/golang-jwt/jwt/v5"
+	"github.com/pardot/oidc/discovery"
 	"github.com/pkg/errors"
 )
 
 type KeycloakVerifier struct {
 	jwks            *keyfunc.JWKS
-	redirect        string
+	jwksURL         string
+	audience        string
 	api_permissions map[string][]string
 	role_mappings   map[string][]string
 }
@@ -81,7 +83,16 @@ func getKeyFunc(httpjwks bool, jwksInfo string) (*keyfunc.JWKS, error) {
 	}
 }
 
-func NewKeycloakVerifier(httpjwks bool, jwksURL string, redirectURL string) (*KeycloakVerifier, error) {
+func NewKeycloakVerifier(httpjwks bool, issuerURL string, audience string) (*KeycloakVerifier, error) {
+	// perform OIDC discovery
+	oidcClient, err := discovery.NewClient(context.Background(), issuerURL)
+	if err != nil {
+		return nil, errors.Errorf("Could not set up OIDC Discovery client with issuer = '%s': %v", issuerURL, err)
+	}
+	oidcClientMetadata := oidcClient.Metadata()
+	jwksURL := oidcClientMetadata.JWKSURI
+
+	// watch JWKS
 	jwks, err := getKeyFunc(httpjwks, jwksURL)
 	if err != nil {
 		return nil, err
@@ -89,7 +100,8 @@ func NewKeycloakVerifier(httpjwks bool, jwksURL string, redirectURL string) (*Ke
 	api_permissions, role_mappings := getAuthLogic()
 	return &KeycloakVerifier{
 		jwks:            jwks,
-		redirect:        redirectURL,
+		audience:        audience,
+		jwksURL:         jwksURL,
 		api_permissions: api_permissions,
 		role_mappings:   role_mappings,
 	}, nil
@@ -154,14 +166,15 @@ func (v *KeycloakVerifier) Verify(r *http.Request) error {
 		return nil
 	}
 
-	token, err := get_token(r, v.redirect)
+	token, err := get_token(r, v.jwksURL)
 	if err != nil {
 		return err
 	}
 
 	// parse token
 	claims := &KeycloakClaim{}
-	jwt_token, err := jwt.ParseWithClaims(token, claims, v.jwks.Keyfunc)
+	parserOptions := jwt.WithAudience(v.audience)
+	jwt_token, err := jwt.ParseWithClaims(token, claims, v.jwks.Keyfunc, parserOptions)
 	if err != nil {
 		return errors.Errorf("Error parsing token: %s", err.Error())
 	}

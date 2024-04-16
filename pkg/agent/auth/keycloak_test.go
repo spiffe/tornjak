@@ -11,10 +11,10 @@ import (
 	//"github.com/spiffe/tornjak/tornjak-backend/pkg/agent/types"
 )
 
-var jwksURL string
+var issuerURL string
 
 func init() {
-	flag.StringVar(&jwksURL, "jwksURL", "", "JWKS Url")
+	flag.StringVar(&issuerURL, "jwksURL", "", "JWKS Url")
 }
 
 // TODO tests for Verify - currently AUTH logic too integrated to make general unit tests
@@ -23,28 +23,28 @@ func init() {
 // Uses functions NewKeycloakVerfier
 func TestNewKeycloakVerifier(t *testing.T) {
 	// INIT failures
-	_, err := NewKeycloakVerifier(true, "", "testredirect")
+	_, err := NewKeycloakVerifier(true, "", "")
 	if err == nil {
-		t.Fatal("ERROR: successfully initialized keyfunc for empty url")
+		t.Fatal("ERROR: successfully initialized keyfunc for empty issuer url")
 	}
-	_, err = NewKeycloakVerifier(true, "invalideurl", "testredirect")
+	_, err = NewKeycloakVerifier(true, "invalid url", "")
 	if err == nil {
 		t.Fatal("ERROR: successfully initialized keyfunc for invalid url")
 	}
 
-	_, err = NewKeycloakVerifier(false, "", "testredirect")
+	_, err = NewKeycloakVerifier(false, "", "")
 	if err == nil {
 		t.Fatal("ERROR: successfully initialized keyfunc for empty jwks json")
 	}
 	// INIT success JSON
 	sample_json := `{"keys":[{"kty":"RSA","e":"AQAB","use":"sig","kid":"MjhhMDk2N2M2NGEwMzgzYjk2OTI3YzdmMGVhOGYxNjI2OTc5Y2Y2MQ","alg":"RS256","n":"zZU9xSgK77PbtkjJgD2Vmmv6_QNe8B54eyOV0k5K2UwuSnhv9RyRA3aL7gDN-qkANemHw3H_4Tc5SKIMltVIYdWlOMW_2m3gDBOODjc1bE-WXEWX6nQkLAOkoFrGW3bgW8TFxfuwgZVTlb6cYkSyiwc5ueFV2xNqo96Qf7nm5E7KZ2QDTkSlNMdW-jIVHMKjuEsy_gtYMaEYrwk5N7VoiYwePaF3I0_g4G2tIrKTLb8DvHApsN1h-s7jMCQFBrY4vCf3RBlYULr4Nz7u8G2NL_L9vURSCU2V2A8rYRkoZoZwk3a3AyJiqeC4T_1rmb8XdrgeFHB5bzXZ7EI0TObhlw"}]}`
-	_, err = NewKeycloakVerifier(false, sample_json, "testredirect")
+	_, err = NewKeycloakVerifier(false, sample_json, "")
 	if err != nil {
 		t.Fatalf("ERROR: could not create keyfunc from json: %v", err)
 	}
 
-	if jwksURL != "" {
-		_, err = NewKeycloakVerifier(true, jwksURL, "testredirect")
+	if issuerURL != "" {
+		_, err = NewKeycloakVerifier(true, issuerURL, "")
 		if err != nil {
 			t.Fatalf("ERROR: could not create keyfunc from HTTP: %v", err)
 		}

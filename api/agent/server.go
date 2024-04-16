@@ -13,7 +13,7 @@ import (
 	"time"
 	"crypto/tls"
 
-	"github.com/cenkalti/backoff/v4"
+	backoff "github.com/cenkalti/backoff/v4"
 	"github.com/gorilla/mux"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
@@ -765,14 +765,24 @@ func NewAuth(authPlugin *ast.ObjectItem) (auth.Auth, error) {
 
 	switch key {
 	case "KeycloakAuth":
+		// check if data is defined
+		if data == nil {
+			return nil, errors.New("KeycloakAuth UserManagement plugin ('config > plugins > UserManagement KeycloakAuth > plugin_data') no populated")
+		}
+		fmt.Printf("KeycloakAuth Usermanagement Data: %+v\n", data)
 		// decode config to struct
 		var config pluginAuthKeycloak
 		if err := hcl.DecodeObject(&config, data); err != nil {
 			return nil, errors.Errorf("Couldn't parse Auth config: %v", err)
 		}
 
+		// Log warning if audience is nil that aud claim is not checked
+		if config.Audience == "" {
+			fmt.Printf("WARNING: Auth plugin has no expected audience configured - `aud` claim will not be checked (please populate 'config > plugins > UserManagement KeycloakAuth > plugin_data > audience')")
+		}
+
 		// create verifier TODO make json an option?
-		verifier, err := auth.NewKeycloakVerifier(true, config.JwksURL, config.RedirectURL)
+		verifier, err := auth.NewKeycloakVerifier(true, config.IssuerURL, config.Audience)
 		if err != nil {
 			return nil, errors.Errorf("Couldn't configure Auth: %v", err)
 		}

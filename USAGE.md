@@ -17,7 +17,7 @@ Please see below for compatibility charts of SPIRE server versions with Tornjak:
 | Tornjak version        | SPIRE Server version |
 | :--------------------- | :------------------- |
 | v1.1.x, v1.2.x, v1.3.x | v1.1.x, v1.2.x, v1.3.x, v1.4.x |
-| v1.4.x                 | v1.5.x, v1.6.x, v1.7.x |
+| v1.4.x, v1.5.x, v1.6.x | v1.5.x, v1.6.x, v1.7.x, v1.8.x, v1.9.x|
 
 ## Tornjak Backend
 
@@ -57,6 +57,8 @@ The frontend is meant to connect to either the Tornjak backend or the Tornjak ma
 | `NODE_OPTIONS`              | Node options for npm start | `--openssl-legacy-provider` | `--openssl-legacy-provider` | false |
 | `REACT_APP_TORNJAK_MANAGER` | Boolean for whether the connected server is a manager | `false` | `true` | false |
 | `REACT_APP_AUTH_SERVER_URI` | URI for the Keycloak instance to obtain access tokens |  | `http://localhost:8080` | false |
+| `REACT_APP_KEYCLOAK_REALM` | Name of Keycloak realm |  | 'tornjak' | false |
+| `REACT_APP_OIDC_CLIENT_ID` | Auth Client ID |  | 'tornjak' | false |
 | `PORT_FE` | Port for the frontend to run | `3000` | `3000` | true |
 | `PORT_BE` | Port for the backend to run | `10000` | `10000` | true |
 | `REACT_APP_SPIRE_HEALTH_CHECK_ENABLE` | Enable SPIRE health check component | `false` | `true` | false |

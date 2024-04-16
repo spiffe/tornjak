@@ -1,23 +1,26 @@
 # Server plugin: Authorization "keycloak"
 
-Please see our documentation on the [authorization feature](./feature_auth.md) for more complete details. 
+Please see our documentation on the [authorization feature](./user-management.md) for more complete details. 
 
 Note that configuring this requires the frontend to be configured to obtain access tokens at the relevant auth server. 
 
 The configuration has the following key-value pairs:
 
-| Key         | Description                                                             | Required | 
-| ----------- | ----------------------------------------------------------------------- | -------- |
-| jwksURL     | Location of the public keys used to validate access tokens              | True     |
-| redirectuRL | Location of the redirect URL to the auth server to obtain access tokens | True     |
+| Key         | Description                                                             | Required            | 
+| ----------- | ----------------------------------------------------------------------- | ------------------- |
+| issuer      | Issuer URL for OIDC Discovery with external IAM System                  | True                |
+| audience    | Expected audience value in received JWT tokens                          | False (Recommended) |
 
 A sample configuration file for syntactic referense is below:
 
 ```hcl
     UserManagement "KeycloakAuth" {
         plugin_data {
-            jwksURL = "http://localhost:8080/jwks"
-            redirectURL = "http://localhost:10000/*"
+            issuer = "http://localhost:8080/realms/tornjak"
+            audience = "tornjak-backend"
         }
     }
 ```
+
+NOTE: If audience field is missing or empty, the server will log an error and NOT perform an audience check. 
+It is highly recommended `audience` is populated to ensure only tokens meant for the Tornjak Backend are accepted. 

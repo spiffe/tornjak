@@ -1,4 +1,4 @@
-VERSION=$(shell cat version.txt)
+VERSION ?= $(shell cat version.txt)
 GITHUB_SHA ?= "$(shell git rev-parse HEAD 2>/dev/null)"
 
 ## REPO defines where to push images
@@ -18,7 +18,7 @@ DOCKERFILE_FRONTEND ?= frontend/Dockerfile.frontend-container
 BINARIES=tornjak-backend tornjak-manager
 IMAGES=$(BINARIES) tornjak-frontend 
 
-GO_VERSION ?= 1.20
+GO_VERSION ?= 1.22
 
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
 
@@ -61,7 +61,7 @@ binaries: $(addprefix bin/,$(BINARIES)) ## Build bin/tornjak-backend and bin/tor
 
 bin/tornjak-backend: cmd/agent $(GO_FILES) | vendor ## Build tornjak-backend binary
 	# Build hack because of flake of imported go module
-	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:$(GO_VERSION) \
+	docker run --rm -v "${PWD}":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 -e CGO_ENABLED=1 golang:$(GO_VERSION) \
 		/bin/sh -c "go build --tags 'sqlite_json' -o agent ./$</main.go; go build --tags 'sqlite_json' -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o $@ ./$</main.go"
 
 bin/tornjak-manager: cmd/manager $(GO_FILES) | vendor ## Build bin/tornjak-manager binary
