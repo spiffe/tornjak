@@ -1,7 +1,7 @@
 import {env} from '../env';
 
 const dexConfig = {
-  authority: "http://dex.dex:5556/dex",
+  authority: "http://localhost:5556/dex",
   clientId: env.REACT_APP_OIDC_CLIENT_ID,
   clientSecret: env.REACT_APP_OIDC_CLIENT_SECRET,
   // autoSignIn: true,

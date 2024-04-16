@@ -25,7 +25,6 @@ import { useAuth } from "oidc-react";
 const keycloak = env.REACT_APP_AUTH_SERVER_URI;
 const dex = env.REACT_APP_DEX;
 const withAuth = env.REACT_APP_AUTH_SERVER_URI || env.REACT_APP_DEX;
-
 type NavigationBarProp = {
   // dispatches a payload if user is authenticated or not return type of void
   isAuthenticatedUpdateFunc: (globalIsAuthenticated: boolean) => void;
@@ -60,7 +59,7 @@ const NavigationBar: React.FC<NavigationBarProp> = ({
   const isAuthenticated = auth.userData?.id_token ? true : false;
   const roles = (auth.userData?.profile.groups) as string[];
   const accessToken = auth.userData?.access_token;
-  
+
   useEffect(() => {
     const fetchData = async () => {
       if (keycloak) {
@@ -84,7 +83,10 @@ const NavigationBar: React.FC<NavigationBarProp> = ({
     fetchData();
   }, [isAuthenticated, roles, accessToken, isAuthenticatedUpdateFunc, accessTokenUpdateFunc, UserRolesUpdateFunc]);
 
-  const isAdmin = tornjakHelper.checkRolesAdminUser(globalUserRoles)
+  let isAdmin = false;
+  if(globalUserRoles !== undefined) {
+    isAdmin = tornjakHelper.checkRolesAdminUser(globalUserRoles)
+  };
 
   let managerNavs;
   managerNavs =
