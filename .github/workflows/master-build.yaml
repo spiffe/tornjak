@@ -34,7 +34,7 @@ jobs:
       - name: Run build
         uses: ./.github/actions/build
         with:
-          tag-version: ${{ contains(fromJSON('["main", "v1.6"]'), steps.branch_name.outputs.branch) && true || false }}
+          tag-version: ${{ contains(fromJSON('["main", "v1.7"]'), steps.branch_name.outputs.branch) && true || false }}
 
       - name: Print job result
         run: |
@@ -73,7 +73,7 @@ jobs:
           image-tag-prefix: ubi-
           backend-dockerfile: Dockerfile.backend-container.ubi
           frontend-dockerfile: frontend/Dockerfile.frontend-container.ubi
-          tag-version: ${{ contains(fromJSON('["main", "v1.6"]'), steps.branch_name.outputs.branch) && true || false }}
+          tag-version: ${{ contains(fromJSON('["main", "v1.7"]'), steps.branch_name.outputs.branch) && true || false }}
 
       - name: Print job result
         run: |
