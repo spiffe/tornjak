@@ -11,6 +11,6 @@ runs:
       id: version
       shell: bash
       run: |
-        version=$(cat version | cut -d '.' -f -2)
+        version="$(cat version.txt | cut -d '.' -f -2)"
         echo VERSION=$version
         echo "version=$version" >> $GITHUB_OUTPUT
