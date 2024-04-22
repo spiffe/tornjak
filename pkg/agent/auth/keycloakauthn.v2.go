@@ -85,16 +85,16 @@ func getToken(r *http.Request, redirectURL string) (string, error) {
 
 }
 
-func (v *KeycloakAuthenticator) AuthenticateRequest(r *http.Request)(*UserInfo, error) {
-	token, err := getToken(r, v.jwksURL)
+func (a *KeycloakAuthenticator) AuthenticateRequest(r *http.Request)(*UserInfo, error) {
+	token, err := getToken(r, a.jwksURL)
 	if err != nil {
 		return nil, err
 	}
 
 	// parse token
 	claims := &KeycloakClaim{}
-	parserOptions := jwt.WithAudience(v.audience)
-	jwt_token, err := jwt.ParseWithClaims(token, claims, v.jwks.Keyfunc, parserOptions)
+	parserOptions := jwt.WithAudience(a.audience)
+	jwt_token, err := jwt.ParseWithClaims(token, claims, a.jwks.Keyfunc, parserOptions)
 	if err != nil {
 		return nil, errors.Errorf("Error parsing token: %s", err.Error())
 	}

@@ -811,6 +811,43 @@ func NewAuth(authPlugin *ast.ObjectItem) (auth.Auth, error) {
 	}
 }
 
+// NewAuthenticator returns a new Auth
+func NewAuthenticator(authenticatorPlugin *ast.ObjectItem) (auth.Authenticator, error) {
+	key, data, _ := getPluginConfig(authenticatorPlugin)
+	/*if err != nil { // default used, no error
+		verifier := auth.NewNullVerifier()
+		return verifier, nil
+	}*/
+
+	switch key {
+	case "Keycloak":
+		// check if data is defined
+		if data == nil {
+			return nil, errors.New("Keycloak Authenticator plugin ('config > plugins > Authenticator Keycloak > plugin_data') not populated")
+		}
+		fmt.Printf("Authenticator Keycloak Plugin Data: %+v\n", data)
+		// decode config to struct
+		var config pluginAuthenticatorKeycloak
+		if err := hcl.DecodeObject(&config, data); err != nil {
+			return nil, errors.Errorf("Couldn't parse Auth config: %v", err)
+		}
+
+		// Log warning if audience is nil that aud claim is not checked
+		if config.Audience == "" {
+			fmt.Printf("WARNING: Auth plugin has no expected audience configured - `aud` claim will not be checked (please populate 'config > plugins > UserManagement KeycloakAuth > plugin_data > audience')")
+		}
+
+		// create authenticator TODO make json an option?
+		authenticator, err := auth.NewKeycloakAuthenticator(true, config.IssuerURL, config.Audience)
+		if err != nil {
+			return nil, errors.Errorf("Couldn't configure Auth: %v", err)
+		}
+		return authenticator, nil
+	default:
+		return nil, errors.Errorf("Invalid option for UserManagement named %s", key)
+	}
+}
+
 func (s *Server) VerifyConfiguration() error {
 	if s.TornjakConfig == nil {
 		return errors.New("config not given")
@@ -890,6 +927,12 @@ func (s *Server) Configure() error {
 			s.Auth, err = NewAuth(pluginObject)
 			if err != nil {
 				return errors.Errorf("Cannot configure auth plugin: %v", err)
+			}
+		// configure Authenticator
+		case "Authenticator":
+			s.Authenticator, err = NewAuthenticator(pluginObject)
+			if err != nil {
+				return errors.Errorf("Cannot configure Authenticator plugin: %v", err)
 			}
 		}
 		// TODO Handle when multiple plugins configured
