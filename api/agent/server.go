@@ -37,6 +37,8 @@ type Server struct {
 	// Plugins
 	Db   agentdb.AgentDB
 	Auth auth.Auth
+	Authenticator auth.Authenticator
+	Authorizer auth.Authorizer
 }
 
 // config type, as defined by SPIRE
@@ -429,15 +431,32 @@ func (s *Server) verificationMiddleware(next http.Handler) http.Handler {
 			cors(w, r)
 			return
 		}
+		// TODO remove this section
 		err := s.Auth.Verify(r)
 		if err != nil {
 			emsg := fmt.Sprintf("Error authorizing request: %v", err.Error())
 			// error should be written already
 			retError(w, emsg, http.StatusUnauthorized)
 			return
-		} else {
-			next.ServeHTTP(w, r)
+		} 
+
+		userInfo, err := s.Authenticator.AuthenticateRequest(r)
+		if err != nil {
+			emsg := fmt.Sprintf("Error authenticating request: %v", err.Error())
+			// error should be written already
+			retError(w, emsg, http.StatusUnauthorized)
+			return
 		}
+
+		err = s.Authorizer.AuthorizeRequest(r, userInfo)
+		if err != nil {
+			emsg := fmt.Sprintf("Error authorizing request: %v", err.Error())
+			// error should be written already
+			retError(w, emsg, http.StatusUnauthorized)
+			return
+		}
+
+		next.ServeHTTP(w, r)
 	}
 	return http.HandlerFunc(f)
 }
@@ -815,6 +834,8 @@ func (s *Server) VerifyConfiguration() error {
 func (s *Server) ConfigureDefaults() error {
 	// no authorization is a default
 	s.Auth = auth.NewNullVerifier()
+	s.Authenticator = auth.NewNullAuthenticator()
+	s.Authorizer = auth.NewNullAuthorizer()
 	return nil
 }
 
