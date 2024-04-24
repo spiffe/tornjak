@@ -75,7 +75,7 @@ For examples on enabling TLS and mTLS connections, please see [our TLS and mTLS 
 | Type | Name | Description |
 | ---- | ---- | ----------- |
 | DataStore | [sql]() | Default SQL storage for Tornjak metadata |
-| UserManagement | [keycloak](/docs/plugin_server_auth_keycloak.md) | Requires JWT Bearer Access Token provided for each request. More details in [our auth feature doc](/docs/feature_auth.md) |
+| UserManagement | [keycloak](/docs/plugin_server_auth_keycloak.md) | Requires JWT Bearer Access Token provided for each request. More details in [our auth feature doc](/docs/user-management.md) |
 
 ### Plugin configuration
 

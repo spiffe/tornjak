@@ -104,11 +104,11 @@ func (h HTTPSConfig) Parse() (*tls.Config, error) {
 
 /* Plugin types */
 type pluginDataStoreSQL struct {
-	Drivername string `json:"drivername"`
-	Filename   string `json:"filename"`
+	Drivername string `hcl:"drivername"`
+	Filename   string `hcl:"filename"`
 }
 
 type pluginAuthKeycloak struct {
-	JwksURL     string
-	RedirectURL string
+	IssuerURL string `hcl:"issuer"`
+	Audience  string `hcl:"audience"`
 }

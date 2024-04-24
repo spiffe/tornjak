@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spiffe/spire/pkg/common/catalog"
 	agentapi "github.com/spiffe/tornjak/api/agent"
-	"github.com/urfave/cli/v2"
+	cli "github.com/urfave/cli/v2"
 )
 
 type cliOptions struct {
