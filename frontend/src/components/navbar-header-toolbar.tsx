@@ -5,7 +5,7 @@ import KeycloakService from "auth/KeycloakAuth";
 import { env } from '../env';
 import { useAuth } from "oidc-react";
 
-const withAuth = env.REACT_APP_AUTH_SERVER_URI || env.REACT_APP_DEX;
+const withAuth = env.REACT_APP_AUTH_SERVER_URI || env.REACT_APP_OIDC;
 const keycloak = env.REACT_APP_AUTH_SERVER_URI;
 
 type HeaderToolBarProp = {}

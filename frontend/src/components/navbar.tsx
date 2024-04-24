@@ -23,8 +23,8 @@ import { env } from '../env';
 import { useAuth } from "oidc-react";
 
 const keycloak = env.REACT_APP_AUTH_SERVER_URI;
-const dex = env.REACT_APP_DEX;
-const withAuth = env.REACT_APP_AUTH_SERVER_URI || env.REACT_APP_DEX;
+const dex = env.REACT_APP_OIDC;
+const withAuth = env.REACT_APP_AUTH_SERVER_URI || env.REACT_APP_OIDC;
 type NavigationBarProp = {
   // dispatches a payload if user is authenticated or not return type of void
   isAuthenticatedUpdateFunc: (globalIsAuthenticated: boolean) => void;

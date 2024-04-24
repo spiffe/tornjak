@@ -1,6 +1,6 @@
 import {env} from '../env';
 
-const dexConfig = {
+const oidcConfig = {
   authority: "http://localhost:5556/dex",
   clientId: env.REACT_APP_OIDC_CLIENT_ID,
   clientSecret: env.REACT_APP_OIDC_CLIENT_SECRET,
@@ -13,4 +13,4 @@ const dexConfig = {
   },
 };
 
-export default dexConfig;
+export default oidcConfig;

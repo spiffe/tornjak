@@ -6,15 +6,15 @@ import reportWebVitals from './reportWebVitals';
 import KeycloakService from "./auth/KeycloakAuth";
 import { env } from './env';
 import { AuthProvider } from "oidc-react";
-import dexConfig from"./auth/DexAuth";
+import oidcConfig from"./auth/DexAuth";
 
 const renderApp = () => ReactDOM.render(<App />, document.getElementById('root'));
 
 if (env.REACT_APP_AUTH_SERVER_URI) { // with Auth using Keycloak
   KeycloakService.initKeycloak(renderApp);
-} else if (env.REACT_APP_DEX) { //with Auth using Dex (Automated)
+} else if (env.REACT_APP_OIDC) { //with Auth using Dex (Automated)
   ReactDOM.render(
-    <AuthProvider {...dexConfig}>
+    <AuthProvider {...oidcConfig}>
       <App />
     </AuthProvider>,
     document.getElementById('root')
