@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import KeycloakService from "./auth/KeycloakAuth";
 import { env } from './env';
 import { AuthProvider } from "oidc-react";
-import oidcConfig from"./auth/DexAuth";
+import oidcConfig from"./auth/OIDCAuth";
 
 const renderApp = () => ReactDOM.render(<App />, document.getElementById('root'));
 

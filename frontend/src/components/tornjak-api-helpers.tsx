@@ -20,7 +20,7 @@ import { showResponseToast } from './error-api';
 // import { logError } from './helpers';
 // import { displayResponseError } from './error-api';
 import { env } from '../env';
-const withAuth = env.REACT_APP_AUTH_SERVER_URI || env.REACT_APP_DEX;
+const withAuth = env.REACT_APP_AUTH_SERVER_URI || env.REACT_APP_OIDC;
 
 type TornjakApiProp = {
   // whether user is authenticated or not
