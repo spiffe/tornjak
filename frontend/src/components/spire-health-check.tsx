@@ -2,7 +2,7 @@ import { Component } from 'react';
 import './style.css';
 import { RootState } from 'redux/reducers';
 import { connect } from 'react-redux';
-import { Dropdown, Tooltip, InlineLoading } from 'carbon-components-react';
+import { Dropdown, InlineLoading } from 'carbon-components-react';
 import TornjakApi from './tornjak-api-helpers';
 import {
   spireHealthCheckFunc,
