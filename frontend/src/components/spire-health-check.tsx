@@ -130,11 +130,11 @@ class SpireHealthCheck extends Component<SpireHealthCheckProp, SpireHealthCheckS
       </div>
     return (
       <div className="health-check">
-        <div className='spire-health-refresh-tooltip'>
+        {/* <div className='spire-health-refresh-tooltip'>
           <Tooltip>
             <p className="spire-health-helper">SPIRE Health Refresh Frequency</p>
           </Tooltip>
-        </div>
+        </div> */}
         <div className="spire-health-check-refresh-dropdown">
           <Dropdown
             ariaLabel="spire-refresh-rate-drop-down"

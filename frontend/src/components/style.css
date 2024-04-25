@@ -410,10 +410,10 @@
   display: inline-block;
 }
 
-.spire-health-refresh-tooltip {
+/* .spire-health-refresh-tooltip {
   display: inline-block;
   margin-right: 10px;
-}
+} */
 
 .spire-health-helper {
   color: rgb(252, 252, 252);

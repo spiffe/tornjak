@@ -12,8 +12,7 @@ type HeaderToolBarProp = {}
 
 const HeaderToolBar: React.FC<HeaderToolBarProp> = () => {
     const auth = useAuth();
-    const isAuthenticated = auth.userData?.id_token ? true : false;
-
+    let isAuthenticated = auth.userData?.id_token ? true : false;
     useEffect(() => {
         if (!auth.isLoading && !isAuthenticated) {
             auth.signIn(); // redirect user to login page after successful logout
@@ -24,7 +23,7 @@ const HeaderToolBar: React.FC<HeaderToolBarProp> = () => {
         KeycloakService.doLogout();
     };
 
-    const handleDexLogOut = () => {
+    const handleOIDCLogOut = () => {
         auth.signOut();
     };
 
@@ -42,7 +41,7 @@ const HeaderToolBar: React.FC<HeaderToolBarProp> = () => {
                             <a
                                 href="#"
                                 className="nav-link"
-                                onClick={keycloak ? handleKeycloakLogout : handleDexLogOut}>
+                                onClick={keycloak ? handleKeycloakLogout : handleOIDCLogOut}>
                                 Logout {keycloak ? KeycloakService.getFirstName() : auth.userData?.profile?.name}
                             </a>
                         )}
