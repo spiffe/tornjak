@@ -811,13 +811,9 @@ func NewAuth(authPlugin *ast.ObjectItem) (auth.Auth, error) {
 	}
 }
 
-// NewAuthenticator returns a new Auth
+// NewAuthenticator returns a new Authenticator
 func NewAuthenticator(authenticatorPlugin *ast.ObjectItem) (auth.Authenticator, error) {
 	key, data, _ := getPluginConfig(authenticatorPlugin)
-	/*if err != nil { // default used, no error
-		verifier := auth.NewNullVerifier()
-		return verifier, nil
-	}*/
 
 	switch key {
 	case "Keycloak":
@@ -840,11 +836,28 @@ func NewAuthenticator(authenticatorPlugin *ast.ObjectItem) (auth.Authenticator, 
 		// create authenticator TODO make json an option?
 		authenticator, err := auth.NewKeycloakAuthenticator(true, config.IssuerURL, config.Audience)
 		if err != nil {
-			return nil, errors.Errorf("Couldn't configure Auth: %v", err)
+			return nil, errors.Errorf("Couldn't configure Authenticator: %v", err)
 		}
 		return authenticator, nil
 	default:
-		return nil, errors.Errorf("Invalid option for UserManagement named %s", key)
+		return nil, errors.Errorf("Invalid option for Authenticator named %s", key)
+	}
+}
+
+// NewAuthorizer returns a new Authorizer
+func NewAuthorizer(authorizerPlugin *ast.ObjectItem) (auth.Authorizer, error) {
+	key, _, _ := getPluginConfig(authorizerPlugin)
+
+	switch key {
+	case "AdminViewer":
+		// this is an empty plugin with no config - a static authorization logic example
+		authorizer, err := auth.NewAdminViewerAuthorizer()
+		if err != nil {
+			return nil, errors.Errorf("Couldn't configure Authorizer: %v", err)
+		}
+		return authorizer, nil
+	default:
+		return nil, errors.Errorf("Invalid option for Authorizer named %s", key)
 	}
 }
 
@@ -933,6 +946,12 @@ func (s *Server) Configure() error {
 			s.Authenticator, err = NewAuthenticator(pluginObject)
 			if err != nil {
 				return errors.Errorf("Cannot configure Authenticator plugin: %v", err)
+			}
+		// configure Authorizer
+		case "Authorizer":
+			s.Authorizer, err = NewAuthorizer(pluginObject)
+			if err != nil {
+				return errors.Errorf("Cannot configure Authorizer plugin: %v", err)
 			}
 		}
 		// TODO Handle when multiple plugins configured
