@@ -1,4 +1,4 @@
-package auth
+package authenticator
 
 import (
 	"context"
@@ -12,7 +12,18 @@ import (
 	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/pardot/oidc/discovery"
 	"github.com/pkg/errors"
+
+	"github.com/spiffe/tornjak/pkg/agent/authentication/user"
 )
+
+type RealmAccessSubclaim struct {
+	Roles []string `json:"roles"`
+}
+
+type KeycloakClaim struct {
+	RealmAccess RealmAccessSubclaim `json:"realm_access"`
+	jwt.RegisteredClaims
+}
 
 type KeycloakAuthenticator struct {
 	jwks            *keyfunc.JWKS
@@ -101,7 +112,7 @@ func (a *KeycloakAuthenticator) TranslateToTornjakRoles(roles []string) ([]strin
 	return translatedRoles
 }
 
-func (a *KeycloakAuthenticator) AuthenticateRequest(r *http.Request)(*UserInfo, error) {
+func (a *KeycloakAuthenticator) AuthenticateRequest(r *http.Request)(*user.UserInfo, error) {
 	token, err := getToken(r, a.jwksURL)
 	if err != nil {
 		return nil, err
@@ -123,7 +134,7 @@ func (a *KeycloakAuthenticator) AuthenticateRequest(r *http.Request)(*UserInfo, 
 	// translate roles to tornjak roles
 	tornjakRoles := a.TranslateToTornjakRoles(claims.RealmAccess.Roles)
 
-	return &UserInfo{
+	return &user.UserInfo{
 		Roles: tornjakRoles,
 	}, nil
 }

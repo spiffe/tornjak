@@ -1,8 +1,10 @@
-package auth
+package authorization
 
 import (
 	"net/http"
 	"github.com/pkg/errors"
+
+	"github.com/spiffe/tornjak/pkg/agent/authentication/user"
 )
 
 type ReadWriteAuthorizer struct {
@@ -46,7 +48,7 @@ func NewAdminViewerAuthorizer() (*ReadWriteAuthorizer, error) {
 	}, nil
 }
 
-func (a *ReadWriteAuthorizer) AuthorizeRequest(r *http.Request, u *UserInfo) error {
+func (a *ReadWriteAuthorizer) AuthorizeRequest(r *http.Request, u *user.UserInfo) error {
 	roles := u.Roles
 	apiPath := r.URL.Path
 

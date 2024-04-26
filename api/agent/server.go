@@ -20,8 +20,10 @@ import (
 	"github.com/hashicorp/hcl/hcl/token"
 	"github.com/pkg/errors"
 
-	auth "github.com/spiffe/tornjak/pkg/agent/auth"
 	agentdb "github.com/spiffe/tornjak/pkg/agent/db"
+	"github.com/spiffe/tornjak/pkg/agent/auth"
+	"github.com/spiffe/tornjak/pkg/agent/authentication/authenticator"
+	"github.com/spiffe/tornjak/pkg/agent/authorization"
 )
 
 type Server struct {
@@ -37,8 +39,8 @@ type Server struct {
 	// Plugins
 	Db   agentdb.AgentDB
 	Auth auth.Auth
-	Authenticator auth.Authenticator
-	Authorizer auth.Authorizer
+	Authenticator authenticator.Authenticator
+	Authorizer authorization.Authorizer
 }
 
 // config type, as defined by SPIRE
@@ -431,7 +433,7 @@ func (s *Server) verificationMiddleware(next http.Handler) http.Handler {
 			cors(w, r)
 			return
 		}
-		// TODO remove this section
+		// TODO Create bypass for liveness/readiness probe
 		err := s.Auth.Verify(r)
 		if err != nil {
 			emsg := fmt.Sprintf("Error authorizing request: %v", err.Error())
@@ -812,7 +814,7 @@ func NewAuth(authPlugin *ast.ObjectItem) (auth.Auth, error) {
 }
 
 // NewAuthenticator returns a new Authenticator
-func NewAuthenticator(authenticatorPlugin *ast.ObjectItem) (auth.Authenticator, error) {
+func NewAuthenticator(authenticatorPlugin *ast.ObjectItem) (authenticator.Authenticator, error) {
 	key, data, _ := getPluginConfig(authenticatorPlugin)
 
 	switch key {
@@ -834,7 +836,7 @@ func NewAuthenticator(authenticatorPlugin *ast.ObjectItem) (auth.Authenticator, 
 		}
 
 		// create authenticator TODO make json an option?
-		authenticator, err := auth.NewKeycloakAuthenticator(true, config.IssuerURL, config.Audience)
+		authenticator, err := authenticator.NewKeycloakAuthenticator(true, config.IssuerURL, config.Audience)
 		if err != nil {
 			return nil, errors.Errorf("Couldn't configure Authenticator: %v", err)
 		}
@@ -845,13 +847,13 @@ func NewAuthenticator(authenticatorPlugin *ast.ObjectItem) (auth.Authenticator, 
 }
 
 // NewAuthorizer returns a new Authorizer
-func NewAuthorizer(authorizerPlugin *ast.ObjectItem) (auth.Authorizer, error) {
+func NewAuthorizer(authorizerPlugin *ast.ObjectItem) (authorization.Authorizer, error) {
 	key, _, _ := getPluginConfig(authorizerPlugin)
 
 	switch key {
 	case "AdminViewer":
 		// this is an empty plugin with no config - a static authorization logic example
-		authorizer, err := auth.NewAdminViewerAuthorizer()
+		authorizer, err := authorization.NewAdminViewerAuthorizer()
 		if err != nil {
 			return nil, errors.Errorf("Couldn't configure Authorizer: %v", err)
 		}
@@ -884,8 +886,8 @@ func (s *Server) VerifyConfiguration() error {
 func (s *Server) ConfigureDefaults() error {
 	// no authorization is a default
 	s.Auth = auth.NewNullVerifier()
-	s.Authenticator = auth.NewNullAuthenticator()
-	s.Authorizer = auth.NewNullAuthorizer()
+	s.Authenticator = authenticator.NewNullAuthenticator()
+	s.Authorizer = authorization.NewNullAuthorizer()
 	return nil
 }
 
