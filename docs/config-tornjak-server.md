@@ -63,6 +63,10 @@ For examples on enabling TLS and mTLS connections, please see [our TLS and mTLS 
 
 ## About Tornjak plugins
 
+Tornjak supports several different plugin types, each representing a different functionality. The diagram below shows how each of the plugins fit into the backend:
+
+![tornjak backend plugin diagram](./rsrc/tornjak-backend-plugin-diagram.png)
+
 ### Plugin types
 
 | Type           | Description | Required |
