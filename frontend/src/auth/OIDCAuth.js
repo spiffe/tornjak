@@ -7,6 +7,7 @@ const oidcConfig = {
   // autoSignIn: true,
   responseType: env.REACT_APP_OIDC_RESPONSE_TYPE,
   scope: env.REACT_APP_OIDC_SCOPES,
+  // audience: "tornjak",
   redirectUri: window.location.origin,
   onSignIn: () => {
     window.location.replace(window.location.origin);
