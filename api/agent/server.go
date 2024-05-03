@@ -432,15 +432,9 @@ func (s *Server) verificationMiddleware(next http.Handler) http.Handler {
 			return
 		}
 	
-		userInfo, err := s.Authenticator.AuthenticateRequest(r)
-		if err != nil {
-			emsg := fmt.Sprintf("Error authenticating request: %v", err.Error())
-			// error should be written already
-			retError(w, emsg, http.StatusUnauthorized)
-			return
-		}
+		userInfo := s.Authenticator.AuthenticateRequest(r)
 
-		err = s.Authorizer.AuthorizeRequest(r, userInfo)
+		err := s.Authorizer.AuthorizeRequest(r, userInfo)
 		if err != nil {
 			emsg := fmt.Sprintf("Error authorizing request: %v", err.Error())
 			// error should be written already

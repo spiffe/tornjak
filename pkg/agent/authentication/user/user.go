@@ -1,5 +1,6 @@
 package user
 
 type UserInfo struct {
-	Roles []string
+	AuthenticationError error
+	Roles 		    []string
 }

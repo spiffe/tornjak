@@ -112,10 +112,16 @@ func (a *KeycloakAuthenticator) TranslateToTornjakRoles(roles []string) ([]strin
 	return translatedRoles
 }
 
-func (a *KeycloakAuthenticator) AuthenticateRequest(r *http.Request)(*user.UserInfo, error) {
+func wrapAuthenticationError(err error) (*user.UserInfo) {
+	return &user.UserInfo{
+		AuthenticationError: err,
+	}
+}
+
+func (a *KeycloakAuthenticator) AuthenticateRequest(r *http.Request)(*user.UserInfo) {
 	token, err := getToken(r, a.jwksURL)
 	if err != nil {
-		return nil, err
+		return wrapAuthenticationError(err)
 	}
 
 	// parse token
@@ -123,12 +129,12 @@ func (a *KeycloakAuthenticator) AuthenticateRequest(r *http.Request)(*user.UserI
 	parserOptions := jwt.WithAudience(a.audience)
 	jwt_token, err := jwt.ParseWithClaims(token, claims, a.jwks.Keyfunc, parserOptions)
 	if err != nil {
-		return nil, errors.Errorf("Error parsing token: %s", err.Error())
+		return wrapAuthenticationError(errors.Errorf("Error parsing token :%s", err.Error()))
 	}
 
 	// check token validity
 	if !jwt_token.Valid {
-		return nil, errors.New("Token invalid")
+		return wrapAuthenticationError(errors.New("Token invalid"))
 	}
 
 	// translate roles to tornjak roles
@@ -136,5 +142,5 @@ func (a *KeycloakAuthenticator) AuthenticateRequest(r *http.Request)(*user.UserI
 
 	return &user.UserInfo{
 		Roles: tornjakRoles,
-	}, nil
+	}
 }

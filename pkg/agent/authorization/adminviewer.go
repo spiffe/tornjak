@@ -49,6 +49,11 @@ func NewAdminViewerAuthorizer() (*ReadWriteAuthorizer, error) {
 }
 
 func (a *ReadWriteAuthorizer) AuthorizeRequest(r *http.Request, u *user.UserInfo) error {
+	// if not authenticated fail and return error
+	if u.AuthenticationError != nil {
+		return u.AuthenticationError
+	}
+
 	roles := u.Roles
 	apiPath := r.URL.Path
 
