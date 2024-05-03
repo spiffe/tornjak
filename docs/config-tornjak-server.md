@@ -72,7 +72,6 @@ Tornjak supports several different plugin types, each representing a different f
 | Type           | Description | Required |
 |:---------------|:------------|:---------|
 | DataStore      | Provides persistent storage for Tornjak metadata. | True |
-| UserManagement | Secures access to Tornjak agent and enables authorization logic | False |
 | Authentication | Verify tokens signed by external OIDC server and extract user information to be passed to the Authorization layer | False |
 | Authorization  | Based on user information passed from authentication layer, verify call permissions | False |
 
@@ -81,7 +80,6 @@ Tornjak supports several different plugin types, each representing a different f
 | Type | Name | Description |
 | ---- | ---- | ----------- |
 | DataStore | [sql]() | Default SQL storage for Tornjak metadata |
-| UserManagement | [keycloak](/docs/plugin_server_auth_keycloak.md) | Requires JWT Bearer Access Token provided for each request. More details in [our auth feature doc](/docs/user-management.md) |
 | Authentication | [keycloak](/docs/plugin_server_authentication_keycloak.md) | Perform OIDC Discovery and extract roles from `realmAccess.roles` field |
 | Authorization  | [adminviewer](/docs/plugin_server_authorization_adminviewer.md) | Check api permission based on user role and static authorization logic |
 

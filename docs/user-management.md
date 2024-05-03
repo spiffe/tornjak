@@ -46,13 +46,15 @@ with more details on the general configuration
 [here](/docs/config-tornjak-server.md). Most notably, populate a new plugin section for keycloak as defined [here](/docs/plugin_server_auth_keycloak.md) like so:
 ```
 ...
-  UserManagement "KeycloakAuth" {
+  Authentication "Keycloak" {
     plugin_data {
       # issuer - Issuer URL for OIDC
       issuer = "http://host.docker.internal:8080/realms/tornjak"
       audience = "tornjak-backend"
     }
   }
+
+  Authorization "AdminViewer" {}
 ...
 ```
 

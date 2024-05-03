@@ -21,7 +21,6 @@ import (
 	"github.com/pkg/errors"
 
 	agentdb "github.com/spiffe/tornjak/pkg/agent/db"
-	"github.com/spiffe/tornjak/pkg/agent/auth"
 	"github.com/spiffe/tornjak/pkg/agent/authentication/authenticator"
 	"github.com/spiffe/tornjak/pkg/agent/authorization"
 )
@@ -38,7 +37,6 @@ type Server struct {
 
 	// Plugins
 	Db   agentdb.AgentDB
-	Auth auth.Auth
 	Authenticator authenticator.Authenticator
 	Authorizer authorization.Authorizer
 }
@@ -433,15 +431,7 @@ func (s *Server) verificationMiddleware(next http.Handler) http.Handler {
 			cors(w, r)
 			return
 		}
-		// TODO Create bypass for liveness/readiness probe
-		err := s.Auth.Verify(r)
-		if err != nil {
-			emsg := fmt.Sprintf("Error authorizing request: %v", err.Error())
-			// error should be written already
-			retError(w, emsg, http.StatusUnauthorized)
-			return
-		} 
-
+	
 		userInfo, err := s.Authenticator.AuthenticateRequest(r)
 		if err != nil {
 			emsg := fmt.Sprintf("Error authenticating request: %v", err.Error())
@@ -776,43 +766,6 @@ func NewAgentsDB(dbPlugin *ast.ObjectItem) (agentdb.AgentDB, error) {
 	}
 }
 
-// NewAuth returns a new Auth
-func NewAuth(authPlugin *ast.ObjectItem) (auth.Auth, error) {
-	key, data, _ := getPluginConfig(authPlugin)
-	/*if err != nil { // default used, no error
-		verifier := auth.NewNullVerifier()
-		return verifier, nil
-	}*/
-
-	switch key {
-	case "KeycloakAuth":
-		// check if data is defined
-		if data == nil {
-			return nil, errors.New("KeycloakAuth UserManagement plugin ('config > plugins > UserManagement KeycloakAuth > plugin_data') no populated")
-		}
-		fmt.Printf("KeycloakAuth Usermanagement Data: %+v\n", data)
-		// decode config to struct
-		var config pluginAuthKeycloak
-		if err := hcl.DecodeObject(&config, data); err != nil {
-			return nil, errors.Errorf("Couldn't parse Auth config: %v", err)
-		}
-
-		// Log warning if audience is nil that aud claim is not checked
-		if config.Audience == "" {
-			fmt.Printf("WARNING: Auth plugin has no expected audience configured - `aud` claim will not be checked (please populate 'config > plugins > UserManagement KeycloakAuth > plugin_data > audience')")
-		}
-
-		// create verifier TODO make json an option?
-		verifier, err := auth.NewKeycloakVerifier(true, config.IssuerURL, config.Audience)
-		if err != nil {
-			return nil, errors.Errorf("Couldn't configure Auth: %v", err)
-		}
-		return verifier, nil
-	default:
-		return nil, errors.Errorf("Invalid option for UserManagement named %s", key)
-	}
-}
-
 // NewAuthenticator returns a new Authenticator
 func NewAuthenticator(authenticatorPlugin *ast.ObjectItem) (authenticator.Authenticator, error) {
 	key, data, _ := getPluginConfig(authenticatorPlugin)
@@ -885,7 +838,6 @@ func (s *Server) VerifyConfiguration() error {
 
 func (s *Server) ConfigureDefaults() error {
 	// no authorization is a default
-	s.Auth = auth.NewNullVerifier()
 	s.Authenticator = authenticator.NewNullAuthenticator()
 	s.Authorizer = authorization.NewNullAuthorizer()
 	return nil
@@ -936,12 +888,6 @@ func (s *Server) Configure() error {
 			s.Db, err = NewAgentsDB(pluginObject)
 			if err != nil {
 				return errors.Errorf("Cannot configure datastore plugin: %v", err)
-			}
-		// configure auth
-		case "UserManagement":
-			s.Auth, err = NewAuth(pluginObject)
-			if err != nil {
-				return errors.Errorf("Cannot configure auth plugin: %v", err)
 			}
 		// configure Authenticator
 		case "Authenticator":
