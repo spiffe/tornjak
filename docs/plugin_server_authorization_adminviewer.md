@@ -7,7 +7,7 @@ The configuration has no inputs. Simply creating a section as below is sufficien
 A sample configuration file for syntactic referense is below:
 
 ```hcl
-    Authorization "AdminViewer" {}
+    Authorizer "AdminViewer" {}
 ```
 
 NOTE: If this feature is enabled without an authentication layer, it will render essentially all calls unauthorizable. 

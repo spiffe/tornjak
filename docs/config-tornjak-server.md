@@ -69,19 +69,19 @@ Tornjak supports several different plugin types, each representing a different f
 
 ### Plugin types
 
-| Type           | Description | Required |
-|:---------------|:------------|:---------|
-| DataStore      | Provides persistent storage for Tornjak metadata. | True |
-| Authentication | Verify tokens signed by external OIDC server and extract user information to be passed to the Authorization layer | False |
-| Authorization  | Based on user information passed from authentication layer, verify call permissions | False |
+| Type          | Description | Required |
+|:--------------|:------------|:---------|
+| DataStore     | Provides persistent storage for Tornjak metadata. | True |
+| Authenticator | Verify tokens signed by external OIDC server and extract user information to be passed to the Authorization layer | False |
+| Authorizer    | Based on user information passed from authentication layer, verify call permissions | False |
 
 ### Built-in plugins
 
 | Type | Name | Description |
 | ---- | ---- | ----------- |
-| DataStore | [sql]() | Default SQL storage for Tornjak metadata |
-| Authentication | [keycloak](/docs/plugin_server_authentication_keycloak.md) | Perform OIDC Discovery and extract roles from `realmAccess.roles` field |
-| Authorization  | [adminviewer](/docs/plugin_server_authorization_adminviewer.md) | Check api permission based on user role and static authorization logic |
+| DataStore     | [sql]() | Default SQL storage for Tornjak metadata |
+| Authenticator | [keycloak](/docs/plugin_server_authentication_keycloak.md) | Perform OIDC Discovery and extract roles from `realmAccess.roles` field |
+| Authorizer    | [adminviewer](/docs/plugin_server_authorization_adminviewer.md) | Check api permission based on user role and static authorization logic |
 
 ### Plugin configuration
 

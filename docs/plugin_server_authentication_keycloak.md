@@ -14,7 +14,7 @@ The configuration has the following key-value pairs:
 A sample configuration file for syntactic referense is below:
 
 ```hcl
-    Authentication "Keycloak" {
+    Authenticator "Keycloak" {
         plugin_data {
             issuer = "http://localhost:8080/realms/tornjak"
             audience = "tornjak-backend"
