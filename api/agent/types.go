@@ -111,4 +111,5 @@ type pluginDataStoreSQL struct {
 type pluginAuthKeycloak struct {
 	IssuerURL string `hcl:"issuer"`
 	Audience  string `hcl:"audience"`
+	RoleClaim string `hcl:"roleclaim"`
 }

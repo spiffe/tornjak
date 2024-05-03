@@ -767,7 +767,7 @@ func NewAuth(authPlugin *ast.ObjectItem) (auth.Auth, error) {
 	case "KeycloakAuth":
 		// check if data is defined
 		if data == nil {
-			return nil, errors.New("KeycloakAuth UserManagement plugin ('config > plugins > UserManagement KeycloakAuth > plugin_data') no populated")
+			return nil, errors.New("KeycloakAuth UserManagement plugin ('config > plugins > UserManagement KeycloakAuth > plugin_data') not populated")
 		}
 		fmt.Printf("KeycloakAuth Usermanagement Data: %+v\n", data)
 		// decode config to struct
@@ -781,8 +781,12 @@ func NewAuth(authPlugin *ast.ObjectItem) (auth.Auth, error) {
 			fmt.Printf("WARNING: Auth plugin has no expected audience configured - `aud` claim will not be checked (please populate 'config > plugins > UserManagement KeycloakAuth > plugin_data > audience')")
 		}
 
+		// Error out if RoleClaim is nil
+		if config.RoleClaim == "" {
+			return nil, errors.Errorf("Couldn't configure Auth. Please populate `config > plugins > UserManagement KeycloakAuth > plugin_data > roleclaim`")
+		}
 		// create verifier TODO make json an option?
-		verifier, err := auth.NewKeycloakVerifier(true, config.IssuerURL, config.Audience)
+		verifier, err := auth.NewKeycloakVerifier(true, config.IssuerURL, config.Audience, config.RoleClaim)
 		if err != nil {
 			return nil, errors.Errorf("Couldn't configure Auth: %v", err)
 		}

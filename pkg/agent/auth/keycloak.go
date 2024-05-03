@@ -18,6 +18,7 @@ type KeycloakVerifier struct {
 	jwks            *keyfunc.JWKS
 	jwksURL         string
 	audience        string
+	roleClaim       string
 	api_permissions map[string][]string
 	role_mappings   map[string][]string
 }
@@ -83,7 +84,7 @@ func getKeyFunc(httpjwks bool, jwksInfo string) (*keyfunc.JWKS, error) {
 	}
 }
 
-func NewKeycloakVerifier(httpjwks bool, issuerURL string, audience string) (*KeycloakVerifier, error) {
+func NewKeycloakVerifier(httpjwks bool, issuerURL string, audience string, roleClaim string) (*KeycloakVerifier, error) {
 	// perform OIDC discovery
 	oidcClient, err := discovery.NewClient(context.Background(), issuerURL)
 	if err != nil {
@@ -102,6 +103,7 @@ func NewKeycloakVerifier(httpjwks bool, issuerURL string, audience string) (*Key
 		jwks:            jwks,
 		audience:        audience,
 		jwksURL:         jwksURL,
+		roleClaim:       roleClaim,
 		api_permissions: api_permissions,
 		role_mappings:   role_mappings,
 	}, nil
@@ -147,8 +149,58 @@ func (v *KeycloakVerifier) requestPermissible(r *http.Request, permissions map[s
 
 }
 
-func (v *KeycloakVerifier) isGoodRequest(r *http.Request, claims *KeycloakClaim) bool {
-	roles := claims.RealmAccess.Roles
+func (v *KeycloakVerifier) extractRoles(claims jwt.MapClaims, key string) ([]string) {
+	fmt.Printf("original claims: %v\n", claims)
+	fields := strings.Split(key, ".")
+	for i, field := range fields {
+		fmt.Printf("searching with claims: %v\n", claims)
+		fmt.Printf("field: %s\n", field)
+		subclaim, ok := claims[field]
+		fmt.Printf("subclaim found: %v\n", subclaim)
+		if !ok { // key not found
+			fmt.Printf("field not found!\n")
+			return nil
+		}
+		if i < len(fields) - 1 {
+			claims, ok = subclaim.(map[string]interface{})
+			if !ok {
+				fmt.Printf("could not cast to map!\n")
+				return nil
+			}
+		} else { // final role
+			finalSubclaim, ok := subclaim.([]interface{})
+			roles := make([]string, 0)
+			if !ok {
+				fmt.Printf("could not cast final claim to []interface{}!\n")
+				return nil
+			} 
+			for _, r := range finalSubclaim {
+				fmt.Printf("role found %v\n", r)
+				if str, ok := r.(string); ok {
+					roles = append(roles, str)
+				} else {
+					fmt.Printf("can't cast to string...\n")
+				}
+			}
+			fmt.Printf("Success!\n")
+			return roles
+		}
+	}
+	return nil
+
+	/*if groups, ok := claims[key].([]string); ok {
+		fmt.Printf("%v\n", groups)
+		return groups
+	}
+	for k := range claims {
+		fmt.Printf("%v\n", k)
+	}
+	return nil*/
+}
+
+
+func (v *KeycloakVerifier) isGoodRequest(r *http.Request, claims jwt.MapClaims) bool {
+	roles := v.extractRoles(claims, v.roleClaim)
 
 	permissions := v.getPermissions(roles)
 	return v.requestPermissible(r, permissions)
@@ -172,9 +224,8 @@ func (v *KeycloakVerifier) Verify(r *http.Request) error {
 	}
 
 	// parse token
-	claims := &KeycloakClaim{}
 	parserOptions := jwt.WithAudience(v.audience)
-	jwt_token, err := jwt.ParseWithClaims(token, claims, v.jwks.Keyfunc, parserOptions)
+	jwt_token, err := jwt.Parse(token, v.jwks.Keyfunc, parserOptions)
 	if err != nil {
 		return errors.Errorf("Error parsing token: %s", err.Error())
 	}
@@ -182,6 +233,12 @@ func (v *KeycloakVerifier) Verify(r *http.Request) error {
 	// check token validity
 	if !jwt_token.Valid {
 		return errors.New("Token invalid")
+	}
+
+	// check role claim
+	claims, ok := jwt_token.Claims.(jwt.MapClaims)
+	if !ok {
+		return errors.New("Could not parse token claims")
 	}
 
 	// check roles
