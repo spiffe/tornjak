@@ -545,41 +545,61 @@ func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (s *Server) health(w http.ResponseWriter, r *http.Request) {
+	var ret = "Endpoint is healthy."
+
+	cors(w, r)
+	je := json.NewEncoder(w)
+
+	var err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+	}
+}
+
+
 func (s *Server) GetRouter() http.Handler {
 	rtr := mux.NewRouter()
 
+	apiRtr := rtr.PathPrefix("/").Subrouter()
+	healthRtr := rtr.PathPrefix("/healthz").Subrouter()
+
+	// Healthcheck (never goes through authn/authz layers)
+	healthRtr.HandleFunc("", s.health)
+
 	// Home
-	rtr.HandleFunc("/", s.home)
+	apiRtr.HandleFunc("/", s.home)
 
 	// SPIRE server healthcheck
-	rtr.HandleFunc("/api/debugserver", s.debugServer)
-	rtr.HandleFunc("/api/healthcheck", s.healthcheck)
+	apiRtr.HandleFunc("/api/debugserver", s.debugServer)
+	apiRtr.HandleFunc("/api/healthcheck", s.healthcheck)
 
 	// Agents
-	rtr.HandleFunc("/api/agent/list", s.agentList)
-	rtr.HandleFunc("/api/agent/ban", s.agentBan)
-	rtr.HandleFunc("/api/agent/delete", s.agentDelete)
-	rtr.HandleFunc("/api/agent/createjointoken", s.agentCreateJoinToken)
+	apiRtr.HandleFunc("/api/agent/list", s.agentList)
+	apiRtr.HandleFunc("/api/agent/ban", s.agentBan)
+	apiRtr.HandleFunc("/api/agent/delete", s.agentDelete)
+	apiRtr.HandleFunc("/api/agent/createjointoken", s.agentCreateJoinToken)
 
 	// Entries
-	rtr.HandleFunc("/api/entry/list", s.entryList)
-	rtr.HandleFunc("/api/entry/create", s.entryCreate)
-	rtr.HandleFunc("/api/entry/delete", s.entryDelete)
+	apiRtr.HandleFunc("/api/entry/list", s.entryList)
+	apiRtr.HandleFunc("/api/entry/create", s.entryCreate)
+	apiRtr.HandleFunc("/api/entry/delete", s.entryDelete)
 
 	// Tornjak specific
-	rtr.HandleFunc("/api/tornjak/serverinfo", s.tornjakGetServerInfo)
+	apiRtr.HandleFunc("/api/tornjak/serverinfo", s.tornjakGetServerInfo)
 	// Agents Selectors
-	rtr.HandleFunc("/api/tornjak/selectors/register", s.tornjakPluginDefine)
-	rtr.HandleFunc("/api/tornjak/selectors/list", s.tornjakSelectorsList)
-	rtr.HandleFunc("/api/tornjak/agents/list", s.tornjakAgentsList)
+	apiRtr.HandleFunc("/api/tornjak/selectors/register", s.tornjakPluginDefine)
+	apiRtr.HandleFunc("/api/tornjak/selectors/list", s.tornjakSelectorsList)
+	apiRtr.HandleFunc("/api/tornjak/agents/list", s.tornjakAgentsList)
 	// Clusters
-	rtr.HandleFunc("/api/tornjak/clusters/list", s.clusterList)
-	rtr.HandleFunc("/api/tornjak/clusters/create", s.clusterCreate)
-	rtr.HandleFunc("/api/tornjak/clusters/edit", s.clusterEdit)
-	rtr.HandleFunc("/api/tornjak/clusters/delete", s.clusterDelete)
+	apiRtr.HandleFunc("/api/tornjak/clusters/list", s.clusterList)
+	apiRtr.HandleFunc("/api/tornjak/clusters/create", s.clusterCreate)
+	apiRtr.HandleFunc("/api/tornjak/clusters/edit", s.clusterEdit)
+	apiRtr.HandleFunc("/api/tornjak/clusters/delete", s.clusterDelete)
 
 	// Middleware
-	rtr.Use(s.verificationMiddleware)
+	apiRtr.Use(s.verificationMiddleware)
 
 	// UI
 	spa := spaHandler{staticPath: "ui-agent", indexPath: "index.html"}
