@@ -4,14 +4,23 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import KeycloakService from "./auth/KeycloakAuth";
-import {env} from './env';
+import { env } from './env';
+import { AuthProvider } from "oidc-react";
+import oidcConfig from"./auth/OIDCAuth";
 
 const renderApp = () => ReactDOM.render(<App />, document.getElementById('root'));
 
-if (env.REACT_APP_AUTH_SERVER_URI) { // with Auth for testing purposes
+if (env.REACT_APP_AUTH_SERVER_URI) { // with Auth using Keycloak
   KeycloakService.initKeycloak(renderApp);
-} else {
-  renderApp(); // without Auth
+} else if (env.REACT_APP_OIDC) { //with Auth using Dex (Automated)
+  ReactDOM.render(
+    <AuthProvider {...oidcConfig}>
+      <App />
+    </AuthProvider>,
+    document.getElementById('root')
+  );
+} else { // without Auth
+  renderApp();
 }
 
 // If you want to start measuring performance in your app, pass a function

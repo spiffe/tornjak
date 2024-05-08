@@ -12,7 +12,7 @@ const keycloakConfig = {
 };
 const keycloak = new Keycloak(keycloakConfig);
 const initKeycloak = (renderApp) => {
-    keycloak.init({ onLoad: 'login-required' })
+    keycloak.init({ onLoad: 'login-required', checkLoginIframe: false })
         .then((authenticated) => {
             if (authenticated) {
                 console.log("User is authenticated...Redirecting to Tornjak App!");
@@ -50,6 +50,7 @@ const KeycloakService = {
     doLogout,
     getToken,
     updateToken,
+    keycloakConfig
 };
 
 export default KeycloakService;

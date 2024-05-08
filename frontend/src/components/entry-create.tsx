@@ -92,6 +92,10 @@ type CreateEntryProp = {
   globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[],
   // the server trust domain and nodeAttestorPlugin as a ServerInfoType
   globalServerInfo: ServerInfo,
+  // whether user is authenticated or not
+  globalIsAuthenticated: boolean;
+  // updated access token
+  globalAccessToken: string | undefined;
 }
 
 type CreateEntryState = {
@@ -126,11 +130,9 @@ type CreateEntryState = {
 }
 
 class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
-  TornjakApi: TornjakApi;
   SpiffeHelper: SpiffeHelper;
   constructor(props: CreateEntryProp) {
     super(props);
-    this.TornjakApi = new TornjakApi(props);
     this.SpiffeHelper = new SpiffeHelper(props);
     this.onChangeSelectors = this.onChangeSelectors.bind(this);
     this.onChangeSpiffeId = this.onChangeSpiffeId.bind(this);
@@ -188,19 +190,20 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
   componentDidMount() {
     if (IsManager) {
       if (this.props.globalServerSelected !== "" && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
-        this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc)
-        this.TornjakApi.populateEntriesUpdate(this.props.globalServerSelected, this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
-        this.TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
+        TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc)
+        TornjakApi.populateEntriesUpdate(this.props.globalServerSelected, this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
+        TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
         this.setState({ selectedServer: this.props.globalServerSelected });
       }
     } else {
       // agent doesnt need to do anything
-      this.TornjakApi.populateLocalAgentsUpdate(this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
-      this.TornjakApi.populateLocalEntriesUpdate(this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
-      this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
-      this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
+      TornjakApi.populateLocalAgentsUpdate(this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
+      TornjakApi.populateLocalEntriesUpdate(this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
+      TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
+      TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
       this.props.newEntriesUpdateFunc([]);
       this.setState({})
+      TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
     }
   }
 
@@ -245,6 +248,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       if (prevState.parentId !== this.state.parentId) {
         this.prepareSelectorsList();
       }
+      TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
     }
   }
 
@@ -970,6 +974,8 @@ const mapStateToProps = (state: RootState) => ({
   globalWorkloadSelectorInfo: state.servers.globalWorkloadSelectorInfo,
   globalAgentsWorkLoadAttestorInfo: state.agents.globalAgentsWorkLoadAttestorInfo,
   globalDebugServerInfo: state.servers.globalDebugServerInfo,
+  globalIsAuthenticated: state.auth.globalIsAuthenticated,
+  globalAccessToken: state.auth.globalAccessToken,
 })
 
 // Note: Needed for UI testing - will be removed after

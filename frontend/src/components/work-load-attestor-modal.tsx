@@ -24,6 +24,10 @@ type WorkLoadAttestorProp = {
     // the list of available workload selectors and their options
     globalWorkloadSelectorInfo: { [index: string]: { label: string }[] },
     agentData: { cells: DataTableCell[] },
+    // whether user is authenticated or not
+    globalIsAuthenticated: boolean;
+    // updated access token
+    globalAccessToken: string | undefined;
 }
 
 type WorkLoadAttestorState = {
@@ -35,10 +39,8 @@ type WorkLoadAttestorState = {
     agentSpiffeId: string,
 }
 class WorkLoadAttestor extends React.Component<WorkLoadAttestorProp, WorkLoadAttestorState> {
-    TornjakApi: TornjakApi;
     constructor(props: WorkLoadAttestorProp) {
         super(props);
-        this.TornjakApi = new TornjakApi(props);
         this.state = {
             workloadPlugin: "",
             selectorsList: "",
@@ -55,16 +57,18 @@ class WorkLoadAttestor extends React.Component<WorkLoadAttestorProp, WorkLoadAtt
     componentDidMount() {
         this.prepareAgentData();
         // if (IsManager) {
-        //     this.TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
+        //     TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
         // }
         // else {
-        //     this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc, this.props.globalServerSelected);
+        //     TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc, this.props.globalServerSelected);
         // }
+        TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
     }
     componentDidUpdate(prevProps: WorkLoadAttestorProp) {
         if (prevProps !== this.props) {
             this.prepareAgentData();
         }
+        TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
     }
 
     prepareAgentData() {
@@ -80,11 +84,11 @@ class WorkLoadAttestor extends React.Component<WorkLoadAttestorProp, WorkLoadAtt
             "plugin": this.state.workloadPlugin,
         };
         if (IsManager) {
-            this.TornjakApi.registerSelectors(this.props.globalServerSelected, wLoadAttdata, this.TornjakApi.refreshSelectorsState, this.props.agentworkloadSelectorInfoFunc);
-            this.TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
+            TornjakApi.registerSelectors(this.props.globalServerSelected, wLoadAttdata, TornjakApi.refreshSelectorsState, this.props.agentworkloadSelectorInfoFunc);
+            TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
         } else {
-            this.TornjakApi.registerLocalSelectors(wLoadAttdata, this.TornjakApi.refreshLocalSelectorsState, this.props.agentworkloadSelectorInfoFunc);
-            this.TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
+            TornjakApi.registerLocalSelectors(wLoadAttdata, TornjakApi.refreshLocalSelectorsState, this.props.agentworkloadSelectorInfoFunc);
+            TornjakApi.refreshLocalSelectorsState(this.props.agentworkloadSelectorInfoFunc);
         }
         return true;
     };
@@ -177,6 +181,8 @@ const mapStateToProps = (state: RootState) => ({
     globalServerSelected: state.servers.globalServerSelected,
     globalAgentsList: state.agents.globalAgentsList,
     globalWorkloadSelectorInfo: state.servers.globalWorkloadSelectorInfo,
+    globalIsAuthenticated: state.auth.globalIsAuthenticated,
+    globalAccessToken: state.auth.globalAccessToken,
 })
 
 export default connect(

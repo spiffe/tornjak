@@ -30,9 +30,11 @@ class TornjakHelper extends Component<TornjakHelperProp, TornjakHelperState> {
   // return whether the user is granted admin role or not
   checkRolesAdminUser(userRoles: string[]) {
     const adminString = "admin";
-    const isAdmin = userRoles.find(element => {
-      return element.toLowerCase().includes(adminString.toLowerCase())
-    });
+    let isAdmin = false;
+    if (userRoles !== undefined && userRoles.length > 0) {
+      // Search for 'adminString' in 'userRoles' array
+      isAdmin = userRoles.some(role => role.toLowerCase() === adminString.toLowerCase());
+  }
     return isAdmin;
   }
 

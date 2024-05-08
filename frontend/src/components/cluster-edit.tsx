@@ -48,7 +48,11 @@ type ClusterEditProp = {
   // the server trust domain and nodeAttestorPlugin as a ServerInfoType
   globalServerInfo: ServerInfo,
   // list of agents' SPIFEE ID's as strings
-  agentsList: AgentLabels[]
+  agentsList: AgentLabels[],
+  // whether user is authenticated or not
+  globalIsAuthenticated: boolean;
+  // updated access token
+  globalAccessToken: string | undefined;
 }
 
 type ClusterEditState = {
@@ -71,10 +75,8 @@ type ClusterEditState = {
 }
 
 class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
-  TornjakApi: TornjakApi;
   constructor(props: ClusterEditProp) {
     super(props);
-    this.TornjakApi = new TornjakApi(props);
     this.onChangeClusterNameList = this.onChangeClusterNameList.bind(this);
     this.onChangeClusterName = this.onChangeClusterName.bind(this);
     this.onChangeClusterType = this.onChangeClusterType.bind(this);
@@ -109,11 +111,12 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
   componentDidMount() {
     if (IsManager) {
       if (this.props.globalServerSelected !== "" && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
-        this.TornjakApi.populateClustersUpdate(this.props.globalServerSelected, this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc)
+        TornjakApi.populateClustersUpdate(this.props.globalServerSelected, this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc)
         this.setState({ selectedServer: this.props.globalServerSelected });
       }
     } else {
-      this.TornjakApi.populateLocalClustersUpdate(this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
+      TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
+      TornjakApi.populateLocalClustersUpdate(this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
     }
     this.prepareClusterNameList()
   }
@@ -127,6 +130,7 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
     if (prevProps.globalClustersList !== this.props.globalClustersList || prevProps.globalAgentsList !== this.props.globalAgentsList) {
       this.prepareClusterNameList()
     }
+    TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
   }
 
   prepareClusterNameList(): void {
@@ -284,11 +288,11 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
       return
     }
     if (IsManager) {
-      successMessage = this.TornjakApi.clusterDelete(this.props.globalServerSelected, inputData, this.props.clustersListUpdateFunc, this.props.globalClustersList);
+      successMessage = TornjakApi.clusterDelete(this.props.globalServerSelected, inputData, this.props.clustersListUpdateFunc, this.props.globalClustersList);
     } else {
-      successMessage = this.TornjakApi.localClusterDelete(inputData, this.props.clustersListUpdateFunc, this.props.globalClustersList);
+      successMessage = TornjakApi.localClusterDelete(inputData, this.props.clustersListUpdateFunc, this.props.globalClustersList);
     }
-    successMessage.then(function (result) {
+    successMessage.then(function (result: string) {
       if (result === "SUCCESS") {
         window.alert("CLUSTER DELETED SUCCESSFULLY!");
         window.location.reload();
@@ -358,10 +362,10 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
 
     if (IsManager) {
       if (this.props.globalServerSelected !== "" && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
-        this.TornjakApi.populateClustersUpdate(this.props.globalServerSelected, this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
+        TornjakApi.populateClustersUpdate(this.props.globalServerSelected, this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
       }
     } else {
-      this.TornjakApi.populateLocalClustersUpdate(this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
+      TornjakApi.populateLocalClustersUpdate(this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
     }
   }
 
@@ -578,6 +582,8 @@ const mapStateToProps = (state: RootState) => ({
   globalWorkloadSelectorInfo: state.servers.globalWorkloadSelectorInfo,
   globalAgentsWorkLoadAttestorInfo: state.agents.globalAgentsWorkLoadAttestorInfo,
   globalDebugServerInfo: state.servers.globalDebugServerInfo,
+  globalIsAuthenticated: state.auth.globalIsAuthenticated,
+  globalAccessToken: state.auth.globalAccessToken,
 })
 
 export default connect(

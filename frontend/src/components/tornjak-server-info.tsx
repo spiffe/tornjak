@@ -41,6 +41,10 @@ type TornjakServerInfoProp = {
   globalTornjakServerInfo: TornjakServInfo,
   // error/ success messege returned for a specific function
   globalErrorMessage: string,
+  // whether user is authenticated or not
+  globalIsAuthenticated: boolean;
+  // updated access token
+  globalAccessToken: string | undefined;
 }
 
 type TornjakServerInfoState = {}
@@ -113,30 +117,30 @@ const TornjakServerInfoDisplay = (props: { tornjakServerInfo: TornjakServInfo, t
 )
 
 class TornjakServerInfo extends Component<TornjakServerInfoProp, TornjakServerInfoState> {
-  TornjakApi: TornjakApi;
   constructor(props: TornjakServerInfoProp) {
     super(props);
-    this.TornjakApi = new TornjakApi(props);
     this.state = {};
   }
 
   componentDidMount() {
     if (IsManager) {
       if (this.props.globalServerSelected !== "") {
-        this.TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
+        TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
       }
     } else {
-      this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
-      this.TornjakApi.populateLocalTornjakDebugServerInfo(this.props.spireDebugServerInfoUpdateFunc, this.props.tornjakMessageFunc);
+      TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
+      TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
+      TornjakApi.populateLocalTornjakDebugServerInfo(this.props.spireDebugServerInfoUpdateFunc, this.props.tornjakMessageFunc);
     }
   }
 
   componentDidUpdate(prevProps: TornjakServerInfoProp) {
     if (IsManager) {
       if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
-        this.TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc)
+        TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc)
       }
     }
+    TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
   }
 
   tornjakServerInfo() {
@@ -173,6 +177,8 @@ const mapStateToProps = (state: RootState) => ({
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
   globalErrorMessage: state.tornjak.globalErrorMessage,
   globalDebugServerInfo: state.servers.globalDebugServerInfo,
+  globalIsAuthenticated: state.auth.globalIsAuthenticated,
+  globalAccessToken: state.auth.globalAccessToken,
 })
 
 export default connect(

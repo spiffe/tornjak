@@ -33,6 +33,10 @@ type ClusterListProp = {
   globalTornjakServerInfo: TornjakServerInfo,
   // list of clusters with their metadata info as an array of ClustersList Type
   globalClustersList: ClustersList[],
+  // whether user is authenticated or not
+  globalIsAuthenticated: boolean;
+  // updated access token
+  globalAccessToken: string | undefined;
 }
 
 type ClusterListState = {
@@ -52,10 +56,8 @@ const Cluster = (props: { cluster: ClustersList }) => (
 )
 
 class ClusterList extends Component<ClusterListProp, ClusterListState> {
-  TornjakApi: TornjakApi;
   constructor(props: ClusterListProp) {
     super(props);
-    this.TornjakApi = new TornjakApi(props);
     this.state = {
       message: "",
     };
@@ -64,12 +66,13 @@ class ClusterList extends Component<ClusterListProp, ClusterListState> {
   componentDidMount() {
     if (IsManager) {
       if (this.props.globalServerSelected !== "") {
-        this.TornjakApi.populateClustersUpdate(this.props.globalServerSelected, this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
+        TornjakApi.populateClustersUpdate(this.props.globalServerSelected, this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
       }
     } else {
-      this.TornjakApi.populateLocalClustersUpdate(this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
+      TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
+      TornjakApi.populateLocalClustersUpdate(this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
       if (this.props.globalTornjakServerInfo && Object.keys(this.props.globalTornjakServerInfo).length) {
-        this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
+        TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
       }
     }
   }
@@ -77,11 +80,12 @@ class ClusterList extends Component<ClusterListProp, ClusterListState> {
   componentDidUpdate(prevProps: ClusterListProp) {
     if (IsManager) {
       if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
-        this.TornjakApi.populateClustersUpdate(this.props.globalServerSelected, this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
+        TornjakApi.populateClustersUpdate(this.props.globalServerSelected, this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
       }
     } else {
+      TornjakApi.tokenAttach(this.props.globalIsAuthenticated, this.props.globalAccessToken)
       if (prevProps.globalTornjakServerInfo !== this.props.globalTornjakServerInfo) {
-        this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
+        TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
       }
     }
   }
@@ -140,6 +144,8 @@ const mapStateToProps = (state: RootState) => ({
   globalClustersList: state.clusters.globalClustersList,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
   globalErrorMessage: state.tornjak.globalErrorMessage,
+  globalIsAuthenticated: state.auth.globalIsAuthenticated,
+  globalAccessToken: state.auth.globalAccessToken,
 })
 
 export default connect(
