@@ -59,6 +59,10 @@ func (a *ReadWriteAuthorizer) AuthorizeRequest(r *http.Request, u *user.UserInfo
 
 	allowedRoles := a.api_permissions[apiPath]
 
+	// if no role required, return nil
+	if len(allowedRoles) == 0 {
+		return nil
+	}
 
 	// check if any roles in sufficientRoles
 	for _, role := range roles {
@@ -68,5 +72,6 @@ func (a *ReadWriteAuthorizer) AuthorizeRequest(r *http.Request, u *user.UserInfo
 			}
 		}
 	}
+
 	return errors.New("Unauthorized request")
 }
