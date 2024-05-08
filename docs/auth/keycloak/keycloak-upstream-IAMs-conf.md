@@ -21,6 +21,23 @@ This documentation is a guide on how to connect some hand picked IAMs. For more 
 
 ## Setup Microsoft Azure Active Directories (AD) as an Upstream Identity Provider
 If you don't have an AD account, follow the instrctions below to create one. 
+> [!NOTE] For simplicity we will be creating a free account
+- Go to [Microsoft Azure](https://azure.microsoft.com/en-us/) and select `Try Azure for free` signup for an account. 
+- Go to `App registrations` (you can search for it on top)
+- Click on `New Regestration` and configure the name and add a `Redirect URI` by selecting `Web` and paste the value of `Redirect URI` from keycloak and Register the application. 
+![Microsoft AD](diagrams/microsoft-azure.png)
+- Note the `Applcation (client) ID`
+- On the left hand side go to Mange > Certificates & secrets and click on `New client secret`, give it a description and choose the expiry length ad click `Add` at the bottom. Note the `Value` of the created secret. 
+
+### Keycloak Microsoft Azure AD setup 
+Go back to keycloak console and select `Microsoft` as an identity provider. 
+> [!IMPORTANT] Make sure you are in the `tornjak` realm or te specific realm Tornjak app is registered on 
+- The `Redirect URI` is automatically set by keycloak, this is the uri you should enter in the `Redirect URI` while creating your AD account above. 
+- Copy ad paste the `Client ID` and `Client Secret` you generated in the AD account from above in the respective fields. 
+- And click `Add`
+
+- Now when you try signing in to the Tornjak application, you should see the keycloak login page and Microsoft as an optional upstream identity provider to sign in to. If you sleect Microsoft, keycloak will redirect you to sign in with Microsoft login and tornjak will be authenticated using AD. 
+> [!IMPORTANT] Make sure you assign appropraite roles within keycloak for your user, or the roles are mapped correctly between AD and keycloak. Check the Mappers section for more roles configuration. 
 
 ## Setup Github as an Upstream Identity Provider
 If you don't have a Github OAUTH app, follow the instrctions below to create one. 
@@ -31,11 +48,11 @@ If you don't have a Github OAUTH app, follow the instrctions below to create one
 - Select `New OAuth App` or keep a note of your existing OAuth App if any. 
 - Give your app a name in the `Application name` field such as `tornjak`, your application Homepage URL (http://localhost:3000) and the `Authorization callback URL` should be set to the `Redirect URI` on keycloak. 
 - And register your application. 
-![Alt text](diagrams/github-oauth-app.png)
+![Github OAuth](diagrams/github-oauth-app.png)
 - Once the application is registered click on `Generate a new client secret` and keep a note of the `Client ID` and the `Client Secret` generated. 
 
 ### Keycloak Github setup 
-Go back to keycloak console and select Github as an identity provider. 
+Go back to keycloak console and select `Github` as an identity provider. 
 > [!IMPORTANT] Make sure you are in the `tornjak` realm or te specific realm Tornjak app is registered on 
 - The `Redirect URI` is automatically set by keycloak, this is the uri you should enter in the `Authorization callback URL` while creating your github OAuth app above. 
 - Copy ad paste the `Client ID` and `Client Secret` you generated in the github OAuth app from above in the respective fields. 
@@ -52,5 +69,5 @@ If you don't have a Google account, follow the instrctions below to create one.
 > [!TIP] To make an upstream identity provider default: in another words for keycloak to directly redirect to the choosen identity provider, instead of showing the default keycloak login page follow the following steps below:
 - Click on `Authentication` on the left handside menu
 - Choose the `browser` flow
-![Alt text](diagrams/browser-flow.png)
+![Keycloak Browser Flow](diagrams/browser-flow.png)
 - Click on the gear icon on the `Identity Provider Redirector` and set to the alias of the identity provider you want keycloak to redirect to. 
