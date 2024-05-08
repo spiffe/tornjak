@@ -41,7 +41,7 @@ Go back to keycloak console and select Github as an identity provider.
 - Copy ad paste the `Client ID` and `Client Secret` you generated in the github OAuth app from above in the respective fields. 
 - And click `Add`
 - Now when you try signing in to the Tornjak application, you should see the keycloak login page and github as an optional upstream identity provider to sign in to. If you sleect github, keycloak will redirect you to sign in with github login and tornjak will be authenticated using github OAuth. 
-> [!IMPORTANT] Make sure the roles are mapped correctly between github and keycloak. 
+> [!IMPORTANT] Make sure you assign appropraite roles within keycloak for your user, or the roles are mapped correctly between github and keycloak. 
 
 ## Setup Openshift as an Upstream Identity Provider
 If you don't have an Openshift account, follow the instrctions below to create one. 
