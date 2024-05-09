@@ -2,7 +2,7 @@
 
 Please see our documentation on the [authorization feature](./user-management.md) for more complete details. 
 
-Note that simply enabling this feature will only perform authentication. In order to apply authorization logic to user details, one must also enable an Authorization plugin. 
+Note that simply enabling this feature will NOT enable authorization. In order to apply authorization logic to user details, one must also enable an Authorization plugin. Any output from this layer, including authentication errors, are to be interpreted by an Authorization layer.
 
 The configuration has the following key-value pairs:
 
@@ -16,7 +16,7 @@ A sample configuration file for syntactic referense is below:
 ```hcl
     Authenticator "Keycloak" {
         plugin_data {
-            issuer = "http://localhost:8080/realms/tornjak"
+            issuer = "http://host.docker.internal:8080/realms/tornjak"
             audience = "tornjak-backend"
         }
     }
