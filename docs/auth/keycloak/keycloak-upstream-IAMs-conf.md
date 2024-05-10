@@ -38,11 +38,12 @@ Go back to keycloak console and select `Microsoft` as an identity provider.
 
 - Now when you try signing in to the Tornjak application, you should see the keycloak login page and Microsoft as an optional upstream identity provider to sign in to. If you sleect Microsoft, keycloak will redirect you to sign in with Microsoft login and tornjak will be authenticated using AD. 
 > [!IMPORTANT] Make sure you assign appropraite roles within keycloak for your user, or the roles are mapped correctly between AD and keycloak. Check the Mappers section for more roles configuration. 
+![Microsoft Keycloak](diagrams/microsoft-keycloak.png)
 
 ## Setup Github as an Upstream Identity Provider
 If you don't have a Github OAUTH app, follow the instrctions below to create one. 
 > [!NOTE] For simplicity we will be creating an OAUTH app under a personal github account. But you can create one under an organization you have admin access to. Github uses OAuth 2.0.
-- Go to the upper-right corner of your github account and click on your profile photo and then click on settings. 
+- In your personal github account, go to the upper-right corner of your github account and click on your profile photo and then click on settings. 
 - At the bottom of the menu on the left hand side, select `<> Developer settings`
 - On the next page, select `OAuth Apps` on the left-hand side menu
 - Select `New OAuth App` or keep a note of your existing OAuth App if any. 
@@ -59,12 +60,30 @@ Go back to keycloak console and select `Github` as an identity provider.
 - And click `Add`
 - Now when you try signing in to the Tornjak application, you should see the keycloak login page and github as an optional upstream identity provider to sign in to. If you sleect github, keycloak will redirect you to sign in with github login and tornjak will be authenticated using github OAuth. 
 > [!IMPORTANT] Make sure you assign appropraite roles within keycloak for your user, or the roles are mapped correctly between github and keycloak. 
+![Github Keycloak](diagrams/github-keycloak.png)
 
 ## Setup Openshift as an Upstream Identity Provider
 If you don't have an Openshift account, follow the instrctions below to create one. 
 
 ## Setup Google as an Upstream Identity Provider
 If you don't have a Google account, follow the instrctions below to create one. 
+> [!NOTE] For simplicity we will be creating an OAUTH app under a personal google account.
+- Go to Google Cloud Platform console: https://console.cloud.google.com
+![Google Cloud Console](diagrams/google-cloud-console.png)
+- Go to `APIs & Services` -> `OAuth consent screen` tab on left hand side and select `External` user type consent screen to create a new consent screen. 
+- After creating the consent screen, go to `Credentials` tab on left hand side, click on `CREATE CREDENTIALS` and select `OAuth Client ID`. For `Application type` select `Web application`. Give it a client name, for `Authorized redirect URIs` use the Redirect URI in your keycloak console. 
+- Once you click create note your client id and client secret. 
+![Google Cloud Credentials](diagrams/google-cloud-credentials.png)
+
+### Keycloak Google setup 
+Go back to keycloak console and select `Google` as an identity provider. 
+> [!IMPORTANT] Make sure you are in the `tornjak` realm or te specific realm Tornjak app is registered on 
+- The `Redirect URI` is automatically set by keycloak, this is the uri you should enter in the `Authorized redirect URIs` while creating your google OAuth app above. 
+- Copy ad paste the `Client ID` and `Client Secret` you generated in the google OAuth app from above in the respective fields. 
+- And click `Add`
+- Now when you try signing in to the Tornjak application, you should see the keycloak login page and google as an optional upstream identity provider to sign in to. If you sleect google, keycloak will redirect you to sign in with google login and tornjak will be authenticated using google OAuth. 
+> [!IMPORTANT] Make sure you assign appropraite roles within keycloak for your user, or the roles are mapped correctly between google and keycloak. 
+![Google Keycloak](diagrams/google-keycloak.png)
 
 > [!TIP] To make an upstream identity provider default: in another words for keycloak to directly redirect to the choosen identity provider, instead of showing the default keycloak login page follow the following steps below:
 - Click on `Authentication` on the left handside menu
