@@ -62,9 +62,6 @@ Go back to keycloak console and select `Github` as an identity provider.
 > [!IMPORTANT] Make sure you assign appropraite roles within keycloak for your user, or the roles are mapped correctly between github and keycloak. 
 ![Github Keycloak](diagrams/github-keycloak.png)
 
-## Setup Openshift as an Upstream Identity Provider
-If you don't have an Openshift account, follow the instrctions below to create one. 
-
 ## Setup Google as an Upstream Identity Provider
 If you don't have a Google account, follow the instrctions below to create one. 
 > [!NOTE] For simplicity we will be creating an OAUTH app under a personal google account.
@@ -85,6 +82,10 @@ Go back to keycloak console and select `Google` as an identity provider.
 > [!IMPORTANT] Make sure you assign appropraite roles within keycloak for your user, or the roles are mapped correctly between google and keycloak. 
 ![Google Keycloak](diagrams/google-keycloak.png)
 
+## Setup Openshift as an Upstream Identity Provider
+If you don't have an Openshift account, follow the instrctions below to create one. 
+
+****DOCUMENTATION FOR OPENSHIFT TO BE ADDED!!!****
 > [!TIP] To make an upstream identity provider default: in another words for keycloak to directly redirect to the choosen identity provider, instead of showing the default keycloak login page follow the following steps below:
 - Click on `Authentication` on the left handside menu
 - Choose the `browser` flow
