@@ -20,8 +20,9 @@ import (
 	"github.com/hashicorp/hcl/hcl/token"
 	"github.com/pkg/errors"
 
-	auth "github.com/spiffe/tornjak/pkg/agent/auth"
 	agentdb "github.com/spiffe/tornjak/pkg/agent/db"
+	"github.com/spiffe/tornjak/pkg/agent/authentication/authenticator"
+	"github.com/spiffe/tornjak/pkg/agent/authorization"
 )
 
 type Server struct {
@@ -36,7 +37,8 @@ type Server struct {
 
 	// Plugins
 	Db   agentdb.AgentDB
-	Auth auth.Auth
+	Authenticator authenticator.Authenticator
+	Authorizer authorization.Authorizer
 }
 
 // config type, as defined by SPIRE
@@ -429,15 +431,18 @@ func (s *Server) verificationMiddleware(next http.Handler) http.Handler {
 			cors(w, r)
 			return
 		}
-		err := s.Auth.Verify(r)
+	
+		userInfo := s.Authenticator.AuthenticateRequest(r)
+
+		err := s.Authorizer.AuthorizeRequest(r, userInfo)
 		if err != nil {
 			emsg := fmt.Sprintf("Error authorizing request: %v", err.Error())
 			// error should be written already
 			retError(w, emsg, http.StatusUnauthorized)
 			return
-		} else {
-			next.ServeHTTP(w, r)
 		}
+
+		next.ServeHTTP(w, r)
 	}
 	return http.HandlerFunc(f)
 }
@@ -755,23 +760,19 @@ func NewAgentsDB(dbPlugin *ast.ObjectItem) (agentdb.AgentDB, error) {
 	}
 }
 
-// NewAuth returns a new Auth
-func NewAuth(authPlugin *ast.ObjectItem) (auth.Auth, error) {
-	key, data, _ := getPluginConfig(authPlugin)
-	/*if err != nil { // default used, no error
-		verifier := auth.NewNullVerifier()
-		return verifier, nil
-	}*/
+// NewAuthenticator returns a new Authenticator
+func NewAuthenticator(authenticatorPlugin *ast.ObjectItem) (authenticator.Authenticator, error) {
+	key, data, _ := getPluginConfig(authenticatorPlugin)
 
 	switch key {
-	case "KeycloakAuth":
+	case "Keycloak":
 		// check if data is defined
 		if data == nil {
-			return nil, errors.New("KeycloakAuth UserManagement plugin ('config > plugins > UserManagement KeycloakAuth > plugin_data') no populated")
+			return nil, errors.New("Keycloak Authenticator plugin ('config > plugins > Authenticator Keycloak > plugin_data') not populated")
 		}
-		fmt.Printf("KeycloakAuth Usermanagement Data: %+v\n", data)
+		fmt.Printf("Authenticator Keycloak Plugin Data: %+v\n", data)
 		// decode config to struct
-		var config pluginAuthKeycloak
+		var config pluginAuthenticatorKeycloak
 		if err := hcl.DecodeObject(&config, data); err != nil {
 			return nil, errors.Errorf("Couldn't parse Auth config: %v", err)
 		}
@@ -781,14 +782,31 @@ func NewAuth(authPlugin *ast.ObjectItem) (auth.Auth, error) {
 			fmt.Printf("WARNING: Auth plugin has no expected audience configured - `aud` claim will not be checked (please populate 'config > plugins > UserManagement KeycloakAuth > plugin_data > audience')")
 		}
 
-		// create verifier TODO make json an option?
-		verifier, err := auth.NewKeycloakVerifier(true, config.IssuerURL, config.Audience)
+		// create authenticator TODO make json an option?
+		authenticator, err := authenticator.NewKeycloakAuthenticator(true, config.IssuerURL, config.Audience)
 		if err != nil {
-			return nil, errors.Errorf("Couldn't configure Auth: %v", err)
+			return nil, errors.Errorf("Couldn't configure Authenticator: %v", err)
 		}
-		return verifier, nil
+		return authenticator, nil
 	default:
-		return nil, errors.Errorf("Invalid option for UserManagement named %s", key)
+		return nil, errors.Errorf("Invalid option for Authenticator named %s", key)
+	}
+}
+
+// NewAuthorizer returns a new Authorizer
+func NewAuthorizer(authorizerPlugin *ast.ObjectItem) (authorization.Authorizer, error) {
+	key, _, _ := getPluginConfig(authorizerPlugin)
+
+	switch key {
+	case "AdminViewer":
+		// this is an empty plugin with no config - a static authorization logic example
+		authorizer, err := authorization.NewAdminViewerAuthorizer()
+		if err != nil {
+			return nil, errors.Errorf("Couldn't configure Authorizer: %v", err)
+		}
+		return authorizer, nil
+	default:
+		return nil, errors.Errorf("Invalid option for Authorizer named %s", key)
 	}
 }
 
@@ -814,7 +832,8 @@ func (s *Server) VerifyConfiguration() error {
 
 func (s *Server) ConfigureDefaults() error {
 	// no authorization is a default
-	s.Auth = auth.NewNullVerifier()
+	s.Authenticator = authenticator.NewNullAuthenticator()
+	s.Authorizer = authorization.NewNullAuthorizer()
 	return nil
 }
 
@@ -864,11 +883,17 @@ func (s *Server) Configure() error {
 			if err != nil {
 				return errors.Errorf("Cannot configure datastore plugin: %v", err)
 			}
-		// configure auth
-		case "UserManagement":
-			s.Auth, err = NewAuth(pluginObject)
+		// configure Authenticator
+		case "Authenticator":
+			s.Authenticator, err = NewAuthenticator(pluginObject)
 			if err != nil {
-				return errors.Errorf("Cannot configure auth plugin: %v", err)
+				return errors.Errorf("Cannot configure Authenticator plugin: %v", err)
+			}
+		// configure Authorizer
+		case "Authorizer":
+			s.Authorizer, err = NewAuthorizer(pluginObject)
+			if err != nil {
+				return errors.Errorf("Cannot configure Authorizer plugin: %v", err)
 			}
 		}
 		// TODO Handle when multiple plugins configured

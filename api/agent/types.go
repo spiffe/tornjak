@@ -108,7 +108,7 @@ type pluginDataStoreSQL struct {
 	Filename   string `hcl:"filename"`
 }
 
-type pluginAuthKeycloak struct {
+type pluginAuthenticatorKeycloak struct {
 	IssuerURL string `hcl:"issuer"`
 	Audience  string `hcl:"audience"`
 }
