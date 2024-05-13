@@ -86,6 +86,10 @@ Go back to keycloak console and select `Google` as an identity provider.
 If you don't have an Openshift account, follow the instrctions below to create one. 
 
 ****DOCUMENTATION FOR OPENSHIFT TO BE ADDED!!!****
+
+- As you add an upstream IAM, you will see an option to sign in with the IAM in the keycloak login page as shown on the picture below. 
+![Keycloak Sign In](diagrams/keycloak-sign-in-page.png)
+
 > [!TIP] To make an upstream identity provider default: in another words for keycloak to directly redirect to the choosen identity provider, instead of showing the default keycloak login page follow the following steps below:
 - Click on `Authentication` on the left handside menu
 - Choose the `browser` flow
