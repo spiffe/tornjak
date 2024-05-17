@@ -794,7 +794,7 @@ func NewAuthenticator(authenticatorPlugin *ast.ObjectItem) (authenticator.Authen
 		// decode config to struct
 		var config pluginAuthenticatorKeycloak
 		if err := hcl.DecodeObject(&config, data); err != nil {
-			return nil, errors.Errorf("Couldn't parse Auth config: %v", err)
+			return nil, errors.Errorf("Couldn't parse Authenticator config: %v", err)
 		}
 
 		// Log warning if audience is nil that aud claim is not checked
@@ -815,12 +815,42 @@ func NewAuthenticator(authenticatorPlugin *ast.ObjectItem) (authenticator.Authen
 
 // NewAuthorizer returns a new Authorizer
 func NewAuthorizer(authorizerPlugin *ast.ObjectItem) (authorization.Authorizer, error) {
-	key, _, _ := getPluginConfig(authorizerPlugin)
+	key, data, _ := getPluginConfig(authorizerPlugin)
 
 	switch key {
 	case "AdminViewer":
 		// this is an empty plugin with no config - a static authorization logic example
 		authorizer, err := authorization.NewAdminViewerAuthorizer()
+		if err != nil {
+			return nil, errors.Errorf("Couldn't configure Authorizer: %v", err)
+		}
+		return authorizer, nil
+	case "RBAC":
+		// check if data is defined
+		if data == nil {
+			return nil, errors.New("RBAC Authorizer plugin ('config > plugins > Authorizer RBAC > plugin_data') not populated")
+		}
+		fmt.Printf("Authorizer RBAC Plugin Data: %+v\n", data)
+
+		// decode config to struct
+		var config pluginAuthorizerRBAC
+		if err := hcl.DecodeObject(&config, data); err != nil {
+			return nil, errors.Errorf("Couldn't parse Authorizer config: %v", err)
+		}
+
+		// decode into role list and apiMapping
+		var roleList []string
+		apiMapping := make(map[string][]string)
+		for _, role := range config.RoleList {
+			fmt.Printf("Role found: %s\n", role.Name)
+			roleList = append(roleList, role.Name)
+		}
+		for _, api := range config.APIRoleMappings {
+			fmt.Printf("API Mapping found: %s, %v\n", api.Name, api.AllowedRoles)
+			apiMapping[api.Name] = api.AllowedRoles
+		}
+
+		authorizer, err := authorization.NewRBACAuthorizer(config.Name, roleList, apiMapping)
 		if err != nil {
 			return nil, errors.Errorf("Couldn't configure Authorizer: %v", err)
 		}

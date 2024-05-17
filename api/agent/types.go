@@ -112,3 +112,19 @@ type pluginAuthenticatorKeycloak struct {
 	IssuerURL string `hcl:"issuer"`
 	Audience  string `hcl:"audience"`
 }
+
+type AuthRole struct {
+	Name string `hcl:"name,label"`
+	Desc string `hcl:"desc"`
+}
+
+type APIRoleMapping struct {
+	Name string `hcl:"name,label"`
+	AllowedRoles []string `hcl:"allowed_roles"`
+}
+
+type pluginAuthorizerRBAC struct {
+	Name string `hcl:"name"`
+	RoleList []*AuthRole `hcl:"role,block"`
+	APIRoleMappings []*APIRoleMapping `hcl:"API,block"`
+}
