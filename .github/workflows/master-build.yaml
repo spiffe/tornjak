@@ -19,7 +19,7 @@ jobs:
           EOF
 
       - name: Check out repository code
-        uses: actions/checkout@v4.1.5
+        uses: actions/checkout@v4.1.6
       
       - name: Log in to GHCR.io
         uses: docker/login-action@v3.1.0
@@ -60,7 +60,7 @@ jobs:
           EOF
 
       - name: Check out repository code
-        uses: actions/checkout@v4.1.5
+        uses: actions/checkout@v4.1.6
       - name: Log in to GHCR.io
         uses: docker/login-action@v3.1.0
         with:
