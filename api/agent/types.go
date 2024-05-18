@@ -114,12 +114,12 @@ type pluginAuthenticatorKeycloak struct {
 }
 
 type AuthRole struct {
-	Name string `hcl:"name,label"`
+	Name string `hcl:",key"`
 	Desc string `hcl:"desc"`
 }
 
 type APIRoleMapping struct {
-	Name string `hcl:"name,label"`
+	Name string `hcl:",key"`
 	AllowedRoles []string `hcl:"allowed_roles"`
 }
 
