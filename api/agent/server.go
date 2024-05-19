@@ -818,13 +818,6 @@ func NewAuthorizer(authorizerPlugin *ast.ObjectItem) (authorization.Authorizer, 
 	key, data, _ := getPluginConfig(authorizerPlugin)
 
 	switch key {
-	case "AdminViewer":
-		// this is an empty plugin with no config - a static authorization logic example
-		authorizer, err := authorization.NewAdminViewerAuthorizer()
-		if err != nil {
-			return nil, errors.Errorf("Couldn't configure Authorizer: %v", err)
-		}
-		return authorizer, nil
 	case "RBAC":
 		// check if data is defined
 		if data == nil {

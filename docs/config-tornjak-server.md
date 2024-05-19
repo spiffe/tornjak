@@ -81,7 +81,7 @@ Tornjak supports several different plugin types, each representing a different f
 | ---- | ---- | ----------- |
 | DataStore     | [sql]() | Default SQL storage for Tornjak metadata |
 | Authenticator | [keycloak](/docs/plugin_server_authentication_keycloak.md) | Perform OIDC Discovery and extract roles from `realmAccess.roles` field |
-| Authorizer    | [adminviewer](/docs/plugin_server_authorization_adminviewer.md) | Check api permission based on user role and static authorization logic |
+| Authorizer    | [RBAC](/docs/plugin_server_authorization_rbac.md) | Check api permission based on user role and defined authorization logic |
 
 ### Plugin configuration
 
