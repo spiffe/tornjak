@@ -108,6 +108,7 @@ func (a *KeycloakAuthenticator) TranslateToTornjakRoles(roles []string) ([]strin
 		if ok {
 			translatedRoles = append(translatedRoles, tornjakRole)
 		}
+		translatedRoles = append(translatedRoles, role)
 	}
 	return translatedRoles
 }

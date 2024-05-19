@@ -799,7 +799,7 @@ func NewAuthenticator(authenticatorPlugin *ast.ObjectItem) (authenticator.Authen
 
 		// Log warning if audience is nil that aud claim is not checked
 		if config.Audience == "" {
-			fmt.Printf("WARNING: Auth plugin has no expected audience configured - `aud` claim will not be checked (please populate 'config > plugins > UserManagement KeycloakAuth > plugin_data > audience')")
+			fmt.Println("WARNING: Auth plugin has no expected audience configured - `aud` claim will not be checked (please populate 'config > plugins > UserManagement KeycloakAuth > plugin_data > audience')")
 		}
 
 		// create authenticator TODO make json an option?
@@ -839,14 +839,16 @@ func NewAuthorizer(authorizerPlugin *ast.ObjectItem) (authorization.Authorizer, 
 		}
 
 		// decode into role list and apiMapping
-		var roleList []string
+		roleList := make(map[string]string)
 		apiMapping := make(map[string][]string)
 		for _, role := range config.RoleList {
-			fmt.Printf("Role found: %s\n", role.Name)
-			roleList = append(roleList, role.Name)
+			roleList[role.Name] = role.Desc
+			// print warning for empty string
+			if role.Name == "" {
+				fmt.Println("WARNING: using the empty string for an API enables access to all authenticated users")
+			}
 		}
 		for _, api := range config.APIRoleMappings {
-			fmt.Printf("API Mapping found: %s, %v\n", api.Name, api.AllowedRoles)
 			apiMapping[api.Name] = api.AllowedRoles
 		}
 
