@@ -27,11 +27,6 @@ It is highly recommended `audience` is populated to ensure only tokens meant for
 
 ## User Info extracted
 
-This plugin assumes roles are available in `realm_access.roles` in the JWT and maps the following values:
-
-| JWT                            | Mapped role           |
-| ------------------------------ | --------------------- |
-| `tornjak-viewer-realm-role`    | `viewer`              |
-| `tornjak-admin-realm-role`     | `admin`               |
+This plugin assumes roles are available in `realm_access.roles` in the JWT and passes this list as user.roles.
 
 These mapped values are passed to the authorization layer. 

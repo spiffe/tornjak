@@ -8,7 +8,7 @@ This configuration has the following inputs:
 | --- | ----------- | -------- |
 | name | name of the policy for logging purposes | no |
 | `role "<x>" {desc = "<y>"}` | `<x>` is the name of a role that can be allowed access; `<y>` is a short description | no |
-| `API "<x>" {allowed_roles = ["<z1>", ...]}` | `<x>` is the name of the API that will allow access to roles listed such as `<z1>` |
+| `API "<x>" {allowed_roles = ["<z1>", ...]}` | `<x>` is the name of the API that will allow access to roles listed such as `<z1>` | no |
 
 There can (and likely will be) multiple `role` and `API` blocks. If there are no role blocks, no API will be allowed any access. If there is a missing API block, no access will be granted for that API. 
 
