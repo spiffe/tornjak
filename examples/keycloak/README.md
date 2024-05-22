@@ -21,4 +21,4 @@ and open the *Administration Console*
 
 The credentials in this example have username and password both `admin`. You may configure this in `statefulset.yaml`
 
-The Tornjak Realm has two users: `admin` and `viewer`. 
+The Tornjak Realm has two users with usernames: `admin` and `viewer`, and passwords `admin` and `viewer` respectively.  
