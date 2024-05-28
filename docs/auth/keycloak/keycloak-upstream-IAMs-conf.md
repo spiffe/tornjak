@@ -24,14 +24,20 @@ The keycloak setup to connect any upstream IAM is pretty much standard. Please f
 
 > [!IMPORTANT] 
 > Make sure you are in the `tornjak` realm or the specific realm Tornjak app is registered on 
-- The `Redirect URI` is automatically set by keycloak, this is the uri you should enter in the `Redirect URI` while creating/ updating your upstream IAM account (check below for specific upstream IAM instuctions). 
-- Fill in the `Client ID` and `Client Secret` generated in the upstream IAM in the respective fields. 
+- The `Redirect URI` is automatically set by keycloak, this is the uri you should enter in the `Redirect URI` section while creating/ updating your upstream IAM account (check below for specific upstream IAM instuctions). 
+- Fill in the `Client ID` and `Client Secret` generated in the upstream IAM in the respective fields. [Go to your upstream IAM account to get the `Client ID` and `Client Secret`]
+- For `Microsoft Azure`single-tenant auth endpoints, fill in the `Tenant ID`. If not specified uses 'common' multi-tenant endpoints. 
 - And click `Add`
 
-- Now when you try signing in to the Tornjak application, you should see the keycloak login page and the upstream IAM as an optional upstream identity provider to sign in to. If you select the upstream IAM, keycloak will redirect you to sign in with the upstream IAM of choice and tornjak will be authenticated using that IAM. 
 > [!IMPORTANT] Make sure you assign appropraite roles within keycloak for your user, or the roles are mapped correctly between the upstream IAM and keycloak. Check the Mappers section for more roles configuration. [****DETAILED MAPPERS SECTION TODO!!!****]
+
+> Now when you try signing in to the Tornjak application, you should see the keycloak login page and the upstream IAM as an optional upstream identity provider to sign in to. If you select the upstream IAM, keycloak will redirect you to sign in with the upstream IAM of choice and tornjak will be authenticated using that IAM. 
+
+### Microsoft
 ![Microsoft Keycloak](diagrams/microsoft-keycloak.png)
+### Github
 ![Github Keycloak](diagrams/github-keycloak.png)
+### Google
 ![Google Keycloak](diagrams/google-keycloak.png)
 
 <details><summary><b> Setup Microsoft Azure Active Directories (AD) as an Upstream Identity Provider </b></summary>
@@ -42,10 +48,19 @@ If you don't have an AD account, follow the instructions below to create one.
 
 - Go to Microsoft Azure portal for your account. 
 - Go to `App registrations` (you can search for it on top)
-- Click on `New Registration` and configure the name and add a `Redirect URI` by selecting `Web` and paste the value of `Redirect URI` from keycloak and Register the application. 
+- Click on `New Registration`
+- Configure the name, kepp the default `Single tenant`directory and add a `Redirect URI` by selecting `Web` and paste the value of `Redirect URI` from keycloak and Register the application. 
+
 ![Microsoft AD](diagrams/microsoft-azure.png)
-- Note the `Applcation (client) ID`
-- On the left hand side go to Manage > Certificates & secrets and click on `New client secret`, give it a description and choose the expiry length ad click `Add` at the bottom. Note the `Value` of the created secret. 
+
+- Note the `Applcation (client) ID`, this is what you use to enter in the `Client ID` field while configuring the IAM on keycloak. 
+- Note the `Directory (tenant) ID`, this is what you will use to enter in the `Tenant ID` field while configuring the IAM on keycloak. 
+
+![Microsoft AD Overview](diagrams/microsoft-azure-overview.png)
+
+- On the left hand side go to Manage > Certificates & secrets and click on `New client secret`, give it a description and choose the expiry length ad click `Add` at the bottom. Note the `Value` of the created secret. This secret is what you will be using as the `Client Secret` to configure the IAM on keycloak. 
+
+![Microsoft AD Secret](diagrams/microsoft-azure-secret.png)
 </details>
 
 <details><summary><b> Setup Github as an Upstream Identity Provider </b></summary>
@@ -60,7 +75,9 @@ If you don't have a Github OAUTH app, follow the instructions below to create on
 - Give your app a name in the `Application name` field such as `tornjak`, your application Homepage URL (http://localhost:3000) and the `Authorization callback URL` should be set to the `Redirect URI` assigned by keycloak. 
 - And register your application. 
 ![Github OAuth](diagrams/github-oauth-app.png)
-- Once the application is registered click on `Generate a new client secret` and keep a note of the `Client ID` and the `Client Secret` generated. 
+- Once the application is registered click on `Generate a new client secret` and keep a note of the `Client ID` and the `Client Secret` generated. This is what you will use to configure upstream IAM on keycloak. 
+
+![Github OAuth Secret](diagrams/github-oauth-app-secret.png)
 </details>
 <details><summary><b> Setup Google as an Upstream Identity Provider </b></summary>
 If you don't have a Google account, follow the instrctions below to create one. 
@@ -71,7 +88,7 @@ If you don't have a Google account, follow the instrctions below to create one.
 ![Google Cloud Console](diagrams/google-cloud-console.png)
 - Go to `APIs & Services` -> `OAuth consent screen` tab on left hand side and select `External` user type consent screen to create a new consent screen. 
 - After creating the consent screen, go to `Credentials` tab on left hand side, click on `CREATE CREDENTIALS` and select `OAuth Client ID`. For `Application type` select `Web application`. Give it a client name, for `Authorized redirect URIs` use the Redirect URI in your keycloak console. 
-- Once you click create note your client id and client secret. 
+- Once you click create note your `Client id` and `Client secret`. This is what you will use to configure upstream IAM on keycloak. 
 ![Google Cloud Credentials](diagrams/google-cloud-credentials.png)
 </details>
 <details><summary><b> Setup Openshift as an Upstream Identity Provider </b></summary>
