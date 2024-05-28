@@ -794,12 +794,12 @@ func NewAuthenticator(authenticatorPlugin *ast.ObjectItem) (authenticator.Authen
 		// decode config to struct
 		var config pluginAuthenticatorKeycloak
 		if err := hcl.DecodeObject(&config, data); err != nil {
-			return nil, errors.Errorf("Couldn't parse Auth config: %v", err)
+			return nil, errors.Errorf("Couldn't parse Authenticator config: %v", err)
 		}
 
 		// Log warning if audience is nil that aud claim is not checked
 		if config.Audience == "" {
-			fmt.Printf("WARNING: Auth plugin has no expected audience configured - `aud` claim will not be checked (please populate 'config > plugins > UserManagement KeycloakAuth > plugin_data > audience')")
+			fmt.Println("WARNING: Auth plugin has no expected audience configured - `aud` claim will not be checked (please populate 'config > plugins > UserManagement KeycloakAuth > plugin_data > audience')")
 		}
 
 		// create authenticator TODO make json an option?
@@ -815,12 +815,37 @@ func NewAuthenticator(authenticatorPlugin *ast.ObjectItem) (authenticator.Authen
 
 // NewAuthorizer returns a new Authorizer
 func NewAuthorizer(authorizerPlugin *ast.ObjectItem) (authorization.Authorizer, error) {
-	key, _, _ := getPluginConfig(authorizerPlugin)
+	key, data, _ := getPluginConfig(authorizerPlugin)
 
 	switch key {
-	case "AdminViewer":
-		// this is an empty plugin with no config - a static authorization logic example
-		authorizer, err := authorization.NewAdminViewerAuthorizer()
+	case "RBAC":
+		// check if data is defined
+		if data == nil {
+			return nil, errors.New("RBAC Authorizer plugin ('config > plugins > Authorizer RBAC > plugin_data') not populated")
+		}
+		fmt.Printf("Authorizer RBAC Plugin Data: %+v\n", data)
+
+		// decode config to struct
+		var config pluginAuthorizerRBAC
+		if err := hcl.DecodeObject(&config, data); err != nil {
+			return nil, errors.Errorf("Couldn't parse Authorizer config: %v", err)
+		}
+
+		// decode into role list and apiMapping
+		roleList := make(map[string]string)
+		apiMapping := make(map[string][]string)
+		for _, role := range config.RoleList {
+			roleList[role.Name] = role.Desc
+			// print warning for empty string
+			if role.Name == "" {
+				fmt.Println("WARNING: using the empty string for an API enables access to all authenticated users")
+			}
+		}
+		for _, api := range config.APIRoleMappings {
+			apiMapping[api.Name] = api.AllowedRoles
+		}
+
+		authorizer, err := authorization.NewRBACAuthorizer(config.Name, roleList, apiMapping)
 		if err != nil {
 			return nil, errors.Errorf("Couldn't configure Authorizer: %v", err)
 		}

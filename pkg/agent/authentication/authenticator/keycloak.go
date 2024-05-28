@@ -31,11 +31,6 @@ type KeycloakAuthenticator struct {
 	audience        string
 }
 
-var StaticRoleMappings = map[string]string{
-	"tornjak-viewer-realm-role": "viewer",
-	"tornjak-admin-realm-role":  "admin",
-}
-
 func getJWKeyFunc(httpjwks bool, jwksInfo string) (*keyfunc.JWKS, error) {
 	if httpjwks {
 		opts := keyfunc.Options{ // TODO add options to config file
@@ -101,17 +96,6 @@ func getToken(r *http.Request, redirectURL string) (string, error) {
 
 }
 
-func (a *KeycloakAuthenticator) TranslateToTornjakRoles(roles []string) ([]string){
-	var translatedRoles []string
-	for _, role := range roles {
-		tornjakRole, ok := StaticRoleMappings[role]
-		if ok {
-			translatedRoles = append(translatedRoles, tornjakRole)
-		}
-	}
-	return translatedRoles
-}
-
 func wrapAuthenticationError(err error) (*user.UserInfo) {
 	return &user.UserInfo{
 		AuthenticationError: err,
@@ -137,10 +121,7 @@ func (a *KeycloakAuthenticator) AuthenticateRequest(r *http.Request)(*user.UserI
 		return wrapAuthenticationError(errors.New("Token invalid"))
 	}
 
-	// translate roles to tornjak roles
-	tornjakRoles := a.TranslateToTornjakRoles(claims.RealmAccess.Roles)
-
 	return &user.UserInfo{
-		Roles: tornjakRoles,
+		Roles: claims.RealmAccess.Roles,
 	}
 }
