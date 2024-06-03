@@ -20,6 +20,11 @@ This documentation is a guide on how to connect some hand picked IAMs. For more 
 ![Identity Providers Homepage](diagrams/identity-providers-homepage.png)
 
 ### Keycloak setup for Upstream IAMs
+
+#### -> Keycloak deployment and Tornjak connection
+
+To deploy keycloak and connect to Tornjak, you can use the documentation [here](https://github.com/spiffe/helm-charts-hardened/blob/main/examples/tornjak/keycloak/README.md). 
+
 The keycloak setup to connect any upstream IAM is pretty much standard. Please follow the steps below to connect your upsteeam IAM of choice. Go to keycloak console and select the IAM of interest as shown in the picture above. 
 
 > [!IMPORTANT] 
@@ -29,7 +34,8 @@ The keycloak setup to connect any upstream IAM is pretty much standard. Please f
 - For `Microsoft Azure`single-tenant auth endpoints, fill in the `Tenant ID`. If not specified uses 'common' multi-tenant endpoints. 
 - And click `Add`
 
-> [!IMPORTANT] Make sure you assign appropraite roles within keycloak for your user, or the roles are mapped correctly between the upstream IAM and keycloak. Check the Mappers section for more roles configuration. [****DETAILED MAPPERS SECTION TODO!!!****]
+> [!IMPORTANT] 
+> Make sure you assign appropraite roles within keycloak for your user, or the roles are mapped correctly between the upstream IAM and keycloak. Check the Mappers section for more roles configuration. [****DETAILED MAPPERS SECTION TODO!!!****]
 
 > Now when you try signing in to the Tornjak application, you should see the keycloak login page and the upstream IAM as an optional upstream identity provider to sign in to. If you select the upstream IAM, keycloak will redirect you to sign in with the upstream IAM of choice and tornjak will be authenticated using that IAM. 
 
@@ -100,7 +106,8 @@ If you don't have an Openshift account, follow the instrctions below to create o
 - As you add an upstream IAM, you will see an option to sign in with the IAM in the keycloak login page as shown on the picture below. 
 ![Keycloak Sign In](diagrams/keycloak-sign-in-page.png)
 
-> [!TIP] To make an upstream identity provider default: in another words for keycloak to directly redirect to the choosen identity provider, instead of showing the default keycloak login page follow the following steps below:
+> [!TIP] 
+> To make an upstream identity provider default: in another words for keycloak to directly redirect to the choosen identity provider, instead of showing the default keycloak login page follow the following steps below:
 - Click on `Authentication` on the left handside menu
 - Choose the `browser` flow
 ![Keycloak Browser Flow](diagrams/browser-flow.png)
