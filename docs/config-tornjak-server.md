@@ -63,19 +63,25 @@ For examples on enabling TLS and mTLS connections, please see [our TLS and mTLS 
 
 ## About Tornjak plugins
 
+Tornjak supports several different plugin types, each representing a different functionality. The diagram below shows how each of the plugin types fit into the backend:
+
+![tornjak backend plugin diagram](./rsrc/tornjak-backend-plugin-diagram.png)
+
 ### Plugin types
 
-| Type           | Description | Required |
-|:---------------|:------------|:---------|
-| DataStore      | Provides persistent storage for Tornjak metadata. | True |
-| UserManagement | Secures access to Tornjak agent and enables authorization logic | False |
+| Type          | Description | Required |
+|:--------------|:------------|:---------|
+| DataStore     | Provides persistent storage for Tornjak metadata. | True |
+| Authenticator | Verify tokens signed by external OIDC server and extract user information to be passed to the Authorization layer. Any user information or errors from this layer are to be interpreted by an Authorizer layer. | False |
+| Authorizer    | Based on user information or errors passed from authentication layer and API call details, apply authorization logic. | False |
 
 ### Built-in plugins
 
 | Type | Name | Description |
 | ---- | ---- | ----------- |
-| DataStore | [sql]() | Default SQL storage for Tornjak metadata |
-| UserManagement | [keycloak](/docs/plugin_server_auth_keycloak.md) | Requires JWT Bearer Access Token provided for each request. More details in [our auth feature doc](/docs/user-management.md) |
+| DataStore     | [sql]() | Default SQL storage for Tornjak metadata |
+| Authenticator | [keycloak](/docs/plugin_server_authentication_keycloak.md) | Perform OIDC Discovery and extract roles from `realmAccess.roles` field |
+| Authorizer    | [RBAC](/docs/plugin_server_authorization_rbac.md) | Check api permission based on user role and defined authorization logic |
 
 ### Plugin configuration
 

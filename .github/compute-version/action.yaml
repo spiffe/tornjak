@@ -1,0 +1,16 @@
+name: Compute Version
+description: computes version of tornjak
+outputs:
+  version:
+    description: "tornjak version"
+    value: ${{ steps.version.outputs.version }}
+runs:
+  using: composite
+  steps:
+    - name: Generate Version
+      id: version
+      shell: bash
+      run: |
+        version="$(cat version.txt | cut -d '.' -f -2)"
+        echo VERSION=$version
+        echo "version=$version" >> $GITHUB_OUTPUT
