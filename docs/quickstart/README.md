@@ -6,12 +6,12 @@ Before we dive into the deployment process, let’s familiarize ourselves with T
 
 [SPIRE](https://github.com/spiffe/spire) (the SPIFFE Runtime Environment) is an open-source software tool that provides a way to issue and manage identities in the form of SPIFFE IDs within a distributed system. These identities are used to establish trust between software services and are based on the SPIFFE (Secure Production Identity Framework For Everyone) standards, which define a universal identity control plane for distributed systems. SPIRE provides access to the SPIFFE Workload API, which authenticates active software systems and allocates SPIFFE IDs and corresponding SVIDs to them. This process enables mutual trust establishment between two distinct workloads.
 
-Tornjak is a control plane and GUI for SPIRE, aimed at managing SPIRE deployments across multiple clusters. It provides a management plane that simplifies and centralizes the administration of SPIRE, offering an intuitive interface for defining, distributing, and visualizing SPIFFE identities across a heterogeneous environment. 
+Tornjak is a control plane and GUI for SPIRE, aimed at managing SPIRE deployments across multiple clusters. It provides a management plane that simplifies and centralizes the administration of SPIRE, offering an intuitive interface for defining, distributing, and visualizing SPIFFE identities across a heterogeneous environment.
 
-This tutorial will get you up and running with a local deployment of SPIRE and Tornjak in three simple steps: 
+This tutorial will get you up and running with a local deployment of SPIRE and Tornjak in three simple steps:
 - Setting up the deployment files
 - Deployment
-- Connecting to Tornjak. 
+- Connecting to Tornjak.
 
 Contents
 - [Step 0: Prerequisite](#step-0-prerequisite)
@@ -21,7 +21,7 @@ Contents
 - [Cleanup](#cleanup)
 - [Troubleshooting Commmon Issues](#Troubleshooting)
 
-## Step 0: Prerequisite 
+## Step 0: Prerequisite
 
 Before you begin this tutorial, make sure you have the following:
 - Minikube: Version 1.12.0 or later. [Download Minikube.](https://minikube.sigs.k8s.io/docs/start/)
@@ -29,13 +29,13 @@ Before you begin this tutorial, make sure you have the following:
 
 Note: While we have tested this tutorial with the versions below, newer versions should also work. Ensure you're using the most recent stable releases to avoid compatibility issues.
  - Minikube Version 1.12.0, Version 1.31.2
- - Docker Version 20.10.23, Version 24.0.6 
+ - Docker Version 20.10.23, Version 24.0.6
 
 ## Step 1: Setup deployment files
 
 ### Setting up k8s
 
-For this tutorial, we will use minikube. If you have an existing kubernetes cluster, feel free to use that. 
+For this tutorial, we will use minikube. If you have an existing kubernetes cluster, feel free to use that.
 
 ```console
 minikube start
@@ -74,11 +74,11 @@ cd tornjak
 cd docs/quickstart
 ```
 
-Notice, the files in this directory are largely the same files as provided by the [SPIRE quickstart for Kubernetes](https://spiffe.io/docs/latest/try/getting-started-k8s/). However, there are some minor key differences. Take note of the tornjak-configmap.yaml file, which includes configuration details for the Tornjak backend. 
+Notice, the files in this directory are largely the same files as provided by the [SPIRE quickstart for Kubernetes](https://spiffe.io/docs/latest/try/getting-started-k8s/). However, there are some minor key differences. Take note of the tornjak-configmap.yaml file, which includes configuration details for the Tornjak backend.
 To view the configuration you can issue the following:
 
 ```console
-cat tornjak-configmap.yaml 
+cat tornjak-configmap.yaml
 ```
 
 Contents of the configuration for the Tornjak backend should look like:
@@ -114,24 +114,24 @@ data:
     }
 ```
 
-More information on this config file format can be found in [our config documentation](../config-tornjak-server.md). 
+More information on this config file format can be found in [our config documentation](../config-tornjak-server.md).
 
-Additionally, we have sample server-statefulset files in the directory `server-statefulset-examples`. We will copy one of them in depending on which deployment scheme you would like. 
+Additionally, we have sample server-statefulset files in the directory `server-statefulset-examples`. We will copy one of them in depending on which deployment scheme you would like.
 
 ### Choosing the Statefulset Deployment
 
 
-Depending on your use case, you can deploy Tornjak in different configurations. Note we have deprecated support of the use case where parts of Tornjak run on the same container as SPIRE. 
+Depending on your use case, you can deploy Tornjak in different configurations. Note we have deprecated support of the use case where parts of Tornjak run on the same container as SPIRE.
 
-Currently, we support the following deployment scheme: 
+Currently, we support the following deployment scheme:
 
-1. Only the Tornjak backend (to make Tornjak API calls)  is run as a separate container on the same pod that exposes only one port (to communicate with the Tornjak backend). This deployment type is fully-supported, has a smaller sidecar image without the frontend components, and ensures that the frontend and backend share no memory. 
+1. Only the Tornjak backend (to make Tornjak API calls)  is run as a separate container on the same pod that exposes only one port (to communicate with the Tornjak backend). This deployment type is fully-supported, has a smaller sidecar image without the frontend components, and ensures that the frontend and backend share no memory.
 
-Using the option below, easily copy in the right server-statefulset file. 
+Using the option below, easily copy in the right server-statefulset file.
 
-<details><summary><b> 🔴 [Click] For the deployment of only the Tornjak backend (API)</b></summary>
+<details open><summary><b> 🔴 [Click] For the deployment of only the Tornjak backend (API)</b></summary>
 
-There is an additional requirement to mount the SPIRE server socket and make it accessible to the Tornjak backend container. 
+There is an additional requirement to mount the SPIRE server socket and make it accessible to the Tornjak backend container.
 
 The relevant file is called `backend-sidecar-server-statefulset.yaml` within the examples directory.  Please copy to the relevant file as follows:
 
@@ -139,10 +139,10 @@ The relevant file is called `backend-sidecar-server-statefulset.yaml` within the
 cp server-statefulset-examples/backend-sidecar-server-statefulset.yaml server-statefulset.yaml
 ```
 
-The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines: 
+The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines:
 
 ```console
-cat server-statefulset.yaml 
+cat server-statefulset.yaml
 ```
 
 ```
@@ -243,11 +243,11 @@ spec:
 
 Note that there are three key differences in this StatefulSet file from that in the SPIRE quickstart:
 
-1. There is a new container in the pod named tornjak-backend. 
+1. There is a new container in the pod named tornjak-backend.
 3. We create a volume named `tornjak-config` that reads from the ConfigMap `tornjak-agent`.
-4. We create a volume named `test-socket` so that the containers may communicate. 
+4. We create a volume named `test-socket` so that the containers may communicate.
 
-This is all done specifically to pass the Tornjak config file as an argument to the container and to allow communication between Tornjak and SPIRE. 
+This is all done specifically to pass the Tornjak config file as an argument to the container and to allow communication between Tornjak and SPIRE.
 
 </details>
 
@@ -255,7 +255,7 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 
 Now that we have the correct deployment files, please follow the below steps to deploy Tornjak and SPIRE!
 
-NOTE: In a Windows OS environment, you will need to replace the backslashes ( \\ ) below with backticks ( \` ) to copy and paste into a Windows terminal. This doesnt apply for Mac. 
+NOTE: In a Windows OS environment, you will need to replace the backslashes ( \\ ) below with backticks ( \` ) to copy and paste into a Windows terminal. This doesnt apply for Mac.
 ```console
 kubectl apply -f spire-namespace.yaml \
     -f server-account.yaml \
@@ -286,7 +286,7 @@ service/tornjak-backend-mtls created
 service/tornjak-frontend created
 ```
 
-Before continuing, check that the spire-server is ready: 
+Before continuing, check that the spire-server is ready:
 
 ```console
 kubectl get statefulset --namespace spire
@@ -301,7 +301,7 @@ NOTE: You may initially see a `0/1` for READY status. Just wait a few minutes an
 
 ### Deploying the agent and creating test entries
 
-The following steps will configure and deploy the SPIRE agent. 
+The following steps will configure and deploy the SPIRE agent.
 NOTE: In a windows environment, you will need to replace the backslashes ( \\ ) below with backticks ( \` ) to copy and paste into a windows terminal
 ```console
 kubectl apply \
@@ -329,7 +329,7 @@ spire-agent   1         1         1       1            1           <none>       
 
 ```
 
-Then, we can create a registration entry for the node. 
+Then, we can create a registration entry for the node.
 
 NOTE: In a windows environment, you will need to replace the backslashes ( \\ ) below with backticks ( \` ) to copy and paste into a windows terminal
 ```console
@@ -375,7 +375,7 @@ Selector         : k8s:ns:default
 Selector         : k8s:sa:default
 ```
 
-Finally, here we deploy a workload container: 
+Finally, here we deploy a workload container:
 
 ```console
 kubectl apply -f client-deployment.yaml
@@ -419,7 +419,7 @@ Should yield two lines depending on which deployment you used:
     Image:         <TORNJAK-IMAGE>
 ```
 
-where `<TORNJAK-IMAGE>` is `ghcr.io/spiffe/tornjak:latest` if you deployed the Tornjak with the UI and is `ghcr.io/spiffe/tornjak-backend:latest` if you deployed only the Tornjak backend. 
+where `<TORNJAK-IMAGE>` is `ghcr.io/spiffe/tornjak:latest` if you deployed the Tornjak with the UI and is `ghcr.io/spiffe/tornjak-backend:latest` if you deployed only the Tornjak backend.
 
 ## Step 3: Configuring Access to Tornjak
 
@@ -438,7 +438,7 @@ Forwarding from 127.0.0.1:10000 -> 10000
 Forwarding from [::1]:10000 -> 10000
 ```
 
-While this runs, open a browser to 
+While this runs, open a browser to
 
 ```
 http://localhost:10000/api/tornjak/serverinfo
@@ -450,16 +450,16 @@ This output represents the backend response. Now you should be able to make Torn
 
 ### Step 3b: Connecting to the Tornjak frontend to access the Tornjak UI
 
-Make sure that the backend is accessible from your browser at `http://localhost:10000`, as above, or the frontend will not work. 
+Make sure that the backend is accessible from your browser at `http://localhost:10000`, as above, or the frontend will not work.
 
 If you chose to deploy Tornjak with the UI, connecting to the UI is very simple. Otherwise, you can always run the UI locally and connect. See the two choices below:
 
 <details><summary><b> 🔴 [Click] Run the Tornjak frontend locally</b></summary>
 
-You will need to deploy the separate frontend separately to access the exposed Tornjak backend. We have prebuilt the frontend in a container, so we can simply run it via a single docker command in a separate terminal, which will take a couple minutes to run: 
+You will need to deploy the separate frontend separately to access the exposed Tornjak backend. We have prebuilt the frontend in a container, so we can simply run it via a single docker command in a separate terminal, which will take a couple minutes to run:
 
 ```console
-docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak-frontend:latest 
+docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak-frontend:latest
 ```
 
 After the image is downloaded, you will eventually see the following output:
@@ -469,7 +469,7 @@ After the image is downloaded, you will eventually see the following output:
 > react-scripts --openssl-legacy-provider start
 
 ℹ ｢wds｣: Project is running at http://172.17.0.3/
-ℹ ｢wds｣: webpack output is served from 
+ℹ ｢wds｣: webpack output is served from
 ℹ ｢wds｣: Content not from webpack is served from /usr/src/app/public
 ℹ ｢wds｣: 404s will fallback to /
 Starting the development server...
@@ -485,7 +485,7 @@ Note that the development build is not optimized.
 To create a production build, use npm run build.
 ```
 
-Note, it will likely take a few minutes for the applicaiton to compile successfully. 
+Note, it will likely take a few minutes for the applicaiton to compile successfully.
 
 </details>
 
@@ -516,7 +516,7 @@ kubectl delete clusterrole spire-server-trust-role spire-agent-cluster-role
 kubectl delete clusterrolebinding spire-server-trust-role-binding spire-agent-cluster-role-binding
 ```
 
-## Troubleshooting 
+## Troubleshooting
 <details><summary><b>Troubleshoot 1: Minikube fails to start with a Docker CLI context error</b></summary>
 
 When running the `minikube start` command, you might encounter an error like the one below:
@@ -541,9 +541,9 @@ Solution:
 -  Make sure Docker is installed on your system. If it's not installed, you can install Docker by following the instructions on the official Docker [installation guide.](https://docs.docker.com/get-docker/)
 
 2. Start Docker:
-- On macOS and Windows: Docker Desktop has a graphical interface to manage the Docker service. Open Docker Desktop to start Docker. Alternativly, run the command '''open -a Docker''''  
+- On macOS and Windows: Docker Desktop has a graphical interface to manage the Docker service. Open Docker Desktop to start Docker. Alternativly, run the command '''open -a Docker''''
 3. Retry Starting Minikube:
-- After ensuring that Docker is running, you can start Minikube again using:  
+- After ensuring that Docker is running, you can start Minikube again using:
 ```console
 minikube start
 ```
