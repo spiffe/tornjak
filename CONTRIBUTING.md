@@ -11,6 +11,9 @@
 
 Please see [CONTRIBUTING](https://github.com/spiffe/spiffe/blob/main/CONTRIBUTING.md) and [GOVERNANCE](https://github.com/spiffe/spiffe/blob/main/GOVERNANCE.md) from the SPIFFE project. 
 
+> [!IMPORTANT] 
+> Before opening a new issue or PR, search for any existing issues [here](https://github.com/spiffe/tornjak/issues) to avoid duplication.
+
 ## Pre-built images
 
 You can use pre-built images for various versions and Tornjak components. For a list of supported public images of Tornjak along with usage instructions please see our [USAGE document](./USAGE.md).
@@ -39,7 +42,40 @@ For usage instructions of the containers, please see our [USAGE document](./USAG
 
 ## Development
 
-We welcome all development attempst and contributions from the community. The easiest place to start is by reviewing our code architecture diagrams available in our [api documentation](./docs/tornjak-ui-api-documentation.md#11-overview).
+We welcome all development attempt and contributions from the community. The easiest place to start is by reviewing our code architecture diagrams available in our [api documentation](./docs/tornjak-ui-api-documentation.md#11-overview).
+
+## Opening a pull request
+
+1. Fork/ clone the tornjak repo
+2. Ensure your branch is based on the latest commit in `dev`
+3. Commit changes to your fork
+4. Make sure your commit messages contain a `Signed-off-by: <your-email-address>` line (see `git-commit --signoff`) to certify the [DCO](/DCO)
+5. Open a [pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)
+  against the upstream `dev` branch
+
+> [!IMPORTANT] 
+> Please make sure you open all PRs against the `dev` branch
+
+> [!IMPORTANT] 
+> For any new feature design, or feature level changes, please create an issue 1st, then submit a PR with design details before code implementation.
+
+## After your pull request is submitted
+
+At least one maintainer must approve the pull request.
+
+Once your pull request is submitted, it's your responsibility to:
+
+* Respond to reviewer's feedback
+* Keep it merge-ready at all times until it has been approved and actually merged
+
+Following approval, the pull request will be merged by the last maintainer to approve the request.
+
+#### Third-party code
+
+When third-party code must be included, all licenses must be preserved. This includes modified
+third-party code and excerpts, as well.
+
+Thank you for contributing to Tornjak!
 
 ## Local testing
 
