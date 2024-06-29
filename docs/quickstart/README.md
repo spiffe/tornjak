@@ -454,7 +454,7 @@ Make sure that the backend is accessible from your browser at `http://localhost:
 
 If you chose to deploy Tornjak with the UI, connecting to the UI is very simple. Otherwise, you can always run the UI locally and connect. See the two choices below:
 
-<details><summary><b> 🔴 [Click] Run the Tornjak frontend locally</b></summary>
+<details open><summary><b> 🔴 [Click] Run the Tornjak frontend locally</b></summary>
 
 You will need to deploy the separate frontend separately to access the exposed Tornjak backend. We have prebuilt the frontend in a container, so we can simply run it via a single docker command in a separate terminal, which will take a couple minutes to run:
 
