@@ -431,7 +431,7 @@ func (s *Server) verificationMiddleware(next http.Handler) http.Handler {
 			cors(w, r)
 			return
 		}
-	
+
 		userInfo := s.Authenticator.AuthenticateRequest(r)
 
 		err := s.Authorizer.AuthorizeRequest(r, userInfo)
@@ -574,17 +574,26 @@ func (s *Server) GetRouter() http.Handler {
 	// SPIRE server healthcheck
 	apiRtr.HandleFunc("/api/debugserver", s.debugServer)
 	apiRtr.HandleFunc("/api/healthcheck", s.healthcheck)
+	apiRtr.HandleFunc("/api/v1/debugserver", s.debugServer)
+	apiRtr.HandleFunc("/api/v1/healthcheck", s.healthcheck)
 
 	// Agents
 	apiRtr.HandleFunc("/api/agent/list", s.agentList)
 	apiRtr.HandleFunc("/api/agent/ban", s.agentBan)
 	apiRtr.HandleFunc("/api/agent/delete", s.agentDelete)
 	apiRtr.HandleFunc("/api/agent/createjointoken", s.agentCreateJoinToken)
+	apiRtr.HandleFunc("/api/v1/agents/list", s.agentList)
+	apiRtr.HandleFunc("/api/v1/agents/ban", s.agentBan)
+	apiRtr.HandleFunc("/api/v1/agents/delete", s.agentDelete)
+	apiRtr.HandleFunc("/api/v1/agents/createjointoken", s.agentCreateJoinToken)
 
 	// Entries
 	apiRtr.HandleFunc("/api/entry/list", s.entryList)
 	apiRtr.HandleFunc("/api/entry/create", s.entryCreate)
 	apiRtr.HandleFunc("/api/entry/delete", s.entryDelete)
+	apiRtr.HandleFunc("/api/v1/entries/list", s.entryList)
+	apiRtr.HandleFunc("/api/v1/entries/create", s.entryCreate)
+	apiRtr.HandleFunc("/api/v1/entries/delete", s.entryDelete)
 
 	// Tornjak specific
 	apiRtr.HandleFunc("/api/tornjak/serverinfo", s.tornjakGetServerInfo)
@@ -636,7 +645,7 @@ func (s *Server) HandleRequests() {
 
 	// TODO: replace with workerGroup for thread safety
 	errChannel := make(chan error, 2)
-	
+
 	serverConfig := s.TornjakConfig.Server
 	if serverConfig.HTTPConfig == nil {
 		err = fmt.Errorf("HTTP Config error: no port configured")
