@@ -599,15 +599,23 @@ func (s *Server) GetRouter() http.Handler {
 
 	// Tornjak specific
 	apiRtr.HandleFunc("/api/tornjak/serverinfo", s.tornjakGetServerInfo)
+	apiRtr.HandleFunc("/api/tornjak/v1/serverinfo", s.tornjakGetServerInfo)
 	// Agents Selectors
 	apiRtr.HandleFunc("/api/tornjak/selectors/register", s.tornjakPluginDefine)
+	apiRtr.HandleFunc("/api/tornjak/v1/selectors/register", s.tornjakPluginDefine)
 	apiRtr.HandleFunc("/api/tornjak/selectors/list", s.tornjakSelectorsList)
+	apiRtr.HandleFunc("/api/tornjak/v1/selectors/list", s.tornjakSelectorsList)
 	apiRtr.HandleFunc("/api/tornjak/agents/list", s.tornjakAgentsList)
+	apiRtr.HandleFunc("/api/tornjak/v1/agents/list", s.tornjakAgentsList)
 	// Clusters
 	apiRtr.HandleFunc("/api/tornjak/clusters/list", s.clusterList)
+	apiRtr.HandleFunc("/api/tornjak/v1/clusters/list", s.clusterList)
 	apiRtr.HandleFunc("/api/tornjak/clusters/create", s.clusterCreate)
+	apiRtr.HandleFunc("/api/tornjak/v1/clusters/create", s.clusterCreate)
 	apiRtr.HandleFunc("/api/tornjak/clusters/edit", s.clusterEdit)
+	apiRtr.HandleFunc("/api/tornjak/v1/clusters/edit", s.clusterEdit)
 	apiRtr.HandleFunc("/api/tornjak/clusters/delete", s.clusterDelete)
+	apiRtr.HandleFunc("/api/tornjak/v1/clusters/delete", s.clusterDelete)
 
 	// Middleware
 	apiRtr.Use(s.verificationMiddleware)
