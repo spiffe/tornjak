@@ -431,7 +431,7 @@ func (s *Server) verificationMiddleware(next http.Handler) http.Handler {
 			cors(w, r)
 			return
 		}
-	
+
 		userInfo := s.Authenticator.AuthenticateRequest(r)
 
 		err := s.Authorizer.AuthorizeRequest(r, userInfo)
@@ -586,6 +586,17 @@ func (s *Server) GetRouter() http.Handler {
 	apiRtr.HandleFunc("/api/entry/create", s.entryCreate)
 	apiRtr.HandleFunc("/api/entry/delete", s.entryDelete)
 
+	// Spire APIs with versioning
+	apiRtr.HandleFunc("/api/v1/spire/debugserver", s.debugServer)
+	apiRtr.HandleFunc("/api/v1/spire/healthcheck", s.healthcheck)
+	apiRtr.HandleFunc("/api/v1/spire/agents/list", s.agentList)
+	apiRtr.HandleFunc("/api/v1/spire/agents/ban", s.agentBan)
+	apiRtr.HandleFunc("/api/v1/spire/agents/delete", s.agentDelete)
+	apiRtr.HandleFunc("/api/v1/spire/agents/createjointoken", s.agentCreateJoinToken)
+	apiRtr.HandleFunc("/api/v1/spire/entries/list", s.entryList)
+	apiRtr.HandleFunc("/api/v1/spire/entries/create", s.entryCreate)
+	apiRtr.HandleFunc("/api/v1/spire/entries/delete", s.entryDelete)
+
 	// Tornjak specific
 	apiRtr.HandleFunc("/api/tornjak/serverinfo", s.tornjakGetServerInfo)
 	// Agents Selectors
@@ -636,7 +647,7 @@ func (s *Server) HandleRequests() {
 
 	// TODO: replace with workerGroup for thread safety
 	errChannel := make(chan error, 2)
-	
+
 	serverConfig := s.TornjakConfig.Server
 	if serverConfig.HTTPConfig == nil {
 		err = fmt.Errorf("HTTP Config error: no port configured")
