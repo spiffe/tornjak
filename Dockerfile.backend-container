@@ -18,10 +18,10 @@ RUN if [ "$TARGETARCH" = "arm64" ]; then CC=aarch64-alpine-linux-musl; fi && \
     go build --tags 'sqlite_json' -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o bin/tornjak-backend ./cmd/agent/main.go
 
 FROM alpine AS runtime
-RUN mkdir -p /opt/spire
+RUN mkdir -p /opt/tornjak
 
-WORKDIR /opt/spire
-ENTRYPOINT ["/opt/spire/run_backend.sh"]
+WORKDIR /opt/tornjak
+ENTRYPOINT ["/opt/tornjak/run_backend.sh"]
 
 # Add init
 COPY scripts/run_backend.sh run_backend.sh
