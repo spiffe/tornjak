@@ -409,7 +409,7 @@ func (s *Server) entryDelete(w http.ResponseWriter, r *http.Request) {
 func cors(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PATCH")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, access-control-allow-origin, access-control-allow-headers, access-control-allow-credentials, Authorization, access-control-allow-methods")
 	w.Header().Set("Access-Control-Expose-Headers", "*, Authorization")
 	w.WriteHeader(http.StatusOK)
@@ -418,7 +418,7 @@ func cors(w http.ResponseWriter, _ *http.Request) {
 func retError(w http.ResponseWriter, emsg string, status int) {
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PATCH")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, access-control-allow-origin, access-control-allow-headers, access-control-allow-credentials, Authorization, access-control-allow-methods")
 	w.Header().Set("Access-Control-Expose-Headers", "*, Authorization")
 	http.Error(w, emsg, status)
@@ -589,13 +589,13 @@ func (s *Server) GetRouter() http.Handler {
 	// Spire APIs with versioning
 	apiRtr.HandleFunc("/api/v1/spire/debugserver", s.debugServer)
 	apiRtr.HandleFunc("/api/v1/spire/healthcheck", s.healthcheck)
-	apiRtr.HandleFunc("/api/v1/spire/agents/list", s.agentList)
-	apiRtr.HandleFunc("/api/v1/spire/agents/ban", s.agentBan)
-	apiRtr.HandleFunc("/api/v1/spire/agents/delete", s.agentDelete)
-	apiRtr.HandleFunc("/api/v1/spire/agents/createjointoken", s.agentCreateJoinToken)
-	apiRtr.HandleFunc("/api/v1/spire/entries/list", s.entryList)
-	apiRtr.HandleFunc("/api/v1/spire/entries/create", s.entryCreate)
-	apiRtr.HandleFunc("/api/v1/spire/entries/delete", s.entryDelete)
+	apiRtr.HandleFunc("/api/v1/spire/agents", s.agentList).Methods("GET")
+	apiRtr.HandleFunc("/api/v1/spire/agents/ban", s.agentBan).Methods("POST")
+	apiRtr.HandleFunc("/api/v1/spire/agents", s.agentDelete).Methods("DELETE")
+	apiRtr.HandleFunc("/api/v1/spire/agents/jointoken", s.agentCreateJoinToken).Methods("POST")
+	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryList).Methods("GET")
+	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryCreate).Methods("POST")
+	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryDelete).Methods("DELETE")
 
 	// Tornjak specific
 	apiRtr.HandleFunc("/api/tornjak/serverinfo", s.tornjakGetServerInfo)
@@ -610,16 +610,16 @@ func (s *Server) GetRouter() http.Handler {
 	apiRtr.HandleFunc("/api/tornjak/clusters/delete", s.clusterDelete)
 
 	// Tornjak specific
-	apiRtr.HandleFunc("/api/v1/tornjak/serverinfo", s.tornjakGetServerInfo)
+	apiRtr.HandleFunc("/api/v1/tornjak/serverinfo", s.tornjakGetServerInfo).Methods("GET")
 	// Agents Selectors
-	apiRtr.HandleFunc("/api/v1/tornjak/selectors/register", s.tornjakPluginDefine)
-	apiRtr.HandleFunc("/api/v1/tornjak/selectors/list", s.tornjakSelectorsList)
-	apiRtr.HandleFunc("/api/v1/tornjak/agents/list", s.tornjakAgentsList)
+	apiRtr.HandleFunc("/api/v1/tornjak/selectors", s.tornjakPluginDefine).Methods("POST")
+	apiRtr.HandleFunc("/api/v1/tornjak/selectors", s.tornjakSelectorsList).Methods("GET")
+	apiRtr.HandleFunc("/api/v1/tornjak/agents", s.tornjakAgentsList).Methods("GET")
 	// Clusters
-	apiRtr.HandleFunc("/api/v1/tornjak/clusters/list", s.clusterList)
-	apiRtr.HandleFunc("/api/v1/tornjak/clusters/create", s.clusterCreate)
-	apiRtr.HandleFunc("/api/v1/tornjak/clusters/edit", s.clusterEdit)
-	apiRtr.HandleFunc("/api/v1/tornjak/clusters/delete", s.clusterDelete)
+	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterList).Methods("GET")
+	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterCreate).Methods("POST")
+	apiRtr.HandleFunc("/api/v1/tornjak/clusters/edit", s.clusterEdit).Methods("PATCH")
+	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterDelete).Methods("DELETE")
 
 
 
