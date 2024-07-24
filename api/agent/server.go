@@ -600,7 +600,7 @@ func (s *Server) GetRouter() http.Handler {
 
 	// Spire APIs with versioning
 	apiRtr.HandleFunc("/api/v1/spire/serverinfo", s.debugServer).Methods("GET")
-	apiRtr.HandleFunc("/api/v1/spire/healthcheck", s.healthcheck).Methods("POST")
+	apiRtr.HandleFunc("/api/v1/spire/healthcheck", s.healthcheck).Methods("GET")
 	apiRtr.HandleFunc("/api/v1/spire/agents", s.agentList).Methods("GET")
 	apiRtr.HandleFunc("/api/v1/spire/agents/ban", s.agentBan).Methods("POST")
 	apiRtr.HandleFunc("/api/v1/spire/agents", s.agentDelete).Methods("DELETE")
