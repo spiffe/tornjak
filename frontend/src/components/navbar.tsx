@@ -14,11 +14,13 @@ import {
   accessTokenUpdateFunc,
   UserRolesUpdateFunc,
 } from 'redux/actions';
+import { Tag } from 'carbon-components-react';
 import {
-  AccessToken
+  AccessToken,
+  ServerInfo
 } from './types';
 import HeaderToolBar from './navbar-header-toolbar';
-import {env} from '../env';
+import { env } from '../env';
 
 const Auth_Server_Uri = env.REACT_APP_AUTH_SERVER_URI;
 
@@ -39,6 +41,8 @@ type NavigationBarProp = {
   clickedDashboardTableFunc: (globalClickedDashboardTable: string) => void,
   // the clicked dashboard table
   globalClickedDashboardTable: string,
+  // the server trust domain and nodeAttestorPlugin as a ServerInfoType
+  globalServerInfo: ServerInfo,
 }
 
 type NavigationBarState = {}
@@ -133,6 +137,12 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
               <img src={tornjak_logo} height="50" width="160" alt="Tornjak" /></a>
           </span>
         </div>
+        {/* Temporarily using trust domain as server unique identifier */}
+        <div>
+          <Tag className="spire-server-unique-identifier" type="cyan">
+            Spire Server: {this.props.globalServerInfo.trustDomain}
+          </Tag>
+        </div>
       </div>
     );
   }
@@ -149,6 +159,7 @@ const mapStateToProps = (state: RootState) => ({
   globalIsAuthenticated: state.auth.globalIsAuthenticated,
   globalAccessToken: state.auth.globalAccessToken,
   globalUserRoles: state.auth.globalUserRoles,
+  globalServerInfo: state.servers.globalServerInfo,
 })
 
 export default connect(
