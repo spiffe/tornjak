@@ -9,10 +9,12 @@
 
 ## Contributor Guidelines and Governance
 
-Please see [CONTRIBUTING](https://github.com/spiffe/spiffe/blob/main/CONTRIBUTING.md) and [GOVERNANCE](https://github.com/spiffe/spiffe/blob/main/GOVERNANCE.md) from the SPIFFE project. 
+Please see [CONTRIBUTING](https://github.com/spiffe/spiffe/blob/main/CONTRIBUTING.md) and [GOVERNANCE](https://github.com/spiffe/spiffe/blob/main/GOVERNANCE.md) from the SPIFFE project for community guidelines. 
 
 > [!IMPORTANT] 
-> Before opening a new issue or PR, search for any existing issues [here](https://github.com/spiffe/tornjak/issues) to avoid duplication.
+> Before opening a new issue, search for any existing issues [here](https://github.com/spiffe/tornjak/issues) to avoid duplication.
+
+If you're new to this project, we recommend you join us on [Slack](https://spiffe.slack.com/archives/C024JTTK58T) for discussion of potential new features. 
 
 ## Pre-built images
 
@@ -29,27 +31,28 @@ In order to build, we require the following installations:
 
 ## Building Executables and Images
 
-Building Tornjak manually can be done with the Makefile. Notable make targets follow:
+Building Tornjak manually can be done with the Makefile. Below is a list of local executable builds: 
 - `make bin/tornjak-backend`: makes the Go executable of the Tornjak backend
 - `make bin/tornjak-manager`: makes the Go executable of the Tornjak manager
 - `make frontend-local-build`: makes the optimized ReactJS app locally for the Tornjak frontend. Uses environment variable configuration as in tornjak-frontend/.env
+
+And below is a list of container image builds: 
 - `make image-tornjak-backend`: containerizes Go executable of the Tornjak backend
 - `make image-tornjak-manager`:containerizes Go executable of the Tornjak manager
 - `make image-tornjak-frontend`: containerizes React JS app for the Tornjak frontend
-- `make image-tornjak`: containerizes Tornjak backend with Tornjak frontend
 
 For usage instructions of the containers, please see our [USAGE document](./USAGE.md) to get started.
 
 ## Development
 
-We welcome all development attempt and contributions from the community. The easiest place to start is by reviewing our code architecture diagrams available in our [api documentation](./docs/tornjak-ui-api-documentation.md#11-overview).
+We welcome all development attempts and contributions from the community. The easiest place to start is by reviewing our code architecture diagrams available in our [api documentation](./docs/tornjak-ui-api-documentation.md#11-overview).
 
 ## Opening a pull request
 
-1. Fork/ clone the tornjak repo
+1. Fork the tornjak repo
 2. Ensure your branch is based on the latest commit in `dev`
-3. Commit changes to your fork
-4. Make sure your commit messages contain a `Signed-off-by: <your-email-address>` line (see `git-commit --signoff`) to certify the [DCO](/DCO)
+3. Commit changes to your fork. Make sure your commit messages contain a `Signed-off-by: <your-email-address>` line (see `git-commit --signoff`) to certify the [DCO](/DCO)
+4. Test your PR locally and ensure all tests in Github actions pass
 5. Open a [pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)
   against the upstream `dev` branch
 
@@ -57,7 +60,7 @@ We welcome all development attempt and contributions from the community. The eas
 > Please make sure you open all PRs against the `dev` branch
 
 > [!IMPORTANT] 
-> For any new feature design, or feature level changes, please create an issue 1st, then submit a PR with design details before code implementation.
+> For any new feature design, or feature level changes, please create an issue first, then submit a PR with design details before code implementation.
 
 ## After your pull request is submitted
 
