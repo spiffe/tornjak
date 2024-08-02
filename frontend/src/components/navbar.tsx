@@ -138,9 +138,9 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
           </span>
         </div>
         {/* Temporarily using trust domain as server unique identifier */}
-        <div>
-          <Tag className="spire-server-unique-identifier" type="cyan">
-            Spire Server: {this.props.globalServerInfo.trustDomain}
+        <div className="spire-server-unique-identifier">
+          <Tag type="cyan">
+            Trust Domain: {this.props.globalServerInfo.trustDomain}
           </Tag>
         </div>
       </div>
