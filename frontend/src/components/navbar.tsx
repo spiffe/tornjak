@@ -8,16 +8,23 @@ import tornjak_logo from "res/tornjak_logo.png";
 import TornjakHelper from 'components/tornjak-helper';
 import KeycloakService from "auth/KeycloakAuth";
 import { RootState } from 'redux/reducers';
+import TornjakApi from './tornjak-api-helpers';
 import {
   clickedDashboardTableFunc,
   isAuthenticatedUpdateFunc,
   accessTokenUpdateFunc,
   UserRolesUpdateFunc,
+  serverInfoUpdateFunc,
+  tornjakServerInfoUpdateFunc,
+  spireDebugServerInfoUpdateFunc,
+  tornjakMessageFunc
 } from 'redux/actions';
 import { Tag } from 'carbon-components-react';
 import {
   AccessToken,
-  ServerInfo
+  ServerInfo,
+  DebugServerInfo,
+  TornjakServerInfo
 } from './types';
 import HeaderToolBar from './navbar-header-toolbar';
 import { env } from '../env';
@@ -43,15 +50,29 @@ type NavigationBarProp = {
   globalClickedDashboardTable: string,
   // the server trust domain and nodeAttestorPlugin as a ServerInfoType
   globalServerInfo: ServerInfo,
+  // tornjak server debug info of the selected server
+  globalDebugServerInfo: DebugServerInfo,
+  // tornjak server info of the selected server
+  globalTornjakServerInfo: TornjakServerInfo, 
+  // dispatches a payload for the server trust domain and nodeAttestorPlugin as a ServerInfoType and has a return type of void
+  serverInfoUpdateFunc: (globalServerInfo: ServerInfo) => void, 
+  // dispatches a payload for the tornjak server info of the selected server and has a return type of void
+  tornjakServerInfoUpdateFunc: (globalTornjakServerInfo: TornjakServerInfo) => void, 
+  // dispatches a payload for the debug server info of the selected server and has a return type of void
+  spireDebugServerInfoUpdateFunc: (globalDebugServerInfo: DebugServerInfo) => void,
+  // dispatches a payload for an Error Message/ Success Message of an executed function as a string and has a return type of void
+  tornjakMessageFunc: (globalErrorMessage: string) => void, 
 }
 
 type NavigationBarState = {}
 
 class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
   TornjakHelper: TornjakHelper;
+  TornjakApi: TornjakApi;
   constructor(props: NavigationBarProp) {
     super(props);
     this.TornjakHelper = new TornjakHelper({});
+    this.TornjakApi = new TornjakApi(props);
     this.state = {};
   }
 
@@ -68,6 +89,9 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
         }
       }
     }
+    this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
+    this.TornjakApi.populateLocalTornjakDebugServerInfo(this.props.spireDebugServerInfoUpdateFunc, this.props.tornjakMessageFunc);
+    this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
   }
 
   render() {
@@ -141,6 +165,7 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
         <div className="spire-server-unique-identifier">
           <Tag type="cyan">
             Trust Domain: {this.props.globalServerInfo.trustDomain}
+            <span style={{ fontWeight: 'bold' }}>{this.props.globalDebugServerInfo.svid_chain[0].id.path}</span>
           </Tag>
         </div>
       </div>
@@ -160,11 +185,22 @@ const mapStateToProps = (state: RootState) => ({
   globalAccessToken: state.auth.globalAccessToken,
   globalUserRoles: state.auth.globalUserRoles,
   globalServerInfo: state.servers.globalServerInfo,
+  globalDebugServerInfo: state.servers.globalDebugServerInfo,
+  globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
 })
 
 export default connect(
   mapStateToProps,
-  { clickedDashboardTableFunc, isAuthenticatedUpdateFunc, accessTokenUpdateFunc, UserRolesUpdateFunc }
+  { 
+    clickedDashboardTableFunc, 
+    isAuthenticatedUpdateFunc, 
+    accessTokenUpdateFunc, 
+    UserRolesUpdateFunc,
+    serverInfoUpdateFunc,
+    tornjakServerInfoUpdateFunc,
+    spireDebugServerInfoUpdateFunc,
+    tornjakMessageFunc
+  }
 )(NavigationBar)
 
 export { NavigationBar }
