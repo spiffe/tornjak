@@ -53,15 +53,15 @@ type NavigationBarProp = {
   // tornjak server debug info of the selected server
   globalDebugServerInfo: DebugServerInfo,
   // tornjak server info of the selected server
-  globalTornjakServerInfo: TornjakServerInfo, 
+  globalTornjakServerInfo: TornjakServerInfo,
   // dispatches a payload for the server trust domain and nodeAttestorPlugin as a ServerInfoType and has a return type of void
-  serverInfoUpdateFunc: (globalServerInfo: ServerInfo) => void, 
+  serverInfoUpdateFunc: (globalServerInfo: ServerInfo) => void,
   // dispatches a payload for the tornjak server info of the selected server and has a return type of void
-  tornjakServerInfoUpdateFunc: (globalTornjakServerInfo: TornjakServerInfo) => void, 
+  tornjakServerInfoUpdateFunc: (globalTornjakServerInfo: TornjakServerInfo) => void,
   // dispatches a payload for the debug server info of the selected server and has a return type of void
   spireDebugServerInfoUpdateFunc: (globalDebugServerInfo: DebugServerInfo) => void,
   // dispatches a payload for an Error Message/ Success Message of an executed function as a string and has a return type of void
-  tornjakMessageFunc: (globalErrorMessage: string) => void, 
+  tornjakMessageFunc: (globalErrorMessage: string) => void,
 }
 
 type NavigationBarState = {}
@@ -164,8 +164,9 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
         {/* Temporarily using trust domain as server unique identifier */}
         <div className="spire-server-unique-identifier">
           <Tag type="cyan">
-            Trust Domain: {this.props.globalServerInfo.trustDomain}
-            <span style={{ fontWeight: 'bold' }}>{this.props.globalDebugServerInfo.svid_chain[0].id.path}</span>
+            <span style={{ fontWeight: 'bold' }}>Server ID: </span>
+            {this.props.globalServerInfo.trustDomain}
+            <span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>{this.props.globalDebugServerInfo.svid_chain[0].id.path}</span>
           </Tag>
         </div>
       </div>
@@ -191,10 +192,10 @@ const mapStateToProps = (state: RootState) => ({
 
 export default connect(
   mapStateToProps,
-  { 
-    clickedDashboardTableFunc, 
-    isAuthenticatedUpdateFunc, 
-    accessTokenUpdateFunc, 
+  {
+    clickedDashboardTableFunc,
+    isAuthenticatedUpdateFunc,
+    accessTokenUpdateFunc,
     UserRolesUpdateFunc,
     serverInfoUpdateFunc,
     tornjakServerInfoUpdateFunc,
