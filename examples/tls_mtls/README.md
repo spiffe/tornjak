@@ -86,7 +86,7 @@ cat server-statefulset-tls.yaml
 volumeMounts:
 ...
   - name: tls-volume
-    mountPath: /opt/spire/server
+    mountPath: /opt/tornjak/server
 ...
 volumes:
 ...
@@ -123,9 +123,9 @@ Then we mount the secret to the Tornjak container via volume mount, as in the pr
 volumeMounts:
 ...
   - name: tls-volume
-    mountPath: /opt/spire/server
+    mountPath: /opt/tornjak/server
   - name: client-cas
-    mountPath: /opt/spire/clients
+    mountPath: /opt/tornjak/clients
 ...
 volumes:
 ...

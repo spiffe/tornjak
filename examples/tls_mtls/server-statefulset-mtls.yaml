@@ -71,9 +71,9 @@ spec:
             - name: socket
               mountPath: /tmp/spire-server/private
             - name: tls-volume              # 👈 TLS SECRET VOLUME MOUNT
-              mountPath: /opt/spire/server  # 👈 TLS SECRET VOLUME MOUNT
+              mountPath: /opt/tornjak/server  # 👈 TLS SECRET VOLUME MOUNT
             - name: client-ca                 # 👈 mTLS CA SECRET VOLUME MOUNT
-              mountPath: /opt/spire/clients   # 👈 mTLS CA SECRET VOLUME MOUNT
+              mountPath: /opt/tornjak/clients   # 👈 mTLS CA SECRET VOLUME MOUNT
       volumes:
         - name: spire-config
           configMap:
