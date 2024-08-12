@@ -426,3 +426,11 @@
   width: 180px;
   float: right;
 }
+.spire-server-unique-identifier {
+  margin-top: 20px;
+  margin-right: 20px;
+  z-index: 1000; /* High z-index to ensure it's on top */
+  position: relative;
+  display: inline;
+  float: right; /* Float to the right */
+}
