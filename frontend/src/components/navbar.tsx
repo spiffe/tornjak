@@ -165,8 +165,8 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
         <div className="spire-server-unique-identifier">
           <Tag type="cyan">
             <span style={{ fontWeight: 'bold' }}>Server ID: </span>
-            {this.props.globalServerInfo.trustDomain}
-            <span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>{this.props.globalDebugServerInfo.svid_chain[0].id.path}</span>
+            <span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>{this.props.globalServerInfo.trustDomain}</span>
+            {this.props.globalDebugServerInfo.svid_chain[0].id.path}
           </Tag>
         </div>
       </div>
