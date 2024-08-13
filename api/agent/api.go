@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	agent "github.com/spiffe/spire-api-sdk/proto/spire/api/server/agent/v1"
+	bundle "github.com/spiffe/spire-api-sdk/proto/spire/api/server/bundle/v1"
 	debugServer "github.com/spiffe/spire-api-sdk/proto/spire/api/server/debug/v1"
 	entry "github.com/spiffe/spire-api-sdk/proto/spire/api/server/entry/v1"
 	types "github.com/spiffe/spire-api-sdk/proto/spire/api/types"
@@ -213,6 +214,112 @@ func (s *Server) GetTornjakServerInfo(inp GetTornjakServerInfoRequest) (*GetTorn
 		return nil, errors.New("No SPIRE config provided to Tornjak")
 	}
 	return (*GetTornjakServerInfoResponse)(&s.SpireServerInfo), nil
+}
+
+// Bundle APIs
+type GetBundleRequest bundle.GetBundleRequest
+type GetBundleResponse types.Bundle
+
+func (s *Server) GetBundle(inp GetBundleRequest) (*GetBundleResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	inpReq := bundle.GetBundleRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	var conn *grpc.ClientConn
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := bundle.NewBundleClient(conn)
+
+	bundle, err := client.GetBundle(context.Background(), &inpReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return (*GetBundleResponse)(bundle), nil
+}
+
+type ListFederatedBundlesRequest bundle.ListFederatedBundlesRequest
+type ListFederatedBundlesResponse bundle.ListFederatedBundlesResponse
+
+func (s *Server) ListFederatedBundles(inp ListFederatedBundlesRequest) (*ListFederatedBundlesResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	inpReq := bundle.ListFederatedBundlesRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	var conn *grpc.ClientConn
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := bundle.NewBundleClient(conn)
+
+	bundle, err := client.ListFederatedBundles(context.Background(), &inpReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return (*ListFederatedBundlesResponse)(bundle), nil
+}
+
+type CreateFederatedBundleRequest bundle.BatchCreateFederatedBundleRequest
+type CreateFederatedBundleResponse bundle.BatchCreateFederatedBundleResponse
+
+func (s *Server) CreateFederatedBundle(inp CreateFederatedBundleRequest) (*CreateFederatedBundleResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	inpReq := bundle.BatchCreateFederatedBundleRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	var conn *grpc.ClientConn
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := bundle.NewBundleClient(conn)
+
+	bundle, err := client.BatchCreateFederatedBundle(context.Background(), &inpReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return (*CreateFederatedBundleResponse)(bundle), nil
+}
+
+type UpdateFederatedBundleRequest bundle.BatchUpdateFederatedBundleRequest
+type UpdateFederatedBundleResponse bundle.BatchUpdateFederatedBundleResponse
+
+func (s *Server) UpdateFederatedBundle(inp UpdateFederatedBundleRequest) (*UpdateFederatedBundleResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	inpReq := bundle.BatchUpdateFederatedBundleRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	var conn *grpc.ClientConn
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := bundle.NewBundleClient(conn)
+
+	bundle, err := client.BatchUpdateFederatedBundle(context.Background(), &inpReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return (*UpdateFederatedBundleResponse)(bundle), nil
+}
+
+type DeleteFederatedBundleRequest bundle.BatchDeleteFederatedBundleRequest
+type DeleteFederatedBundleResponse bundle.BatchDeleteFederatedBundleResponse
+
+func (s *Server) DeleteFederatedBundle(inp DeleteFederatedBundleRequest) (*DeleteFederatedBundleResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	inpReq := bundle.BatchDeleteFederatedBundleRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	var conn *grpc.ClientConn
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := bundle.NewBundleClient(conn)
+
+	bundle, err := client.BatchDeleteFederatedBundle(context.Background(), &inpReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return (*DeleteFederatedBundleResponse)(bundle), nil
 }
 
 /*

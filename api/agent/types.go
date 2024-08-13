@@ -27,8 +27,8 @@ type SpireServerConfig struct {
 }
 
 type SPIREConfig struct {
-	Server *SpireServerConfig `hcl:"server"`
-	Plugins ast.Node `hcl:"plugins"`
+	Server  *SpireServerConfig `hcl:"server"`
+	Plugins ast.Node           `hcl:"plugins"`
 }
 
 type TornjakConfig struct {
@@ -49,9 +49,9 @@ type HTTPConfig struct {
 }
 
 type HTTPSConfig struct {
-	ListenPort int `hcl:"port"`
-	Cert	   string `hcl:"cert"`
-	Key 	   string `hcl:"key"`
+	ListenPort int    `hcl:"port"`
+	Cert       string `hcl:"cert"`
+	Key        string `hcl:"key"`
 	ClientCA   string `hcl:"client_ca"`
 }
 
@@ -119,12 +119,12 @@ type AuthRole struct {
 }
 
 type APIRoleMapping struct {
-	Name string `hcl:",key"`
+	Name         string   `hcl:",key"`
 	AllowedRoles []string `hcl:"allowed_roles"`
 }
 
 type pluginAuthorizerRBAC struct {
-	Name string `hcl:"name"`
-	RoleList []*AuthRole `hcl:"role,block"`
+	Name            string            `hcl:"name"`
+	RoleList        []*AuthRole       `hcl:"role,block"`
 	APIRoleMappings []*APIRoleMapping `hcl:"API,block"`
 }
