@@ -1070,6 +1070,10 @@ func NewAuthorizer(authorizerPlugin *ast.ObjectItem) (authorization.Authorizer, 
 		}
 		for _, api := range config.APIRoleMappings {
 			apiMapping[api.Name] = api.AllowedRoles
+			fmt.Printf("API name: %s, Allowed Roles: %s \n", api.Name, api.AllowedRoles)
+		}
+		for _, apiV1 := range config.APIv1RoleMappings{
+			fmt.Printf("API V1 method: %s, API V1 name: %s \n", apiV1.Method, apiV1.Name)
 		}
 
 		authorizer, err := authorization.NewRBACAuthorizer(config.Name, roleList, apiMapping)
