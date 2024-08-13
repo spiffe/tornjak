@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	agent "github.com/spiffe/spire-api-sdk/proto/spire/api/server/agent/v1"
-  bundle "github.com/spiffe/spire-api-sdk/proto/spire/api/server/bundle/v1"
+	bundle "github.com/spiffe/spire-api-sdk/proto/spire/api/server/bundle/v1"
 	debugServer "github.com/spiffe/spire-api-sdk/proto/spire/api/server/debug/v1"
 	entry "github.com/spiffe/spire-api-sdk/proto/spire/api/server/entry/v1"
 	types "github.com/spiffe/spire-api-sdk/proto/spire/api/types"
@@ -321,7 +321,6 @@ func (s *Server) DeleteFederatedBundle(inp DeleteFederatedBundleRequest) (*Delet
 
 	return (*DeleteFederatedBundleResponse)(bundle), nil
 }
-
 
 /*
 

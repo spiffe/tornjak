@@ -1,6 +1,7 @@
 package api
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,7 +12,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-	"crypto/tls"
 
 	backoff "github.com/cenkalti/backoff/v4"
 	"github.com/gorilla/mux"
@@ -20,9 +20,9 @@ import (
 	"github.com/hashicorp/hcl/hcl/token"
 	"github.com/pkg/errors"
 
-	agentdb "github.com/spiffe/tornjak/pkg/agent/db"
 	"github.com/spiffe/tornjak/pkg/agent/authentication/authenticator"
 	"github.com/spiffe/tornjak/pkg/agent/authorization"
+	agentdb "github.com/spiffe/tornjak/pkg/agent/db"
 )
 
 type Server struct {
@@ -36,9 +36,9 @@ type Server struct {
 	TornjakConfig *TornjakConfig
 
 	// Plugins
-	Db   agentdb.AgentDB
+	Db            agentdb.AgentDB
 	Authenticator authenticator.Authenticator
-	Authorizer authorization.Authorizer
+	Authorizer    authorization.Authorizer
 }
 
 // config type, as defined by SPIRE
@@ -607,7 +607,6 @@ func (s *Server) federatedBundleDelete(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 func cors(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -760,7 +759,6 @@ func (s *Server) health(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 func (s *Server) GetRouter() http.Handler {
 	rtr := mux.NewRouter()
 
@@ -887,7 +885,6 @@ func (s *Server) HandleRequests() {
 		canStartHTTPS := true
 		httpsConfig := serverConfig.HTTPSConfig
 		var tlsConfig *tls.Config
-
 
 		if serverConfig.HTTPSConfig.ListenPort == 0 {
 			// Fail because this is required field in this section
