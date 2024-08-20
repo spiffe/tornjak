@@ -124,8 +124,9 @@ type APIRoleMapping struct {
 }
 
 type APIv1RoleMapping struct {
-	Method string `hcl:",key"`
 	Name string `hcl:",key"`
+	Method string `hcl:"-"`
+	Path string `hcl:"-"`
 	AllowedRoles []string `hcl:"allowed_roles"`
 }
 
