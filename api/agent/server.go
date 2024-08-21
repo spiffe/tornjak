@@ -808,7 +808,7 @@ func (s *Server) GetRouter() http.Handler {
 	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryList).Methods("GET")
 	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryCreate).Methods("POST")
 	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryDelete).Methods("DELETE")
-	apiRtr.HandleFunc("/api/v1/spire/bundle", s.bundleGet).Methods("GET")
+	apiRtr.HandleFunc("/api/v1/spire/bundles", s.bundleGet).Methods("GET")
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleList).Methods("GET")
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleCreate).Methods("POST")
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleUpdate).Methods("PATCH")
