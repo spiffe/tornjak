@@ -724,8 +724,6 @@ paths:
 
 components:
   schemas:
-    TODO:
-      type: string
 
     spiffe_id:
       type: object
