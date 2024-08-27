@@ -1,0 +1,778 @@
+openapi: 3.1.0
+info:
+  title: Tornjak
+  description: |
+    This API allows management of SPIRE server via the Tornjak server,
+    comprised of SPIRE server API calls and Tornjak-specific API calls.
+  version: 1.3.0
+paths:
+  /api/v1/spire/healthcheck:
+    get:
+      summary: Query SPIRE Healthcheck status
+      description: Retrieves SPIRE healthcheck status. SPIRE currently uses Google grpc_health_v1 package
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    minimum: 0
+                    maximum: 3
+                    description: |
+                      Possible values for SPIRE server healthcheck
+                      `0` means UNKNOWN
+                      `1` means SERVING
+                      `2` means NOT_SERVING
+                      `3` means SERVICE UNKNOWN
+  /api/v1/spire/serverinfo:
+    get:
+      summary: Get general SPIRE server information, as defined in SPIRE api-sdk
+      description: Retrieves general SPIRE server information as defined in SPIRE api-sdk
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  svid_chain:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: object
+                          properties:
+                            trust_domain:
+                              type: string
+                              examples: ["example.org"]
+                            path:
+                              type: string
+                              examples: ["/spire/server"]
+                        expires_at:
+                          type: integer
+                          examples: [111]
+                        subject:
+                          type: string
+                          examples: ["O=SPIRE,C=US,2.5.4.45=#222"]
+                  uptime:
+                    type: integer
+                    minimum: 0
+                    examples: [333]
+                    description: |
+                      Represents the number of seconds a SPIRE server has been running
+                  federated_bundles_count:
+                    type: integer
+                    minimum: 0
+                    examples: [1]
+                    description: |
+                      Represents the number of federated bundles stored in SPIRE server
+              example: # This part adds a full example for manual display
+                {
+                  "svid_chain": [
+                    {
+                      "id": {
+                        "trust_domain": "example.org",
+                        "path": "/spire/server"
+                      },
+                      "expires_at": 111,
+                      "subject": "O=SPIRE,C=US,2.5.4.45=#222"
+                    },
+                    {
+                      "id": {
+                        "trust_domain": "example.org",
+                        "path": "/spire/server/other"
+                      },
+                      "expires_at": 222,
+                      "subject": "O=SPIFFE,C=US"
+                    }
+                  ],
+                  "uptime": 333,
+                  "federated_bundles_count": 1
+                }
+  /api/v1/spire/agents:
+    get:
+      summary: Calls SPIRE server `spire-server agent list` command
+      description: Display attested nodes
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/agent'
+              example: # Example response
+                {
+                  "agents": [
+                    {
+                      "id": {
+                        "trust_domain": "example.org",
+                        "path": "/spire/agent"
+                      },
+                      "attestation_type": "k8s_sat",
+                      "x509svid_serial_number": "111",
+                      "x509svid_expires_at": 222,
+                      "selectors": [
+                        {
+                          "type": "k8s_sat",
+                          "value": "agent_ns:spire"
+                        },
+                        {
+                          "type": "k8s_sat",
+                          "value": "agent_sa:spire-agent"
+                        }
+                      ]
+                    }
+                  ]
+                }
+
+    delete:
+      summary: Calls SPIRE server `spire-server agent evict` command
+      description: Evict attested node given spiffeID so node is not able to re-attest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/spiffe_id'
+            examples:
+              spiffe_id_example:
+                value:
+                  id:
+                    path: "/spire/agent/"
+                    trust_domain: "example.org"
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: string
+                examples: ["SUCCESS"]
+  /api/v1/spire/agents/ban:
+    post:
+      summary: Calls SPIRE server `spire-server agent ban` command
+      description: Ban attested node given spiffeID so node is not able to re-attest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/spiffe_id'
+            examples:
+              example_request:
+                value:
+                  id:
+                    path: "/spire/agent/"
+                    trust_domain: "example.org"
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: string
+                examples: ["SUCCESS"]
+  /api/v1/spire/agents/jointoken:
+    post:
+      summary: Calls SPIRE server `spire-server token generate`
+      description: Generates one node join token and creates a registration entry for it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  examples: ["/sample/spiffe/id"]
+                token:
+                  type: integer
+                  examples: [1111]
+                trust_domain:
+                  type: string
+                  examples: ["example.org"]
+                ttl:
+                  type: integer
+                  examples: [500]
+            examples:
+              example1:
+                value:
+                  path: "/sample/spiffe/id"
+                  token: 1111
+                  trust_domain: "example.org"
+                  ttl: 500
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: integer
+                    examples: [1111]
+                  expires_at:
+                    type: integer
+                    examples: [555]
+              examples:
+                example1:
+                  value:
+                    value: 1111
+                    expires_at: 555
+  /api/v1/spire/entries:
+    get:
+      summary: Calls SPIRE server `spire-server entry show`
+      description: Displays configured registration entries
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/entry'
+              examples:
+                example_response:
+                  summary: "A sample response showing entries"
+                  value:
+                    entries:
+                      - id: "id1"
+                        spiffe_id:
+                          trust_domain: "example.org"
+                          path: "/spire/agent/"
+                        parent_id:
+                          trust_domain: "example.org"
+                          path: "/spire/agent/"
+                        selectors:
+                          - type: "k8s_sat"
+                            value: "agent_ns:spire"
+                          - type: "k8s_sat"
+                            value: "agent_sa:spire-agent"
+    post:
+      summary: Calls SPIRE server `spire-server entry create`
+      description: Create registration entries
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/entry'
+                - type: object
+                  properties:
+                    admin:
+                      type: string
+                    dns_names:
+                      type: string
+                    downstream:
+                      type: string
+                    expires_at:
+                      type: string
+                    federates_with:
+                      type: array
+                      items:
+                        type: string
+                      examples: []
+            examples:
+              example_request:
+                summary: "Example request for creating a registration entry"
+                value:
+                  admin: "/spire/agent/"
+                  dns_names: "/spire/agent/"
+                  downstream: "/spire/agent/"
+                  expires_at: "/spire/agent/"
+                  federates_with: []
+                  parent_id:
+                    trust_domain: "example.org"
+                    path: "/spire/agent/"
+                  selectors:
+                    - type: "k8s_sat"
+                      value: "agent_ns:spire"
+                    - type: "k8s_sat"
+                      value: "agent_sa:spire-agent"
+                  spiffe_id:
+                    trust_domain: "example.org"
+                    path: "/spire/agent/"
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                              examples: ["OK"]
+                        entry:
+                          $ref: '#/components/schemas/entry'
+              examples:
+                example_response:
+                  summary: "Example response after creating a registration entry"
+                  value:
+                    results:
+                      - status:
+                          message: "OK"
+                        entry:
+                          spiffe_id:
+                            trust_domain: "example.org"
+                            path: "/spire/agent/"
+                          parent_id:
+                            trust_domain: "example.org"
+                            path: "/spire/agent/"
+                          selectors:
+                            - type: "k8s_sat"
+                              value: "agent_ns:spire"
+                            - type: "k8s_sat"
+                              value: "agent_sa:spire-agent"
+    delete:
+      summary: Calls SPIRE server `spire-server entry delete` command
+      description: Deletes a specified registration entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: string
+              examples:
+                - summary: "Example request to delete a registration entry"
+                  value:
+                    ids:
+                      - "111"
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                              examples:
+                                - "OK"
+                        id:
+                          type: string
+                          examples:
+                            - "111"
+              examples:
+                example_response:
+                  summary: "Example response after deleting a registration entry"
+                  value:
+                    Results:
+                      - status:
+                          message: "OK"
+                        id: "111"
+
+  /api/v1/tornjak/serverinfo:
+    get:
+      summary: Get general Tornjak server information.
+      description: Get general Tornjak server information.
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  DataStore:
+                    type: array
+                    items:
+                      type: string
+                      examples: ["sql"]
+                  KeyManager:
+                    type: array
+                    items:
+                      type: string
+                      examples: ["disk"]
+                  NodeAttestor:
+                    type: array
+                    items:
+                      type: string
+                      examples: ["k8s_sat"]
+                  NodeResolver:
+                    type: array
+                    items:
+                      type: string
+                      examples: ["k8sbundle"]
+                  trust_domain:
+                    type: string
+                    examples: ["example.org"]
+                  verboseConfig:
+                    type: string
+                    examples: ["Plugin info..."]
+
+  /api/v1/tornjak/selectors:
+    get:
+      summary: Get list of Tornjak selectors.
+      description: Retrieves a list of Tornjak selectors including agent details.
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: object
+                    properties:
+                      spiffeid:
+                        type: string
+                        examples: ["spiffe://example.org/spire/agent/"]
+                      plugin:
+                        type: string
+                        examples: ["plugin1"]
+    post:
+      summary: Post Tornjak selectors.
+      description: Submits a selector to the Tornjak server.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: object
+                  properties:
+                    plugin:
+                      type: string
+                      examples: ["plugin1"]
+                    spiffe id:
+                      type: string
+                      examples: ["spiffe://example.org/spire/agent"]
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "SUCCESS"
+          content:
+            text/plain:
+              schema:
+                type: string
+                examples: ["SUCCESS"]
+
+  /api/v1/tornjak/clusters:
+    get:
+      summary: Get list of Tornjak clusters.
+      description: Retrieves a list of Tornjak clusters, including details such as name, creation time, and associated agents.
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clusters:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          examples: ["clustername"]
+                        editedName:
+                          type: string
+                          examples: [""]
+                        creationTime:
+                          type: string
+                          examples: ["Feb 08 2023 21:02:10"]
+                        domainName:
+                          type: string
+                          examples: [""]
+                        managedBy:
+                          type: string
+                          examples: [""]
+                        platformType:
+                          type: string
+                          examples: ["Docker"]
+                        agentsList:
+                          type: array
+                          items:
+                            type: string
+                            examples: ["agent1"]
+    post:
+      summary: Create a Tornjak selector.
+      description: Creates a new Tornjak selector with the specified cluster details.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cluster:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      examples: ["clusterName"]
+                    platformType:
+                      type: string
+                      examples: ["Docker"]
+                    agentsList:
+                      type: array
+                      items:
+                        type: string
+                        examples:
+                          - ["agent1", "agent2"]
+                    domainName:
+                      type: string
+                      examples: ["example.org"]
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "SUCCESS"
+          content:
+            text/plain:
+              schema:
+                type: string
+                examples: ["SUCCESS"]
+    patch:
+      summary: Update Tornjak selector.
+      description: Updates the details of a Tornjak selector, including the cluster name, platform type, agent list, and domain name.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cluster:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      examples: ["clusterName"]
+                    editedName:
+                      type: string
+                      examples: ["newClusterName"]
+                    platformType:
+                      type: string
+                      examples: ["Docker"]
+                    agentsList:
+                      type: array
+                      items:
+                        type: string
+                        examples: ["agent1"]
+                    domainName:
+                      type: string
+                      examples: ["example.org"]
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "SUCCESS"
+          content:
+            text/plain:
+              schema:
+                type: string
+                examples: ["SUCCESS"]
+    delete:
+      summary: Delete a Tornjak selector.
+      description: Deletes a Tornjak selector based on the provided cluster name.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cluster:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      examples: ["clusterName"]
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "SUCCESS"
+          content:
+            text/plain:
+              schema:
+                type: string
+                examples: ["SUCCESS"]
+
+components:
+  schemas:
+
+    spiffe_id:
+      type: object
+      properties:
+        path:
+          type: string
+        trust_domain:
+          type: string
+
+    selector:
+      type: object
+      properties:
+        type:
+          type: string
+          examples: [k8s_sat]
+        value:
+          type: string
+
+    entry:
+      type: object
+      properties:
+        id:
+          type: string
+        spiffe_id:
+          $ref: '#/components/schemas/spiffe_id'
+        parent_id:
+          $ref: '#/components/schemas/spiffe_id'
+        selectors:
+          type: array
+          items:
+            $ref: '#/components/schemas/selector'
+
+
+    agent:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/spiffe_id'
+        attestation_type:
+          type: string
+          examples: [k8s_sat]
+        x509svid_serial_number:
+          type: integer
+        x509svid_expires_at:
+          type: integer
+        selectors:
+          type: array
+          items:
+            $ref: '#/components/schemas/selector'
+    error:
+      type: string
+      examples: ["Bad request"]
