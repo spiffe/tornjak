@@ -11,7 +11,8 @@ import (
 	bundle "github.com/spiffe/spire-api-sdk/proto/spire/api/server/bundle/v1"
 	debugServer "github.com/spiffe/spire-api-sdk/proto/spire/api/server/debug/v1"
 	entry "github.com/spiffe/spire-api-sdk/proto/spire/api/server/entry/v1"
-	types "github.com/spiffe/spire-api-sdk/proto/spire/api/types"
+  trustdomain "github.com/spiffe/spire-api-sdk/proto/spire/api/server/trustdomain/v1"
+  types "github.com/spiffe/spire-api-sdk/proto/spire/api/types"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
 	tornjakTypes "github.com/spiffe/tornjak/pkg/agent/types"
@@ -320,6 +321,29 @@ func (s *Server) DeleteFederatedBundle(inp DeleteFederatedBundleRequest) (*Delet
 	}
 
 	return (*DeleteFederatedBundleResponse)(bundle), nil
+}
+
+// Federation APIs
+type ListFederationRelationshipsRequest trustdomain.ListFederationRelationshipsRequest
+type ListFederationRelationshipsResponse trustdomain.ListFederationRelationshipsResponse
+
+func (s *Server) ListFederationRelationships(inp ListFederationRelationshipsRequest) (*ListFederationRelationshipsResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	inpReq := trustdomain.ListFederationRelationshipsRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	var conn *grpc.ClientConn
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := trustdomain.NewTrustDomainClient(conn)
+
+	bundle, err := client.ListFederationRelationships(context.Background(), &inpReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return (*ListFederationRelationshipsResponse)(bundle), nil
+
 }
 
 /*
