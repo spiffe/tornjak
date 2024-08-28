@@ -1,31 +1,32 @@
 package authorization
 
 import (
-	"net/http"
 	"github.com/pkg/errors"
 	"fmt"
 	"strings"
+	"net/http"
+
 	"github.com/spiffe/tornjak/pkg/agent/authentication/user"
 )
 
 type RBACAuthorizer struct {
-	name string
-	roleList map[string]string
+	name       string
+	roleList   map[string]string
 	apiMapping map[string][]string
 	apiV1Mapping map[string]map[string][]string
 }
 
 // TODO put this in a common constants file
 var staticAPIList = map[string]struct{}{
-	"/": 				   {},
-	"/api/healthcheck":            	   {},
-	"/api/debugserver":            	   {},
-	"/api/agent/list":             	   {},
-	"/api/entry/list":             	   {},
-	"/api/tornjak/serverinfo":     	   {},
-	"/api/tornjak/selectors/list": 	   {},
-	"/api/tornjak/agents/list":    	   {},
-	"/api/tornjak/clusters/list":  	   {},
+	"/":                               {},
+	"/api/healthcheck":                {},
+	"/api/debugserver":                {},
+	"/api/agent/list":                 {},
+	"/api/entry/list":                 {},
+	"/api/tornjak/serverinfo":         {},
+	"/api/tornjak/selectors/list":     {},
+	"/api/tornjak/agents/list":        {},
+	"/api/tornjak/clusters/list":      {},
 	"/api/agent/ban":                  {},
 	"/api/agent/delete":               {},
 	"/api/agent/createjointoken":      {},
@@ -93,8 +94,8 @@ func NewRBACAuthorizer(policyName string, roleList map[string]string, apiMapping
 	}
 	fmt.Printf("apiV1Mapping: %v\n", apiV1Mapping)
 	return &RBACAuthorizer{
-		name: policyName,
-		roleList: roleList,
+		name:       policyName,
+		roleList:   roleList,
 		apiMapping: apiMapping,
 		apiV1Mapping: apiV1Mapping,
 	}, nil

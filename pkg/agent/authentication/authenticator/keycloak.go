@@ -26,9 +26,9 @@ type KeycloakClaim struct {
 }
 
 type KeycloakAuthenticator struct {
-	jwks            *keyfunc.JWKS
-	jwksURL         string
-	audience        string
+	jwks     *keyfunc.JWKS
+	jwksURL  string
+	audience string
 }
 
 func getJWKeyFunc(httpjwks bool, jwksInfo string) (*keyfunc.JWKS, error) {
@@ -57,7 +57,8 @@ func getJWKeyFunc(httpjwks bool, jwksInfo string) (*keyfunc.JWKS, error) {
 }
 
 // newKeycloakAuthenticator (https bool, jwks string, redirect string)
-//   get keyfunc based on https
+//
+//	get keyfunc based on https
 func NewKeycloakAuthenticator(httpjwks bool, issuerURL string, audience string) (*KeycloakAuthenticator, error) {
 	// perform OIDC discovery
 	oidcClient, err := discovery.NewClient(context.Background(), issuerURL)
@@ -73,9 +74,9 @@ func NewKeycloakAuthenticator(httpjwks bool, issuerURL string, audience string) 
 		return nil, err
 	}
 	return &KeycloakAuthenticator{
-		jwks:            jwks,
-		audience:        audience,
-		jwksURL:         jwksURL,
+		jwks:     jwks,
+		audience: audience,
+		jwksURL:  jwksURL,
 	}, nil
 }
 
@@ -96,13 +97,13 @@ func getToken(r *http.Request, redirectURL string) (string, error) {
 
 }
 
-func wrapAuthenticationError(err error) (*user.UserInfo) {
+func wrapAuthenticationError(err error) *user.UserInfo {
 	return &user.UserInfo{
 		AuthenticationError: err,
 	}
 }
 
-func (a *KeycloakAuthenticator) AuthenticateRequest(r *http.Request)(*user.UserInfo) {
+func (a *KeycloakAuthenticator) AuthenticateRequest(r *http.Request) *user.UserInfo {
 	token, err := getToken(r, a.jwksURL)
 	if err != nil {
 		return wrapAuthenticationError(err)
