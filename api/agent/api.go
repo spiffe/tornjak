@@ -343,8 +343,71 @@ func (s *Server) ListFederationRelationships(inp ListFederationRelationshipsRequ
 	}
 
 	return (*ListFederationRelationshipsResponse)(bundle), nil
-
 }
+
+type CreateFederationRelationshipRequest trustdomain.BatchCreateFederationRelationshipRequest
+type CreateFederationRelationshipResponse trustdomain.BatchCreateFederationRelationshipResponse
+
+func (s *Server) CreateFederationRelationship(inp CreateFederationRelationshipRequest) (*CreateFederationRelationshipResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	inpReq := trustdomain.BatchCreateFederationRelationshipRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	var conn *grpc.ClientConn
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := trustdomain.NewTrustDomainClient(conn)
+
+	bundle, err := client.BatchCreateFederationRelationship(context.Background(), &inpReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return (*CreateFederationRelationshipResponse)(bundle), nil
+}
+
+type UpdateFederationRelationshipRequest trustdomain.BatchUpdateFederationRelationshipRequest
+type UpdateFederationRelationshipResponse trustdomain.BatchUpdateFederationRelationshipResponse
+
+func (s *Server) UpdateFederationRelationship(inp UpdateFederationRelationshipRequest) (*UpdateFederationRelationshipResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	inpReq := trustdomain.BatchUpdateFederationRelationshipRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	var conn *grpc.ClientConn
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := trustdomain.NewTrustDomainClient(conn)
+
+	bundle, err := client.BatchUpdateFederationRelationship(context.Background(), &inpReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return (*UpdateFederationRelationshipResponse)(bundle), nil
+}
+
+type DeleteFederationRelationshipRequest trustdomain.BatchDeleteFederationRelationshipRequest
+type DeleteFederationRelationshipResponse trustdomain.BatchDeleteFederationRelationshipResponse
+
+func (s *Server) DeleteFederationRelationship(inp DeleteFederationRelationshipRequest) (*DeleteFederationRelationshipResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	inpReq := trustdomain.BatchDeleteFederationRelationshipRequest(inp) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	var conn *grpc.ClientConn
+	conn, err := grpc.Dial(s.SpireServerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := trustdomain.NewTrustDomainClient(conn)
+
+	bundle, err := client.BatchDeleteFederationRelationship(context.Background(), &inpReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return (*DeleteFederationRelationshipResponse)(bundle), nil
+}
+
 
 /*
 
