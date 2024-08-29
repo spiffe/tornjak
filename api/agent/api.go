@@ -11,8 +11,8 @@ import (
 	bundle "github.com/spiffe/spire-api-sdk/proto/spire/api/server/bundle/v1"
 	debugServer "github.com/spiffe/spire-api-sdk/proto/spire/api/server/debug/v1"
 	entry "github.com/spiffe/spire-api-sdk/proto/spire/api/server/entry/v1"
-  trustdomain "github.com/spiffe/spire-api-sdk/proto/spire/api/server/trustdomain/v1"
-  types "github.com/spiffe/spire-api-sdk/proto/spire/api/types"
+	trustdomain "github.com/spiffe/spire-api-sdk/proto/spire/api/server/trustdomain/v1"
+	types "github.com/spiffe/spire-api-sdk/proto/spire/api/types"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
 	tornjakTypes "github.com/spiffe/tornjak/pkg/agent/types"

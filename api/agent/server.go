@@ -975,10 +975,10 @@ func (s *Server) GetRouter() http.Handler {
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleCreate).Methods("POST")
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleUpdate).Methods("PATCH")
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleDelete).Methods("DELETE")
-  apiRtr.HandleFunc("/api/v1/spire/federations", s.federationList).Methods("GET")
-  apiRtr.HandleFunc("/api/v1/spire/federations", s.federationCreate).Methods("POST")
-  apiRtr.HandleFunc("/api/v1/spire/federations", s.federationUpdate).Methods("PATCH")
-  apiRtr.HandleFunc("/api/v1/spire/federations", s.federationDelete).Methods("DELETE")
+	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationList).Methods("GET")
+	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationCreate).Methods("POST")
+	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationUpdate).Methods("PATCH")
+	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationDelete).Methods("DELETE")
 
 	// Tornjak specific
 	apiRtr.HandleFunc("/api/v1/tornjak/serverinfo", s.tornjakGetServerInfo).Methods("GET")
