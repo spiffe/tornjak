@@ -696,6 +696,7 @@ func (s *Server) federationCreate(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) federationUpdate(w http.ResponseWriter, r *http.Request) {
 	var input UpdateFederationRelationshipRequest
+  var rawInput trustdomain.BatchUpdateFederationRelationshipRequest
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
@@ -709,12 +710,14 @@ func (s *Server) federationUpdate(w http.ResponseWriter, r *http.Request) {
 	if n == 0 {
 		input = UpdateFederationRelationshipRequest{}
 	} else {
-		err := json.Unmarshal([]byte(data), &input)
+		err := protojson.Unmarshal([]byte(data), &rawInput)
 		if err != nil {
 			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
 			retError(w, emsg, http.StatusBadRequest)
 			return
 		}
+    input = UpdateFederationRelationshipRequest(rawInput) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+
 	}
 
 	ret, err := s.UpdateFederationRelationship(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
