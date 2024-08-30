@@ -20,6 +20,9 @@ import (
 	"github.com/hashicorp/hcl/hcl/token"
 	"github.com/pkg/errors"
 
+	"google.golang.org/protobuf/encoding/protojson"
+	trustdomain "github.com/spiffe/spire-api-sdk/proto/spire/api/server/trustdomain/v1"
+
 	"github.com/spiffe/tornjak/pkg/agent/authentication/authenticator"
 	"github.com/spiffe/tornjak/pkg/agent/authorization"
 	agentdb "github.com/spiffe/tornjak/pkg/agent/db"
@@ -650,6 +653,7 @@ func (s *Server) federationList(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) federationCreate(w http.ResponseWriter, r *http.Request) {
 	var input CreateFederationRelationshipRequest
+	var rawInput trustdomain.BatchCreateFederationRelationshipRequest
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
@@ -663,12 +667,14 @@ func (s *Server) federationCreate(w http.ResponseWriter, r *http.Request) {
 	if n == 0 {
 		input = CreateFederationRelationshipRequest{}
 	} else {
-		err := json.Unmarshal([]byte(data), &input)
+		// required to use protojson because of oneof field
+		err := protojson.Unmarshal([]byte(data), &rawInput)
 		if err != nil {
 			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
 			retError(w, emsg, http.StatusBadRequest)
 			return
 		}
+		input = CreateFederationRelationshipRequest(rawInput) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	}
 
 	ret, err := s.CreateFederationRelationship(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
