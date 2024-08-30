@@ -3,7 +3,7 @@ package authorization
 import (
 	"net/http"
 	"github.com/pkg/errors"
-
+	"fmt"
 	"github.com/spiffe/tornjak/pkg/agent/authentication/user"
 )
 
@@ -41,7 +41,7 @@ func validateInitParameters(roleList map[string]string, apiMapping map[string][]
 		if _, ok := staticAPIList[api]; !ok {
 			return errors.Errorf("API %s does not exist", api)
 		}
-		
+
 		// check that each role exists in roleList
 		for _, allowedRole := range allowList {
 			if _, ok := roleList[allowedRole]; !ok {
@@ -52,11 +52,12 @@ func validateInitParameters(roleList map[string]string, apiMapping map[string][]
 	return nil
 }
 
-func NewRBACAuthorizer(policyName string, roleList map[string]string, apiMapping map[string][]string) (*RBACAuthorizer, error) {
+func NewRBACAuthorizer(policyName string, roleList map[string]string, apiMapping map[string][]string, apiV1Mapping map[string]map[string][]string) (*RBACAuthorizer, error) {
 	err := validateInitParameters(roleList, apiMapping)
 	if err != nil {
 		return nil, errors.Errorf("Could not parse policy %s: invalid mapping: %v", policyName, err)
 	}
+	fmt.Printf("apiV1Mapping: %v\n", apiV1Mapping)
 	return &RBACAuthorizer{
 		name: policyName,
 		roleList: roleList,
