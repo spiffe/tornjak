@@ -50,6 +50,9 @@ var staticAPIV1List = map[string]map[string]struct{}{
 }
 
 func validateInitParameters(roleList map[string]string, apiMapping map[string][]string, apiV1Mapping map[string]map[string][]string) error {
+	if roleList == nil {
+		return errors.Errorf("No roles defined")
+	}
 	for api, allowList := range apiMapping {
 		// check that API exists
 		if _, ok := staticAPIList[api]; !ok {
