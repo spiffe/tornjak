@@ -158,16 +158,22 @@ func (a *RBACAuthorizer) AuthorizeRequest(r *http.Request, u *user.UserInfo) err
 		return errors.Errorf("Authentication error: %v", u.AuthenticationError)
 	}
 
-	// check old API Request
-	err := a.authorizeAPIRequest(r, u)
-	if err != nil {
-		return errors.Errorf("Tornjak API Authorization error: %v", err)
-	}
+	// based on path
+	apiPath := r.URL.Path
+	isV1 := strings.HasPrefix(apiPath, "/api/v1")
 
-	// check API V1 Request
-	err = a.authorizeAPIV1Request(r, u)
-	if err != nil {
-		return errors.Errorf("Tornjak API V1 Authorization error: %v", err)
+	if !isV1 {
+		// check old API Request
+		err := a.authorizeAPIRequest(r, u)
+		if err != nil {
+			return errors.Errorf("Tornjak API Authorization error: %v", err)
+		}
+	} else {
+		// check API V1 Request
+		err = a.authorizeAPIV1Request(r, u)
+		if err != nil {
+			return errors.Errorf("Tornjak API V1 Authorization error: %v", err)
+		}
 	}
 
 	return nil
