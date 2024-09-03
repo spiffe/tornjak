@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"github.com/pkg/errors"
 	"fmt"
+	"strings"
 	"github.com/spiffe/tornjak/pkg/agent/authentication/user"
 )
 
@@ -170,7 +171,7 @@ func (a *RBACAuthorizer) AuthorizeRequest(r *http.Request, u *user.UserInfo) err
 		}
 	} else {
 		// check API V1 Request
-		err = a.authorizeAPIV1Request(r, u)
+    err := a.authorizeAPIV1Request(r, u)
 		if err != nil {
 			return errors.Errorf("Tornjak API V1 Authorization error: %v", err)
 		}
