@@ -40,7 +40,7 @@ var staticAPIV1List = map[string]map[string]struct{}{
 	"/api/v1/spire/healthcheck" :{"GET": {}},
 	"/api/v1/spire/entries" :{"GET": {}, "POST": {}, "DELETE": {}},
 	"/api/v1/spire/agents" :{"GET": {}, "POST": {}, "DELETE": {}},
-	"/api/v1/spire/agent/ban" :{"POST": {}},
+	"/api/v1/spire/agents/ban" :{"POST": {}},
 	"/api/v1/spire/agents/jointoken" :{"POST": {}},
 	"/api/v1/tornjak/clusters" :{"GET": {}, "POST": {}, "PATCH": {}, "DELETE": {}},
 	"/api/v1/tornjak/selectors" :{"GET": {}, "POST": {}},
@@ -71,13 +71,13 @@ func validateInitParameters(roleList map[string]string, apiMapping map[string][]
 		for method, allowList := range method_dict {
 			// check that API exists
 			if _, ok := staticAPIV1List[path][method]; !ok {
-				return errors.Errorf("API path %s does not exist with method %s", path, method)
+				return errors.Errorf("API V1 path %s does not exist with method %s", path, method)
 			}
 
 			// check that each role exists in roleList
 			for _, allowedRole := range allowList {
 				if _, ok := roleList[allowedRole]; !ok {
-					return errors.Errorf("API %s lists undefined role %s", path, allowedRole)
+					return errors.Errorf("API V1  %s lists undefined role %s", path, allowedRole)
 				}
 			}
 		}
