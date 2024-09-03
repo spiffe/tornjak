@@ -11,6 +11,7 @@ type RBACAuthorizer struct {
 	name string
 	roleList map[string]string
 	apiMapping map[string][]string
+	apiV1Mapping map[string]map[string][]string
 }
 
 // TODO put this in a common constants file
@@ -94,15 +95,11 @@ func NewRBACAuthorizer(policyName string, roleList map[string]string, apiMapping
 		name: policyName,
 		roleList: roleList,
 		apiMapping: apiMapping,
+		apiV1Mapping: apiV1Mapping,
 	}, nil
 }
 
-func (a *RBACAuthorizer) AuthorizeRequest(r *http.Request, u *user.UserInfo) error {
-	// if not authenticated fail and return error
-	if u.AuthenticationError != nil {
-		return errors.Errorf("Authentication error: %v", u.AuthenticationError)
-	}
-
+func (a *RBACAuthorizer) authorizeAPIRequest(r *http.Request, u *user.UserInfo) error {
 	userRoles := u.Roles
 	apiPath := r.URL.Path
 
@@ -125,6 +122,53 @@ func (a *RBACAuthorizer) AuthorizeRequest(r *http.Request, u *user.UserInfo) err
 			}
 		}
 	}
+	return errors.New("Unauthorized Request")
+}
 
-	return errors.New("Unauthorized request")
+func (a *RBACAuthorizer) authorizeAPIV1Request(r *http.Request, u *user.UserInfo) error {
+	userRoles := u.Roles
+	apiPath := r.URL.Path
+	apiMethod := r.Method
+
+	allowedRoles := a.apiV1Mapping[apiPath][apiMethod]
+
+	// if no role listed for api, reject
+	if len(allowedRoles) == 0 {
+		return errors.New("Unauthorized request")
+	}
+
+	// check each allowed role
+	for _, allowedRole := range allowedRoles {
+		if allowedRole == "" { // all authenticated allowed
+			return nil
+		}
+		for _, role := range userRoles {
+			// user has role
+			if role == allowedRole {
+				return nil
+			}
+		}
+	}
+	return errors.New("Unauthorized Request")
+}
+
+func (a *RBACAuthorizer) AuthorizeRequest(r *http.Request, u *user.UserInfo) error {
+	// if not authenticated fail and return error
+	if u.AuthenticationError != nil {
+		return errors.Errorf("Authentication error: %v", u.AuthenticationError)
+	}
+
+	// check old API Request
+	err := a.authorizeAPIRequest(r, u)
+	if err != nil {
+		return errors.Errorf("Tornjak API Authorization error: %v", err)
+	}
+
+	// check API V1 Request
+	err = a.authorizeAPIV1Request(r, u)
+	if err != nil {
+		return errors.Errorf("Tornjak API V1 Authorization error: %v", err)
+	}
+
+	return nil
 }
