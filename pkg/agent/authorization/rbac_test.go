@@ -21,9 +21,8 @@ func TestNewRBACAuthorizer(t *testing.T) {
 	roleList_2 := map[string]string{"admin": "admin", "viewer": "viewer"}
 	apiV1Mapping_2 := apiV1Mapping_1
 
-	roleList_3 :=
-	apiV1Mapping_3 := 
-
+	roleList_3 := map[string]string{"admin": "admin", "user": "user"}
+	apiV1Mapping_3 := apiV1Mapping_1
 	// fail when roles in apiMapping not in roleList
 	_, err = NewRBACAuthorizer(policyName, roleList_1, nil, apiV1Mapping_1)
 	expectedErr := "Could not parse policy testPolicy: invalid mapping: API V1  /api/v1/spire/serverinfo lists undefined role viewer"
