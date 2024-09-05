@@ -4,7 +4,7 @@ info:
   description: |
     This API allows management of SPIRE server via the Tornjak server,
     comprised of SPIRE server API calls and Tornjak-specific API calls.
-  version: 1.3.0
+  version: "1.8.0"
 paths:
   /api/v1/spire/healthcheck:
     get:
@@ -107,6 +107,23 @@ paths:
                   "uptime": 333,
                   "federated_bundles_count": 1
                 }
+  /api/v1/spire/bundle:
+    get:
+      summary: Get current SPIRE server bundle
+      description: Retrieves SPIRE server bundle
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bundle'
   /api/v1/spire/agents:
     get:
       summary: Calls SPIRE server `spire-server agent list` command
@@ -129,30 +146,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/agent'
-              example: # Example response
-                {
-                  "agents": [
-                    {
-                      "id": {
-                        "trust_domain": "example.org",
-                        "path": "/spire/agent"
-                      },
-                      "attestation_type": "k8s_sat",
-                      "x509svid_serial_number": "111",
-                      "x509svid_expires_at": 222,
-                      "selectors": [
-                        {
-                          "type": "k8s_sat",
-                          "value": "agent_ns:spire"
-                        },
-                        {
-                          "type": "k8s_sat",
-                          "value": "agent_sa:spire-agent"
-                        }
-                      ]
-                    }
-                  ]
-                }
+
 
     delete:
       summary: Calls SPIRE server `spire-server agent evict` command
@@ -192,13 +186,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/spiffe_id'
-            examples:
-              example_request:
-                value:
-                  id:
-                    path: "/spire/agent/"
-                    trust_domain: "example.org"
+              type: object
+              properties:
+                id:
+                  $ref: '#/components/schemas/spiffe_id'
       responses:
         default:
           description: "Unexpected error"
@@ -236,13 +227,6 @@ paths:
                 ttl:
                   type: integer
                   examples: [500]
-            examples:
-              example1:
-                value:
-                  path: "/sample/spiffe/id"
-                  token: 1111
-                  trust_domain: "example.org"
-                  ttl: 500
       responses:
         default:
           description: "Unexpected error"
@@ -263,11 +247,6 @@ paths:
                   expires_at:
                     type: integer
                     examples: [555]
-              examples:
-                example1:
-                  value:
-                    value: 1111
-                    expires_at: 555
   /api/v1/spire/entries:
     get:
       summary: Calls SPIRE server `spire-server entry show`
@@ -284,26 +263,13 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/entry'
-              examples:
-                example_response:
-                  summary: "A sample response showing entries"
-                  value:
-                    entries:
-                      - id: "id1"
-                        spiffe_id:
-                          trust_domain: "example.org"
-                          path: "/spire/agent/"
-                        parent_id:
-                          trust_domain: "example.org"
-                          path: "/spire/agent/"
-                        selectors:
-                          - type: "k8s_sat"
-                            value: "agent_ns:spire"
-                          - type: "k8s_sat"
-                            value: "agent_sa:spire-agent"
+                type: object
+                properties:
+                  entries:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/entry'
+
     post:
       summary: Calls SPIRE server `spire-server entry create`
       description: Create registration entries
@@ -312,43 +278,13 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-                - $ref: '#/components/schemas/entry'
-                - type: object
-                  properties:
-                    admin:
-                      type: string
-                    dns_names:
-                      type: string
-                    downstream:
-                      type: string
-                    expires_at:
-                      type: string
-                    federates_with:
-                      type: array
-                      items:
-                        type: string
-                      examples: []
-            examples:
-              example_request:
-                summary: "Example request for creating a registration entry"
-                value:
-                  admin: "/spire/agent/"
-                  dns_names: "/spire/agent/"
-                  downstream: "/spire/agent/"
-                  expires_at: "/spire/agent/"
-                  federates_with: []
-                  parent_id:
-                    trust_domain: "example.org"
-                    path: "/spire/agent/"
-                  selectors:
-                    - type: "k8s_sat"
-                      value: "agent_ns:spire"
-                    - type: "k8s_sat"
-                      value: "agent_sa:spire-agent"
-                  spiffe_id:
-                    trust_domain: "example.org"
-                    path: "/spire/agent/"
+              type: object
+              properties:
+                entries:
+                  type: array
+                  items: 
+                    $ref: '#/components/schemas/entry'
+
       responses:
         default:
           description: "Unexpected error"
@@ -367,34 +303,12 @@ paths:
                     type: array
                     items:
                       type: object
-                      properties:
-                        status:
-                          type: object
+                      allOf:
+                        - $ref: '#/components/schemas/spire_status'
+                        - type: object
                           properties:
-                            message:
-                              type: string
-                              examples: ["OK"]
-                        entry:
-                          $ref: '#/components/schemas/entry'
-              examples:
-                example_response:
-                  summary: "Example response after creating a registration entry"
-                  value:
-                    results:
-                      - status:
-                          message: "OK"
-                        entry:
-                          spiffe_id:
-                            trust_domain: "example.org"
-                            path: "/spire/agent/"
-                          parent_id:
-                            trust_domain: "example.org"
-                            path: "/spire/agent/"
-                          selectors:
-                            - type: "k8s_sat"
-                              value: "agent_ns:spire"
-                            - type: "k8s_sat"
-                              value: "agent_sa:spire-agent"
+                            entry:
+                              $ref: '#/components/schemas/entry'
     delete:
       summary: Calls SPIRE server `spire-server entry delete` command
       description: Deletes a specified registration entry
@@ -409,11 +323,7 @@ paths:
                   type: array
                   items:
                     type: string
-              examples:
-                - summary: "Example request to delete a registration entry"
-                  value:
-                    ids:
-                      - "111"
+                    examples: ["858da-3d-40-b7-caea9"]
       responses:
         default:
           description: "Unexpected error"
@@ -428,31 +338,293 @@ paths:
               schema:
                 type: object
                 properties:
-                  Results:
+                  results:
                     type: array
                     items:
                       type: object
-                      properties:
-                        status:
-                          type: object
+                      allOf:
+                        - $ref: '#/components/schemas/spire_status'
+                        - type: object
                           properties:
-                            message:
+                            id:
                               type: string
                               examples:
-                                - "OK"
-                        id:
-                          type: string
-                          examples:
-                            - "111"
-              examples:
-                example_response:
-                  summary: "Example response after deleting a registration entry"
-                  value:
-                    Results:
-                      - status:
-                          message: "OK"
-                        id: "111"
-
+                                - "858da-3d-40-b7-caea9"
+  /api/v1/spire/federations:
+    get:
+      summary: Lists all federations configured on SPIRE Server
+      description: Lists all federations configured on SPIRE Server
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  federation_relationships:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/federation_response'
+    post:
+      summary: Creates federation relationship on SPIRE server
+      description: Calls `spire-server federation create`
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: 
+                federation_relationships:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/federation_request'
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      allOf:
+                        - $ref: '#/components/schemas/spire_status'
+                        - type: object
+                          properties:
+                            federation_relationship: 
+                              $ref: '#/components/schemas/federation_response'
+    patch:
+      summary: Creates federation relationship on SPIRE server
+      description: Calls `spire-server federation create`
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: 
+                federation_relationships:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/federation_request'
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      allOf:
+                        - $ref: '#/components/schemas/spire_status'
+                        - type: object
+                          properties:
+                            federation_relationship: 
+                              $ref: '#/components/schemas/federation_response' 
+    delete:
+      summary: Deletes federation relationship on SPIRE server
+      description: Calls `spire-server federation delete`
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: 
+                trust_domains:
+                  type: array
+                  items:
+                    type: string
+                    examples: ["example.org"]
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      allOf:
+                        - $ref: '#/components/schemas/spire_status'
+                        - type: object
+                          properties:
+                            trust_domain:
+                              type: string
+                              examples: ["example.org"]
+  /api/v1/spire/federations/bundles:
+    get:
+      summary: Lists federation bundles
+      description: Call `spire-server bundle list`
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      bundles:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/bundle'
+                  - type: object # if no bundles, it is empty
+    post:
+      summary: Sets federation bundles
+      description: Call `spire-server bundle set`
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: 
+                bundle:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/bundle'
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      allOf:
+                        - $ref: '#/components/schemas/spire_status'
+                        - type: object
+                          properties:
+                            bundle: 
+                              $ref: '#/components/schemas/bundle'
+    patch:
+      summary: Sets federation bundles
+      description: Updates if bundle found, else returns error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: 
+                bundle:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/bundle'
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      allOf:
+                        - $ref: '#/components/schemas/spire_status'
+                        - type: object
+                          properties:
+                            bundle: 
+                              $ref: '#/components/schemas/bundle'
+    delete:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                trust_domains:
+                  type: array
+                  items:
+                    type: string
+                    examples: ["example.org"]
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      allOf:
+                        - $ref: '#/components/schemas/spire_status'
+                        - type: object
+                          properties:
+                            trust_domain:
+                              type: string
+                              examples: ["trust_domain"]
   /api/v1/tornjak/serverinfo:
     get:
       summary: Get general Tornjak server information.
@@ -517,14 +689,19 @@ paths:
                 type: object
                 properties:
                   agents:
-                    type: object
-                    properties:
-                      spiffeid:
-                        type: string
-                        examples: ["spiffe://example.org/spire/agent/"]
-                      plugin:
-                        type: string
-                        examples: ["plugin1"]
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        spiffeid:
+                          type: string
+                          examples: ["spiffe://example.org/spire/agent/"]
+                        plugin:
+                          type: string
+                          examples: ["plugin1"]
+                        cluster:
+                          type: string
+                          examples: [""]
     post:
       summary: Post Tornjak selectors.
       description: Submits a selector to the Tornjak server.
@@ -535,15 +712,12 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  type: object
-                  properties:
-                    plugin:
-                      type: string
-                      examples: ["plugin1"]
-                    spiffe id:
-                      type: string
-                      examples: ["spiffe://example.org/spire/agent"]
+                plugin:
+                  type: string
+                  examples: ["plugin1"]
+                spiffe id:
+                  type: string
+                  examples: ["spiffe://example.org/spire/agent"]
       responses:
         default:
           description: "Unexpected error"
@@ -581,33 +755,10 @@ paths:
                     type: array
                     items:
                       type: object
-                      properties:
-                        name:
-                          type: string
-                          examples: ["clustername"]
-                        editedName:
-                          type: string
-                          examples: [""]
-                        creationTime:
-                          type: string
-                          examples: ["Feb 08 2023 21:02:10"]
-                        domainName:
-                          type: string
-                          examples: [""]
-                        managedBy:
-                          type: string
-                          examples: [""]
-                        platformType:
-                          type: string
-                          examples: ["Docker"]
-                        agentsList:
-                          type: array
-                          items:
-                            type: string
-                            examples: ["agent1"]
+                      $ref: '#/components/schemas/tornjak_cluster'
     post:
-      summary: Create a Tornjak selector.
-      description: Creates a new Tornjak selector with the specified cluster details.
+      summary: Create a Tornjak cluster
+      description: Creates a new Tornjak cluster.
       requestBody:
         required: true
         content:
@@ -617,22 +768,7 @@ paths:
               properties:
                 cluster:
                   type: object
-                  properties:
-                    name:
-                      type: string
-                      examples: ["clusterName"]
-                    platformType:
-                      type: string
-                      examples: ["Docker"]
-                    agentsList:
-                      type: array
-                      items:
-                        type: string
-                        examples:
-                          - ["agent1", "agent2"]
-                    domainName:
-                      type: string
-                      examples: ["example.org"]
+                  $ref: '#/components/schemas/tornjak_cluster'
       responses:
         default:
           description: "Unexpected error"
@@ -724,29 +860,55 @@ paths:
 
 components:
   schemas:
+    spire_status_ok:
+      type: object
+      properties:
+        message: 
+          type: string
+          examples: ["OK"]
+    spire_status_error:
+      type: object
+      properties:
+        code: 
+          type: integer
+          minimum: 0
+        message:
+          type: string
+          examples: ["failed to ..."]
+    spire_status:
+      type: object
+      properties:
+        status:
+          oneOf:
+            - $ref: '#/components/schemas/spire_status_ok'
+            - $ref: '#/components/schemas/spire_status_error'
 
     spiffe_id:
       type: object
       properties:
         path:
           type: string
+          examples: ["/ns/default"]
         trust_domain:
           type: string
+          examples: ["example.org"]
 
     selector:
       type: object
       properties:
         type:
           type: string
-          examples: [k8s_sat]
+          examples: ["k8s_sat"]
         value:
           type: string
+          examples: ["agent_ns:spire", "agent_sa:spire-agent"]
 
     entry:
       type: object
       properties:
         id:
           type: string
+          examples: ["858da-34-50-b7-cacd98"]
         spiffe_id:
           $ref: '#/components/schemas/spiffe_id'
         parent_id:
@@ -755,7 +917,33 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/selector'
-
+        x509_svid_ttl:
+          type: integer
+          minimum: 0
+          examples: [12345]
+        created_at:
+          type: integer
+          minimum: 0
+          examples: [1725556278]
+        admin:
+          type: boolean
+          examples: [false]
+        dns_names:
+          type: array
+          items:
+            type: string
+            examples: ["example1.org"]
+        downstream:
+          type: boolean
+          examples: [false]
+        expires_at:
+          type: integer
+          examples: [12345]
+        federates_with:
+          type: array
+          items:
+            type: string
+            examples: ["example1.org", "example2.org"]
 
     agent:
       type: object
@@ -764,7 +952,7 @@ components:
           $ref: '#/components/schemas/spiffe_id'
         attestation_type:
           type: string
-          examples: [k8s_sat]
+          examples: ["k8s_sat"]
         x509svid_serial_number:
           type: integer
         x509svid_expires_at:
@@ -773,6 +961,144 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/selector'
+    
+    federation_profile_web:
+      type: object
+      properties:
+        https_web:
+          type: object
+    federation_profile_web_response:
+      type: object
+      properties:
+        HttpsWeb:
+          type: object
+    federation_profile_spiffe:
+      type: object
+      properties:
+        https_spiffe:
+          type: object
+          properties:
+            endpoint_spiffe_id:
+              type: string
+              examples: ["spiffe://example1.org/spire-server"]
+    federation_profile_spiffe_response:
+      type: object
+      properties:
+        HttpsSpiffe:
+          type: object
+          properties:
+            endpoint_spiffe_id:
+              type: string
+              examples: ["spiffe://example1.org/spire-server"]
+    federation_request:
+      type: object
+      required: 
+        - trust_domain
+        - bundle_endpoint_url
+      allOf:
+        - type: object
+          properties:
+            trust_domain:
+              type: string
+              examples: ["example1.org"]
+            bundle_endpoint_url:
+              type: string
+              examples: ["https://bundle.example1.org"]
+            trust_domain_bundle:
+              type: object
+              $ref: '#/components/schemas/bundle'
+        - oneOf:
+            - $ref: '#/components/schemas/federation_profile_spiffe'
+            - $ref: '#/components/schemas/federation_profile_web'
+      examples:
+        - {
+            "trust_domain": "example1.org",
+            "bundle_endpoint_url": "https://bundle.example1.org",
+            "https_spiffe": {
+              "endpoint_spiffe_id": "spiffe://example1.org/spire-server"
+            }
+          }
+        - {"trust_domain": "example2.org",
+            "bundle_endpoint_url": "https://bundle.example2.org",
+            "https_web": {}
+          }
+    federation_response:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            trust_domain:
+              type: string
+              examples: ["example1.org"]
+            bundle_endpoint_url:
+              type: string
+              examples: ["https://bundle.example1.org"]
+            BundleEndpointProfile:
+              type: object
+              oneOf:
+                - $ref: '#/components/schemas/federation_profile_spiffe_response'
+                - $ref: '#/components/schemas/federation_profile_web_response'
+    bundle:
+      type: object
+      properties:
+        trust_domain:
+          type: string
+          examples: ["example.org"]
+        x509_authorities:
+          type: array
+          items:
+            type: object
+            properties:
+              asn1:
+                type: string
+                examples: ["MIIDiz..."]
+        jwt_authorities:
+          type: array
+          items:
+            type: object
+            properties:
+              public_key:
+                type: string
+                examples: ["MIIBIj..."]
+              key_id:
+                type: string
+                examples: ["Elaub..."]
+              expires_at:
+                type: integer
+                minimum: 0
+                examples: [1723062174]
+        sequence_number:
+          type: integer
+          minimum: 0
+          examples: [3]
+    tornjak_cluster:
+      type: object
+      properties:
+        name:
+          type: string
+          examples: ["clusterName"]
+        platformType:
+          type: string
+          examples: ["Docker"]
+        agentsList:
+          type: array
+          items:
+            type: string
+            examples:
+              - "agent1"
+              - "agent2"
+        domainName:
+          type: string
+          examples: ["example.org"]
+        editedName:
+          type: string
+          examples: [""]
+        creationTime:
+          type: string
+          examples: ["Feb 08 2023 21:02:10"]
+        managedBy:
+          type: string
+          examples: [""]
     error:
       type: string
       examples: ["Bad request"]
