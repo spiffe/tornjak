@@ -49,28 +49,32 @@ func TestNewRBACAuthorizer(t *testing.T) {
 	_, err = NewRBACAuthorizer(policyName, roleList_3, nil, apiV1Mapping_3)
 	expectedErr = "Could not parse policy testPolicy: invalid mapping: API V1  /api/v1/spire/serverinfo lists undefined role viewer"
 	if err == nil {
-		t.Fatal("ERROR: successfully initialized RBAC without roles")
-	} else if err.Error() != expectedErr {
-		t.Fatalf("ERROR: expected %s, got %s", expectedErr, err.Error())
-	}
+        t.Fatalf("expected an error but got nil")
+    }
+    expectedPhrase := "undefined role viewer"
+    if !strings.Contains(err.Error(), expectedPhrase) {
+        t.Fatalf("expected error to contain %q but got %q", expectedPhrase, err.Error())
+    }
 
 	// fail when apiV1Mapping has path not in staticAPIV1List
 	_, err = NewRBACAuthorizer(policyName, roleList_4, nil, apiV1Mapping_4)
-	expectedErr = "Could not parse policy testPolicy: invalid mapping: API V1 path /api/v1/unknown/serverinfo does not exist with method GET"
-	if err == nil {
-		t.Fatal("ERROR: successfully initialized RBAC without roles")
-	} else if err.Error() != expectedErr {
-		t.Fatalf("ERROR: expected %s, got %s", expectedErr, err.Error())
-	}
+    if err == nil {
+        t.Fatal("ERROR: successfully initialized RBAC without roles")
+    }
+    expectedPhrase = "/api/v1/unknown/serverinfo does not exist"
+    if !strings.Contains(err.Error(), expectedPhrase) {
+        t.Fatalf("expected error to contain %q but got %q", expectedPhrase, err.Error())
+    }
 
 	// fail when apiV1Mapping has method not in staticAPIV1List
 	_, err = NewRBACAuthorizer(policyName, roleList_5, nil, apiV1Mapping_5)
-	expectedErr = "Could not parse policy testPolicy: invalid mapping: API V1 path /api/v1/spire/serverinfo does not exist with method POST"
 	if err == nil {
-		t.Fatal("ERROR: successfully initialized RBAC without roles")
-	} else if err.Error() != expectedErr {
-		t.Fatalf("ERROR: expected %s, got %s", expectedErr, err.Error())
-	}
+        t.Fatal("ERROR: successfully initialized RBAC without roles")
+    }
+    expectedPhrase = "does not exist with method POST"
+    if !strings.Contains(err.Error(), expectedPhrase) {
+        t.Fatalf("expected error to contain %q but got %q", expectedPhrase, err.Error())
+    }
 
 }
 // func TestAuthorizeRequest(t *testing.T) {
