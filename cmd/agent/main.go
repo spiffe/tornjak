@@ -15,7 +15,7 @@ import (
 
 type cliOptions struct {
 	genericOptions struct {
-		spireFile  string
+		spireFile   string
 		tornjakFile string
 		expandEnv   bool
 	}
@@ -123,7 +123,6 @@ func GetServerInfo(configData string) (agentapi.TornjakSpireServerInfo, error) {
 	if err != nil {
 		return agentapi.TornjakSpireServerInfo{}, errors.Errorf("Could not parse SPIRE Config: %v", err)
 	}
-
 
 	if config.Plugins == nil {
 		return agentapi.TornjakSpireServerInfo{}, errors.New("config plugins map should not be nil")
