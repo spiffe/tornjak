@@ -10,5 +10,6 @@ declare global {
     REACT_APP_TORNJAK_MANAGER: string,
     REACT_APP_KEYCLOAK_REALM: string,
     REACT_APP_OIDC_CLIENT_ID: string,
+    REACT_APP_API_VERSION: string,
   }
   export const env: EnvType = { ...process.env, ...window.env }
