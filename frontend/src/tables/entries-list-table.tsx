@@ -12,6 +12,7 @@ import { RootState } from "redux/reducers";
 import { DenormalizedRow } from "carbon-components-react";
 import { saveAs } from "file-saver";
 import { showResponseToast } from "components/error-api";
+import apiEndpoints from 'components/apiConfig';
 
 // EntriesListTable takes in 
 // listTableData: entries data to be rendered on table
@@ -88,7 +89,7 @@ class EntriesListTable extends React.Component<EntriesListTableProp, EntriesList
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/entry/delete') + "/" + this.props.globalServerSelected
         } else {
-            endpoint = GetApiServerUri('/api/entry/delete')
+            endpoint = GetApiServerUri(apiEndpoints.spireEntriesApi)
         }
         if (selectedRows.length !== 0) {
             for (let i = 0; i < selectedRows.length; i++) {

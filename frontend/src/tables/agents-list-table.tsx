@@ -11,6 +11,7 @@ import { AgentsList, AgentsWorkLoadAttestorInfo } from "components/types";
 import { DenormalizedRow } from "carbon-components-react";
 import { RootState } from "redux/reducers";
 import { showResponseToast } from "components/error-api";
+import apiEndpoints from 'components/apiConfig';
 
 // AgentListTable takes in 
 // listTableData: agents data to be rendered on table
@@ -99,7 +100,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
             endpoint = GetApiServerUri('/manager-api/agent/delete') + "/" + this.props.globalServerSelected;
 
         } else {
-            endpoint = GetApiServerUri('/api/agent/delete');
+            endpoint = GetApiServerUri(apiEndpoints.spireAgentsApi);
         }
 
         if (selectedRows !== undefined && selectedRows.length !== 0) {
@@ -138,7 +139,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
             endpoint = GetApiServerUri('/manager-api/agent/ban') + "/" + this.props.globalServerSelected
 
         } else {
-            endpoint = GetApiServerUri('/api/agent/ban')
+            endpoint = GetApiServerUri(apiEndpoints.spireAgentsBanApi)
         }
 
         if (selectedRows === undefined || !selectedRows) return ""

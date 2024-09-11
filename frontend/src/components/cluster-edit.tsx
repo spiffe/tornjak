@@ -27,6 +27,7 @@ import {
   DebugServerInfo,
 } from './types';
 import { showResponseToast, showToast } from './error-api';
+import apiEndpoints from './apiConfig';
 
 type ClusterEditProp = {
   // tornjak server debug info of the selected server
@@ -259,7 +260,7 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
 
   getApiEntryCreateEndpoint(): string {
     if (!IsManager) {
-      return GetApiServerUri('/api/tornjak/clusters/edit')
+      return GetApiServerUri(apiEndpoints.tornjakClustersApi)
     }
     if (IsManager && this.state.selectedServer !== "") {
       return GetApiServerUri('/manager-api/tornjak/clusters/edit') + "/" + this.state.selectedServer
