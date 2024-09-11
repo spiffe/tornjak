@@ -970,8 +970,8 @@ func (s *Server) GetRouter() http.Handler {
 	apiRtr.HandleFunc("/api/tornjak/clusters/delete", s.clusterDelete)
 
 	// Spire APIs with versioning
-	apiRtr.HandleFunc("/api/v1/spire/serverinfo", s.debugServer).Methods("GET")
-	apiRtr.HandleFunc("/api/v1/spire/healthcheck", s.healthcheck).Methods("GET")
+	apiRtr.HandleFunc("/api/v1/spire/serverinfo", s.debugServer).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/healthcheck", s.healthcheck).Methods(http.MethodGet, http.MethodOptions)
 	apiRtr.HandleFunc("/api/v1/spire/agents", s.agentList).Methods("GET")
 	apiRtr.HandleFunc("/api/v1/spire/agents/ban", s.agentBan).Methods("POST")
 	apiRtr.HandleFunc("/api/v1/spire/agents", s.agentDelete).Methods("DELETE")
@@ -996,7 +996,7 @@ func (s *Server) GetRouter() http.Handler {
 	apiRtr.HandleFunc("/api/v1/tornjak/selectors", s.tornjakSelectorsList).Methods("GET")
 	apiRtr.HandleFunc("/api/v1/tornjak/agents", s.tornjakAgentsList).Methods("GET")
 	// Clusters
-	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterList).Methods("GET")
+	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterList).Methods(http.MethodGet, http.MethodOptions)
 	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterCreate).Methods("POST")
 	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterEdit).Methods("PATCH")
 	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterDelete).Methods("DELETE")
