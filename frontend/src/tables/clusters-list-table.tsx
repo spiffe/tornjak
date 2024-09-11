@@ -11,7 +11,7 @@ import { ClustersList } from "components/types";
 import { DenormalizedRow } from "carbon-components-react";
 import { RootState } from "redux/reducers";
 import { showResponseToast } from "components/error-api";
-import apiEndpoints from 'components/apiConfig';
+// import apiEndpoints from 'components/apiConfig';
 
 // ClusterListTable takes in 
 // listTableData: clusters data to be rendered on table
@@ -96,7 +96,7 @@ class ClustersListTable extends React.Component<ClustersListTableProp, ClustersL
             endpoint = GetApiServerUri('/manager-api/tornjak/clusters/delete') + "/" + this.props.globalServerSelected
 
         } else {
-            endpoint = GetApiServerUri(apiEndpoints.tornjakClustersApi)
+            endpoint = GetApiServerUri('/api/tornjak/clusters/delete')
         }
 
         if (!selectedRows) return ""
