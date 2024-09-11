@@ -25,7 +25,7 @@ import {
   TornjakServerInfo
 } from './types'
 import { showResponseToast, showToast } from './error-api';
-// import apiEndpoints from './apiConfig';
+import apiEndpoints from './apiConfig';
 
 type ClusterCreateProp = {
   // dispatches a payload for the server trust domain and nodeAttestorPlugin as a ServerInfoType and has a return type of void
@@ -206,7 +206,7 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
 
   getApiEntryCreateEndpoint(): string {
     if (!IsManager) {
-      return GetApiServerUri('/api/tornjak/clusters/create')
+      return GetApiServerUri(apiEndpoints.tornjakClustersApi)
     } else if (IsManager && this.state.selectedServer !== "") {
       return GetApiServerUri('/manager-api/tornjak/clusters/create') + "/" + this.state.selectedServer
     } else {
