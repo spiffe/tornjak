@@ -108,15 +108,21 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
                 id[i] = { "path": "", "trust_domain": "" }
                 id[i]["trust_domain"] = selectedRows[i].cells[1].value;
                 id[i]["path"] = selectedRows[i].cells[2].value.substr(selectedRows[i].cells[1].value.concat(prefix).length);
-                promises.push(axios.post(endpoint, {
-                    "id": {
-                        "trust_domain": id[i].trust_domain,
-                        "path": id[i].path,
-                    }
-                }))
+                promises.push(axios.delete(endpoint, {
+                    data: {
+                        "id": {
+                            "trust_domain": id[i].trust_domain,
+                            "path": id[i].path,
+                        }
+                    },
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    crossdomain: true
+                }));
             }
         } else {
-            return ""
+            return "";
         }
         Promise.all(promises)
             .then(responses => {
@@ -128,12 +134,13 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
                         el.id.trust_domain !== id[i].trust_domain ||
                         el.id.path !== id[i].path));
                 }
+                window.alert(`Agents deleted successfully!`);
             })
-            .catch((error) => showResponseToast(error, {caption: "Could not delete agent."}))
+            .catch((error) => showResponseToast(error, { caption: "Could not delete agent." }))
     }
 
     banAgent(selectedRows: readonly DenormalizedRow[]) {
-        var id: {path: string; trust_domain: string}[] = [], i = 0, endpoint = "", prefix = "spiffe://"
+        var id: { path: string; trust_domain: string }[] = [], i = 0, endpoint = "", prefix = "spiffe://"
 
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/agent/ban') + "/" + this.props.globalServerSelected
@@ -145,16 +152,16 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
         if (selectedRows === undefined || !selectedRows) return ""
 
         for (i = 0; i < selectedRows.length; i++) {
-            id[i] = {path: "", trust_domain: ""}
+            id[i] = { path: "", trust_domain: "" }
             id[i].trust_domain = selectedRows[i].cells[1].value
             id[i].path = selectedRows[i].cells[2].value.substr(selectedRows[i].cells[1].value.concat(prefix).length)
 
-            axios.post(endpoint, {id: {trust_domain: id[i].trust_domain, path: id[i].path}})
+            axios.post(endpoint, { id: { trust_domain: id[i].trust_domain, path: id[i].path } })
                 .then(res => {
                     alert("Ban SUCCESS")
                     this.componentDidMount()
                 })
-                .catch((error) => showResponseToast(error, {caption: "Could not ban agent."}))
+                .catch((error) => showResponseToast(error, { caption: "Could not ban agent." }))
         }
     }
     render() {

@@ -11,7 +11,7 @@ import { ClustersList } from "components/types";
 import { DenormalizedRow } from "carbon-components-react";
 import { RootState } from "redux/reducers";
 import { showResponseToast } from "components/error-api";
-// import apiEndpoints from 'components/apiConfig';
+import TornjakApi from 'components/tornjak-api-helpers';
 
 // ClusterListTable takes in 
 // listTableData: clusters data to be rendered on table
@@ -45,8 +45,10 @@ type ClustersListTableState = {
 
 }
 class ClustersListTable extends React.Component<ClustersListTableProp, ClustersListTableState> {
+    TornjakApi: TornjakApi;
     constructor(props: ClustersListTableProp) {
         super(props);
+        this.TornjakApi = new TornjakApi(props);
         this.state = {
             listData: props.data,
             listTableData: [],
@@ -89,33 +91,28 @@ class ClustersListTable extends React.Component<ClustersListTableProp, ClustersL
     }
 
     deleteCluster(selectedRows: readonly DenormalizedRow[]) {
-        var cluster: {name: string}[] = [], endpoint = ""
-        let promises = []
-
-        if (IsManager) {
-            endpoint = GetApiServerUri('/manager-api/tornjak/clusters/delete') + "/" + this.props.globalServerSelected
-
-        } else {
-            endpoint = GetApiServerUri('/api/tornjak/clusters/delete')
-        }
-
-        if (!selectedRows) return ""
+        if (!selectedRows || selectedRows.length === 0) return "";
+        let cluster: { name: string }[] = [], successMessage
 
         for (let i = 0; i < selectedRows.length; i++) {
-            cluster[i] = {name: ""}
-            cluster[i].name = selectedRows[i].cells[1].value;
-            promises.push(axios.post(endpoint, {cluster: {name: cluster[i].name}}))
-        }
-
-        Promise.all(promises)
-            .then(responses => {
-                if (this.props.globalClustersList === undefined) return
-                for (let i = 0; i < responses.length; i++) {
-                    this.props.clustersListUpdateFunc(this.props.globalClustersList.filter(el =>el.name !== cluster[i].name))
+            cluster[i] = { name: selectedRows[i].cells[1].value };
+            if (IsManager) {
+                successMessage = this.TornjakApi.clusterDelete(this.props.globalServerSelected, { cluster: cluster[i] }, this.props.clustersListUpdateFunc, this.props.globalClustersList);
+            } else {
+                successMessage = this.TornjakApi.localClusterDelete({ cluster: cluster[i] }, this.props.clustersListUpdateFunc, this.props.globalClustersList);
+            }
+            successMessage.then(function (result) {
+                if (result === "SUCCESS") {
+                    window.alert(`CLUSTER "${cluster[i].name}" DELETED SUCCESSFULLY!`);
+                    window.location.reload();
+                } else {
+                    window.alert(`Error deleting cluster "${cluster[i].name}": ` + result);
                 }
+                return;
             })
-            .catch((error) => showResponseToast(error, {caption: "Could not delete cluster."}))
+        }
     }
+
 
     render() {
         const { listTableData } = this.state;

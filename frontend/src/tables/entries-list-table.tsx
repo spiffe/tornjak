@@ -13,6 +13,7 @@ import { DenormalizedRow } from "carbon-components-react";
 import { saveAs } from "file-saver";
 import { showResponseToast } from "components/error-api";
 import apiEndpoints from 'components/apiConfig';
+import TornjakApi from 'components/tornjak-api-helpers';
 
 // EntriesListTable takes in 
 // listTableData: entries data to be rendered on table
@@ -39,8 +40,10 @@ type EntriesListTableState = {
 }
 
 class EntriesListTable extends React.Component<EntriesListTableProp, EntriesListTableState> {
+    TornjakApi: TornjakApi;
     constructor(props: EntriesListTableProp) {
         super(props);
+        this.TornjakApi = new TornjakApi(props);
         this.state = {
             listData: props.data,
             listTableData: [{ "id": "0" }],
@@ -84,33 +87,36 @@ class EntriesListTable extends React.Component<EntriesListTableProp, EntriesList
     }
 
     deleteEntry(selectedRows: readonly DenormalizedRow[]) {
-        var id = [], endpoint = "";
-        let promises = [];
-        if (IsManager) {
-            endpoint = GetApiServerUri('/manager-api/entry/delete') + "/" + this.props.globalServerSelected
-        } else {
-            endpoint = GetApiServerUri(apiEndpoints.spireEntriesApi)
-        }
-        if (selectedRows.length !== 0) {
-            for (let i = 0; i < selectedRows.length; i++) {
-                id[i] = selectedRows[i].id;
-                promises.push(axios.post(endpoint, {
-                    "ids": [id[i]]
-                }))
-            }
-        } else {
-            return ""
-        }
-        Promise.all(promises)
-            .then(responses => {
-                if (this.props.globalEntriesList === undefined) {
-                    return
-                }
-                for (let i = 0; i < responses.length; i++) {
-                    this.props.entriesListUpdateFunc(this.props.globalEntriesList.filter(el => el.id !== responses[i].data.results[0].id))
+        if (!selectedRows || selectedRows.length === 0) return "";
+
+        // Collect the IDs of the selected entries
+        const idsToDelete = selectedRows.map(row => row.cells[1].value);
+
+        const deletePromise = IsManager
+            ? this.TornjakApi.entryDelete(this.props.globalServerSelected, { ids: idsToDelete }, this.props.entriesListUpdateFunc, this.props.globalEntriesList)
+            : this.TornjakApi.localEntryDelete({ ids: idsToDelete }, this.props.entriesListUpdateFunc, this.props.globalEntriesList);
+
+        deletePromise
+            .then(response => {
+                const results = response.results; // Ensure you're accessing the 'results' array in the response
+
+                if (Array.isArray(results)) {
+                    const successIds = results.map(result => result.id);
+                    const failedIds = idsToDelete.filter(id => !successIds.includes(id));
+
+                    if (failedIds.length === 0) {
+                        window.alert(`Entries deleted successfully!`);
+                        window.location.reload(); // Reload the page or update the UI as needed
+                    } else {
+                        window.alert(`Error deleting entries with IDs: ${failedIds.join(', ')}`);
+                    }
+                } else {
+                    window.alert("Unexpected response format. Could not delete entries.");
                 }
             })
-            .catch((error) => showResponseToast(error, {caption: "Could not delete entry."}))
+            .catch(error => {
+                window.alert(`Error deleting entries: ${error.message}`);
+            });
     }
 
     downloadEntries(selectedRows: readonly DenormalizedRow[]) {
@@ -118,14 +124,14 @@ class EntriesListTable extends React.Component<EntriesListTableProp, EntriesList
         if (selectedRows.length !== 0) {
             selectedEntriesInfo[0] = jsonInit;
             for (let i = 0; i < selectedRows.length; i++) {
-                if( i < selectedRows.length-1) {
-                    selectedEntriesInfo[i+1] = selectedRows[i].cells[infoCell].value + ",\n" ;
+                if (i < selectedRows.length - 1) {
+                    selectedEntriesInfo[i + 1] = selectedRows[i].cells[infoCell].value + ",\n";
                 } else {
-                    selectedEntriesInfo[i+1] = selectedRows[i].cells[infoCell].value + "\n]\n}" ;
+                    selectedEntriesInfo[i + 1] = selectedRows[i].cells[infoCell].value + "\n]\n}";
                 }
             }
         }
-        var blob = new Blob(selectedEntriesInfo, {type: "application/json"});
+        var blob = new Blob(selectedEntriesInfo, { type: "application/json" });
         saveAs(
             blob,
             "selectedEntries.json"

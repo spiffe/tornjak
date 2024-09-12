@@ -257,30 +257,52 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
         },
         crossdomain: true,
       });
-
       clustersListUpdateFunc(globalClustersList.filter(el => el.name !== inputData.cluster.name));
       return response.data;
     } catch (error) {
       return error;
     }
   }
-  // async localClusterDelete(inputData: { cluster: { name: string; }; }, clustersListUpdateFunc: { (globalClustersList: ClustersList[]): void }, globalClustersList: any[]) {
-  //   const response = await axios.post(GetApiServerUri(apiEndpoints.tornjakClustersApi), inputData,
-  //     {
-  //       crossdomain: true,
-  //     })
-  //     .then(function (response) {
-  //       clustersListUpdateFunc(globalClustersList.filter(el =>
-  //         el.name !== inputData))
-  //       return response.data;
-  //     })
-  //     .catch(function (error) {
-  //       return error.message;
-  //     })
-  //   return response;
-  // }
+
+  // localEntryDelete - returns success message after successful deletion of a entry in Local mode for the server
+  async localEntryDelete(
+    inputData: { ids: string[] },
+    entriesListUpdateFunc: { (globalEntriesList: EntriesList[]): void },
+    globalEntriesList: EntriesList[]
+  ) {
+    try {
+      const response = await axios.delete(GetApiServerUri(apiEndpoints.spireEntriesApi), {
+        data: { ids: inputData.ids }, 
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        crossdomain: true,
+      });
+      entriesListUpdateFunc(globalEntriesList.filter(el => !inputData.ids.includes(el.id)));
+      return response.data;
+    } catch (error) {
+      return error;
+    }
+  }
 
   // manager apis
+
+  // entryDelete - returns success message after successful deletion of a entry in manager mode
+  async entryDelete(serverName: string, inputData:{ ids: string[] }, entriesListUpdateFunc: { (globalEntriesList: EntriesList[]): void }, globalEntriesList: any[]) {
+    const response = await axios.post(GetApiServerUri("/manager-api/tornjak/entry/delete/") + serverName, inputData,
+      {
+        crossdomain: true,
+      })
+      .then(function (response) {
+        entriesListUpdateFunc(globalEntriesList.filter(el =>
+          el.name !== inputData))
+        return response.data;
+      })
+      .catch(function (error) {
+        return error.message;
+      })
+    return response.data;
+  }
 
   // clusterDelete - returns success message after successful deletion of a cluster in manager mode
   async clusterDelete(serverName: string, inputData: { cluster: { name: string; }; }, clustersListUpdateFunc: { (globalClustersList: ClustersList[]): void }, globalClustersList: any[]) {
