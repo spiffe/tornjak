@@ -970,36 +970,36 @@ func (s *Server) GetRouter() http.Handler {
 	apiRtr.HandleFunc("/api/tornjak/clusters/delete", s.clusterDelete)
 
 	// Spire APIs with versioning
-	apiRtr.HandleFunc("/api/v1/spire/serverinfo", s.debugServer).Methods("GET")
-	apiRtr.HandleFunc("/api/v1/spire/healthcheck", s.healthcheck).Methods("GET")
-	apiRtr.HandleFunc("/api/v1/spire/agents", s.agentList).Methods("GET")
-	apiRtr.HandleFunc("/api/v1/spire/agents/ban", s.agentBan).Methods("POST")
-	apiRtr.HandleFunc("/api/v1/spire/agents", s.agentDelete).Methods("DELETE")
-	apiRtr.HandleFunc("/api/v1/spire/agents/jointoken", s.agentCreateJoinToken).Methods("POST")
-	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryList).Methods("GET")
-	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryCreate).Methods("POST")
-	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryDelete).Methods("DELETE")
-	apiRtr.HandleFunc("/api/v1/spire/bundle", s.bundleGet).Methods("GET")
-	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleList).Methods("GET")
-	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleCreate).Methods("POST")
-	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleUpdate).Methods("PATCH")
-	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleDelete).Methods("DELETE")
-	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationList).Methods("GET")
-	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationCreate).Methods("POST")
-	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationUpdate).Methods("PATCH")
-	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationDelete).Methods("DELETE")
+	apiRtr.HandleFunc("/api/v1/spire/serverinfo", s.debugServer).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/healthcheck", s.healthcheck).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/agents", s.agentList).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/agents/ban", s.agentBan).Methods(http.MethodPost, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/agents", s.agentDelete).Methods(http.MethodDelete, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/agents/jointoken", s.agentCreateJoinToken).Methods(http.MethodPost, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryList).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryCreate).Methods(http.MethodPost)
+	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryDelete).Methods(http.MethodDelete)
+	apiRtr.HandleFunc("/api/v1/spire/bundle", s.bundleGet).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleList).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleCreate).Methods(http.MethodPost)
+	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleUpdate).Methods(http.MethodPatch)
+	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleDelete).Methods(http.MethodDelete)
+	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationList).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationCreate).Methods(http.MethodPost)
+	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationUpdate).Methods(http.MethodPatch)
+	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationDelete).Methods(http.MethodDelete)
 
 	// Tornjak specific
-	apiRtr.HandleFunc("/api/v1/tornjak/serverinfo", s.tornjakGetServerInfo).Methods("GET")
+	apiRtr.HandleFunc("/api/v1/tornjak/serverinfo", s.tornjakGetServerInfo).Methods(http.MethodGet, http.MethodOptions)
 	// Agents Selectors
-	apiRtr.HandleFunc("/api/v1/tornjak/selectors", s.tornjakPluginDefine).Methods("POST")
-	apiRtr.HandleFunc("/api/v1/tornjak/selectors", s.tornjakSelectorsList).Methods("GET")
-	apiRtr.HandleFunc("/api/v1/tornjak/agents", s.tornjakAgentsList).Methods("GET")
+	apiRtr.HandleFunc("/api/v1/tornjak/selectors", s.tornjakPluginDefine).Methods(http.MethodPost, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/tornjak/selectors", s.tornjakSelectorsList).Methods(http.MethodGet)
+	apiRtr.HandleFunc("/api/v1/tornjak/agents", s.tornjakAgentsList).Methods(http.MethodGet, http.MethodOptions)
 	// Clusters
-	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterList).Methods("GET")
-	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterCreate).Methods("POST")
-	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterEdit).Methods("PATCH")
-	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterDelete).Methods("DELETE")
+	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterList).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterCreate).Methods(http.MethodPost)
+	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterEdit).Methods(http.MethodPatch)
+	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterDelete).Methods(http.MethodDelete)
 
 	// Middleware
 	apiRtr.Use(s.verificationMiddleware)
@@ -1012,7 +1012,7 @@ func (s *Server) GetRouter() http.Handler {
 }
 
 func (s *Server) redirectHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" && r.Method != "HEAD" {
+	if r.Method != http.MethodGet && r.Method != "HEAD" {
 		http.Error(w, "Use HTTPS", http.StatusBadRequest)
 		return
 	}
