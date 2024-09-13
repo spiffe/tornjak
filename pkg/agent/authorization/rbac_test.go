@@ -2,6 +2,7 @@ package authorization
 
 import (
 	"testing"
+	"strings"
 	//"github.com/spiffe/tornjak/pkg/agent/authentication/user"
 )
 
