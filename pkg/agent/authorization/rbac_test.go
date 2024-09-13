@@ -48,7 +48,6 @@ func TestNewRBACAuthorizer(t *testing.T) {
 
 	// fail when typo in apiMapping
 	_, err = NewRBACAuthorizer(policyName, roleList_3, nil, apiV1Mapping_3)
-	expectedErr = "Could not parse policy testPolicy: invalid mapping: API V1  /api/v1/spire/serverinfo lists undefined role viewer"
 	if err == nil {
         t.Fatalf("expected an error but got nil")
     }
