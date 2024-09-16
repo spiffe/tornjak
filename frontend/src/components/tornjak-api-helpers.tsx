@@ -120,13 +120,16 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   // populateLocalTornjakAgentInfo returns tornjak info of requested agents including cluster name and selector
   populateLocalTornjakAgentInfo = (
     agentworkloadSelectorInfoFunc: (globalAgentsWorkLoadAttestorInfo: AgentsWorkLoadAttestorInfo[]) => void,
-    inputData: string
+    inputData: string // Assuming this input data is used as query parameters
   ) => {
-    axios.post(GetApiServerUri(apiEndpoints.tornjakAgentsApi), inputData, { crossdomain: true })
+    axios.get(GetApiServerUri(apiEndpoints.tornjakAgentsApi), {
+      params: { input: inputData }, // Add inputData as query parameter
+      crossdomain: true
+    })
       .then(response => {
-        agentworkloadSelectorInfoFunc(response.data["agents"])
+        agentworkloadSelectorInfoFunc(response.data["agents"]);
       })
-      .catch((error) => showResponseToast(error, { caption: "Could not populate local tornjak agent info." }))
+      .catch((error) => showResponseToast(error, { caption: "Could not populate local tornjak agent info." }));
   }
 
   // populateLocalTornjakDebugServerInfo returns the debug server info of the server in local mode
@@ -251,7 +254,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   ) {
     try {
       const response = await axios.delete(GetApiServerUri(apiEndpoints.tornjakClustersApi), {
-        data: inputData, 
+        data: inputData,
         headers: {
           'Content-Type': 'application/json'
         },
@@ -272,7 +275,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   ) {
     try {
       const response = await axios.delete(GetApiServerUri(apiEndpoints.spireEntriesApi), {
-        data: { ids: inputData.ids }, 
+        data: { ids: inputData.ids },
         headers: {
           'Content-Type': 'application/json'
         },
@@ -288,7 +291,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   // manager apis
 
   // entryDelete - returns success message after successful deletion of a entry in manager mode
-  async entryDelete(serverName: string, inputData:{ ids: string[] }, entriesListUpdateFunc: { (globalEntriesList: EntriesList[]): void }, globalEntriesList: any[]) {
+  async entryDelete(serverName: string, inputData: { ids: string[] }, entriesListUpdateFunc: { (globalEntriesList: EntriesList[]): void }, globalEntriesList: any[]) {
     const response = await axios.post(GetApiServerUri("/manager-api/tornjak/entry/delete/") + serverName, inputData,
       {
         crossdomain: true,
