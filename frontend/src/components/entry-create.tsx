@@ -47,6 +47,7 @@ import EntryExpiryFeatures from './entry-expiry-features';
 import CreateEntryJson from './entry-create-json';
 import { ToastContainer } from "react-toastify"
 import { showResponseToast, showToast } from './error-api';
+import apiEndpoints from './apiConfig';
 // import PropTypes from "prop-types"; // needed for testing will be removed on last pr
 
 type CreateEntryProp = {
@@ -573,7 +574,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
 
   getApiEntryCreateEndpoint(): string {
     if (!IsManager) {
-      return GetApiServerUri('/api/entry/create')
+      return GetApiServerUri(apiEndpoints.spireEntriesApi)
     } 
     if (IsManager && this.state.selectedServer !== "") {
       return GetApiServerUri('/manager-api/entry/create') + "/" + this.state.selectedServer

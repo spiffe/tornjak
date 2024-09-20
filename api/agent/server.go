@@ -1,6 +1,7 @@
 package api
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,7 +12,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-	"crypto/tls"
 
 	backoff "github.com/cenkalti/backoff/v4"
 	"github.com/gorilla/mux"
@@ -20,9 +20,12 @@ import (
 	"github.com/hashicorp/hcl/hcl/token"
 	"github.com/pkg/errors"
 
-	agentdb "github.com/spiffe/tornjak/pkg/agent/db"
+	"google.golang.org/protobuf/encoding/protojson"
+	trustdomain "github.com/spiffe/spire-api-sdk/proto/spire/api/server/trustdomain/v1"
+
 	"github.com/spiffe/tornjak/pkg/agent/authentication/authenticator"
 	"github.com/spiffe/tornjak/pkg/agent/authorization"
+	agentdb "github.com/spiffe/tornjak/pkg/agent/db"
 )
 
 type Server struct {
@@ -36,9 +39,9 @@ type Server struct {
 	TornjakConfig *TornjakConfig
 
 	// Plugins
-	Db   agentdb.AgentDB
+	Db            agentdb.AgentDB
 	Authenticator authenticator.Authenticator
-	Authorizer authorization.Authorizer
+	Authorizer    authorization.Authorizer
 }
 
 // config type, as defined by SPIRE
@@ -406,10 +409,379 @@ func (s *Server) entryDelete(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Bundle APIs
+func (s *Server) bundleGet(w http.ResponseWriter, r *http.Request) {
+	var input GetBundleRequest
+	buf := new(strings.Builder)
+
+	n, err := io.Copy(buf, r.Body)
+	if err != nil {
+		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	data := buf.String()
+
+	if n == 0 {
+		input = GetBundleRequest{}
+	} else {
+		err := json.Unmarshal([]byte(data), &input)
+		if err != nil {
+			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		}
+	}
+
+	ret, err := s.GetBundle(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusInternalServerError)
+		return
+	}
+
+	cors(w, r)
+	je := json.NewEncoder(w)
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+}
+
+func (s *Server) federatedBundleList(w http.ResponseWriter, r *http.Request) {
+	var input ListFederatedBundlesRequest
+	buf := new(strings.Builder)
+
+	n, err := io.Copy(buf, r.Body)
+	if err != nil {
+		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	data := buf.String()
+
+	if n == 0 {
+		input = ListFederatedBundlesRequest{}
+	} else {
+		err := json.Unmarshal([]byte(data), &input)
+		if err != nil {
+			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		}
+	}
+
+	ret, err := s.ListFederatedBundles(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusInternalServerError)
+		return
+	}
+
+	cors(w, r)
+	je := json.NewEncoder(w)
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+}
+
+func (s *Server) federatedBundleCreate(w http.ResponseWriter, r *http.Request) {
+	var input CreateFederatedBundleRequest
+	buf := new(strings.Builder)
+
+	n, err := io.Copy(buf, r.Body)
+	if err != nil {
+		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	data := buf.String()
+
+	if n == 0 {
+		input = CreateFederatedBundleRequest{}
+	} else {
+		err := json.Unmarshal([]byte(data), &input)
+		if err != nil {
+			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		}
+	}
+
+	ret, err := s.CreateFederatedBundle(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusInternalServerError)
+		return
+	}
+
+	cors(w, r)
+	je := json.NewEncoder(w)
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+}
+
+func (s *Server) federatedBundleUpdate(w http.ResponseWriter, r *http.Request) {
+	var input UpdateFederatedBundleRequest
+	buf := new(strings.Builder)
+
+	n, err := io.Copy(buf, r.Body)
+	if err != nil {
+		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	data := buf.String()
+
+	if n == 0 {
+		input = UpdateFederatedBundleRequest{}
+	} else {
+		err := json.Unmarshal([]byte(data), &input)
+		if err != nil {
+			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		}
+	}
+
+	ret, err := s.UpdateFederatedBundle(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusInternalServerError)
+		return
+	}
+
+	cors(w, r)
+	je := json.NewEncoder(w)
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+}
+
+func (s *Server) federatedBundleDelete(w http.ResponseWriter, r *http.Request) {
+	var input DeleteFederatedBundleRequest
+	buf := new(strings.Builder)
+
+	n, err := io.Copy(buf, r.Body)
+	if err != nil {
+		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	data := buf.String()
+
+	if n == 0 {
+		input = DeleteFederatedBundleRequest{}
+	} else {
+		err := json.Unmarshal([]byte(data), &input)
+		if err != nil {
+			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		}
+	}
+
+	ret, err := s.DeleteFederatedBundle(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusInternalServerError)
+		return
+	}
+
+	cors(w, r)
+	je := json.NewEncoder(w)
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+}
+
+// Federation APIs
+func (s *Server) federationList(w http.ResponseWriter, r *http.Request) {
+	var input ListFederationRelationshipsRequest
+	buf := new(strings.Builder)
+
+	n, err := io.Copy(buf, r.Body)
+	if err != nil {
+		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	data := buf.String()
+
+	if n == 0 {
+		input = ListFederationRelationshipsRequest{}
+	} else {
+		err := json.Unmarshal([]byte(data), &input)
+		if err != nil {
+			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		}
+	}
+
+	ret, err := s.ListFederationRelationships(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusInternalServerError)
+		return
+	}
+
+	cors(w, r)
+	je := json.NewEncoder(w)
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+}
+
+func (s *Server) federationCreate(w http.ResponseWriter, r *http.Request) {
+	var input CreateFederationRelationshipRequest
+	var rawInput trustdomain.BatchCreateFederationRelationshipRequest
+	buf := new(strings.Builder)
+
+	n, err := io.Copy(buf, r.Body)
+	if err != nil {
+		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	data := buf.String()
+
+	if n == 0 {
+		input = CreateFederationRelationshipRequest{}
+	} else {
+		// required to use protojson because of oneof field
+		err := protojson.Unmarshal([]byte(data), &rawInput)
+		if err != nil {
+			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		}
+		input = CreateFederationRelationshipRequest(rawInput) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	}
+
+	ret, err := s.CreateFederationRelationship(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusInternalServerError)
+		return
+	}
+
+	cors(w, r)
+	je := json.NewEncoder(w)
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+}
+
+func (s *Server) federationUpdate(w http.ResponseWriter, r *http.Request) {
+	var input UpdateFederationRelationshipRequest
+  var rawInput trustdomain.BatchUpdateFederationRelationshipRequest
+	buf := new(strings.Builder)
+
+	n, err := io.Copy(buf, r.Body)
+	if err != nil {
+		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	data := buf.String()
+
+	if n == 0 {
+		input = UpdateFederationRelationshipRequest{}
+	} else {
+		err := protojson.Unmarshal([]byte(data), &rawInput)
+		if err != nil {
+			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		}
+    input = UpdateFederationRelationshipRequest(rawInput) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+
+	}
+
+	ret, err := s.UpdateFederationRelationship(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusInternalServerError)
+		return
+	}
+
+	cors(w, r)
+	je := json.NewEncoder(w)
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+}
+
+func (s *Server) federationDelete(w http.ResponseWriter, r *http.Request) {
+	var input DeleteFederationRelationshipRequest
+	buf := new(strings.Builder)
+
+	n, err := io.Copy(buf, r.Body)
+	if err != nil {
+		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	data := buf.String()
+
+	if n == 0 {
+		input = DeleteFederationRelationshipRequest{}
+	} else {
+		err := json.Unmarshal([]byte(data), &input)
+		if err != nil {
+			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		}
+	}
+
+	ret, err := s.DeleteFederationRelationship(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusInternalServerError)
+		return
+	}
+
+	cors(w, r)
+	je := json.NewEncoder(w)
+	err = je.Encode(ret)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+}
+
+
 func cors(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PATCH")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, access-control-allow-origin, access-control-allow-headers, access-control-allow-credentials, Authorization, access-control-allow-methods")
 	w.Header().Set("Access-Control-Expose-Headers", "*, Authorization")
 	w.WriteHeader(http.StatusOK)
@@ -418,7 +790,7 @@ func cors(w http.ResponseWriter, _ *http.Request) {
 func retError(w http.ResponseWriter, emsg string, status int) {
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PATCH")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, access-control-allow-origin, access-control-allow-headers, access-control-allow-credentials, Authorization, access-control-allow-methods")
 	w.Header().Set("Access-Control-Expose-Headers", "*, Authorization")
 	http.Error(w, emsg, status)
@@ -431,7 +803,7 @@ func (s *Server) verificationMiddleware(next http.Handler) http.Handler {
 			cors(w, r)
 			return
 		}
-	
+
 		userInfo := s.Authenticator.AuthenticateRequest(r)
 
 		err := s.Authorizer.AuthorizeRequest(r, userInfo)
@@ -558,7 +930,6 @@ func (s *Server) health(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 func (s *Server) GetRouter() http.Handler {
 	rtr := mux.NewRouter()
 
@@ -598,6 +969,38 @@ func (s *Server) GetRouter() http.Handler {
 	apiRtr.HandleFunc("/api/tornjak/clusters/edit", s.clusterEdit)
 	apiRtr.HandleFunc("/api/tornjak/clusters/delete", s.clusterDelete)
 
+	// Spire APIs with versioning
+	apiRtr.HandleFunc("/api/v1/spire/serverinfo", s.debugServer).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/healthcheck", s.healthcheck).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/agents", s.agentList).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/agents/ban", s.agentBan).Methods(http.MethodPost, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/agents", s.agentDelete).Methods(http.MethodDelete, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/agents/jointoken", s.agentCreateJoinToken).Methods(http.MethodPost, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryList).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryCreate).Methods(http.MethodPost)
+	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryDelete).Methods(http.MethodDelete)
+	apiRtr.HandleFunc("/api/v1/spire/bundle", s.bundleGet).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleList).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleCreate).Methods(http.MethodPost)
+	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleUpdate).Methods(http.MethodPatch)
+	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleDelete).Methods(http.MethodDelete)
+	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationList).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationCreate).Methods(http.MethodPost)
+	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationUpdate).Methods(http.MethodPatch)
+	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationDelete).Methods(http.MethodDelete)
+
+	// Tornjak specific
+	apiRtr.HandleFunc("/api/v1/tornjak/serverinfo", s.tornjakGetServerInfo).Methods(http.MethodGet, http.MethodOptions)
+	// Agents Selectors
+	apiRtr.HandleFunc("/api/v1/tornjak/selectors", s.tornjakPluginDefine).Methods(http.MethodPost, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/tornjak/selectors", s.tornjakSelectorsList).Methods(http.MethodGet)
+	apiRtr.HandleFunc("/api/v1/tornjak/agents", s.tornjakAgentsList).Methods(http.MethodGet, http.MethodOptions)
+	// Clusters
+	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterList).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterCreate).Methods(http.MethodPost)
+	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterEdit).Methods(http.MethodPatch)
+	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterDelete).Methods(http.MethodDelete)
+
 	// Middleware
 	apiRtr.Use(s.verificationMiddleware)
 
@@ -609,7 +1012,7 @@ func (s *Server) GetRouter() http.Handler {
 }
 
 func (s *Server) redirectHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" && r.Method != "HEAD" {
+	if r.Method != http.MethodGet && r.Method != "HEAD" {
 		http.Error(w, "Use HTTPS", http.StatusBadRequest)
 		return
 	}
@@ -636,7 +1039,7 @@ func (s *Server) HandleRequests() {
 
 	// TODO: replace with workerGroup for thread safety
 	errChannel := make(chan error, 2)
-	
+
 	serverConfig := s.TornjakConfig.Server
 	if serverConfig.HTTPConfig == nil {
 		err = fmt.Errorf("HTTP Config error: no port configured")
@@ -657,7 +1060,6 @@ func (s *Server) HandleRequests() {
 		canStartHTTPS := true
 		httpsConfig := serverConfig.HTTPSConfig
 		var tlsConfig *tls.Config
-
 
 		if serverConfig.HTTPSConfig.ListenPort == 0 {
 			// Fail because this is required field in this section
@@ -834,6 +1236,7 @@ func NewAuthorizer(authorizerPlugin *ast.ObjectItem) (authorization.Authorizer, 
 		// decode into role list and apiMapping
 		roleList := make(map[string]string)
 		apiMapping := make(map[string][]string)
+		apiV1Mapping := make(map[string]map[string][]string)
 		for _, role := range config.RoleList {
 			roleList[role.Name] = role.Desc
 			// print warning for empty string
@@ -843,9 +1246,22 @@ func NewAuthorizer(authorizerPlugin *ast.ObjectItem) (authorization.Authorizer, 
 		}
 		for _, api := range config.APIRoleMappings {
 			apiMapping[api.Name] = api.AllowedRoles
+			fmt.Printf("API name: %s, Allowed Roles: %s \n", api.Name, api.AllowedRoles)
 		}
+		for _, apiV1 := range config.APIv1RoleMappings{
+			arr := strings.Split(apiV1.Name, " ")
+			apiV1.Method = arr[0]
+			apiV1.Path = arr[1]
+			fmt.Printf("API V1 method: %s, API V1 path: %s, API V1 allowed roles: %s \n", apiV1.Method, apiV1.Path, apiV1.AllowedRoles)
+			if _, ok := apiV1Mapping[apiV1.Path]; ok {
+				apiV1Mapping[apiV1.Path][apiV1.Method] = apiV1.AllowedRoles
+			} else {
+				apiV1Mapping[apiV1.Path] = map[string][]string{apiV1.Method: apiV1.AllowedRoles}
+			}
+		}
+		fmt.Printf("API V1 Mapping: %+v\n", apiV1Mapping)
 
-		authorizer, err := authorization.NewRBACAuthorizer(config.Name, roleList, apiMapping)
+		authorizer, err := authorization.NewRBACAuthorizer(config.Name, roleList, apiMapping, apiV1Mapping)
 		if err != nil {
 			return nil, errors.Errorf("Couldn't configure Authorizer: %v", err)
 		}

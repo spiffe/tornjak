@@ -11,6 +11,6 @@ type NullAuthorizer struct{}
 func NewNullAuthorizer() *NullAuthorizer {
 	return &NullAuthorizer{}
 }
-func (a *NullAuthorizer) AuthorizeRequest(r *http.Request, u *user.UserInfo) (error) {
+func (a *NullAuthorizer) AuthorizeRequest(r *http.Request, u *user.UserInfo) error {
 	return nil
 }

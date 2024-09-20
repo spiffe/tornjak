@@ -7,6 +7,7 @@ import { serverSelectedFunc } from 'redux/actions';
 import { RootState } from 'redux/reducers';
 import { ToastContainer } from "react-toastify"
 import { showResponseToast, showToast } from './error-api';
+import apiEndpoints from './apiConfig';
 
 type CreateJoinTokenProp = {
   globalServerSelected: string,
@@ -102,7 +103,7 @@ class CreateJoinToken extends Component<CreateJoinTokenProp, CreateJoinTokenStat
 
   getApiTokenEndpoint(): string {
     if (!IsManager) {
-      return GetApiServerUri('/api/agent/createjointoken')
+      return GetApiServerUri(apiEndpoints.spireJoinTokenApi)
     } else if (IsManager && this.state.selectedServer !== "") {
       return GetApiServerUri('/manager-api/agent/createjointoken') + "/" + this.state.selectedServer
     } else {

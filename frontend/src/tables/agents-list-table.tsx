@@ -11,6 +11,7 @@ import { AgentsList, AgentsWorkLoadAttestorInfo } from "components/types";
 import { DenormalizedRow } from "carbon-components-react";
 import { RootState } from "redux/reducers";
 import { showResponseToast } from "components/error-api";
+import apiEndpoints from 'components/apiConfig';
 
 // AgentListTable takes in 
 // listTableData: agents data to be rendered on table
@@ -99,7 +100,7 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
             endpoint = GetApiServerUri('/manager-api/agent/delete') + "/" + this.props.globalServerSelected;
 
         } else {
-            endpoint = GetApiServerUri('/api/agent/delete');
+            endpoint = GetApiServerUri(apiEndpoints.spireAgentsApi);
         }
 
         if (selectedRows !== undefined && selectedRows.length !== 0) {
@@ -107,15 +108,21 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
                 id[i] = { "path": "", "trust_domain": "" }
                 id[i]["trust_domain"] = selectedRows[i].cells[1].value;
                 id[i]["path"] = selectedRows[i].cells[2].value.substr(selectedRows[i].cells[1].value.concat(prefix).length);
-                promises.push(axios.post(endpoint, {
-                    "id": {
-                        "trust_domain": id[i].trust_domain,
-                        "path": id[i].path,
-                    }
-                }))
+                promises.push(axios.delete(endpoint, {
+                    data: {
+                        "id": {
+                            "trust_domain": id[i].trust_domain,
+                            "path": id[i].path,
+                        }
+                    },
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    crossdomain: true
+                }));
             }
         } else {
-            return ""
+            return "";
         }
         Promise.all(promises)
             .then(responses => {
@@ -127,33 +134,34 @@ class AgentsListTable extends React.Component<AgentsListTableProp, AgentsListTab
                         el.id.trust_domain !== id[i].trust_domain ||
                         el.id.path !== id[i].path));
                 }
+                window.alert(`Agents deleted successfully!`);
             })
-            .catch((error) => showResponseToast(error, {caption: "Could not delete agent."}))
+            .catch((error) => showResponseToast(error, { caption: "Could not delete agent." }))
     }
 
     banAgent(selectedRows: readonly DenormalizedRow[]) {
-        var id: {path: string; trust_domain: string}[] = [], i = 0, endpoint = "", prefix = "spiffe://"
+        var id: { path: string; trust_domain: string }[] = [], i = 0, endpoint = "", prefix = "spiffe://"
 
         if (IsManager) {
             endpoint = GetApiServerUri('/manager-api/agent/ban') + "/" + this.props.globalServerSelected
 
         } else {
-            endpoint = GetApiServerUri('/api/agent/ban')
+            endpoint = GetApiServerUri(apiEndpoints.spireAgentsBanApi)
         }
 
         if (selectedRows === undefined || !selectedRows) return ""
 
         for (i = 0; i < selectedRows.length; i++) {
-            id[i] = {path: "", trust_domain: ""}
+            id[i] = { path: "", trust_domain: "" }
             id[i].trust_domain = selectedRows[i].cells[1].value
             id[i].path = selectedRows[i].cells[2].value.substr(selectedRows[i].cells[1].value.concat(prefix).length)
 
-            axios.post(endpoint, {id: {trust_domain: id[i].trust_domain, path: id[i].path}})
+            axios.post(endpoint, { id: { trust_domain: id[i].trust_domain, path: id[i].path } })
                 .then(res => {
                     alert("Ban SUCCESS")
                     this.componentDidMount()
                 })
-                .catch((error) => showResponseToast(error, {caption: "Could not ban agent."}))
+                .catch((error) => showResponseToast(error, { caption: "Could not ban agent." }))
         }
     }
     render() {
