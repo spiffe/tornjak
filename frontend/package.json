@@ -58,7 +58,9 @@
     "test": "react-scripts test -env=jsdom",
     "coverage": "react-scripts test -env=jsdom --watchAll=false --coverage",
     "eject": "react-scripts eject",
-    "dev": "concurrently -k -n COMPILER,NODEMON -c yellow,blue \"tsc -w\" \"nodemon -w dist -q dist/index.js\""
+    "dev": "concurrently -k -n COMPILER,NODEMON -c yellow,blue \"tsc -w\" \"nodemon -w dist -q dist/index.js\"",
+    "lint": "markdownlint-cli2 '../docs/*.md' '!node_modules'",
+    "lint:fix": "markdownlint-cli2-fix '../docs/*.md' '!node_modules'"
   },
   "eslintConfig": {
     "extends": [
@@ -101,7 +103,8 @@
     "puppeteer": "^22.11.2",
     "react-inject-env": "^2.1.0",
     "react-test-renderer": "^18.2.0",
-    "redux-mock-store": "^1.5.4"
+    "redux-mock-store": "^1.5.4",
+    "markdownlint-cli2": "^0.7.1"
   },
   "jest": {
     "moduleNameMapper": {
