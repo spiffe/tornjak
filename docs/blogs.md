@@ -11,5 +11,4 @@
 | 2021-08-23 | [Shepherding your Cloud Native “cattle” with Tornjak](https://medium.com/universal-workload-identity/shepherding-your-cloud-native-cattle-with-tornjak-eb0b9a7c96bc) | Introduction to Tornjak |
 | 2021-08-26 | [Open source workload identity management could help secure hybrid clouds](https://research.ibm.com/blog/tornjak-project-cncf) | IBM donates Tornjak to CNCF |
 
-
 [Tornjak Channel on Medium](https://medium.com/universal-workload-identity)
