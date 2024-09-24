@@ -50,14 +50,14 @@ We welcome all development attempts and contributions from the community. The ea
 ## Opening a pull request
 
 1. Fork the tornjak repo
-2. Ensure your branch is based on the latest commit in `dev`
+2. Ensure your branch is based on the latest commit in `main`
 3. Commit changes to your fork. Make sure your commit messages contain a `Signed-off-by: <your-email-address>` line (see `git-commit --signoff`) to certify the [DCO](/DCO)
 4. Test your PR locally and ensure all tests in Github actions pass
 5. Open a [pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)
-  against the upstream `dev` branch
+  against the upstream `main` branch
 
 > [!IMPORTANT] 
-> Please make sure you open all PRs against the `dev` branch
+> Please make sure you open all PRs against the `main` branch
 
 > [!IMPORTANT] 
 > For any new feature design, or feature level changes, please create an issue first, then submit a PR with design details before code implementation.
