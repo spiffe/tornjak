@@ -5,11 +5,10 @@ permissions:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
-      - uses: ljharb/actions/node/install@main
-        name: 'nvm install lts/* && npm install'
-      - run: npm run lint
+    - uses: actions/checkout@v4
+    - uses: DavidAnson/markdownlint-cli2-action@v17
+      with:
+        globs: |
+          docs/*.md
+          !examples/*.md
