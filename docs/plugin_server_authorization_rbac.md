@@ -1,8 +1,8 @@
 # Server plugin: Authorization "RBAC"
 
-Please see our documentation on the [authorization feature](./user-management.md) for more complete details. 
+Please see our documentation on the [authorization feature](./user-management.md) for more complete details.
 
-This configuration has the following inputs: 
+This configuration has the following inputs:
 
 | Key | Description | Required |
 | --- | ----------- | -------- |
@@ -10,7 +10,7 @@ This configuration has the following inputs:
 | `role "<x>" {desc = "<y>"}` | `<x>` is the name of a role that can be allowed access; `<y>` is a short description | no |
 | `API "<x>" {allowed_roles = ["<z1>", ...]}` | `<x>` is the name of the API that will allow access to roles listed such as `<z1>` | no |
 
-There can (and likely will be) multiple `role` and `API` blocks. If there are no role blocks, no API will be allowed any access. If there is a missing API block, no access will be granted for that API. 
+There can (and likely will be) multiple `role` and `API` blocks. If there are no role blocks, no API will be allowed any access. If there is a missing API block, no access will be granted for that API.
 
 A sample configuration file for syntactic referense is below:
 
@@ -44,13 +44,13 @@ Authorizer "RBAC" {
 }
 ```
 
-NOTE: If this feature is enabled without an authentication layer, it will render all calls uncallable. 
+NOTE: If this feature is enabled without an authentication layer, it will render all calls uncallable.
 
-The above specification assumes roles `admin` and `viewer` are passed by the authentication layer. In this example, the following apply: 
+The above specification assumes roles `admin` and `viewer` are passed by the authentication layer. In this example, the following apply:
 
 1. If user has `admin` role, can perform any call
 2. If user has `viewer` role, can perform all read-only calls (See lists below)
-3. If user is authenticated with no role, can perform only `/` Tornjak home call. 
+3. If user is authenticated with no role, can perform only `/` Tornjak home call.
 
 ## Valid inputs
 
@@ -61,10 +61,8 @@ There are a couple failure cases in which the plugin will fail to initialize and
 
 ## The empty string role ""
 
-If there is a role listed with name `""`, this enables some APIs to allow all users where the authentication layer does not return error. In the above example, only the `/` API has this behavior. 
+If there is a role listed with name `""`, this enables some APIs to allow all users where the authentication layer does not return error. In the above example, only the `/` API has this behavior.
 
 ## Additional behavior specification
 
-If there is a role that is not included as an `allowed_role` in any API block, a user will not be granted access to any API based on that role. 
-
-
+If there is a role that is not included as an `allowed_role` in any API block, a user will not be granted access to any API based on that role.
