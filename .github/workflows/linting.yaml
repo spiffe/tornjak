@@ -6,12 +6,13 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: DavidAnson/markdownlint-cli2-action@v17
-      continue-on-error: true
-      with:
-        fix: true
-        config: 'docs/.markdownlint.yml'
-        globs: |
-          docs/*.md
-          !examples/*.md
+      - name: Checkout markdown
+        uses: actions/checkout@v4.2.0
+      - name: Lint markdown
+        uses: DavidAnson/markdownlint-cli2-action@v17
+        continue-on-error: true
+        with:
+          config: '.markdownlint.yml'
+          globs: |
+            docs/*.md
+            !examples/*.md
