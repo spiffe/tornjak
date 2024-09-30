@@ -164,7 +164,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       })
       .catch((error) => {
         showResponseToast(error, { caption: "Could not populate local tornjak server info." })
-        tornjakMessageFunc(error.response.statusText)
+        tornjakMessageFunc(error)
       })
   }
 

@@ -3,6 +3,7 @@ import {
     AgentsList,
     AgentsWorkLoadAttestorInfo,
     ClustersList,
+    ServersList,
     EntriesList,
     SelectorInfoLabels,
     ServerInfo,
@@ -104,7 +105,7 @@ export interface ServersReducerState {
     globalServerSelected: string,
     globalServerInfo: ServerInfo,
     globalTornjakServerInfo: TornjakServerInfo,
-    globalServersList: Array<string>,
+    globalServersList: ServersList[],
     globalSelectorInfo: SelectorInfoLabels,
     globalWorkloadSelectorInfo: WorkloadSelectorInfoLabels,
     globalSpireHealthCheck: boolean,
@@ -126,7 +127,7 @@ export interface TornjakServerInfoAction extends Action<typeof GLOBAL_TORNJAK_SE
 }
 
 export interface ServersListAction extends Action<typeof GLOBAL_SERVERS_LIST> {
-    payload: Array<string>;
+    payload: ServersList[];
 }
 export interface SelectorInfoAction extends Action<typeof GLOBAL_SELECTOR_INFO> {
     payload: SelectorInfoLabels;

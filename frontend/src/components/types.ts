@@ -128,6 +128,14 @@ export interface SpireHealthCheckFreq {
   SpireHealthCheckFreqDisplay: string; // SPIRE health check dropdown display/ for persistence
 }
 
+// servers
+export interface ServersList {
+  name: string; // Name of Server
+  address: string; // url
+  mtls: string; // mtls
+  tls: string; // tls
+}
+
 // tornjak 
 export interface StringLabels {
   label: string;
