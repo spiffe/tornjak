@@ -7,8 +7,7 @@
 -   [Tornjak User Interface (UI) Interaction with API Endpoints](#3-tornjak-user-interface-ui-interaction-with-api-endpoints)
     - [Agent API’s](#31-tornjak-apis)
     - [Manager API’s](#32-manager-apis)
--   [Tornjak Redux Reducers and Actions With Their Respective Descriptions
-](#4-tornjak-redux-reducers-and-actions-with-their-respective-descriptions)
+-   [Tornjak Redux Reducers and Actions With Their Respective Descriptions](#4-tornjak-redux-reducers-and-actions-with-their-respective-descriptions)
     - [Reducers](#41-reducers)
     - [Actions](#42-actions)
 
