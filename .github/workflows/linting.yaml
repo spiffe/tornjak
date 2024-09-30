@@ -11,7 +11,7 @@ jobs:
       continue-on-error: true
       with:
         fix: true
-        config: '../.markdownlint.yml'
+        config: 'docs/.markdownlint.yml'
         globs: |
           docs/*.md
           !examples/*.md
