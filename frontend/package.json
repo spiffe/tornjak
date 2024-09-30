@@ -59,8 +59,8 @@
     "coverage": "react-scripts test -env=jsdom --watchAll=false --coverage",
     "eject": "react-scripts eject",
     "dev": "concurrently -k -n COMPILER,NODEMON -c yellow,blue \"tsc -w\" \"nodemon -w dist -q dist/index.js\"",
-    "lint": "markdownlint-cli2 '../docs/*.md' --config '../.markdownlint.yml' '!node_modules' '!../.markdownlint.yml'",
-    "lint:fix": "markdownlint-cli2-fix '../docs/*.md' --config '../.markdownlint.yml' '!node_modules' '!../.markdownlint.yml'"
+    "lint": "markdownlint-cli2 '../docs/*.md' --config '../docs/.markdownlint.yml' '!node_modules' '!../docs/.markdownlint.yml'",
+    "lint:fix": "markdownlint-cli2-fix '../docs/*.md' --config '../docs/.markdownlint.yml' '!node_modules' '!../docs/.markdownlint.yml'"
   },
   "eslintConfig": {
     "extends": [
