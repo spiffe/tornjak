@@ -56,7 +56,7 @@ const TornjakServerInfoDisplay = (props: { tornjakServerInfo: TornjakServInfo, t
   <Accordion>
     <AccordionItem title="Trust Domain" open>
       <p>
-        {props.tornjakDebugInfo.svid_chain[0].id.trust_domain}
+        {props.tornjakServerInfo.trustDomain}
       </p>
     </AccordionItem>
     <AccordionItem title="Plugins" open>

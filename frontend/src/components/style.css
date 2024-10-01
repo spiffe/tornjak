@@ -434,3 +434,23 @@
   display: inline;
   float: right; /* Float to the right */
 }
+
+.tls-mtls-enabled input {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.server-form {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 20px;
+  width: 1000px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(180, 178, 178);
+  padding: 30px 30px 30px 30px;
+}
+
+.server-select-dropdown {
+  margin-top: 20px;
+}

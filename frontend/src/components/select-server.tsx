@@ -4,6 +4,7 @@ import axios from 'axios';
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
+import './style.css';
 
 import {
     serverSelectedFunc,
@@ -135,7 +136,7 @@ class SelectServer extends Component<SelectServerProp, SelectServerState> {
 
     render() {
         let managerServerSelector = (
-            <div id="server-dropdown-div">
+            <div className="server-select-dropdown">
                 <label id="server-dropdown">Choose a Server</label>
                 <div className="servers-drp-dwn">
                     <select name="servers" id="servers" onChange={this.onServerSelect}>
