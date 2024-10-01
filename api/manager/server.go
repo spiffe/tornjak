@@ -14,10 +14,6 @@ import (
 	managerdb "github.com/spiffe/tornjak/pkg/manager/db"
 )
 
-/*var (
-	jsonContentType string = "application/json"
-)*/
-
 const (
 	keyShowLen  int = 40
 	certShowLen int = 50
