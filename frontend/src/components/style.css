@@ -376,6 +376,18 @@
   margin-top: 7px;
 }
 
+.manager-toolbar-header {
+  position: relative;
+  display: inline;
+  padding: 15px;
+  color: white;
+  border: 0.1px solid white;
+  padding: 4px;
+  float: right;
+  margin-right: 10px;
+  margin-top: 7px;
+}
+
 .health-check {
   position: relative;
   z-index: 3;
