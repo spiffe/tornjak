@@ -165,6 +165,11 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
                 <h5>ADMIN PORTAL</h5>
               </div>
             }
+            {IsManager &&
+              <div className="manager-toolbar-header">
+                <h5>MANAGER PORTAL</h5>
+              </div>
+            }
             {IsManager && managerNavs}
           </div>
         </div>
