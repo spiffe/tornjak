@@ -9,6 +9,15 @@ import {
 import { showResponseToast } from './error-api';
 import { ServersList } from './types'
 import { RootState } from 'redux/reducers';
+import { ToastContainer } from 'react-toastify';
+import {
+  TextInput,
+  Accordion,
+  AccordionItem,
+  InlineNotification
+} from 'carbon-components-react';
+import Table from "tables/servers-list-table";
+import './style.css';
 
 type ServerManagementProp = {
   // returns the list of available servers and their basic info
@@ -30,13 +39,15 @@ type ServerManagementState = {
   certFileText?: string,
   keyFileText?: string,
   message: string,
+  statusOK: string,
 }
 
 const Server = (props: { server: ServersList }) => (
   <tr>
     <td>{props.server.name}</td>
     <td>{props.server.address}</td>
-    <td>{(props.server.mtls && "mTLS") || (props.server.tls && "TLS") || "None"}</td>
+    <td>{(props.server.mtls && "mTLS") || "None"}</td>
+    <td>{(props.server.tls && "TLS") || "None"}</td>
   </tr>
 )
 
@@ -55,12 +66,15 @@ class ServerManagement extends Component<ServerManagementProp, ServerManagementS
       certFileText: "",
       keyFileText: "",
       message: "",
+      statusOK: "",
     };
     this.onCertFileChange = this.onCertFileChange.bind(this);
     this.onCAFileChange = this.onCAFileChange.bind(this);
     this.onKeyFileChange = this.onKeyFileChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.onChangeServerName = this.onChangeServerName.bind(this);
+    this.onChangeServerAddress = this.onChangeServerAddress.bind(this);
   }
 
   componentDidMount() {
@@ -97,6 +111,25 @@ class ServerManagement extends Component<ServerManagementProp, ServerManagementS
     }));
   }
 
+  onChangeServerName(e: { target: { value: string; }; } | undefined): void {
+    if (e === undefined) {
+      return;
+    }
+    var sid = e.target.value;
+    this.setState({
+      formServerName: sid,
+    });
+  }
+
+  onChangeServerAddress(e: { target: { value: string; }; } | undefined): void {
+    if (e === undefined) {
+      return;
+    }
+    var sid = e.target.value;
+    this.setState({
+      formServerAddress: sid,
+    });
+  }
 
   onCAFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -105,7 +138,7 @@ class ServerManagement extends Component<ServerManagementProp, ServerManagementS
       reader.onload = (e: ProgressEvent<FileReader>) => {
         if (e.target && e.target.result) {
           const result = e.target.result;
-  
+
           // Handle string and ArrayBuffer cases
           if (typeof result === "string") {
             this.setState({
@@ -123,7 +156,7 @@ class ServerManagement extends Component<ServerManagementProp, ServerManagementS
       reader.readAsText(files[0]);
     }
   };
-  
+
   onCertFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files[0]) {
@@ -131,7 +164,7 @@ class ServerManagement extends Component<ServerManagementProp, ServerManagementS
       reader.onload = (e: ProgressEvent<FileReader>) => {
         if (e.target && e.target.result) {
           const result = e.target.result;
-  
+
           // Handle string and ArrayBuffer cases
           if (typeof result === "string") {
             this.setState({
@@ -149,7 +182,7 @@ class ServerManagement extends Component<ServerManagementProp, ServerManagementS
       reader.readAsText(files[0]);
     }
   };
-  
+
   onKeyFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files[0]) {
@@ -157,7 +190,7 @@ class ServerManagement extends Component<ServerManagementProp, ServerManagementS
       reader.onload = (e: ProgressEvent<FileReader>) => {
         if (e.target && e.target.result) {
           const result = e.target.result;
-  
+
           // Handle string and ArrayBuffer cases
           if (typeof result === "string") {
             this.setState({
@@ -175,8 +208,8 @@ class ServerManagement extends Component<ServerManagementProp, ServerManagementS
       reader.readAsText(files[0]);
     }
   };
-  
-  
+
+
 
 
   onSubmit(e: { preventDefault: () => void; }) {
@@ -194,11 +227,20 @@ class ServerManagement extends Component<ServerManagementProp, ServerManagementS
     };
     axios.post(GetApiServerUri('/manager-api/server/register'), cjtData)
       .then(res => {
-        this.setState({ message: "Requst:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' ') });
+        this.setState({
+          message: "Requst:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
+          statusOK: "OK",
+        });
         this.refreshServerState();
       }
       )
-      .catch(err => this.setState({ message: "ERROR:" + err + (typeof (err.response) !== "undefined" ? err.response.data : "") }))
+      .catch(err => {
+        showResponseToast(err)
+        this.setState({
+          message: "ERROR:" + err + (typeof (err.response) !== "undefined" ? err.response.data : ''),
+          statusOK: "ERROR",
+        })
+      })
 
   }
 
@@ -231,80 +273,100 @@ class ServerManagement extends Component<ServerManagementProp, ServerManagementS
 
     return (
       <div>
-        <h3> Register New Server </h3>
-        <form onSubmit={this.onSubmit}>
-          <div className="form-group">
-            <label>Server Name (Unique)</label>
-            <input type="text"
-              name="formServerName"
-              required
-              className="form-control"
-              value={this.state.formServerName}
-              onChange={this.handleInputChange}
-            />
-          </div>
+        <Accordion className="accordion-entry-form">
+          <AccordionItem
+            title={<h3> Register New Server </h3>} open>
+            <form onSubmit={this.onSubmit}>
+              <div className="server-form">
+                <div className="dnsnames-input-field">
+                  <TextInput
+                    helperText="e.g. Server1"
+                    id="dnsnames-input-field"
+                    invalidText="A valid value is required - refer to helper text below"
+                    labelText="Server Name (Unique)"
+                    placeholder="Enter the Server name - Must be unique name"
+                    onChange={this.onChangeServerName}
+                  />
+                </div>
+                <div className="dnsnames-input-field">
+                  <TextInput
+                    helperText="e.g. http://localhost:5000/"
+                    id="dnsnames-input-field"
+                    invalidText="A valid value is required - refer to helper text below"
+                    labelText="Server Address (Url)"
+                    placeholder="Enter the Server address"
+                    onChange={this.onChangeServerAddress}
+                  />
+                </div>
+                <div className="tls-mtls-enabled">
+                  <input
+                    name="formTLS"
+                    type="checkbox"
+                    checked={this.state.formTLS}
+                    onChange={this.handleInputChange}
+                  />
+                  TLS Enabled
+                </div>
+                {this.state.formTLS && tlsFormOptions}
 
+                <div className="tls-mtls-enabled">
+                  <input
+                    name="formMTLS"
+                    type="checkbox"
+                    checked={this.state.formMTLS}
+                    onChange={this.handleInputChange}
+                  />
+                  mTLS Enabled
+                </div>
+                {this.state.formMTLS && mtlsFormOptions}
 
-          <div className="form-group">
-            <label>Address (i.e. http://localhost:5000/) </label>
-            <input type="text"
-              name="formServerAddress"
-              required
-              className="form-control"
-              value={this.state.formServerAddress}
-              onChange={this.handleInputChange}
-            />
-          </div>
-
-          <div>
-            <input
-              name="formTLS"
-              type="checkbox"
-              checked={this.state.formTLS}
-              onChange={this.handleInputChange}
-            />
-            TLS Enabled
-          </div>
-          {this.state.formTLS && tlsFormOptions}
-
-          <div>
-            <input
-              name="formMTLS"
-              type="checkbox"
-              checked={this.state.formMTLS}
-              onChange={this.handleInputChange}
-            />
-            mTLS Enabled
-          </div>
-          {this.state.formMTLS && mtlsFormOptions}
-
-          <div className="form-group">
-            <br></br>
-            <input type="submit" value="Register Server" className="btn btn-primary" />
-          </div>
-        </form>
-
-        <div className="alert-primary" role="alert">
-          <pre>
-            {this.state.message}
-          </pre>
-        </div>
-
-
-        <h3>Server List</h3>
-        <table className="table" style={{ width: "100%" }}>
-          <thead className="thead-light">
-            <tr>
-              <th>Server Name</th>
-              <th>Address</th>
-              <th>TLS?</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.serverList()}
-          </tbody>
-        </table>
-
+                <div className="form-group">
+                  <br></br>
+                  <input type="submit" value="Register Server" className="btn btn-primary" />
+                </div>
+              </div>
+            </form>
+            <div>
+              {this.state.statusOK === "OK" &&
+                <InlineNotification
+                  kind="success"
+                  hideCloseButton
+                  title="SERVER SUCCESSFULLY CREATED"
+                  subtitle={
+                    <div className="toast-messege" data-test="alert-primary">
+                      <pre className="toast-messege-color">
+                        {this.state.message}
+                      </pre>
+                    </div>
+                  }
+                />
+              }
+              {(this.state.statusOK === "ERROR") &&
+                <InlineNotification
+                  kind="error"
+                  hideCloseButton
+                  title="SERVER CREATION FAILED"
+                  subtitle={
+                    <div className="toast-messege" data-test="alert-primary">
+                      <pre className="toast-messege-color">
+                        {this.state.message}
+                      </pre>
+                    </div>
+                  }
+                />
+              }
+            </div>
+          </AccordionItem>
+          <AccordionItem
+            title={<h3>Servers List</h3>} open>
+            <Table data={this.serverList()} id="table-1" />
+          </AccordionItem>
+        </Accordion>
+        <ToastContainer
+          className="carbon-toast"
+          containerId="notifications"
+          draggable={false}
+        />
       </div>
     )
   }
