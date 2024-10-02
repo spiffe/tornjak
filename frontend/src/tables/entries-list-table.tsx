@@ -1,8 +1,6 @@
 import React from "react";
 import { connect } from 'react-redux';
-import GetApiServerUri from 'components/helpers';
 import IsManager from 'components/is_manager';
-import axios from 'axios'
 import {
     entriesListUpdateFunc
 } from 'redux/actions';
@@ -11,8 +9,6 @@ import { EntriesList } from "components/types";
 import { RootState } from "redux/reducers";
 import { DenormalizedRow } from "carbon-components-react";
 import { saveAs } from "file-saver";
-import { showResponseToast } from "components/error-api";
-import apiEndpoints from 'components/apiConfig';
 import TornjakApi from 'components/tornjak-api-helpers';
 
 // EntriesListTable takes in 

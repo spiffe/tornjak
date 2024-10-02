@@ -256,7 +256,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     //user prefered option
     localAgentsIdList[0] = this.state.parentIdManualEntryOption;
     //default option
-    localAgentsIdList[1] = prefix + this.props.globalDebugServerInfo.svid_chain[0].id.trust_domain + "/spire/server";
+    localAgentsIdList[1] = prefix + this.props.globalServerInfo.trustDomain + "/spire/server";
 
     //agents
     let agentEntriesDict: { [key: string]: EntriesList[]; } | undefined = this.SpiffeHelper.getAgentsEntries(this.props.globalAgentsList, this.props.globalEntriesList)

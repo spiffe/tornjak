@@ -26,7 +26,7 @@ const Auth_Server_Uri = env.REACT_APP_AUTH_SERVER_URI;
 // selectedRows: selectedRows from DataTable
 // returns the toolbar of the table for the specified entity
 type TableToolBarProp = {
-    deleteEntity: (selectedRows: readonly DenormalizedRow[]) => string | void,
+    deleteEntity: ((selectedRows: readonly DenormalizedRow[]) => string | void) | undefined,
     banEntity: ((selectedRows: readonly DenormalizedRow[]) => string | void) | undefined,
     downloadEntity: ((selectedRows: readonly DenormalizedRow[]) => void) | undefined,
     onInputChange: (event: React.SyntheticEvent<HTMLInputElement, Event>) => void,
@@ -60,7 +60,8 @@ class TableToolBar extends React.Component<TableToolBarProp, TableToolBarState> 
                             renderIcon={IoTrashOutline}
                             iconDescription="Delete"
                             onClick={() => {
-                                this.props.deleteEntity(this.props.selectedRows);
+                                if(this.props.deleteEntity !== undefined)
+                                    this.props.deleteEntity(this.props.selectedRows);
                                 this.props.getBatchActionProps().onCancel();
                             }}
                         >

@@ -4,6 +4,7 @@ import axios from 'axios';
 import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
+import './style.css';
 
 import {
     serverSelectedFunc,
@@ -17,6 +18,7 @@ import {
 import { RootState } from 'redux/reducers';
 import { 
     AgentsList, 
+    ServersList,
     ServerInfo, 
     TornjakServerInfo,
     DebugServerInfo,
@@ -27,7 +29,7 @@ type SelectServerProp = {
     // tornjak server debug info of the selected server
     globalDebugServerInfo: DebugServerInfo,
     // dispatches a payload for the list of available servers and their basic info as array of strings and has a return type of void
-    serversListUpdateFunc: (globalServersList: Array<string>) => void,
+    serversListUpdateFunc: (globalServersList: ServersList[]) => void,
     // dispatches a payload for the server selected in the redux state as a string and has a return type of void
     serverSelectedFunc: (globalServerSelected: string) => void,
     // dispatches a payload for the server trust domain and nodeAttestorPlugin and has a return type of void
@@ -43,7 +45,7 @@ type SelectServerProp = {
     // tornjak server info of the selected server
     globalTornjakServerInfo: TornjakServerInfo,
     // list of avialable servers
-    globalServersList: Array<string>,
+    globalServersList: ServersList[],
     // error/ success messege returned for a specific function
     globalErrorMessage: string,
 }
@@ -134,7 +136,7 @@ class SelectServer extends Component<SelectServerProp, SelectServerState> {
 
     render() {
         let managerServerSelector = (
-            <div id="server-dropdown-div">
+            <div className="server-select-dropdown">
                 <label id="server-dropdown">Choose a Server</label>
                 <div className="servers-drp-dwn">
                     <select name="servers" id="servers" onChange={this.onServerSelect}>

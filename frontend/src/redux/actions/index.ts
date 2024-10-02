@@ -51,6 +51,7 @@ import {
     AgentsList,
     AgentsWorkLoadAttestorInfo,
     ClustersList,
+    ServersList,
     EntriesList,
     SelectorInfoLabels,
     ServerInfo,
@@ -233,7 +234,7 @@ export function serverInfoUpdateFunc(globalServerInfo: ServerInfo): ThunkAction<
 //      }
 //  ]
 // serversListUpdateFunc returns the list of available servers and their basic info
-export function serversListUpdateFunc(globalServersList: Array<string>): ThunkAction<void, RootState, undefined, ServersListAction> {
+export function serversListUpdateFunc(globalServersList: ServersList[]): ThunkAction<void, RootState, undefined, ServersListAction> {
     return dispatch => {
         dispatch({
             type: GLOBAL_SERVERS_LIST,

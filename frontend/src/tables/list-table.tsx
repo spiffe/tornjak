@@ -20,7 +20,7 @@ const {
 type DataTableRenderProp = {
     listTableData: DataTableRow<string>[],
     headerData: DataTableHeader<string>[],
-    deleteEntity: (selectedRows: readonly DenormalizedRow[]) => string | void,
+    deleteEntity: ((selectedRows: readonly DenormalizedRow[]) => string | void) | undefined,
     banEntity: ((selectedRows: readonly DenormalizedRow[]) => string | void) | undefined,
     downloadEntity: ((selectedRows: readonly DenormalizedRow[]) => string | undefined | void) | undefined,
     entityType: string, 

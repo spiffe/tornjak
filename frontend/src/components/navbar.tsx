@@ -62,6 +62,10 @@ type NavigationBarProp = {
   spireDebugServerInfoUpdateFunc: (globalDebugServerInfo: DebugServerInfo) => void,
   // dispatches a payload for an Error Message/ Success Message of an executed function as a string and has a return type of void
   tornjakMessageFunc: (globalErrorMessage: string) => void,
+  // the selected server for manager mode 
+  globalServerSelected: string,
+  // tornjak error messege
+  globalErrorMessage: string,
 }
 
 type NavigationBarState = {}
@@ -89,9 +93,18 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
         }
       }
     }
-    this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
-    this.TornjakApi.populateLocalTornjakDebugServerInfo(this.props.spireDebugServerInfoUpdateFunc, this.props.tornjakMessageFunc);
-    this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
+    if (IsManager) {
+      if (this.props.globalServerSelected !== "" && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
+        // this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc)
+        // this.TornjakApi.populateEntriesUpdate(this.props.globalServerSelected, this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
+        // this.TornjakApi.refreshSelectorsState(this.props.globalServerSelected, this.props.agentworkloadSelectorInfoFunc);
+        // this.setState({ selectedServer: this.props.globalServerSelected });
+      }
+    } else {
+      this.TornjakApi.populateLocalTornjakServerInfo(this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
+      this.TornjakApi.populateLocalTornjakDebugServerInfo(this.props.spireDebugServerInfoUpdateFunc, this.props.tornjakMessageFunc);
+      this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
+    }
   }
 
   render() {
@@ -152,6 +165,11 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
                 <h5>ADMIN PORTAL</h5>
               </div>
             }
+            {IsManager &&
+              <div className="manager-toolbar-header">
+                <h5>MANAGER PORTAL</h5>
+              </div>
+            }
             {IsManager && managerNavs}
           </div>
         </div>
@@ -188,6 +206,8 @@ const mapStateToProps = (state: RootState) => ({
   globalServerInfo: state.servers.globalServerInfo,
   globalDebugServerInfo: state.servers.globalDebugServerInfo,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
+  globalServerSelected: state.servers.globalServerSelected,
+  globalErrorMessage: state.tornjak.globalErrorMessage,
 })
 
 export default connect(

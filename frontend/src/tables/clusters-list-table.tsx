@@ -1,8 +1,6 @@
 import React from "react";
 import { connect } from 'react-redux';
 import IsManager from 'components/is_manager';
-import GetApiServerUri from 'components/helpers';
-import axios from 'axios';
 import {
     clustersListUpdateFunc
 } from 'redux/actions';
@@ -10,7 +8,6 @@ import Table from './list-table';
 import { ClustersList } from "components/types";
 import { DenormalizedRow } from "carbon-components-react";
 import { RootState } from "redux/reducers";
-import { showResponseToast } from "components/error-api";
 import TornjakApi from 'components/tornjak-api-helpers';
 
 // ClusterListTable takes in 
