@@ -184,6 +184,10 @@ func (s *Server) HandleRequests() {
 	rtr.HandleFunc("/manager-api/server/list", corsHandler(s.serverList))
 	rtr.HandleFunc("/manager-api/server/register", corsHandler(s.serverRegister))
 
+	// SPIRE server info calls
+	rtr.HandleFunc("/manager-api/healthcheck/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/spire/healthcheck", http.MethodGet)))
+	rtr.HandleFunc("/manager-api/serverinfo/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/spire/serverinfo", http.MethodGet)))
+
 	// Entries
 	rtr.HandleFunc("/manager-api/entry/list/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/spire/entries", http.MethodGet)))
 	rtr.HandleFunc("/manager-api/entry/delete/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/spire/entries", http.MethodDelete)))
