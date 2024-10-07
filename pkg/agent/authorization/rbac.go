@@ -2,7 +2,6 @@ package authorization
 
 import (
 	"github.com/pkg/errors"
-	"fmt"
 	"net/http"
 
 	"github.com/spiffe/tornjak/pkg/agent/authentication/user"
