@@ -199,7 +199,7 @@ spec:
             periodSeconds: 5
         ### 👈 BEGIN ADDITIONAL CONTAINER ###
         - name: tornjak-backend
-          image: ghcr.io/spiffe/tornjak-backend:latest
+          image: ghcr.io/spiffe/tornjak-backend:2.0.0
           args:
             - --config
             - /run/spire/config/server.conf
@@ -441,7 +441,7 @@ Forwarding from [::1]:10000 -> 10000
 While this runs, open a browser to
 
 ```
-http://localhost:10000/api/tornjak/serverinfo
+http://localhost:10000/api/v1/tornjak/serverinfo
 ```
 
 This output represents the backend response. Now you should be able to make Tornjak API calls!
