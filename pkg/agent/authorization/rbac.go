@@ -2,8 +2,6 @@ package authorization
 
 import (
 	"github.com/pkg/errors"
-	"fmt"
-	"strings"
 	"net/http"
 
 	"github.com/spiffe/tornjak/pkg/agent/authentication/user"
@@ -98,8 +96,6 @@ func (a *RBACAuthorizer) AuthorizeRequest(r *http.Request, u *user.UserInfo) err
 		return errors.Errorf("Authentication error: %v", u.AuthenticationError)
 	}
 
-	// based on path
-	apiPath := r.URL.Path
 	// check API V1 Request
   err := a.authorizeAPIV1Request(r, u)
 	if err != nil {
