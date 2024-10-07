@@ -138,7 +138,6 @@ func NewAuthorizer(authorizerPlugin *ast.ObjectItem) (authorization.Authorizer, 
 
 		// decode into role list and apiMapping
 		roleList := make(map[string]string)
-		apiMapping := make(map[string][]string)
 		apiV1Mapping := make(map[string]map[string][]string)
 		for _, role := range config.RoleList {
 			roleList[role.Name] = role.Desc
@@ -146,10 +145,6 @@ func NewAuthorizer(authorizerPlugin *ast.ObjectItem) (authorization.Authorizer, 
 			if role.Name == "" {
 				fmt.Println("WARNING: using the empty string for an API enables access to all authenticated users")
 			}
-		}
-		for _, api := range config.APIRoleMappings {
-			apiMapping[api.Name] = api.AllowedRoles
-			fmt.Printf("API name: %s, Allowed Roles: %s \n", api.Name, api.AllowedRoles)
 		}
 		for _, apiV1 := range config.APIv1RoleMappings {
 			arr := strings.Split(apiV1.Name, " ")
@@ -164,7 +159,7 @@ func NewAuthorizer(authorizerPlugin *ast.ObjectItem) (authorization.Authorizer, 
 		}
 		fmt.Printf("API V1 Mapping: %+v\n", apiV1Mapping)
 
-		authorizer, err := authorization.NewRBACAuthorizer(config.Name, roleList, apiMapping, apiV1Mapping)
+		authorizer, err := authorization.NewRBACAuthorizer(config.Name, roleList, apiV1Mapping)
 		if err != nil {
 			return nil, errors.Errorf("Couldn't configure Authorizer: %v", err)
 		}

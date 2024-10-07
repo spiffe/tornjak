@@ -118,11 +118,6 @@ type AuthRole struct {
 	Desc string `hcl:"desc"`
 }
 
-type APIRoleMapping struct {
-	Name         string   `hcl:",key"`
-	AllowedRoles []string `hcl:"allowed_roles"`
-}
-
 type APIv1RoleMapping struct {
 	Name string `hcl:",key"`
 	Method string `hcl:"-"`
@@ -133,6 +128,5 @@ type APIv1RoleMapping struct {
 type pluginAuthorizerRBAC struct {
 	Name            string            `hcl:"name"`
 	RoleList        []*AuthRole       `hcl:"role,block"`
-	APIRoleMappings []*APIRoleMapping `hcl:"API,block"`
 	APIv1RoleMappings []*APIv1RoleMapping `hcl:"APIv1,block"`
 }
