@@ -1,0 +1,18 @@
+name: Markdown Linter
+on: [pull_request, push]
+permissions:
+  contents: read
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout markdown
+        uses: actions/checkout@v4.2.0
+      - name: Lint markdown
+        uses: DavidAnson/markdownlint-cli2-action@v17
+        continue-on-error: true
+        with:
+          config: '.markdownlint.yml'
+          globs: |
+            docs/*.md
+            !examples/*.md

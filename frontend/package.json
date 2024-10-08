@@ -41,6 +41,7 @@
     "redux-thunk": "^2.3.0",
     "stringify-object": "^4.0.1",
     "tss-react": "^4.8.4",
+    "typescript": "5.0.3",
     "url-join": "^4.0.1",
     "web-vitals": "^0.2.4"
   },
@@ -58,7 +59,9 @@
     "test": "react-scripts test -env=jsdom",
     "coverage": "react-scripts test -env=jsdom --watchAll=false --coverage",
     "eject": "react-scripts eject",
-    "dev": "concurrently -k -n COMPILER,NODEMON -c yellow,blue \"tsc -w\" \"nodemon -w dist -q dist/index.js\""
+    "dev": "concurrently -k -n COMPILER,NODEMON -c yellow,blue \"tsc -w\" \"nodemon -w dist -q dist/index.js\"",
+    "lint": "markdownlint-cli2 '../docs/*.md' --config '../.markdownlint.yml' '!node_modules' '!../.markdownlint.yml'",
+    "lint:fix": "markdownlint-cli2-fix '../docs/*.md' --config '../.markdownlint.yml' '!node_modules' '!../.markdownlint.yml'"
   },
   "eslintConfig": {
     "extends": [
@@ -101,7 +104,8 @@
     "puppeteer": "^22.11.2",
     "react-inject-env": "^2.1.0",
     "react-test-renderer": "^18.2.0",
-    "redux-mock-store": "^1.5.4"
+    "redux-mock-store": "^1.5.4",
+    "markdownlint-cli2": "^0.7.1"
   },
   "jest": {
     "moduleNameMapper": {
