@@ -46,6 +46,17 @@ export interface ClustersList {
   agentsList: Array<string>; // List of agents associated with the cluster
 }
 
+// federations
+export interface FederationsList {
+  name: string; // Name of Cluster
+  editedName: string; // Edited Name if Cluster Name is edited from original
+  creationTime: string; // Time cluster is created
+  domainName: string; // Domain Name of cluster if any
+  managedBy: string; // Person/ entity managing the cluster
+  platformType: string; // Platform type of the cluster
+  agentsList: Array<string>; // List of agents associated with the cluster
+}
+
 // entries
 export interface EntriesList {
   // From https://github.com/spiffe/spire-api-sdk/blob/main/proto/spire/api/types/entry.pb.go
