@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout markdown
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.1
       - name: Lint markdown
         uses: DavidAnson/markdownlint-cli2-action@v17
         continue-on-error: true
