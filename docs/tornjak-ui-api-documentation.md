@@ -51,7 +51,9 @@ Below are UI pages of Tornjak with their respective paths. For details on a spec
 ### - [Healthcheck](https://pkg.go.dev/google.golang.org/grpc/health/grpc_health_v1#HealthCheckRequest)
 
 #### GET
+
 ##### /api/v1/spire/healthcheck
+
 ```
 Request 
 api/v1/spire/healthcheck
@@ -68,7 +70,9 @@ Content-Type: application/json; charset=utf-8
 ### - [DebugServer](https://github.com/spiffe/spire-api-sdk/tree/main/proto/spire/api/server/debug/v1)
 
 #### GET
+
 ##### /api/v1/spire/serverinfo
+
 ```
 Request 
 api/v1/spire/serverinfo
@@ -103,7 +107,9 @@ Content-Type: application/json; charset=utf-8
 ### - [Agents](https://github.com/spiffe/spire-api-sdk/tree/main/proto/spire/api/server/agent/v1)
 
 #### GET
+
 ##### /api/v1/spire/agents
+
 ```
 Request 
 api/v1/spire/agent
@@ -137,7 +143,9 @@ Content-Type: application/json; charset=utf-8
 ```
 
 #### POST
+
 ##### /api/v1/spire/agents/ban
+
 ```
 Request 
 api/v1/spire/agents/ban
@@ -154,8 +162,11 @@ Content-Type: application/json; charset=utf-8
 Example response:
 SUCCESS
 ```
+
 #### DELETE
+
 ##### /api/v1/spire/agents
+
 ```
 Request 
 api/v1/spire/agents
@@ -172,8 +183,11 @@ Content-Type: application/json; charset=utf-8
 Example response:
 SUCCESS
 ```
+
 #### POST
+
 ##### /api/v1/spire/agents/jointoken
+
 ```
 Request 
 api/v1/spire/agents/jointoken
@@ -198,7 +212,9 @@ Example response:
 ### - [Entries](https://github.com/spiffe/spire-api-sdk/tree/main/proto/spire/api/server/entry/v1)
 
 #### GET
+
 ##### /api/v1/spire/entries
+
 ```
 Request 
 api/v1/spire/entries
@@ -233,7 +249,9 @@ Content-Type: application/json; charset=utf-8
 ```
 
 #### POST
+
 ##### /api/v1/spire/entries
+
 ```
 Request 
 api/v1/spire/entries
@@ -296,8 +314,11 @@ Example response:
   }
 }
 ```
+
 #### DELETE
+
 ##### /api/v1/spire/entries
+
 ```
 Request 
 api/v1/spire/entries
@@ -325,7 +346,9 @@ Example response:
 ### - Tornjak Specific
 
 #### GET
+
 ##### /api/v1/tornjak/serverinfo
+
 ```
 Request 
 api/v1/tornjak/serverinfo
@@ -346,7 +369,9 @@ Content-Type: application/json; charset=utf-8
 }
 
 ```
+
 ##### /api/v1/tornjak/selectors
+
 ```
 Request 
 api/v1/tornjak/selectors
@@ -363,6 +388,7 @@ Content-Type: application/json; charset=utf-8
 ```
 
 ##### /api/v1/tornjak/clusters
+
 ```
 Request 
 api/v1/tornjak/clusters
@@ -384,7 +410,9 @@ Content-Type: application/json; charset=utf-8
 ```
 
 #### POST
+
 ##### /api/v1/tornjak/selectors
+
 ```
 Request 
 api/v1/tornjak/selectors
@@ -404,6 +432,7 @@ SUCCESS
 ```
 
 ##### /api/v1/tornjak/clusters
+
 ```
 Request 
 api/v1/tornjak/clusters
@@ -425,7 +454,9 @@ SUCCESS
 ```
 
 #### PATCH
+
 ##### /api/v1/tornjak/clusters
+
 ```
 Request 
 api/v1/tornjak/clusters
@@ -448,7 +479,9 @@ SUCCESS
 ```
 
 #### DELETE
+
 ##### /api/v1/tornjak/clusters
+
 ```
 Request 
 api/v1/tornjak/clusters

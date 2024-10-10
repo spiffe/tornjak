@@ -97,7 +97,7 @@ func (a *RBACAuthorizer) AuthorizeRequest(r *http.Request, u *user.UserInfo) err
 	}
 
 	// if not authorized fail and return error
-  err := a.authorizeAPIV1Request(r, u)
+	err := a.authorizeAPIV1Request(r, u)
 	if err != nil {
 		return errors.Errorf("Tornjak API V1 Authorization error: %v", err)
 	}
