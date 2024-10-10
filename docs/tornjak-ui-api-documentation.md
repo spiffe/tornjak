@@ -50,9 +50,9 @@ Below are UI pages of Tornjak with their respective paths. For details on a spec
 
 ### - [Healthcheck](https://pkg.go.dev/google.golang.org/grpc/health/grpc_health_v1#HealthCheckRequest)
 
-#### GET
+#### /api/v1/spire/healthcheck
 
-##### /api/v1/spire/healthcheck
+##### GET
 
 ```
 Request 
@@ -69,9 +69,9 @@ Content-Type: application/json; charset=utf-8
 
 ### - [DebugServer](https://github.com/spiffe/spire-api-sdk/tree/main/proto/spire/api/server/debug/v1)
 
-#### GET
+#### /api/v1/spire/serverinfo
 
-##### /api/v1/spire/serverinfo
+##### GET
 
 ```
 Request 
@@ -106,9 +106,9 @@ Content-Type: application/json; charset=utf-8
 
 ### - [Agents](https://github.com/spiffe/spire-api-sdk/tree/main/proto/spire/api/server/agent/v1)
 
-#### GET
+#### /api/v1/spire/agents
 
-##### /api/v1/spire/agents
+##### GET
 
 ```
 Request 
@@ -142,9 +142,9 @@ Content-Type: application/json; charset=utf-8
 }
 ```
 
-#### POST
+##### POST
 
-##### /api/v1/spire/agents/ban
+###### /api/v1/spire/agents/ban
 
 ```
 Request 
@@ -163,30 +163,7 @@ Example response:
 SUCCESS
 ```
 
-#### DELETE
-
-##### /api/v1/spire/agents
-
-```
-Request 
-api/v1/spire/agents
-Example request payload:
-HTTP/1.1 200 OK
-Content-Type: application/json; charset=utf-8
-
-{
-  "id": {
-    "path": "/spire/agent/",
-    "trust_domain": "example.org"
-  }
-}
-Example response:
-SUCCESS
-```
-
-#### POST
-
-##### /api/v1/spire/agents/jointoken
+###### /api/v1/spire/agents/jointoken
 
 ```
 Request 
@@ -209,11 +186,30 @@ Example response:
 
 ```
 
+##### DELETE
+
+```
+Request 
+api/v1/spire/agents
+Example request payload:
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{
+  "id": {
+    "path": "/spire/agent/",
+    "trust_domain": "example.org"
+  }
+}
+Example response:
+SUCCESS
+```
+
 ### - [Entries](https://github.com/spiffe/spire-api-sdk/tree/main/proto/spire/api/server/entry/v1)
 
-#### GET
+#### /api/v1/spire/entries
 
-##### /api/v1/spire/entries
+##### GET
 
 ```
 Request 
@@ -248,9 +244,7 @@ Content-Type: application/json; charset=utf-8
 }
 ```
 
-#### POST
-
-##### /api/v1/spire/entries
+##### POST
 
 ```
 Request 
@@ -315,9 +309,7 @@ Example response:
 }
 ```
 
-#### DELETE
-
-##### /api/v1/spire/entries
+##### DELETE
 
 ```
 Request 
@@ -345,9 +337,9 @@ Example response:
 
 ### - Tornjak Specific
 
-#### GET
+#### /api/v1/tornjak/serverinfo
 
-##### /api/v1/tornjak/serverinfo
+##### GET
 
 ```
 Request 
