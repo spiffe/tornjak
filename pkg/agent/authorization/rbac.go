@@ -3,7 +3,6 @@ package authorization
 import (
 	"github.com/pkg/errors"
 	"fmt"
-	"strings"
 	"net/http"
 
 	"github.com/spiffe/tornjak/pkg/agent/authentication/user"
@@ -16,27 +15,7 @@ type RBACAuthorizer struct {
 	apiV1Mapping map[string]map[string][]string
 }
 
-// TODO put this in a common constants file
-var staticAPIList = map[string]struct{}{
-	"/":                               {},
-	"/api/healthcheck":                {},
-	"/api/debugserver":                {},
-	"/api/agent/list":                 {},
-	"/api/entry/list":                 {},
-	"/api/tornjak/serverinfo":         {},
-	"/api/tornjak/selectors/list":     {},
-	"/api/tornjak/agents/list":        {},
-	"/api/tornjak/clusters/list":      {},
-	"/api/agent/ban":                  {},
-	"/api/agent/delete":               {},
-	"/api/agent/createjointoken":      {},
-	"/api/entry/create":               {},
-	"/api/entry/delete":               {},
-	"/api/tornjak/selectors/register": {},
-	"/api/tornjak/clusters/create":    {},
-	"/api/tornjak/clusters/edit":      {},
-	"/api/tornjak/clusters/delete":    {},
-}
+// TODO put this in a common constants filecd
 var staticAPIV1List = map[string]map[string]struct{}{
 	"/api/v1/spire/serverinfo" :{"GET": {}},
 	"/api/v1/spire/healthcheck" :{"GET": {}},
@@ -58,9 +37,6 @@ func validateInitParameters(roleList map[string]string, apiMapping map[string][]
 	}
 	for api, allowList := range apiMapping {
 		// check that API exists
-		if _, ok := staticAPIList[api]; !ok {
-			return errors.Errorf("API %s does not exist", api)
-		}
 
 		// check that each role exists in roleList
 		for _, allowedRole := range allowList {
@@ -101,31 +77,6 @@ func NewRBACAuthorizer(policyName string, roleList map[string]string, apiMapping
 	}, nil
 }
 
-func (a *RBACAuthorizer) authorizeAPIRequest(r *http.Request, u *user.UserInfo) error {
-	userRoles := u.Roles
-	apiPath := r.URL.Path
-
-	allowedRoles := a.apiMapping[apiPath]
-
-	// if no role listed for api, reject
-	if len(allowedRoles) == 0 {
-		return errors.New("Unauthorized request")
-	}
-
-	// check each allowed role
-	for _, allowedRole := range allowedRoles {
-		if allowedRole == "" { // all authenticated allowed
-			return nil
-		}
-		for _, role := range userRoles {
-			// user has role
-			if role == allowedRole {
-				return nil
-			}
-		}
-	}
-	return errors.New("Unauthorized Request")
-}
 
 func (a *RBACAuthorizer) authorizeAPIV1Request(r *http.Request, u *user.UserInfo) error {
 	userRoles := u.Roles
@@ -160,23 +111,10 @@ func (a *RBACAuthorizer) AuthorizeRequest(r *http.Request, u *user.UserInfo) err
 		return errors.Errorf("Authentication error: %v", u.AuthenticationError)
 	}
 
-	// based on path
-	apiPath := r.URL.Path
-	isV1 := strings.HasPrefix(apiPath, "/api/v1")
-
-	if !isV1 {
-		// check old API Request
-		err := a.authorizeAPIRequest(r, u)
-		if err != nil {
-			return errors.Errorf("Tornjak API Authorization error: %v", err)
-		}
-	} else {
-		// check API V1 Request
+	// if not authorized fail and return error
     err := a.authorizeAPIV1Request(r, u)
 		if err != nil {
 			return errors.Errorf("Tornjak API V1 Authorization error: %v", err)
 		}
-	}
-
 	return nil
 }
