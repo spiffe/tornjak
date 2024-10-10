@@ -86,17 +86,17 @@ func NewAgentsDB(dbPlugin *ast.ObjectItem) (agentdb.AgentDB, error) {
 }
 
 // NewCRDManager returns ...
-func NewCRDManager(crdPlugin &ast.ObjectItem) (string, error) {
+func NewCRDManager(crdPlugin *ast.ObjectItem) (string, error) {
 	_, data, _ := getPluginConfig(crdPlugin)
 	
 	// check if data is defined
 	if data == nil {
-		return nil, errors.New("SPIREControllerManager plugin ('config > plugins > SPIREControllerManager > plugin_data') not populated")
+		return "", errors.New("SPIREControllerManager plugin ('config > plugins > SPIREControllerManager > plugin_data') not populated")
 	}
 	// decode config to struct
 	var config pluginControllerManager
 	if err := hcl.DecodeObject(&config, data); err != nil {
-		return nil, errors.Errorf("Couldn't parse SPIREControllerManager config: %v", err)
+		return "", errors.Errorf("Couldn't parse SPIREControllerManager config: %v", err)
 	}
 
 	fmt.Println("CRD Controller configured. WARNING: This is currently a no-op")
@@ -263,9 +263,9 @@ func (s *Server) Configure() error {
 			}
 		// configure controller maanger CRD management
 		case "SPIREControllerManager":
-			s.CRDManger, err = NewCRDManager(pluginObject)
+			s.CRDManager, err = NewCRDManager(pluginObject)
 			if err != nil {
-				return errors.Errorf("Cannot configure CRD management plugin: %v")
+				return errors.Errorf("Cannot configure CRD management plugin: %v", err)
 			}
 		// configure Authenticator
 		case "Authenticator":
