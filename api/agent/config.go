@@ -105,7 +105,7 @@ func NewCRDManager(crdPlugin *ast.ObjectItem) (spirecrd.CRDManager, error) {
 	// decode config to struct
 	var config pluginControllerManager
 	if err := hcl.DecodeObject(&config, data); err != nil {
-		return nil, errors.Errorf("Couldn't parse SPIREControllerManager config: %v", err)
+		return "", errors.Errorf("Couldn't parse SPIREControllerManager config: %v", err)
 	}
 
 	fmt.Println("CRD Controller configured. spire-controller-manager APIs enabled")
@@ -279,7 +279,6 @@ func (s *Server) Configure() error {
 			if len(pluginObject.Keys) != 1 {
 				return fmt.Errorf("plugin SPIRECRDManager expected to have one key (type)")
 			}
-
 			s.CRDManager, err = NewCRDManager(pluginObject)
 			if err != nil {
 				return errors.Errorf("Cannot configure CRD management plugin: %v", err)
