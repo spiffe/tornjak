@@ -32,6 +32,7 @@ type Server struct {
 
 	// Plugins
 	Db            agentdb.AgentDB
+	CRDManager		string // TODO create plugin for this
 	Authenticator authenticator.Authenticator
 	Authorizer    authorization.Authorizer
 }

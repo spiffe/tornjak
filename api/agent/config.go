@@ -85,6 +85,25 @@ func NewAgentsDB(dbPlugin *ast.ObjectItem) (agentdb.AgentDB, error) {
 	}
 }
 
+// NewCRDManager returns ...
+func NewCRDManager(crdPlugin &ast.ObjectItem) (string, error) {
+	_, data, _ := getPluginConfig(crdPlugin)
+	
+	// check if data is defined
+	if data == nil {
+		return nil, errors.New("SPIREControllerManager plugin ('config > plugins > SPIREControllerManager > plugin_data') not populated")
+	}
+	// decode config to struct
+	var config pluginControllerManager
+	if err := hcl.DecodeObject(&config, data); err != nil {
+		return nil, errors.Errorf("Couldn't parse SPIREControllerManager config: %v", err)
+	}
+
+	fmt.Println("CRD Controller configured. WARNING: This is currently a no-op")
+
+	return "CRD config string", nil
+}
+
 // NewAuthenticator returns a new Authenticator
 func NewAuthenticator(authenticatorPlugin *ast.ObjectItem) (authenticator.Authenticator, error) {
 	key, data, _ := getPluginConfig(authenticatorPlugin)
@@ -241,6 +260,12 @@ func (s *Server) Configure() error {
 			s.Db, err = NewAgentsDB(pluginObject)
 			if err != nil {
 				return errors.Errorf("Cannot configure datastore plugin: %v", err)
+			}
+		// configure controller maanger CRD management
+		case "SPIREControllerManager":
+			s.CRDManger, err = NewCRDManager(pluginObject)
+			if err != nil {
+				return errors.Errorf("Cannot configure CRD management plugin: %v")
 			}
 		// configure Authenticator
 		case "Authenticator":
