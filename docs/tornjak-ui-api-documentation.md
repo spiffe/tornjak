@@ -50,13 +50,13 @@ Below are UI pages of Tornjak with their respective paths. For details on a spec
 
 ### - [Healthcheck](https://pkg.go.dev/google.golang.org/grpc/health/grpc_health_v1#HealthCheckRequest)
 
-#### GET
+#### /api/v1/spire/healthcheck
 
-##### /api/healthcheck
+##### GET
 
 ```
 Request 
-api/healthcheck
+api/v1/spire/healthcheck
 
 Example response:
 HTTP/1.1 200 OK
@@ -69,13 +69,13 @@ Content-Type: application/json; charset=utf-8
 
 ### - [DebugServer](https://github.com/spiffe/spire-api-sdk/tree/main/proto/spire/api/server/debug/v1)
 
-#### GET
+#### /api/v1/spire/serverinfo
 
-##### /api/debugserver
+##### GET
 
 ```
 Request 
-api/debugserver
+api/v1/spire/serverinfo
 
 Example response:
 HTTP/1.1 200 OK
@@ -106,13 +106,13 @@ Content-Type: application/json; charset=utf-8
 
 ### - [Agents](https://github.com/spiffe/spire-api-sdk/tree/main/proto/spire/api/server/agent/v1)
 
-#### GET
+#### /api/v1/spire/agents
 
-##### /api/agent/list
+##### GET
 
 ```
 Request 
-api/agent/list
+api/v1/spire/agent
 
 Example response:
 HTTP/1.1 200 OK
@@ -142,13 +142,13 @@ Content-Type: application/json; charset=utf-8
 }
 ```
 
-#### POST
+##### POST
 
-##### /api/agent/ban
+###### /api/v1/spire/agents/ban
 
 ```
 Request 
-api/agent/ban
+api/v1/spire/agents/ban
 Example request payload:
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
@@ -163,30 +163,11 @@ Example response:
 SUCCESS
 ```
 
-##### /api/agent/delete
+###### /api/v1/spire/agents/jointoken
 
 ```
 Request 
-api/agent/delete
-Example request payload:
-HTTP/1.1 200 OK
-Content-Type: application/json; charset=utf-8
-
-{
-  "id": {
-    "path": "/spire/agent/",
-    "trust_domain": "example.org"
-  }
-}
-Example response:
-SUCCESS
-```
-
-##### /api/agent/createjointoken
-
-```
-Request 
-api/agent/createjointoken
+api/v1/spire/agents/jointoken
 Example request payload:
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
@@ -205,15 +186,34 @@ Example response:
 
 ```
 
-### - [Entries](https://github.com/spiffe/spire-api-sdk/tree/main/proto/spire/api/server/entry/v1)
-
-#### GET
-
-##### /api/entry/list
+##### DELETE
 
 ```
 Request 
-api/entry/list
+api/v1/spire/agents
+Example request payload:
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{
+  "id": {
+    "path": "/spire/agent/",
+    "trust_domain": "example.org"
+  }
+}
+Example response:
+SUCCESS
+```
+
+### - [Entries](https://github.com/spiffe/spire-api-sdk/tree/main/proto/spire/api/server/entry/v1)
+
+#### /api/v1/spire/entries
+
+##### GET
+
+```
+Request 
+api/v1/spire/entries
 Example response:
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
@@ -244,13 +244,11 @@ Content-Type: application/json; charset=utf-8
 }
 ```
 
-#### POST
-
-##### /api/entry/create
+##### POST
 
 ```
 Request 
-api/entry/create
+api/v1/spire/entries
 Example request payload:
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
@@ -311,11 +309,11 @@ Example response:
 }
 ```
 
-##### /api/entry/delete
+##### DELETE
 
 ```
 Request 
-api/entry/delete
+api/v1/spire/entries
 Example request payload:
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
@@ -339,13 +337,13 @@ Example response:
 
 ### - Tornjak Specific
 
-#### GET
+#### /api/v1/tornjak/serverinfo
 
-##### /api/tornjak/serverinfo
+##### GET
 
 ```
 Request 
-api/tornjak/serverinfo
+api/v1/tornjak/serverinfo
 Example Response:
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
@@ -364,11 +362,11 @@ Content-Type: application/json; charset=utf-8
 
 ```
 
-##### /api/tornjak/selectors/list
+##### /api/v1/tornjak/selectors
 
 ```
 Request 
-api/tornjak/selectors/list
+api/v1/tornjak/selectors
 Example response:
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
@@ -381,11 +379,11 @@ Content-Type: application/json; charset=utf-8
 }
 ```
 
-##### /api/tornjak/clusters/list
+##### /api/v1/tornjak/clusters
 
 ```
 Request 
-api/tornjak/clusters/list
+api/v1/tornjak/clusters
 Example response:
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
@@ -405,11 +403,11 @@ Content-Type: application/json; charset=utf-8
 
 #### POST
 
-##### /api/tornjak/selectors/register
+##### /api/v1/tornjak/selectors
 
 ```
 Request 
-api/tornjak/selectors/register
+api/v1/tornjak/selectors
 Example request payload:
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
@@ -425,11 +423,11 @@ Example response:
 SUCCESS
 ```
 
-##### /api/tornjak/clusters/create
+##### /api/v1/tornjak/clusters
 
 ```
 Request 
-api/tornjak/selectors/register
+api/v1/tornjak/clusters
 Example request payload:
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
@@ -447,11 +445,13 @@ Example response:
 SUCCESS
 ```
 
-##### /api/tornjak/clusters/edit
+#### PATCH
+
+##### /api/v1/tornjak/clusters
 
 ```
 Request 
-api/tornjak/selectors/register
+api/v1/tornjak/clusters
 Example request payload:
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
@@ -470,11 +470,13 @@ Example response:
 SUCCESS
 ```
 
-##### /api/tornjak/clusters/delete
+#### DELETE
+
+##### /api/v1/tornjak/clusters
 
 ```
 Request 
-api/tornjak/selectors/register
+api/v1/tornjak/clusters
 Example request payload:
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8

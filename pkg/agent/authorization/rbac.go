@@ -2,7 +2,6 @@ package authorization
 
 import (
 	"github.com/pkg/errors"
-	"fmt"
 	"net/http"
 
 	"github.com/spiffe/tornjak/pkg/agent/authentication/user"
@@ -11,11 +10,10 @@ import (
 type RBACAuthorizer struct {
 	name       string
 	roleList   map[string]string
-	apiMapping map[string][]string
 	apiV1Mapping map[string]map[string][]string
 }
 
-// TODO put this in a common constants filecd
+// TODO put this in a common constants file
 var staticAPIV1List = map[string]map[string]struct{}{
 	"/api/v1/spire/serverinfo" :{"GET": {}},
 	"/api/v1/spire/healthcheck" :{"GET": {}},
@@ -31,19 +29,9 @@ var staticAPIV1List = map[string]map[string]struct{}{
 	"/api/v1/spire/federations/bundles" :{"GET": {}, "POST": {}, "DELETE": {}, "PATCH": {}},
 }
 
-func validateInitParameters(roleList map[string]string, apiMapping map[string][]string, apiV1Mapping map[string]map[string][]string) error {
+func validateInitParameters(roleList map[string]string, apiV1Mapping map[string]map[string][]string) error {
 	if roleList == nil {
 		return errors.Errorf("No roles defined")
-	}
-	for api, allowList := range apiMapping {
-		// check that API exists
-
-		// check that each role exists in roleList
-		for _, allowedRole := range allowList {
-			if _, ok := roleList[allowedRole]; !ok {
-				return errors.Errorf("API %s lists undefined role %s", api, allowedRole)
-			}
-		}
 	}
 	for path, method_dict := range apiV1Mapping {
 		for method, allowList := range method_dict {
@@ -63,20 +51,17 @@ func validateInitParameters(roleList map[string]string, apiMapping map[string][]
 	return nil
 }
 
-func NewRBACAuthorizer(policyName string, roleList map[string]string, apiMapping map[string][]string, apiV1Mapping map[string]map[string][]string) (*RBACAuthorizer, error) {
-	err := validateInitParameters(roleList, apiMapping, apiV1Mapping)
+func NewRBACAuthorizer(policyName string, roleList map[string]string, apiV1Mapping map[string]map[string][]string) (*RBACAuthorizer, error) {
+	err := validateInitParameters(roleList, apiV1Mapping)
 	if err != nil {
 		return nil, errors.Errorf("Could not parse policy %s: invalid mapping: %v", policyName, err)
 	}
-	fmt.Printf("apiV1Mapping: %v\n", apiV1Mapping)
 	return &RBACAuthorizer{
 		name:       policyName,
 		roleList:   roleList,
-		apiMapping: apiMapping,
 		apiV1Mapping: apiV1Mapping,
 	}, nil
 }
-
 
 func (a *RBACAuthorizer) authorizeAPIV1Request(r *http.Request, u *user.UserInfo) error {
 	userRoles := u.Roles
@@ -112,9 +97,9 @@ func (a *RBACAuthorizer) AuthorizeRequest(r *http.Request, u *user.UserInfo) err
 	}
 
 	// if not authorized fail and return error
-    err := a.authorizeAPIV1Request(r, u)
-		if err != nil {
-			return errors.Errorf("Tornjak API V1 Authorization error: %v", err)
-		}
+	err := a.authorizeAPIV1Request(r, u)
+	if err != nil {
+		return errors.Errorf("Tornjak API V1 Authorization error: %v", err)
+	}
 	return nil
 }
