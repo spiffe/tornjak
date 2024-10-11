@@ -72,19 +72,21 @@ Tornjak supports several different plugin types, each representing a different f
 
 ### Plugin types
 
-| Type          | Description | Required |
-|:--------------|:------------|:---------|
-| DataStore     | Provides persistent storage for Tornjak metadata. | True |
-| Authenticator | Verify tokens signed by external OIDC server and extract user information to be passed to the Authorization layer. Any user information or errors from this layer are to be interpreted by an Authorizer layer. | False |
-| Authorizer    | Based on user information or errors passed from authentication layer and API call details, apply authorization logic. | False |
+| Type            | Description | Required |
+|:----------------|:------------|:---------|
+| DataStore       | Provides persistent storage for Tornjak metadata. | True |
+| SPIRECRDManager | Enables SPIRE CRD Management via Tornjak API. | False | 
+| Authenticator   | Verify tokens signed by external OIDC server and extract user information to be passed to the Authorization layer. Any user information or errors from this layer are to be interpreted by an Authorizer layer. | False |
+| Authorizer      | Based on user information or errors passed from authentication layer and API call details, apply authorization logic. | False |
 
 ### Built-in plugins
 
 | Type | Name | Description |
 | ---- | ---- | ----------- |
-| DataStore     | SQL | Default SQL storage for Tornjak metadata |
-| Authenticator | [keycloak](/docs/plugin_server_authentication_keycloak.md) | Perform OIDC Discovery and extract roles from `realmAccess.roles` field |
-| Authorizer    | [RBAC](/docs/plugin_server_authorization_rbac.md) | Check api permission based on user role and defined authorization logic |
+| DataStore       | SQL | Default SQL storage for Tornjak metadata |
+| SPIRECRDManager | [](/docs/plugin_server_spirecrd.md) | CRD Manager |
+| Authenticator   | [keycloak](/docs/plugin_server_authentication_keycloak.md) | Perform OIDC Discovery and extract roles from `realmAccess.roles` field |
+| Authorizer      | [RBAC](/docs/plugin_server_authorization_rbac.md) | Check api permission based on user role and defined authorization logic |
 
 ### Plugin configuration
 
