@@ -75,7 +75,7 @@ Tornjak supports several different plugin types, each representing a different f
 | Type            | Description | Required |
 |:----------------|:------------|:---------|
 | DataStore       | Provides persistent storage for Tornjak metadata. | True |
-| SPIRECRDManager | Enables SPIRE CRD Management via Tornjak API. | False | 
+| SPIRECRDManager | Enables SPIRE CRD Management via Tornjak API. | False |
 | Authenticator   | Verify tokens signed by external OIDC server and extract user information to be passed to the Authorization layer. Any user information or errors from this layer are to be interpreted by an Authorizer layer. | False |
 | Authorizer      | Based on user information or errors passed from authentication layer and API call details, apply authorization logic. | False |
 
