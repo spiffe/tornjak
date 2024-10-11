@@ -18,8 +18,8 @@ import { RootState } from 'redux/reducers';
 import { FederationsList, ServerInfo, TornjakServerInfo } from './types'
 
 type FederationsListProp = {
-  // dispatches a payload for list of clusters with their metadata info as an array of FederationsList Type and has a return type of void
-  federationsListUpdateFunc: (globalClustersList: FederationsList[]) => void,
+  // dispatches a payload for list of federations with their metadata info as an array of FederationsList Type and has a return type of void
+  federationsListUpdateFunc: (globalFederationsList: FederationsList[]) => void,
   // dispatches a payload for the tornjak error messsege and has a return type of void
   tornjakMessageFunc: (globalErrorMessage: string) => void,
   // dispatches a payload for the server trust domain and nodeAttestorPlugin as a ServerInfoType and has a return type of void
@@ -38,19 +38,19 @@ type FederationsListState = {
   message: string // error/ success messege returned for a specific function for this specific component
 }
 
-const Cluster = (props: { federations: FederationsList }) => (
+const Federation = (props: { federation: FederationsList }) => (
   <tr>
-    <td>{props.cluster.name}</td>
-    <td>{props.cluster.platformType}</td>
-    <td>{props.cluster.domainName}</td>
-    <td>{props.cluster.managedBy}</td>
+    <td>{props.federation.name}</td>
+    <td>{props.federation.platformType}</td>
+    <td>{props.federation.domainName}</td>
+    <td>{props.federation.managedBy}</td>
     <td><div style={{ overflowX: 'auto', width: "400px" }}>
-      <pre>{JSON.stringify(props.cluster.agentsList, null, ' ')}</pre>
+      <pre>{JSON.stringify(props.federation.agentsList, null, ' ')}</pre>
     </div></td>
   </tr>
 )
 
-class FederationsList extends Component<FederationsListProp, FederationsListState> {
+class FederationList extends Component<FederationsListProp, FederationsListState> {
   TornjakApi: TornjakApi;
   constructor(props: FederationsListProp) {
     super(props);
@@ -76,7 +76,7 @@ class FederationsList extends Component<FederationsListProp, FederationsListStat
   componentDidUpdate(prevProps: FederationsListProp) {
     if (IsManager) {
       if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
-        this.TornjakApi.populateClustersUpdate(this.props.globalServerSelected, this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
+        this.TornjakApi.populateFederationsUpdate(this.props.globalServerSelected, this.props.federationsListUpdateFunc, this.props.tornjakMessageFunc);
       }
     } else {
       if (prevProps.globalTornjakServerInfo !== this.props.globalTornjakServerInfo) {
@@ -85,10 +85,10 @@ class FederationsList extends Component<FederationsListProp, FederationsListStat
     }
   }
 
-  clusterList() {
-    if (typeof this.props.globalClustersList !== 'undefined') {
-      return this.props.globalClustersList.map((currentCluster: FederationsList) => {
-        return <Cluster key={currentCluster.name} cluster={currentCluster} />;
+  federationList() {
+    if (typeof this.props.globalFederationsList !== 'undefined') {
+      return this.props.globalFederationsList.map((currentFederation: FederationsList) => {
+        return <Federation key={currentFederation.name} federation={currentFederation} />;
       })
     } else {
       return ""
@@ -98,7 +98,7 @@ class FederationsList extends Component<FederationsListProp, FederationsListStat
   render() {
     return (
       <div data-test="cluster-list">
-        <h3>Clusters List</h3>
+        <h3>Federations List</h3>
         {this.props.globalErrorMessage !== "OK" &&
           <div className="alert-primary" role="alert">
             <pre>
@@ -108,7 +108,7 @@ class FederationsList extends Component<FederationsListProp, FederationsListStat
         }
         <br /><br />
         <div className="indvidual-list-table">
-          <Table data={this.clusterList()} id="table-1" />
+          <Table data={this.federationList()} id="table-1" />
         </div>
       </div>
     )
@@ -144,6 +144,6 @@ const mapStateToProps = (state: RootState) => ({
 export default connect(
   mapStateToProps,
   { serverSelectedFunc, agentsListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessageFunc, workloadSelectorInfoFunc, agentworkloadSelectorInfoFunc, clustersListUpdateFunc }
-)(FederationsList)
+)(FederationList)
 
-export { FederationsList }
+export { FederationList }
