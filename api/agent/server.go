@@ -33,7 +33,7 @@ type Server struct {
 
 	// Plugins
 	Db            agentdb.AgentDB
-	CRDManager    spirecrd.CRDManager
+	CRDManager		spirecrd.CRDManager
 	Authenticator authenticator.Authenticator
 	Authorizer    authorization.Authorizer
 }
