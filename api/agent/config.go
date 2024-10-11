@@ -14,6 +14,7 @@ import (
 	"github.com/spiffe/tornjak/pkg/agent/authentication/authenticator"
 	"github.com/spiffe/tornjak/pkg/agent/authorization"
 	agentdb "github.com/spiffe/tornjak/pkg/agent/db"
+	"github.com/spiffe/tornjak/pkg/agent/spirecrd"
 )
 
 func stringFromToken(keyToken token.Token) (string, error) {
@@ -86,7 +87,7 @@ func NewAgentsDB(dbPlugin *ast.ObjectItem) (agentdb.AgentDB, error) {
 }
 
 // NewCRDManager returns ...
-func NewCRDManager(crdPlugin *ast.ObjectItem) (string, error) {
+func NewCRDManager(crdPlugin *ast.ObjectItem) (spirecrd.CRDManager, error) {
 	_, data, _ := getPluginConfig(crdPlugin)
 	
 	// check if data is defined
@@ -101,7 +102,12 @@ func NewCRDManager(crdPlugin *ast.ObjectItem) (string, error) {
 
 	fmt.Println("CRD Controller configured. WARNING: This is currently a no-op")
 
-	return "CRD config string", nil
+	crdManager, err := spirecrd.NewSPIRECRDManager(config.Classname)
+	if err != nil {
+		return nil, errors.Errorf("Could not initialize CRD manager: %v", err)
+	}
+
+	return crdManager, nil
 }
 
 // NewAuthenticator returns a new Authenticator

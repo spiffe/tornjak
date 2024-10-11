@@ -18,6 +18,7 @@ import (
 	"github.com/spiffe/tornjak/pkg/agent/authentication/authenticator"
 	"github.com/spiffe/tornjak/pkg/agent/authorization"
 	agentdb "github.com/spiffe/tornjak/pkg/agent/db"
+	"github.com/spiffe/tornjak/pkg/agent/spirecrd"
 )
 
 type Server struct {
@@ -32,7 +33,7 @@ type Server struct {
 
 	// Plugins
 	Db            agentdb.AgentDB
-	CRDManager		string // TODO create plugin for this
+	CRDManager		spirecrd.CRDManager
 	Authenticator authenticator.Authenticator
 	Authorizer    authorization.Authorizer
 }
