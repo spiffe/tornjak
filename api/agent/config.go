@@ -92,7 +92,7 @@ func NewCRDManager(crdPlugin *ast.ObjectItem) (spirecrd.CRDManager, error) {
 	
 	// check if data is defined
 	if data == nil {
-		return "", errors.New("SPIREControllerManager plugin ('config > plugins > SPIREControllerManager > plugin_data') not populated")
+		return "", errors.New("SPIRECRDManager plugin ('config > plugins > SPIRECRDManager > plugin_data') not populated")
 	}
 	// decode config to struct
 	var config pluginControllerManager
@@ -268,7 +268,7 @@ func (s *Server) Configure() error {
 				return errors.Errorf("Cannot configure datastore plugin: %v", err)
 			}
 		// configure controller maanger CRD management
-		case "SPIREControllerManager":
+		case "SPIRECRDManager":
 			s.CRDManager, err = NewCRDManager(pluginObject)
 			if err != nil {
 				return errors.Errorf("Cannot configure CRD management plugin: %v", err)
