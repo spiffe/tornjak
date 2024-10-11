@@ -100,7 +100,7 @@ func NewCRDManager(crdPlugin *ast.ObjectItem) (spirecrd.CRDManager, error) {
 	
 	// check if data is defined
 	if data == nil {
-		return "", errors.New("SPIREControllerManager plugin ('config > plugins > SPIREControllerManager > plugin_data') not populated")
+		return "", errors.New("SPIRECRDManager plugin ('config > plugins > SPIRECRDManager > plugin_data') not populated")
 	}
 	// decode config to struct
 	var config pluginControllerManager

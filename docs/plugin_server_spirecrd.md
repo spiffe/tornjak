@@ -1,6 +1,6 @@
 # Server plugin: SPIRECRDManager
 
-Note the SPIRECRDManager is an optional plugin. This plugin enables the creation of SPIRE CRDs on the cluster Tornjak is deployed on.
+Note the SPIRECRDManager is an optional plugin. This plugin enables the creation of SPIRE CRDs on the cluster Tornjak is deployed on. 
 
 The configuration has the following key-value pairs:
 
