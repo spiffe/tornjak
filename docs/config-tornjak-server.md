@@ -84,7 +84,7 @@ Tornjak supports several different plugin types, each representing a different f
 | Type | Name | Description |
 | ---- | ---- | ----------- |
 | DataStore       | SQL | Default SQL storage for Tornjak metadata |
-| SPIRECRDManager | [](/docs/plugin_server_spirecrd.md) | CRD Manager |
+| SPIRECRDManager | [""](/docs/plugin_server_spirecrd.md) | CRD Manager |
 | Authenticator   | [keycloak](/docs/plugin_server_authentication_keycloak.md) | Perform OIDC Discovery and extract roles from `realmAccess.roles` field |
 | Authorizer      | [RBAC](/docs/plugin_server_authorization_rbac.md) | Check api permission based on user role and defined authorization logic |
 
