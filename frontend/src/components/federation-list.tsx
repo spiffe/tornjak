@@ -13,6 +13,7 @@ import {
   workloadSelectorInfoFunc,
   agentworkloadSelectorInfoFunc,
   clustersListUpdateFunc,
+  federationsListUpdateFunc
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
 import { FederationsList, ServerInfo, TornjakServerInfo } from './types'
@@ -131,7 +132,7 @@ const mapStateToProps = (state: RootState) => ({
 
 export default connect(
   mapStateToProps,
-  { serverSelectedFunc, agentsListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessageFunc, workloadSelectorInfoFunc, agentworkloadSelectorInfoFunc, clustersListUpdateFunc }
+  { serverSelectedFunc, agentsListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessageFunc, workloadSelectorInfoFunc, agentworkloadSelectorInfoFunc, clustersListUpdateFunc, federationsListUpdateFunc }
 )(FederationList)
 
 export { FederationList }
