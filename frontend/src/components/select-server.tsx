@@ -5,6 +5,7 @@ import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
 import './style.css';
+import { Dropdown } from 'carbon-components-react';
 
 import {
     serverSelectedFunc,
@@ -112,15 +113,11 @@ class SelectServer extends Component<SelectServerProp, SelectServerState> {
         }
     }
 
-    onServerSelect(e: { target: { value: string; }; } | undefined) {
-        if (e === undefined) {
-            return;
+    onServerSelect = ({ selectedItem }: { selectedItem: string }) => {
+        if (selectedItem) {
+          this.props.serverSelectedFunc(selectedItem);
         }
-        const serverName = e.target.value;
-        if (serverName !== "") {
-            this.props.serverSelectedFunc(serverName);
-        }
-    }
+    };
 
     getServer(serverName: string) {
         var i;
@@ -135,25 +132,24 @@ class SelectServer extends Component<SelectServerProp, SelectServerState> {
     }
 
     render() {
+        const items = this.props.globalServersList
+          ? this.props.globalServersList.map((server) => server.name)
+          : [];
+    
         let managerServerSelector = (
-            <div className="server-select-dropdown">
-                <label id="server-dropdown">Choose a Server</label>
-                <div className="servers-drp-dwn">
-                    <select name="servers" id="servers" onChange={this.onServerSelect}>
-                        <optgroup label="Servers">
-                            <option value="none" selected disabled>Select an Option </option>
-                            <option value="none" selected disabled>{this.props.globalServerSelected} </option>
-                            {this.serverDropdownList()}
-                        </optgroup>
-                    </select>
-                </div>
-            </div>
-        )
-        return (
-            <div>
-                {IsManager && managerServerSelector}
-            </div>
-        )
+          <div className="server-select-dropdown">
+            <Dropdown
+              id="server-dropdown"
+              titleText="Choose a Server"
+              label="Select an Option"
+              items={items}
+              selectedItem={this.props.globalServerSelected}
+              onChange={this.onServerSelect}
+	          style={{ width: '300px' }}
+            />
+          </div>
+        );
+        return <div>{IsManager && managerServerSelector}</div>;
     }
 }
 
