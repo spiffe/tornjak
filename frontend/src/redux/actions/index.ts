@@ -44,7 +44,7 @@ import {
     GLOBAL_SPIRE_HEALTH_CHECK_TIME,
     SpireHealthCheckTimeAction,
     GLOBAL_DEBUG_SERVER_INFO,
-    DebugServerInfoAction
+    DebugServerInfoAction, GLOBAL_FEDERATIONS_LIST, FederationsListAction
 } from './types';
 
 import {
@@ -58,7 +58,7 @@ import {
     TornjakServerInfo,
     WorkloadSelectorInfoLabels,
     SpireHealthCheckFreq,
-    DebugServerInfo
+    DebugServerInfo, FederationsList
 } from 'components/types';
 
 // Expected input - spire debug server info
@@ -315,6 +315,17 @@ export function agentsListUpdateFunc(globalAgentsList: AgentsList[]): ThunkActio
         dispatch({
             type: GLOBAL_AGENTS_LIST,
             payload: globalAgentsList
+        });
+    }
+}
+
+// Expected input - List of federations with their info
+// federationsListUpdateFunc returns the list of federations with their info
+export function federationsListUpdateFunc(globalFederationsList: FederationsList[]): ThunkAction<void, RootState, undefined, FederationsListAction> {
+    return dispatch => {
+        dispatch({
+            type: GLOBAL_FEDERATIONS_LIST,
+            payload: globalFederationsList
         });
     }
 }
