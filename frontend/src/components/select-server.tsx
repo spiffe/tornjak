@@ -5,7 +5,6 @@ import GetApiServerUri from './helpers';
 import IsManager from './is_manager';
 import TornjakApi from './tornjak-api-helpers';
 import './style.css';
-import { Dropdown } from 'carbon-components-react';
 
 import {
     serverSelectedFunc,
@@ -113,7 +112,6 @@ class SelectServer extends Component<SelectServerProp, SelectServerState> {
         }
     }
 
-    /*
     onServerSelect(e: { target: { value: string; }; } | undefined) {
         if (e === undefined) {
             return;
@@ -123,14 +121,6 @@ class SelectServer extends Component<SelectServerProp, SelectServerState> {
             this.props.serverSelectedFunc(serverName);
         }
     }
-    */
-
-    onServerSelect = ({ selectedItem }: { selectedItem: string }) => {
-        if (selectedItem) {
-          this.props.serverSelectedFunc(selectedItem);
-        }
-    };
-
 
     getServer(serverName: string) {
         var i;
@@ -144,7 +134,6 @@ class SelectServer extends Component<SelectServerProp, SelectServerState> {
         return null
     }
 
-    /*
     render() {
         let managerServerSelector = (
             <div className="server-select-dropdown">
@@ -165,28 +154,6 @@ class SelectServer extends Component<SelectServerProp, SelectServerState> {
                 {IsManager && managerServerSelector}
             </div>
         )
-    }
-    */
-
-    render() {
-        const items = this.props.globalServersList
-          ? this.props.globalServersList.map((server) => server.name)
-          : [];
-    
-        let managerServerSelector = (
-          <div className="server-select-dropdown">
-            <Dropdown
-              id="server-dropdown"
-              titleText="Choose a Server"
-              label="Select an Option"
-              items={items}
-              selectedItem={this.props.globalServerSelected}
-              onChange={this.onServerSelect}
-	          style={{ width: '300px' }}
-            />
-          </div>
-        );
-        return <div>{IsManager && managerServerSelector}</div>;
     }
 }
 
