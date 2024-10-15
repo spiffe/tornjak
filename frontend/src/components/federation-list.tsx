@@ -61,27 +61,15 @@ class FederationList extends Component<FederationsListProp, FederationsListState
   }
 
   componentDidMount() {
-    if (IsManager) {
-      if (this.props.globalServerSelected !== "") {
-        this.TornjakApi.populateClustersUpdate(this.props.globalServerSelected, this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
-      }
-    } else {
-      this.TornjakApi.populateLocalClustersUpdate(this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
-      if (this.props.globalTornjakServerInfo && Object.keys(this.props.globalTornjakServerInfo).length) {
-        this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
-      }
+    this.TornjakApi.populateLocalFederationsUpdate(this.props.federationsListUpdateFunc, this.props.tornjakMessageFunc);
+    if (this.props.globalTornjakServerInfo && Object.keys(this.props.globalTornjakServerInfo).length) {
+      this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
     }
   }
 
   componentDidUpdate(prevProps: FederationsListProp) {
-    if (IsManager) {
-      if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
-        this.TornjakApi.populateFederationsUpdate(this.props.globalServerSelected, this.props.federationsListUpdateFunc, this.props.tornjakMessageFunc);
-      }
-    } else {
-      if (prevProps.globalTornjakServerInfo !== this.props.globalTornjakServerInfo) {
-        this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
-      }
+    if (prevProps.globalTornjakServerInfo !== this.props.globalTornjakServerInfo) {
+      this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
     }
   }
 
