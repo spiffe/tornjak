@@ -10,7 +10,7 @@ import {
   ServerInfo,
   EntriesList,
   ClustersList,
-  DebugServerInfo
+  DebugServerInfo, FederationsList
 } from './types';
 import KeycloakService from "auth/KeycloakAuth";
 import { showResponseToast } from './error-api';
@@ -224,6 +224,25 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       .catch((error) => {
         showResponseToast(error, { caption: "Could not populate local agents." })
         agentsListUpdateFunc([]);
+        tornjakMessageFunc("Error retrieving: " + error.message);
+      })
+  }
+
+  // populateLocalFederationsUpdate - returns the list of federations with their info in Local mode for the server
+  populateLocalFederationsUpdate = (federationsListUpdateFunc: {
+    (globalFederationsList: FederationsList[]): void;
+  },
+    tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
+    axios.get(GetApiServerUri(apiEndpoints.spireFederationsApi), { crossdomain: true })
+      .then(response => {
+        if (!response.data["federations"]) {
+          federationsListUpdateFunc([]);
+        } else { federationsListUpdateFunc(response.data["federations"]); }
+        tornjakMessageFunc(response.statusText);
+      })
+      .catch((error) => {
+        showResponseToast(error, { caption: "Could not populate local federations." })
+        federationsListUpdateFunc([]);
         tornjakMessageFunc("Error retrieving: " + error.message);
       })
   }
