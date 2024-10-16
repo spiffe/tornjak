@@ -145,7 +145,7 @@ class SelectServer extends Component<SelectServerProp, SelectServerState> {
               items={items}
               selectedItem={this.props.globalServerSelected}
               onChange={this.onServerSelect}
-	          style={{ width: '300px' }}
+	          style={{ width: '230px' }}
             />
           </div>
         );
