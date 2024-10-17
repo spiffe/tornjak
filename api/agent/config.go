@@ -279,6 +279,7 @@ func (s *Server) Configure() error {
 			if len(pluginObject.Keys) != 1 {
 				return fmt.Errorf("plugin SPIRECRDManager expected to have one key (type)")
 			}
+
 			s.CRDManager, err = NewCRDManager(pluginObject)
 			if err != nil {
 				return errors.Errorf("Cannot configure CRD management plugin: %v", err)
