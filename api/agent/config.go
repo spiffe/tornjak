@@ -250,10 +250,6 @@ func (s *Server) Configure() error {
 	// iterate over plugin list
 
 	for _, pluginObject := range pluginList.Items {
-		if len(pluginObject.Keys) != 2 {
-			return fmt.Errorf("plugin item expected to have two keys (type then name)")
-		}
-
 		pluginType, err := stringFromToken(pluginObject.Keys[0].Token)
 		if err != nil {
 			return fmt.Errorf("invalid plugin type key %q: %w", pluginObject.Keys[0].Token.Text, err)
@@ -263,24 +259,37 @@ func (s *Server) Configure() error {
 		switch pluginType {
 		// configure datastore
 		case "DataStore":
+			if len(pluginObject.Keys) != 2 {
+				return fmt.Errorf("plugin DataStore expected to have two keys (type then name)")
+			}
 			s.Db, err = NewAgentsDB(pluginObject)
 			if err != nil {
 				return errors.Errorf("Cannot configure datastore plugin: %v", err)
 			}
 		// configure controller maanger CRD management
 		case "SPIRECRDManager":
+			if len(pluginObject.Keys) != 1 {
+				return fmt.Errorf("plugin SPIRECRDManager expected to have one key (type)")
+			}
+
 			s.CRDManager, err = NewCRDManager(pluginObject)
 			if err != nil {
 				return errors.Errorf("Cannot configure CRD management plugin: %v", err)
 			}
 		// configure Authenticator
 		case "Authenticator":
+			if len(pluginObject.Keys) != 2 {
+				return fmt.Errorf("plugin Authenticator expected to have two keys (type then name)")
+			}
 			s.Authenticator, err = NewAuthenticator(pluginObject)
 			if err != nil {
 				return errors.Errorf("Cannot configure Authenticator plugin: %v", err)
 			}
 		// configure Authorizer
 		case "Authorizer":
+			if len(pluginObject.Keys) != 2 {
+				return fmt.Errorf("plugin Authorizer expected to have two keys (type then name)")
+			}
 			s.Authorizer, err = NewAuthorizer(pluginObject)
 			if err != nil {
 				return errors.Errorf("Cannot configure Authorizer plugin: %v", err)
