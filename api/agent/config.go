@@ -37,11 +37,12 @@ func getPluginConfig(plugin *ast.ObjectItem) (string, ast.Node, error) {
 	// extract plugin name and value
 	pluginKeys := plugin.Keys
 	var pluginName string
+	var err error
 
-	if len(plugin.Keys > 1) {
-		pluginName, err := stringFromToken(plugin.Keys[1].Token)
+	if len(pluginKeys) > 1 {
+		pluginName, err = stringFromToken(pluginKeys[1].Token)
 		if err != nil {
-			return "", nil, fmt.Errorf("invalid plugin type name %q: %w", plugin.Keys[1].Token.Text, err)
+			return "", nil, fmt.Errorf("invalid plugin type name %q: %w", pluginKeys[1].Token.Text, err)
 		}
 	} else {
 		pluginName = ""
