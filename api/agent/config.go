@@ -35,9 +35,16 @@ func stringFromToken(keyToken token.Token) (string, error) {
 // getPluginConfig returns first plugin configuration
 func getPluginConfig(plugin *ast.ObjectItem) (string, ast.Node, error) {
 	// extract plugin name and value
-	pluginName, err := stringFromToken(plugin.Keys[1].Token)
-	if err != nil {
-		return "", nil, fmt.Errorf("invalid plugin type name %q: %w", plugin.Keys[1].Token.Text, err)
+	pluginKeys := plugin.Keys
+	var pluginName string
+
+	if len(plugin.Keys > 1) {
+		pluginName, err := stringFromToken(plugin.Keys[1].Token)
+		if err != nil {
+			return "", nil, fmt.Errorf("invalid plugin type name %q: %w", plugin.Keys[1].Token.Text, err)
+		}
+	} else {
+		pluginName = ""
 	}
 	// extract data
 	var hclPluginConfig hclPluginConfig
