@@ -24,6 +24,6 @@ func NewSPIRECRDManager(className string) (*SPIRECRDManager, error) {
 }
 
 func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp trustdomain.ListFederationRelationshipsRequest) (trustdomain.ListFederationRelationshipsResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	fmt.Printf("list crd federation endpoint hit")
+	fmt.Println("list crd federation endpoint hit")
 	return trustdomain.ListFederationRelationshipsResponse{}, nil 
 }
