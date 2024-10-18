@@ -7,7 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	trustdomain "github.com/spiffe/spire-api-sdk/proto/spire/api/server/trustdomain/v1"
+	// trustdomain "github.com/spiffe/spire-api-sdk/proto/spire/api/server/trustdomain/v1"
+	crdmanager "github.com/spiffe/tornjak/pkg/agent/spirecrd"
 	// "google.golang.org/protobuf/encoding/protojson"
 )
 
@@ -19,7 +20,7 @@ func (s *Server) CRDFederationList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// if CRD management is configured
-	var input trustdomain.ListFederationRelationshipsRequest
+	var input crdmanager.ListFederationRelationshipsRequest
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
@@ -31,7 +32,7 @@ func (s *Server) CRDFederationList(w http.ResponseWriter, r *http.Request) {
 	data := buf.String()
 
 	if n == 0 {
-		input = trustdomain.ListFederationRelationshipsRequest{}
+		input = crdmanager.ListFederationRelationshipsRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
 		if err != nil {
