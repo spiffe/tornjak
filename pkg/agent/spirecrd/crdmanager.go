@@ -9,7 +9,7 @@ import (
 type CRDManager interface {
 	// TODO add List/Create/Update/Delete functions for Federation CRD
 	// ListClusterFederatedTrustDomain has the same signature as spire api
-	ListClusterFederatedTrustDomains(trustdomain.ListFederationRelationshipsRequest) (trustdomain.ListFederationRelationshipsResponse, error)
+	ListClusterFederatedTrustDomains(ListFederationRelationshipsRequest) (ListFederationRelationshipsResponse, error)
 }
 
 type SPIRECRDManager struct {
@@ -23,7 +23,10 @@ func NewSPIRECRDManager(className string) (*SPIRECRDManager, error) {
 	}, nil
 }
 
-func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp trustdomain.ListFederationRelationshipsRequest) (trustdomain.ListFederationRelationshipsResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+type ListFederationRelationshipsRequest trustdomain.ListFederationRelationshipsRequest
+type ListFederationRelationshipsResponse trustdomain.ListFederationRelationshipsResponse
+
+func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRelationshipsRequest) (ListFederationRelationshipsResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	fmt.Println("list crd federation endpoint hit")
-	return trustdomain.ListFederationRelationshipsResponse{}, nil 
+	return ListFederationRelationshipsResponse{}, nil 
 }
