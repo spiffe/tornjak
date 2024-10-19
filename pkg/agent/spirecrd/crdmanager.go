@@ -50,7 +50,7 @@ func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRel
 	gvr :=schema.GroupVersionResource {
 		Group: "spire.spiffe.io",
 		Version: "v1alpha1",
-		Resource: "ClusterFederatedTrustDomains",
+		Resource: "clusterfederatedtrustdomains",
 	}
 
 	trustDomainList, err := kubeClient.Resource(gvr).Namespace("").List(context.TODO(), metav1.ListOptions{})
