@@ -74,7 +74,7 @@ class FederationsListTable extends React.Component<FederationsListTableProp, Fed
             listtabledata[i]["id"] = (i + 1).toString();
             listtabledata[i]["federationTrustDomain"] = listData[i].props.federation.trust_domain;
             listtabledata[i]["federationBundleUrl"] = listData[i].props.federation.bundle_endpoint_url;
-            listtabledata[i]["federationBundleUrl"] = listData[i].props.federation.BundleEndpointProfile;
+            listtabledata[i]["federationBundleProfile"] = listData[i].props.federation.BundleEndpointProfile.HttpsSpiffe ? 'https_spiffe' : 'https_web';
         }
         this.setState({
             listTableData: listtabledata
@@ -94,7 +94,7 @@ class FederationsListTable extends React.Component<FederationsListTableProp, Fed
             },
             {
                 header: 'Bundle Endpoint URL',
-                key: 'federationBundleURL',
+                key: 'federationBundleUrl',
             },
             {
                 header: 'Bundle Endpoint Profile',

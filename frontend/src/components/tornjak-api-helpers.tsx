@@ -236,8 +236,6 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
     tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
     axios.get(GetApiServerUri(apiEndpoints.spireFederationsApi), { crossdomain: true })
       .then(response => {
-        console.log(response)
-        console.log(response.data["federation_relationships"])
         if (!response.data["federation_relationships"]) {
           federationsListUpdateFunc([]);
         } else { federationsListUpdateFunc(response.data["federation_relationships"]); }

@@ -71,7 +71,6 @@ class FederationList extends Component<FederationsListProp, FederationsListState
   }
 
   federationList() {
-    console.log(this.props.globalFederationsList)
     if (typeof this.props.globalFederationsList !== 'undefined') {
       return this.props.globalFederationsList.map((currentFederation: FederationsList, index) => {
         return <Federation key={`federation-${index}`} federation={currentFederation} />;
@@ -122,7 +121,7 @@ class FederationList extends Component<FederationsListProp, FederationsListState
 
 const mapStateToProps = (state: RootState) => ({
   globalServerSelected: state.servers.globalServerSelected,
-  globalClustersList: state.clusters.globalClustersList,
+  globalFederationsList: state.federations.globalFederationsList,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
   globalErrorMessage: state.tornjak.globalErrorMessage,
 })
