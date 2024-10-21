@@ -10,7 +10,8 @@ import {
   ServerInfo,
   EntriesList,
   ClustersList,
-  DebugServerInfo, FederationsList
+  DebugServerInfo,
+  FederationsList
 } from './types';
 import KeycloakService from "auth/KeycloakAuth";
 import { showResponseToast } from './error-api';
@@ -235,9 +236,11 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
     tornjakMessageFunc: { (globalErrorMessage: string): void; }) => {
     axios.get(GetApiServerUri(apiEndpoints.spireFederationsApi), { crossdomain: true })
       .then(response => {
-        if (!response.data["federations"]) {
+        console.log(response)
+        console.log(response.data["federation_relationships"])
+        if (!response.data["federation_relationships"]) {
           federationsListUpdateFunc([]);
-        } else { federationsListUpdateFunc(response.data["federations"]); }
+        } else { federationsListUpdateFunc(response.data["federation_relationships"]); }
         tornjakMessageFunc(response.statusText);
       })
       .catch((error) => {

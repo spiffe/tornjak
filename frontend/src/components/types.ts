@@ -18,6 +18,15 @@ export interface Selector {
   value: string;
 }
 
+export interface FederationProfileSpiffeResponse {
+  endpoint_spiffe_id: string;
+}
+
+export interface BundleEndpointProfile {
+  HttpsSpiffe?: FederationProfileSpiffeResponse
+  HttpsWeb?: object
+}
+
 export interface AgentsList {
   // From https://github.com/spiffe/spire-api-sdk/blob/main/proto/spire/api/types/agent.pb.go
   id: SPIFFEID; // SPIFFE ID of the agent.
@@ -48,13 +57,9 @@ export interface ClustersList {
 
 // federations
 export interface FederationsList {
-  name: string; // Name of Cluster
-  editedName: string; // Edited Name if Cluster Name is edited from original
-  creationTime: string; // Time cluster is created
-  domainName: string; // Domain Name of cluster if any
-  managedBy: string; // Person/ entity managing the cluster
-  platformType: string; // Platform type of the cluster
-  agentsList: Array<string>; // List of agents associated with the cluster
+  trust_domain: string;
+  bundle_endpoint_url: string;
+  BundleEndpointProfile: BundleEndpointProfile;
 }
 
 // entries

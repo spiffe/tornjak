@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import IsManager from './is_manager';
-import Table from "tables/clusters-list-table";
+import Table from "tables/federations-list-table";
 import TornjakApi from './tornjak-api-helpers';
 import {
   serverSelectedFunc,
@@ -41,13 +41,9 @@ type FederationsListState = {
 
 const Federation = (props: { federation: FederationsList }) => (
   <tr>
-    <td>{props.federation.name}</td>
-    <td>{props.federation.platformType}</td>
-    <td>{props.federation.domainName}</td>
-    <td>{props.federation.managedBy}</td>
-    <td><div style={{ overflowX: 'auto', width: "400px" }}>
-      <pre>{JSON.stringify(props.federation.agentsList, null, ' ')}</pre>
-    </div></td>
+    <td>{props.federation.trust_domain}</td>
+    <td>{props.federation.bundle_endpoint_url}</td>
+    <td>{props.federation.BundleEndpointProfile.HttpsSpiffe ? 'https_spiffe' : 'https_web'}</td>
   </tr>
 )
 
@@ -75,9 +71,10 @@ class FederationList extends Component<FederationsListProp, FederationsListState
   }
 
   federationList() {
+    console.log(this.props.globalFederationsList)
     if (typeof this.props.globalFederationsList !== 'undefined') {
-      return this.props.globalFederationsList.map((currentFederation: FederationsList) => {
-        return <Federation key={currentFederation.name} federation={currentFederation} />;
+      return this.props.globalFederationsList.map((currentFederation: FederationsList, index) => {
+        return <Federation key={`federation-${index}`} federation={currentFederation} />;
       })
     } else {
       return ""
@@ -86,7 +83,7 @@ class FederationList extends Component<FederationsListProp, FederationsListState
 
   render() {
     return (
-      <div data-test="cluster-list">
+      <div>
         <h3>Federations List</h3>
         {this.props.globalErrorMessage !== "OK" &&
           <div className="alert-primary" role="alert">
