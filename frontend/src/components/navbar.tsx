@@ -131,9 +131,10 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
               <a href="/federations" className="dropbtn">Federations </a>
               <div className="dropdown-content">
                 <a href="/federations" className="nav-link">Federations List</a>
-                {(isAdmin || !withAuth) &&
-                    <a href="" className="nav-link">Create Federation</a>
-                }
+                {/* To be added */}
+                {/*{(isAdmin || !withAuth) &&*/}
+                {/*    <a href="" className="nav-link">Create Federation</a>*/}
+                {/*}*/}
               </div>
             </div>
             <div className="dropdown">
