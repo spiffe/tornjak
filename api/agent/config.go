@@ -14,6 +14,7 @@ import (
 	"github.com/spiffe/tornjak/pkg/agent/authentication/authenticator"
 	"github.com/spiffe/tornjak/pkg/agent/authorization"
 	agentdb "github.com/spiffe/tornjak/pkg/agent/db"
+	"github.com/spiffe/tornjak/pkg/agent/spirecrd"
 )
 
 func stringFromToken(keyToken token.Token) (string, error) {
@@ -34,9 +35,17 @@ func stringFromToken(keyToken token.Token) (string, error) {
 // getPluginConfig returns first plugin configuration
 func getPluginConfig(plugin *ast.ObjectItem) (string, ast.Node, error) {
 	// extract plugin name and value
-	pluginName, err := stringFromToken(plugin.Keys[1].Token)
-	if err != nil {
-		return "", nil, fmt.Errorf("invalid plugin type name %q: %w", plugin.Keys[1].Token.Text, err)
+	pluginKeys := plugin.Keys
+	var pluginName string
+	var err error
+
+	if len(pluginKeys) > 1 {
+		pluginName, err = stringFromToken(pluginKeys[1].Token)
+		if err != nil {
+			return "", nil, fmt.Errorf("invalid plugin type name %q: %w", pluginKeys[1].Token.Text, err)
+		}
+	} else {
+		pluginName = ""
 	}
 	// extract data
 	var hclPluginConfig hclPluginConfig
@@ -83,6 +92,30 @@ func NewAgentsDB(dbPlugin *ast.ObjectItem) (agentdb.AgentDB, error) {
 	default:
 		return nil, errors.Errorf("Couldn't create datastore")
 	}
+}
+
+// NewCRDManager returns ...
+func NewCRDManager(crdPlugin *ast.ObjectItem) (spirecrd.CRDManager, error) {
+	_, data, _ := getPluginConfig(crdPlugin)
+	
+	// check if data is defined
+	if data == nil {
+		return "", errors.New("SPIRECRDManager plugin ('config > plugins > SPIRECRDManager > plugin_data') not populated")
+	}
+	// decode config to struct
+	var config pluginControllerManager
+	if err := hcl.DecodeObject(&config, data); err != nil {
+		return "", errors.Errorf("Couldn't parse SPIREControllerManager config: %v", err)
+	}
+
+	fmt.Println("CRD Controller configured. WARNING: This is currently a no-op")
+
+	crdManager, err := spirecrd.NewSPIRECRDManager(config.Classname)
+	if err != nil {
+		return nil, errors.Errorf("Could not initialize CRD manager: %v", err)
+	}
+
+	return crdManager, nil
 }
 
 // NewAuthenticator returns a new Authenticator
@@ -225,10 +258,6 @@ func (s *Server) Configure() error {
 	// iterate over plugin list
 
 	for _, pluginObject := range pluginList.Items {
-		if len(pluginObject.Keys) != 2 {
-			return fmt.Errorf("plugin item expected to have two keys (type then name)")
-		}
-
 		pluginType, err := stringFromToken(pluginObject.Keys[0].Token)
 		if err != nil {
 			return fmt.Errorf("invalid plugin type key %q: %w", pluginObject.Keys[0].Token.Text, err)
@@ -238,18 +267,37 @@ func (s *Server) Configure() error {
 		switch pluginType {
 		// configure datastore
 		case "DataStore":
+			if len(pluginObject.Keys) != 2 {
+				return fmt.Errorf("plugin DataStore expected to have two keys (type then name)")
+			}
 			s.Db, err = NewAgentsDB(pluginObject)
 			if err != nil {
 				return errors.Errorf("Cannot configure datastore plugin: %v", err)
 			}
+		// configure controller maanger CRD management
+		case "SPIRECRDManager":
+			if len(pluginObject.Keys) != 1 {
+				return fmt.Errorf("plugin SPIRECRDManager expected to have one key (type)")
+			}
+
+			s.CRDManager, err = NewCRDManager(pluginObject)
+			if err != nil {
+				return errors.Errorf("Cannot configure CRD management plugin: %v", err)
+			}
 		// configure Authenticator
 		case "Authenticator":
+			if len(pluginObject.Keys) != 2 {
+				return fmt.Errorf("plugin Authenticator expected to have two keys (type then name)")
+			}
 			s.Authenticator, err = NewAuthenticator(pluginObject)
 			if err != nil {
 				return errors.Errorf("Cannot configure Authenticator plugin: %v", err)
 			}
 		// configure Authorizer
 		case "Authorizer":
+			if len(pluginObject.Keys) != 2 {
+				return fmt.Errorf("plugin Authorizer expected to have two keys (type then name)")
+			}
 			s.Authorizer, err = NewAuthorizer(pluginObject)
 			if err != nil {
 				return errors.Errorf("Cannot configure Authorizer plugin: %v", err)
