@@ -108,6 +108,10 @@ type pluginDataStoreSQL struct {
 	Filename   string `hcl:"filename"`
 }
 
+type pluginControllerManager struct {
+	Classname string `hcl:"classname"`
+}
+
 type pluginAuthenticatorKeycloak struct {
 	IssuerURL string `hcl:"issuer"`
 	Audience  string `hcl:"audience"`
