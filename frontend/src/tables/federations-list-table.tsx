@@ -1,6 +1,5 @@
 import React from "react";
-import { connect } from 'react-redux';
-import IsManager from 'components/is_manager';
+import { connect } from 'react-redux';=
 import {
     federationsListUpdateFunc
 } from 'redux/actions';

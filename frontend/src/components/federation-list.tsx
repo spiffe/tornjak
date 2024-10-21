@@ -1,6 +1,5 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
-import IsManager from './is_manager';
 import Table from "tables/federations-list-table";
 import TornjakApi from './tornjak-api-helpers';
 import {
