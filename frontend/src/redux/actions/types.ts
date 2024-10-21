@@ -10,7 +10,7 @@ import {
     TornjakServerInfo,
     WorkloadSelectorInfoLabels,
     SpireHealthCheckFreq,
-    DebugServerInfo
+    DebugServerInfo, FederationsList
 } from "components/types";
 
 // auth
@@ -48,6 +48,17 @@ export interface AgentsListAction extends Action<typeof GLOBAL_AGENTS_LIST> {
 }
 export interface AgentWorkloadSelectorInfoAction extends Action<typeof GLOBAL_AGENTS_WORKLOADATTESTOR_INFO> {
     payload: AgentsWorkLoadAttestorInfo[];
+}
+
+// federations
+export const GLOBAL_FEDERATIONS_LIST = 'GLOBAL_FEDERATIONS_LIST';
+
+export interface FederationsReducerState {
+    globalFederationsList: FederationsList[],
+}
+
+export interface FederationsListAction extends Action<typeof GLOBAL_FEDERATIONS_LIST> {
+    payload: FederationsList[];
 }
 
 // clusters
