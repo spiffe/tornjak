@@ -69,9 +69,8 @@ func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRel
 		if err != nil {
 			return ListFederationRelationshipsResponse{}, fmt.Errorf("error parsing trustdomain: %v", err)
 		}
-		fmt.Printf("Federation CRD Name: %s, Spec: %+v\n", clusterFederatedTrustDomain.Name, clusterFederatedTrustDomain.Spec)
+		fmt.Printf("Federation CRD Name: %s, Trustdomain: %s, Spec: %+v\n", clusterFederatedTrustDomain.Name, clusterFederatedTrustDomain.Spec.TrustDomain, clusterFederatedTrustDomain.Spec)
 	}
 
-	fmt.Printf("Listed trust domains: %v \n", trustDomainList)
 	return ListFederationRelationshipsResponse{}, nil 
 }
