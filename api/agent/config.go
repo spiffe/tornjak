@@ -108,7 +108,7 @@ func NewCRDManager(crdPlugin *ast.ObjectItem) (spirecrd.CRDManager, error) {
 		return nil, errors.Errorf("Couldn't parse SPIREControllerManager config: %v", err)
 	}
 
-	fmt.Println("CRD Controller configured. WARNING: This is currently a no-op")
+	fmt.Println("CRD Controller configured. spire-controller-manager APIs enabled")
 
 	crdManager, err := spirecrd.NewSPIRECRDManager(config.Classname)
 	if err != nil {
