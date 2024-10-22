@@ -11,6 +11,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.19
 	github.com/pardot/oidc v1.0.1
 	github.com/pkg/errors v0.9.1
+	github.com/spiffe/go-spiffe/v2 v2.3.0
 	github.com/spiffe/spire v1.6.4
 	github.com/spiffe/spire-api-sdk v1.10.4
 	github.com/spiffe/spire-controller-manager v0.6.0
@@ -71,7 +72,6 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/spiffe/go-spiffe/v2 v2.3.0 // indirect
 	github.com/spiffe/spire-plugin-sdk v1.4.4-0.20230224144655-648f8c740f73 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/twmb/murmur3 v1.1.6 // indirect

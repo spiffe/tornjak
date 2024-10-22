@@ -1,6 +1,7 @@
 package spirecrd
 
 import (
+	apitypes "github.com/spiffe/spire-api-sdk/proto/spire/api/types"
 	trustdomain "github.com/spiffe/spire-api-sdk/proto/spire/api/server/trustdomain/v1"
 	"fmt"
 	"context"
@@ -29,6 +30,7 @@ func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRel
 		return ListFederationRelationshipsResponse{}, fmt.Errorf("error listing trust domains: %v", err)
 	}
 
+	var result []*apitypes.FederationRelationship
 	for _, trustDomain := range trustDomainList.Items {
 		// parse TrustDomain into ClusterFederatedTrustDomain object
 		var clusterFederatedTrustDomain spirev1alpha1.ClusterFederatedTrustDomain
@@ -53,7 +55,13 @@ func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRel
 		}
 
 		fmt.Printf("SPIRE Federation object: %+v\n", spireAPIFederation)
-	}
 
-	return ListFederationRelationshipsResponse{}, nil 
+		// place SPIRE API object into result
+		result = append(result, spireAPIFederation)
+	}
+	fmt.Printf("resulting list: %+v\n", result)
+
+	return ListFederationRelationshipsResponse{
+		FederationRelationships: result,
+	}, nil 
 }
