@@ -57,3 +57,41 @@ func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRel
 		FederationRelationships: result,
 	}, nil 
 }
+
+type BatchCreateFederationRelationshipsRequest trustdomain.BatchCreateFederationRelationshipRequest
+type BatchCreateFederationRelationshipsResponse trustdomain.BatchCreateFederationRelationshipResponse
+
+func (s *SPIRECRDManager) BatchCreateClusterFederatedTrustDomains(inp BatchCreateFederationRelationshipsRequest) (BatchCreateFederationRelationshipsResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+
+	trustDomainList, err := s.kubeClient.Resource(gvrFederation).Namespace("").List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error listing trust domains: %v", err)
+	}
+
+	var result []*apitypes.FederationRelationship
+	for _, trustDomain := range trustDomainList.Items {
+		// parse TrustDomain into ClusterFederatedTrustDomain object
+		var clusterFederatedTrustDomain spirev1alpha1.ClusterFederatedTrustDomain
+		err := runtime.DefaultUnstructuredConverter.FromUnstructured(trustDomain.Object, &clusterFederatedTrustDomain)
+		if err != nil {
+			return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error parsing trustdomain: %v", err)
+		}
+		// parse ClusterFederatedTrustDomain object into Federation object
+		federation, err := spirev1alpha1.ParseClusterFederatedTrustDomainSpec(&clusterFederatedTrustDomain.Spec)
+		if err != nil {
+			return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error parsing crd spec: %v", err)
+		}
+
+		// parse Federation object into spire API object
+		spireAPIFederation, err := federationRelationshipToAPI(*federation)
+		if err != nil {
+			return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error parsing into spire API object: %v", err)
+		}
+
+		// place SPIRE API object into result
+		result = append(result, spireAPIFederation)
+	}
+	fmt.Printf("result: %+v\n", result)
+
+	return BatchCreateFederationRelationshipsResponse{}, nil 
+}
