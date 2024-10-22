@@ -1,5 +1,5 @@
 import React from "react";
-import { connect } from 'react-redux';=
+import { connect } from 'react-redux';
 import {
     federationsListUpdateFunc
 } from 'redux/actions';
@@ -29,12 +29,7 @@ type FederationsListTableProp = {
 
 type FederationsListTableState = {
     listData: { key: string, props: { federation: FederationsList } }[] | FederationsList[] | string | JSX.Element[],
-    listTableData: {
-        id: string;
-        federationTrustDomain: string;
-        federationBundleUrl: string;
-        federationBundleProfile: string;
-    }[]
+    listTableData: { id: string, [x: string]: string; }[]
 
 }
 class FederationsListTable extends React.Component<FederationsListTableProp, FederationsListTableState> {
@@ -67,13 +62,14 @@ class FederationsListTable extends React.Component<FederationsListTableProp, Fed
         if (typeof (data) === "string" || data === undefined)
             return
         data.forEach(val => listData.push(Object.assign({}, val)));
-        let listtabledata: { id: string; federationTrustDomain: string; federationBundleUrl: string; federationBundleProfile: string  }[] = [];
+        let listtabledata: { id: string; federationTrustDomain: string; federationBundleUrl: string; federationBundleProfile: string; info: string }[] = [];
         for (let i = 0; i < listData.length; i++) {
-            listtabledata[i] = { id: "", federationTrustDomain: "", federationBundleUrl: "", federationBundleProfile: "" };
+            listtabledata[i] = { id: "", federationTrustDomain: "", federationBundleUrl: "", federationBundleProfile: "", info: "" };
             listtabledata[i]["id"] = (i + 1).toString();
             listtabledata[i]["federationTrustDomain"] = listData[i].props.federation.trust_domain;
             listtabledata[i]["federationBundleUrl"] = listData[i].props.federation.bundle_endpoint_url;
             listtabledata[i]["federationBundleProfile"] = listData[i].props.federation.BundleEndpointProfile.HttpsSpiffe ? 'https_spiffe' : 'https_web';
+            listtabledata[i]["info"] = JSON.stringify(listData[i].props.federation, null, ' ');
         }
         this.setState({
             listTableData: listtabledata
@@ -98,6 +94,10 @@ class FederationsListTable extends React.Component<FederationsListTableProp, Fed
             {
                 header: 'Bundle Endpoint Profile',
                 key: 'federationBundleProfile',
+            },
+            {
+                header: 'Info',
+                key: 'info',
             },
         ];
         return (
