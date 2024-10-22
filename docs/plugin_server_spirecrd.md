@@ -4,6 +4,7 @@ Note the SPIRECRDManager is an optional plugin. This plugin enables the creation
 
 - `GET /api/v1/spire-controller-manager/clusterfederatedtrustdomains`
 
+> [!IMPORTANT]
 > This plugin requires two things: (a) That Tornjak is deployed in the same cluster as the relevant CRDs as it uses its own service account token to talk to the kube API server. (b) That the proper permissions are given to the Service Account token that Tornjak will use. Current Helm charts deploy SPIRE Controller manager and Tornjak in the same pod as the SPIRE server, so no extra configuration is necessary if deployed this way.
 
 The configuration has the following key-value pairs:
