@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Table from "tables/federations-list-table";
 import TornjakApi from './tornjak-api-helpers';
@@ -43,6 +43,9 @@ const Federation = (props: { federation: FederationsList }) => (
     <td>{props.federation.trust_domain}</td>
     <td>{props.federation.bundle_endpoint_url}</td>
     <td>{props.federation.BundleEndpointProfile.HttpsSpiffe ? 'https_spiffe' : 'https_web'}</td>
+    <td><div style={{ overflowX: 'auto', width: "400px" }}>
+      <pre>{JSON.stringify(props.federation, null, ' ')}</pre>
+    </div></td>
   </tr>
 )
 
