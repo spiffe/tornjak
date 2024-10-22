@@ -46,6 +46,38 @@ export interface ClustersList {
   agentsList: Array<string>; // List of agents associated with the cluster
 }
 
+// federations
+export interface FederationProfileSpiffeResponse {
+  endpoint_spiffe_id: string;
+}
+
+export interface BundleEndpointProfile {
+  HttpsSpiffe?: FederationProfileSpiffeResponse
+  HttpsWeb?: object
+}
+
+export interface x509Authority {
+  asn1: string
+}
+
+export interface JwtAuthority {
+  public_key: string
+  key_id: string
+}
+
+export interface TrustDomainBundle {
+  trust_domain: string
+  x509_authorities: Array<x509Authority>
+  jwt_authorities: Array<JwtAuthority>
+}
+
+export interface FederationsList {
+  trust_domain: string;
+  bundle_endpoint_url: string;
+  BundleEndpointProfile: BundleEndpointProfile;
+  trust_domain_bundle: TrustDomainBundle;
+}
+
 // entries
 export interface EntriesList {
   // From https://github.com/spiffe/spire-api-sdk/blob/main/proto/spire/api/types/entry.pb.go

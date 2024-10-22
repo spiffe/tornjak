@@ -146,6 +146,16 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
               </div>
             </div>
             <div className="dropdown">
+              <a href="/federations" className="dropbtn">Federations </a>
+              <div className="dropdown-content">
+                <a href="/federations" className="nav-link">Federations List</a>
+                {/* To be added */}
+                {/*{(isAdmin || !withAuth) &&*/}
+                {/*    <a href="" className="nav-link">Create Federation</a>*/}
+                {/*}*/}
+              </div>
+            </div>
+            <div className="dropdown">
               <a href="/tornjak/serverinfo" className="dropbtn">Tornjak ServerInfo</a>
             </div>
             <div className="dropdown">

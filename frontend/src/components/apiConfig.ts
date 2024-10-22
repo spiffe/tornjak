@@ -9,6 +9,7 @@ const apiEndpoints = {
     spireAgentsBanApi: `${API_BASE_URL}/spire/agents/ban`,
     spireJoinTokenApi: `${API_BASE_URL}/spire/agents/jointoken`,
     spireEntriesApi: `${API_BASE_URL}/spire/entries`,
+    spireFederationsApi: `${API_BASE_URL}/spire/federations`,
     tornjakServerInfoApi: `${API_BASE_URL}/tornjak/serverinfo`,
     tornjakSelectorsApi: `${API_BASE_URL}/tornjak/selectors`,
     tornjakAgentsApi: `${API_BASE_URL}/tornjak/agents`,
