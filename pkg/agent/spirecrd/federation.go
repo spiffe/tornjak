@@ -23,7 +23,6 @@ type ListFederationRelationshipsRequest trustdomain.ListFederationRelationshipsR
 type ListFederationRelationshipsResponse trustdomain.ListFederationRelationshipsResponse
 
 func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRelationshipsRequest) (ListFederationRelationshipsResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	fmt.Println("list crd federation endpoint hit")
 
 	trustDomainList, err := s.kubeClient.Resource(gvrFederation).Namespace("").List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -38,15 +37,11 @@ func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRel
 		if err != nil {
 			return ListFederationRelationshipsResponse{}, fmt.Errorf("error parsing trustdomain: %v", err)
 		}
-		fmt.Printf("Federation CRD Name: %s, Trustdomain: %s, Spec: %+v\n", clusterFederatedTrustDomain.Name, clusterFederatedTrustDomain.Spec.TrustDomain, clusterFederatedTrustDomain.Spec)
-
 		// parse ClusterFederatedTrustDomain object into Federation object
 		federation, err := spirev1alpha1.ParseClusterFederatedTrustDomainSpec(&clusterFederatedTrustDomain.Spec)
 		if err != nil {
 			return ListFederationRelationshipsResponse{}, fmt.Errorf("error parsing crd spec: %v", err)
 		}
-
-		fmt.Printf("Federation object: %+v\n", federation)
 
 		// parse Federation object into spire API object
 		spireAPIFederation, err := federationRelationshipToAPI(*federation)
@@ -54,12 +49,9 @@ func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRel
 			return ListFederationRelationshipsResponse{}, fmt.Errorf("error parsing into spire API object: %v", err)
 		}
 
-		fmt.Printf("SPIRE Federation object: %+v\n", spireAPIFederation)
-
 		// place SPIRE API object into result
 		result = append(result, spireAPIFederation)
 	}
-	fmt.Printf("resulting list: %+v\n", result)
 
 	return ListFederationRelationshipsResponse{
 		FederationRelationships: result,
