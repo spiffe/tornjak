@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"context"
 
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/dynamic"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -18,38 +16,6 @@ var gvrFederation = schema.GroupVersionResource{
 	Group:    "spire.spiffe.io",
 	Version:  "v1alpha1",
 	Resource: "clusterfederatedtrustdomains",
-}
-
-
-// CRDManager defines the interface for managing CRDs
-type CRDManager interface {
-	// TODO add List/Create/Update/Delete functions for Federation CRD
-	// ListClusterFederatedTrustDomain has the same signature as spire api
-	ListClusterFederatedTrustDomains(ListFederationRelationshipsRequest) (ListFederationRelationshipsResponse, error)
-}
-
-type SPIRECRDManager struct {
-	className string
-	kubeClient *dynamic.DynamicClient
-}
-
-// NewSPIRECRDManager initializes new SPIRECRDManager
-func NewSPIRECRDManager(className string) (*SPIRECRDManager, error) {
-	// assume in-cluster
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		return nil, fmt.Errorf("error with in-cluster config: %v", err)
-	}
-	// create client
-	kubeClient, err := dynamic.NewForConfig(config)
-	if err != nil {
-		return nil, fmt.Errorf("error creating kube client: %v", err)
-	}
-
-	return &SPIRECRDManager{
-		className: className,
-		kubeClient: kubeClient,
-	}, nil
 }
 
 type ListFederationRelationshipsRequest trustdomain.ListFederationRelationshipsRequest
@@ -64,12 +30,29 @@ func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRel
 	}
 
 	for _, trustDomain := range trustDomainList.Items {
+		// parse TrustDomain into ClusterFederatedTrustDomain object
 		var clusterFederatedTrustDomain spirev1alpha1.ClusterFederatedTrustDomain
 		err := runtime.DefaultUnstructuredConverter.FromUnstructured(trustDomain.Object, &clusterFederatedTrustDomain)
 		if err != nil {
 			return ListFederationRelationshipsResponse{}, fmt.Errorf("error parsing trustdomain: %v", err)
 		}
 		fmt.Printf("Federation CRD Name: %s, Trustdomain: %s, Spec: %+v\n", clusterFederatedTrustDomain.Name, clusterFederatedTrustDomain.Spec.TrustDomain, clusterFederatedTrustDomain.Spec)
+
+		// parse ClusterFederatedTrustDomain object into Federation object
+		federation, err := spirev1alpha1.ParseClusterFederatedTrustDomainSpec(&clusterFederatedTrustDomain.Spec)
+		if err != nil {
+			return ListFederationRelationshipsResponse{}, fmt.Errorf("error parsing crd spec: %v", err)
+		}
+
+		fmt.Printf("Federation object: %+v\n", federation)
+
+		// parse Federation object into spire API object
+		spireAPIFederation, err := federationRelationshipToAPI(*federation)
+		if err != nil {
+			return ListFederationRelationshipsResponse{}, fmt.Errorf("error parsing into spire API object: %v", err)
+		}
+
+		fmt.Printf("SPIRE Federation object: %+v\n", spireAPIFederation)
 	}
 
 	return ListFederationRelationshipsResponse{}, nil 
