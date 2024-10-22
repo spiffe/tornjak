@@ -8,7 +8,7 @@ import (
 
 // CRDManager defines the interface for managing CRDs
 type CRDManager interface {
-	// TODO add Create/Update/Delete functions for Federation CRD
+	// TODO add List/Create/Update/Delete functions for Federation CRD
 	// ListClusterFederatedTrustDomain has the same signature as spire api
 	ListClusterFederatedTrustDomains(ListFederationRelationshipsRequest) (ListFederationRelationshipsResponse, error)
 }

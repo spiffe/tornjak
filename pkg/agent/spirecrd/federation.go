@@ -37,6 +37,7 @@ func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRel
 		if err != nil {
 			return ListFederationRelationshipsResponse{}, fmt.Errorf("error parsing trustdomain: %v", err)
 		}
+
 		// parse ClusterFederatedTrustDomain object into Federation object
 		federation, err := spirev1alpha1.ParseClusterFederatedTrustDomainSpec(&clusterFederatedTrustDomain.Spec)
 		if err != nil {
