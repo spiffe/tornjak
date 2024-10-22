@@ -7,9 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	// trustdomain "github.com/spiffe/spire-api-sdk/proto/spire/api/server/trustdomain/v1"
 	crdmanager "github.com/spiffe/tornjak/pkg/agent/spirecrd"
-	// "google.golang.org/protobuf/encoding/protojson"
 )
 
 func (s *Server) CRDFederationList(w http.ResponseWriter, r *http.Request) {
