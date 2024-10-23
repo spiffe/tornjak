@@ -63,35 +63,26 @@ type BatchCreateFederationRelationshipsResponse trustdomain.BatchCreateFederatio
 
 func (s *SPIRECRDManager) BatchCreateClusterFederatedTrustDomains(inp BatchCreateFederationRelationshipsRequest) (BatchCreateFederationRelationshipsResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 
-	trustDomainList, err := s.kubeClient.Resource(gvrFederation).Namespace("").List(context.TODO(), metav1.ListOptions{})
-	if err != nil {
-		return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error listing trust domains: %v", err)
+	apiFederationList := inp.FederationRelationships
+	for _, apiFederation := range apiFederationList {
+
+		fmt.Printf("apiFederation object: %+v\n", apiFederation)
+
+		// parse into federation object
+		federation, err := federationRelationshipFromAPI(apiFederation)
+		if err != nil {
+			return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error parsing into federation object: %v", err)
+		}
+		fmt.Printf("federation object: %+v\n", federation)
+
+		// parse into ClusterFederatedTrustDomain object
+		clusterFederatedTrustDomain, err := s.parseToClusterFederatedTrustDomain(&federation)
+		if err != nil {
+			return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error parsing into clusterFederatedTrustDomain object: %v", err)
+		}
+		fmt.Printf("crd object: %+v\n", clusterFederatedTrustDomain)
+		
 	}
-
-	var result []*apitypes.FederationRelationship
-	for _, trustDomain := range trustDomainList.Items {
-		// parse TrustDomain into ClusterFederatedTrustDomain object
-		var clusterFederatedTrustDomain spirev1alpha1.ClusterFederatedTrustDomain
-		err := runtime.DefaultUnstructuredConverter.FromUnstructured(trustDomain.Object, &clusterFederatedTrustDomain)
-		if err != nil {
-			return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error parsing trustdomain: %v", err)
-		}
-		// parse ClusterFederatedTrustDomain object into Federation object
-		federation, err := spirev1alpha1.ParseClusterFederatedTrustDomainSpec(&clusterFederatedTrustDomain.Spec)
-		if err != nil {
-			return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error parsing crd spec: %v", err)
-		}
-
-		// parse Federation object into spire API object
-		spireAPIFederation, err := federationRelationshipToAPI(*federation)
-		if err != nil {
-			return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error parsing into spire API object: %v", err)
-		}
-
-		// place SPIRE API object into result
-		result = append(result, spireAPIFederation)
-	}
-	fmt.Printf("result: %+v\n", result)
 
 	return BatchCreateFederationRelationshipsResponse{}, nil 
 }
