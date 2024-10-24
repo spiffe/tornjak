@@ -307,6 +307,9 @@ func (s *SPIRECRDManager) parseToClusterFederatedTrustDomain(inp *spireapi.Feder
 } 
 
 func (s *SPIRECRDManager) parseToClusterFederatedTrustDomainSpec(inp *spireapi.FederationRelationship)(*spirev1alpha1.ClusterFederatedTrustDomainSpec, error) {
+	// get ClassName
+	className := s.className
+
 	// get TrustDomain
 	trustDomain := inp.TrustDomain.String()
 
@@ -325,17 +328,20 @@ func (s *SPIRECRDManager) parseToClusterFederatedTrustDomainSpec(inp *spireapi.F
 		return nil, fmt.Errorf("failed to parse trustDomainBundle: %w", err)
 	}
 
-	// get ClassName
-	className := s.className
-
 	fmt.Printf("trustDomain: %s, bundleEndpointURL: %s, bundleEndpointProfile: %+v, trustDomainBundle: %+v, className: %s\n", trustDomain, bundleEndpointURL, bundleEndpointProfile, trustDomainBundle, className)
-	return &spirev1alpha1.ClusterFederatedTrustDomainSpec{
+
+	result := &spirev1alpha1.ClusterFederatedTrustDomainSpec{
 		TrustDomain: trustDomain,
 		BundleEndpointURL: bundleEndpointURL,
 		BundleEndpointProfile: bundleEndpointProfile,
-		TrustDomainBundle: trustDomainBundle,
 		ClassName: className,
-	}, nil
+	}
+
+	if trustDomainBundle != "" {
+		result.TrustDomainBundle = trustDomainBundle
+	}
+
+	return result, nil
 }
 
 func parseBundleEndpointProfile(inp *spireapi.FederationRelationship)(spirev1alpha1.BundleEndpointProfile, error) {
@@ -364,6 +370,10 @@ func parseBundleEndpointProfile(inp *spireapi.FederationRelationship)(spirev1alp
 
 func parseTrustDomainBundle(inp *spireapi.FederationRelationship)(string, error) {
 	spireAPIBundle := inp.TrustDomainBundle
+	if spireAPIBundle == nil {
+		return "", nil
+	}
+
 	bundleByte, err := spireAPIBundle.Marshal()
 	if err != nil {
 		return "", fmt.Errorf("Error marshalling bundle: %w", err)
