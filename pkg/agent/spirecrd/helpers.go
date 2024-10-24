@@ -299,7 +299,11 @@ func (s *SPIRECRDManager) parseToClusterFederatedTrustDomain(inp *spireapi.Feder
 
 	fmt.Printf("typeMeta: %+v, objectMeta: %+v, spec: %+v\n", typeMeta, objectMeta, spec)
 	// Populate Spec
-	return nil, nil
+	return &spirev1alpha1.ClusterFederatedTrustDomain{
+		TypeMeta: typeMeta,
+		ObjectMeta: objectMeta,
+		Spec: *spec,
+	}, nil
 } 
 
 func (s *SPIRECRDManager) parseToClusterFederatedTrustDomainSpec(inp *spireapi.FederationRelationship)(*spirev1alpha1.ClusterFederatedTrustDomainSpec, error) {
@@ -325,7 +329,13 @@ func (s *SPIRECRDManager) parseToClusterFederatedTrustDomainSpec(inp *spireapi.F
 	className := s.className
 
 	fmt.Printf("trustDomain: %s, bundleEndpointURL: %s, bundleEndpointProfile: %+v, trustDomainBundle: %+v, className: %s\n", trustDomain, bundleEndpointURL, bundleEndpointProfile, trustDomainBundle, className)
-	return nil, nil
+	return &spirev1alpha1.ClusterFederatedTrustDomainSpec{
+		TrustDomain: trustDomain,
+		BundleEndpointURL: bundleEndpointURL,
+		BundleEndpointProfile: bundleEndpointProfile,
+		TrustDomainBundle: trustDomainBundle,
+		ClassName: className,
+	}, nil
 }
 
 func parseBundleEndpointProfile(inp *spireapi.FederationRelationship)(spirev1alpha1.BundleEndpointProfile, error) {
@@ -352,6 +362,12 @@ func parseBundleEndpointProfile(inp *spireapi.FederationRelationship)(spirev1alp
 	}
 }
 
-func parseTrustDomainBundle(inp *spireapi.FederationRelationship)(*spirev1alpha1.BundleEndpointProfile, error) {
-	return nil, nil
+func parseTrustDomainBundle(inp *spireapi.FederationRelationship)(string, error) {
+	spireAPIBundle := inp.TrustDomainBundle
+	bundleByte, err := spireAPIBundle.Marshal()
+	if err != nil {
+		return "", fmt.Errorf("Error marshalling bundle: %w", err)
+	}
+
+	return string(bundleByte), nil
 }
