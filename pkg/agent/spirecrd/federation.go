@@ -9,6 +9,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	spirev1alpha1 "github.com/spiffe/spire-controller-manager/api/v1alpha1"
 )
@@ -81,7 +82,23 @@ func (s *SPIRECRDManager) BatchCreateClusterFederatedTrustDomains(inp BatchCreat
 			return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error parsing into clusterFederatedTrustDomain object: %v", err)
 		}
 		fmt.Printf("crd object: %+v\n", clusterFederatedTrustDomain)
-		
+
+		// translate to unstructured
+		unstructuredObject, err := runtime.DefaultUnstructuredConverter.ToUnstructured(clusterFederatedTrustDomain)
+		if err != nil {
+			return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error parsing trustdomain: %v", err)
+		}
+		createInput := &unstructured.Unstructured{Object: unstructuredObject}
+
+		// post ClusterFederatedTrustDomain object
+		createResult, err := s.kubeClient.Resource(gvrFederation).Create(context.TODO(), createInput, metav1.CreateOptions{})
+		// TODO do not return error, simply store result and continue
+		if err != nil {
+			return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error listing trust domains: %v", err)
+		}
+
+		fmt.Printf("createResult: %+v\n\n", createResult)
+
 	}
 
 	return BatchCreateFederationRelationshipsResponse{}, nil 
