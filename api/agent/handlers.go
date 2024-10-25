@@ -11,10 +11,30 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
+/*
+TODO: 
+	1. Golang tutorial!
+	2. Understand what each function is doing -- comment everything!
+		a. Mason is starting from the top function
+		b. Collin is starting from the bottom function
+	3. Group up functions into different files depending on what they do (at Maia's suggestion)
+		a. server handlers vs. agent handlers?
+		b. vs. federation api?
+		c. vs. cluster handlers?
+	4. Refactor at least 3 functions before the end of the semester
+*/
+
+//Gets called from GetRouter func in server.go
+//http is a type of command that the server can take that starts the server
 func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
+
+	//To store the HealthcheckRequest we get from grpc
 	var input HealthcheckRequest
 	buf := new(strings.Builder)
 
+	//copies body of http.Request into buf
+	//and then puts the # of bytes of type int64 into n and an error into err
+	//err is nil if there was no error
 	n, err := io.Copy(buf, r.Body)
 	if err != nil {
 		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
@@ -23,6 +43,7 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 	}
 	data := buf.String()
 
+	//if the body of the request was empty
 	if n == 0 {
 		input = HealthcheckRequest{}
 	} else {
