@@ -625,6 +625,29 @@ paths:
                             trust_domain:
                               type: string
                               examples: ["trust_domain"]
+  /api/v1/spire-controller-manager/clusterfederatedtrustdomains:
+    get:
+      summary: Lists all federations configured on SPIRE Server
+      description: Lists all federations configured on SPIRE Server
+      responses:
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  federation_relationships:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/federation_response'
+
   /api/v1/tornjak/serverinfo:
     get:
       summary: Get general Tornjak server information.
