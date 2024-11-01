@@ -21,6 +21,24 @@ TODO:
 	4. Refactor at least 3 functions before the end of the semester
 */
 
+// TODO For later: Determine if input is http.StatusBadRequest OR http.StatusInternalServerError
+// TODO: Seems like there should be a more elegant solution for this...
+func isBadRequest(err error, w http.ResponseWriter, emsg string) (bool) {
+	if err != nil {
+		retError(w, emsg, http.StatusBadRequest)
+		return true
+	}
+	return false
+}
+
+func isInternalServerError(err error, w http.ResponseWriter, emsg string) (bool) {
+	if err != nil {
+		retError(w, emsg, http.StatusBadRequest)
+		return true
+	}
+	return false
+}
+
 // Gets called from GetRouter func in server.go
 // http is a type of command that the server can take that starts the server
 // Gives an explicit return only if an error is countered
@@ -35,11 +53,7 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 	//and then puts the # of bytes of type int64 into n and an error into err
 	//err is nil if there was no error
 	n, err := io.Copy(buf, r.Body)
-	if err != nil {
-		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
-		return
-	}
+	if isBadRequest(err, w, fmt.Sprintf("Error parsing data: %v", err.Error())){return}
 	data := buf.String()
 
 	//if the body of the request was empty
@@ -50,21 +64,13 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 	//unmarshal the JSON and check for errors
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		if err != nil {
-			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-			retError(w, emsg, http.StatusBadRequest)
-			return
-		}
+		if isBadRequest(err, w, fmt.Sprintf("Error parsing data: %v", err.Error())){return}
 	}
 
 	//ret gets the address to the HealthcheckReponse response
 		//the HealthcheckResponse is actually the response of the server "input" as returned by grpc's HealthClient.Check()
 	ret, err := s.SPIREHealthcheck(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	if err != nil {
-		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusInternalServerError)
-		return
-	}
+	if isInternalServerError(err, w, fmt.Sprintf("Error: %v", err.Error())){return}
 
 	//Sets the headers associated with the request to specific values
 	/*
@@ -85,34 +91,23 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 	err = je.Encode(ret)
 	
 	//if the Encode failed
-	if err != nil {
-		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
-		return
-	}
+	if isBadRequest(err, w, fmt.Sprintf("Error: %v", err.Error())){return}
 
 	//if we never return an error, then all is well!
 }
+
 
 func (s *Server) debugServer(w http.ResponseWriter, r *http.Request) {
 	input := DebugServerRequest{} // HARDCODED INPUT because there are no fields to DebugServerRequest
 
 	ret, err := s.DebugServer(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	if err != nil {
-		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusInternalServerError)
-		return
-	}
+	if isInternalServerError(err, w, fmt.Sprintf("Error: %v", err.Error())){return}
 
 	cors(w, r)
 	je := json.NewEncoder(w)
 
 	err = je.Encode(ret)
-	if err != nil {
-		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
-		return
-	}
+	if isBadRequest(err, w, fmt.Sprintf("Error: %v", err.Error())){return}
 }
 
 func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
@@ -120,40 +115,24 @@ func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-	if err != nil {
-		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
-		return
-	}
+	if isBadRequest(err, w, fmt.Sprintf("Error parsing data: %v", err.Error())){return}
 	data := buf.String()
 
 	if n == 0 {
 		input = ListAgentsRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		if err != nil {
-			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-			retError(w, emsg, http.StatusBadRequest)
-			return
-		}
+		if isBadRequest(err, w, fmt.Sprintf("Error parsing data: %v", err.Error())){return}
 	}
 
 	ret, err := s.ListAgents(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	if err != nil {
-		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusInternalServerError)
-		return
-	}
+	if isBadRequest(err, w, fmt.Sprintf("Error: %v", err.Error())){return}
 
 	cors(w, r)
 	je := json.NewEncoder(w)
 
 	err = je.Encode(ret)
-	if err != nil {
-		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
-		return
-	}
+	if isBadRequest(err, w, fmt.Sprintf("Error: %v", err.Error())){return}
 
 }
 
