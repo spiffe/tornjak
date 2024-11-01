@@ -23,6 +23,8 @@ TODO:
 
 // Gets called from GetRouter func in server.go
 // http is a type of command that the server can take that starts the server
+// Gives an explicit return only if an error is countered
+	//otherwise, since no return is outlined, no return is necessary
 func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 
 	//To store the HealthcheckRequest we get from grpc
@@ -43,6 +45,9 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 	//if the body of the request was empty
 	if n == 0 {
 		input = HealthcheckRequest{}
+
+	//else if the body was NOT empty
+	//unmarshal the JSON and check for errors
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
 		if err != nil {
@@ -52,6 +57,8 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	//ret gets the address to the HealthcheckReponse response
+		//the HealthcheckResponse is actually the response of the server "input" as returned by grpc's HealthClient.Check()
 	ret, err := s.SPIREHealthcheck(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
@@ -59,15 +66,32 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//Sets the headers associated with the request to specific values
+	/*
+		"Content-Type" --> "application/json;charset=UTF-8"
+		"Access-Control-Allow-Origin" --> "*"
+		"Access-Control-Allow-Methods" --> "POST, GET, OPTIONS, DELETE, PATCH"
+		"Access-Control-Allow-Headers" --> "Content-Type, access-control-allow-origin, access-control-allow-headers, access-control-allow-credentials, Authorization, access-control-allow-methods"
+		"Access-Control-Expose-Headers" --> "*, Authorization"
+	*/
 	cors(w, r)
+
+	//Creates an Encoder object pointer that will be writing to http.ResponseWriter w
 	je := json.NewEncoder(w)
 
+	//writing the JSON encoing of ret 
+		//(address to the HealtheckResponse of whatever server we're checking) 
+		//to http.ResponseWriter w
 	err = je.Encode(ret)
+	
+	//if the Encode failed
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
 		retError(w, emsg, http.StatusBadRequest)
 		return
 	}
+
+	//if we never return an error, then all is well!
 }
 
 func (s *Server) debugServer(w http.ResponseWriter, r *http.Request) {
