@@ -6,7 +6,6 @@ import { withStyles } from 'tss-react/mui';
 import {
     CssBaseline,
     Drawer,
-    AppBar,
     Toolbar,
     List,
     Typography,
@@ -46,24 +45,6 @@ const styles = theme => ({
         padding: '0 8px',
         ...theme.mixins.toolbar,
     },
-    appBar: { //appbar
-        backgroundColor: 'lightgrey',
-        marginTop: 48,
-        zIndex: 2,
-        height: 80,
-        transition: theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-    },
-    appBarShift: { //appbar on shift/ open
-        marginLeft: drawerWidth,
-        width: `calc(100% - ${drawerWidth}px)`,
-        transition: theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    },
     menuButton: { //menu button next to Tornjak Dashboard title on view
         marginRight: 35,
         marginTop: 20
@@ -79,7 +60,7 @@ const styles = theme => ({
     drawerPaper: { //dashboard side drawer on open
         position: 'relative',
         whiteSpace: 'nowrap',
-        marginLeft: -20,
+        marginLeft: 10,
         top: 10,
         zIndex: 1,
         width: drawerWidth,
@@ -100,7 +81,6 @@ const styles = theme => ({
             width: theme.spacing(9),
         },
     },
-    appBarSpacer: theme.mixins.toolbar,
     content: {
         flexGrow: 1,
     },
@@ -152,24 +132,6 @@ class DashboardDrawer extends React.Component {
         return (
             <div>
                 <CssBaseline />
-                <AppBar position="absolute" className={clsx(classes.appBar, this.state.open && classes.appBarShift)}>
-                    <Toolbar className={classes.toolbar}>
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={this.handleDrawerOpen}
-                            className={clsx(classes.menuButton, this.state.open && classes.menuButtonHidden)}
-                        >
-                            <MenuIcon
-                                className={classes.menuIcon}
-                                color="inherit" />
-                        </IconButton>
-                        <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-                            Tornjak Dashboard
-                        </Typography>
-                    </Toolbar>
-                </AppBar>
                 <Drawer
                     variant="permanent"
                     classes={{
@@ -177,11 +139,6 @@ class DashboardDrawer extends React.Component {
                     }}
                     open={this.state.open}
                 >
-                    <div className={classes.toolbarIcon}>
-                        <IconButton onClick={this.handleDrawerClose}>
-                            <ChevronLeftIcon />
-                        </IconButton>
-                    </div>
                     <Divider 
                         className={classes.drawerdivider}/>
                     <List>
