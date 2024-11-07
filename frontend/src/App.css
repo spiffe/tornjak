@@ -1,14 +1,18 @@
 .app-container {
   display: flex;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .main-content {
   flex: 1;
   flex-direction: column;
+  overflow-y: auto;
 }
 
-.bottom{
+.main{
   padding: 20px;
+  margin-top: -20px;
 }
 
 .App {

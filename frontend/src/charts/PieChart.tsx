@@ -41,11 +41,10 @@ class PieChart1 extends React.Component<PieChartProps, PieChartState> {
   }
 
   render() {
-    const { data } = this.props;
+    const { data, title } = this.props;
     return (
       <div>
-        <div>
-        </div>
+          <h3 style={{ fontSize: '18px' }}>{title}</h3>
           <PieChart
             data={data}
             options={this.state.options}

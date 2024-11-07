@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 import { Dropdown, TextInput, NumberInput, InlineNotification } from 'carbon-components-react';
 import TornjakApi from './tornjak-api-helpers';

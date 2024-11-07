@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
 import { Dropdown, TextInput, FilterableMultiSelect, TextArea, InlineNotification } from 'carbon-components-react';

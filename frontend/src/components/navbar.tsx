@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import jwt_decode from "jwt-decode";
 import { connect } from 'react-redux';
 import IsManager from './is_manager';

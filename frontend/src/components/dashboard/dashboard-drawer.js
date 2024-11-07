@@ -6,9 +6,7 @@ import { withStyles } from 'tss-react/mui';
 import {
     CssBaseline,
     Drawer,
-    Toolbar,
     List,
-    Typography,
     Divider,
     IconButton,
     ListItem,
@@ -16,9 +14,9 @@ import {
     ListItemText,
     ListSubheader,
 } from '@mui/material';
-// Icons
-import MenuIcon from '@mui/icons-material/Menu';
+
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -31,7 +29,7 @@ const drawerHeight = '100%';
 
 const styles = theme => ({
     root: {
-        marginTop: -25,
+        marginTop: -35, //set to 0 
         marginLeft: -20,
         display: 'flex',
     },
@@ -45,9 +43,27 @@ const styles = theme => ({
         padding: '0 8px',
         ...theme.mixins.toolbar,
     },
+    appBar: { //appbar
+        backgroundColor: 'lightgrey', //remove bg color or make transparent
+        marginTop: 48,
+        zIndex: 2,
+        height: 80, //set height to 0
+        transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+    },
+    appBarShift: { //appbar on shift/ open
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    },
     menuButton: { //menu button next to Tornjak Dashboard title on view
-        marginRight: 35,
-        marginTop: 20
+        marginLeft: -20,
+        marginTop: 20,
     },
     menuButtonHidden: { //menu button next to Tornjak Dashboard title on hidden
         display: 'none',
@@ -60,7 +76,6 @@ const styles = theme => ({
     drawerPaper: { //dashboard side drawer on open
         position: 'relative',
         whiteSpace: 'nowrap',
-        marginLeft: 10,
         top: 10,
         zIndex: 1,
         width: drawerWidth,
@@ -81,6 +96,7 @@ const styles = theme => ({
             width: theme.spacing(9),
         },
     },
+    appBarSpacer: theme.mixins.toolbar,
     content: {
         flexGrow: 1,
     },
@@ -104,20 +120,25 @@ const styles = theme => ({
     },
     drawerdivider: {
         marginTop: 16,
+    },
+    h3: {
+        color: 'black',
+        marginTop: 20,
+        marginLeft: 10
     }
 });
 
 class DashboardDrawer extends React.Component {
-    constructor(props) {
+   constructor(props) {
         super(props);
-        const { classes } = this.props;
         this.state = {
             open: true,
         };
-        this.handleDrawerOpen = () => this.setState({ open: true })
-        this.handleDrawerClose = () => this.setState({ open: false })
-        this.fixedHeightPaper = clsx(classes.paper, classes.fixedHeight)
-        this.assignDashboardPath = this.assignDashboardPath.bind(this);
+        this.toggleDrawer = this.toggleDrawer.bind(this);
+    }
+
+    toggleDrawer() {
+        this.setState(prevState => ({ open: !prevState.open }));
     }
 
     assignDashboardPath(entity) {
@@ -132,6 +153,9 @@ class DashboardDrawer extends React.Component {
         return (
             <div>
                 <CssBaseline />
+                <div style={{ display: 'flex' }}>
+                    <h3 style={{ marginLeft: '20px', marginTop: '20px'}}>Tornjak Dashboard</h3>
+                </div>
                 <Drawer
                     variant="permanent"
                     classes={{
@@ -187,6 +211,11 @@ class DashboardDrawer extends React.Component {
                         </div>
                     </List>
                     <Divider />
+                    <div className={classes.toolbarIcon}>
+                        <IconButton onClick={this.toggleDrawer}>
+                            {this.state.open ? <ChevronLeftIcon /> : <ChevronRightIcon/>}
+                        </IconButton>
+                    </div>
                 </Drawer>
             </div>
         );

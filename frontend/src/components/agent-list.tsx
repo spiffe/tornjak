@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 import IsManager from './is_manager';
 import Table from "tables/agents-list-table";

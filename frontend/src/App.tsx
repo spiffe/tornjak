@@ -19,12 +19,6 @@ import DashboardDetailsRender from 'components/dashboard/dashboard-details-rende
 import RenderOnAdminRole from 'components/RenderOnAdminRole'
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
-import SpireHealthCheck from 'components/spire-health-check';
-import {env} from './env';
-import Topbar from './components/topbar';
-
-// to enable SPIRE health check component
-const spireHealthCheck = (env.REACT_APP_SPIRE_HEALTH_CHECK_ENABLE === 'true') ?? false; // defualt value false
 
 function App() {
     return (
@@ -35,17 +29,9 @@ function App() {
                         <div className="sidebar">
                             <NavigationBar />
                         </div>
-                        {spireHealthCheck &&
-                            <div>
-                                <SpireHealthCheck />
-                            </div>
-                        }
+
                         <div className="main-content">
-                            <div className="top">
-                                <Topbar/>
-                            </div>
-                            
-                            <div className="bottom">
+                            <div className="main">
                                 <SelectServer />
                                 <br />
                                 {IsManager && <br />}
