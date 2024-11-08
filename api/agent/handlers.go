@@ -14,6 +14,7 @@ TODO:
 	2. Understand what each function is doing -- comment everything!
 		a. Mason is starting from the top function
 		b. Collin is starting from the bottom function
+		c. UPDATE: This may not be necessary considering how much code is reused
 	3. Group up functions into different files depending on what they do (at Maia's suggestion)
 		a. server handlers vs. agent handlers?
 		b. vs. federation api?
@@ -21,15 +22,9 @@ TODO:
 	4. Refactor at least 3 functions before the end of the semester
 */
 
-// TODO For later: Determine if input is http.StatusBadRequest OR http.StatusInternalServerError
-// TODO: Seems like there should be a more elegant solution for this...
-func isHttpError(err error, w http.ResponseWriter, emsg string, errType string) (bool){
+func isHttpError(err error, w http.ResponseWriter, emsg string, status int) (bool){
 	if err != nil {
-		if errType == "BadReq" {
-			retError(w, emsg, http.StatusBadRequest)
-		}else if errType == "InternalError" {
-			retError(w, emsg, http.StatusBadRequest)
-		}
+		retError(w, emsg, status)
 		return true
 	}
 	return false
@@ -49,7 +44,7 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 	// and then puts the # of bytes of type int64 into n and an error into err
 	// err is nil if there was no error
 	n, err := io.Copy(buf, r.Body)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 	data := buf.String()
 
@@ -61,14 +56,14 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 	// unmarshal the JSON and check for errors
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		if isErr {return}
 	}
 
 	// ret gets the address to the HealthcheckReponse response
 		// the HealthcheckResponse is actually the response of the server "input" as returned by grpc's HealthClient.Check()
 	ret, err := s.SPIREHealthcheck(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "InternalError")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusInternalServerError)
 	if isErr {return}
 
 	// Sets the headers associated with the request to specific values
@@ -90,25 +85,24 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 	err = je.Encode(ret)
 	
 	// if the Encode failed
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 
 	// if we never return an error, then all is well!
 }
 
-
 func (s *Server) debugServer(w http.ResponseWriter, r *http.Request) {
 	input := DebugServerRequest{} // HARDCODED INPUT because there are no fields to DebugServerRequest
 
 	ret, err := s.DebugServer(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	isErr := isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "InternalError")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusInternalServerError)
 	if isErr {return}
 
 	cors(w, r)
 	je := json.NewEncoder(w)
 
 	err = je.Encode(ret)
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 }
 
@@ -117,7 +111,7 @@ func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 	data := buf.String()
 
@@ -125,19 +119,19 @@ func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
 		input = ListAgentsRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		if isErr {return}
 	}
 
 	ret, err := s.ListAgents(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 
 	cors(w, r)
 	je := json.NewEncoder(w)
 
 	err = je.Encode(ret)
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 
 }
@@ -147,7 +141,7 @@ func (s *Server) agentBan(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 	data := buf.String()
 
@@ -157,18 +151,18 @@ func (s *Server) agentBan(w http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		if isErr {return}
 	}
 
 	err = s.BanAgent(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	isErr = isHttpError(err, w, fmt.Sprintf("Error listing agents: %v", err.Error()), "InternalError")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error listing agents: %v", err.Error()), http.StatusInternalServerError)
 	if isErr {return}
 
 	cors(w, r)
 	_, err = w.Write([]byte("SUCCESS"))
 
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 
 }
@@ -180,7 +174,7 @@ func (s *Server) agentDelete(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 	data := buf.String()
 
@@ -190,18 +184,18 @@ func (s *Server) agentDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		if isErr {return}
 	}
 
 	err = s.DeleteAgent(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	isErr = isHttpError(err, w, fmt.Sprintf("Error listing agents: %v", err.Error()), "InternalError")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error listing agents: %v", err.Error()), http.StatusInternalServerError)
 	if isErr {return}
 
 	cors(w, r)
 	_, err = w.Write([]byte("SUCCESS"))
 
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 
 }
@@ -211,7 +205,7 @@ func (s *Server) agentCreateJoinToken(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 	data := buf.String()
 
@@ -219,18 +213,18 @@ func (s *Server) agentCreateJoinToken(w http.ResponseWriter, r *http.Request) {
 		input = CreateJoinTokenRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		if isErr {return}
 	}
 
 	ret, err := s.CreateJoinToken(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "InternalError")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusInternalServerError)
 	if isErr {return}
 
 	cors(w, r)
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 
 }
@@ -240,7 +234,7 @@ func (s *Server) entryList(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 	data := buf.String()
 
@@ -248,18 +242,18 @@ func (s *Server) entryList(w http.ResponseWriter, r *http.Request) {
 		input = ListEntriesRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		if isErr {return}
 	}
 
 	ret, err := s.ListEntries(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "InternalError")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusInternalServerError)
 	if isErr {return}
 
 	cors(w, r)
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 
 }
@@ -269,7 +263,7 @@ func (s *Server) entryCreate(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 	data := buf.String()
 
@@ -277,18 +271,18 @@ func (s *Server) entryCreate(w http.ResponseWriter, r *http.Request) {
 		input = BatchCreateEntryRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		if isErr {return}
 	}
 
 	ret, err := s.BatchCreateEntry(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "InternalError")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusInternalServerError)
 	if isErr {return}
 
 	cors(w, r)
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 
 }
@@ -298,7 +292,7 @@ func (s *Server) entryDelete(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 	data := buf.String()
 
@@ -306,18 +300,18 @@ func (s *Server) entryDelete(w http.ResponseWriter, r *http.Request) {
 		input = BatchDeleteEntryRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		if isErr {return}
 	}
 
 	ret, err := s.BatchDeleteEntry(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "InternalError")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusInternalServerError)
 	if isErr {return}
 
 	cors(w, r)
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 }
 
@@ -327,7 +321,7 @@ func (s *Server) bundleGet(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 	data := buf.String()
 
@@ -335,18 +329,18 @@ func (s *Server) bundleGet(w http.ResponseWriter, r *http.Request) {
 		input = GetBundleRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		if isErr {return}
 	}
 
 	ret, err := s.GetBundle(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "InternalError")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusInternalServerError)
 	if isErr {return}
 
 	cors(w, r)
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 }
 
@@ -355,7 +349,7 @@ func (s *Server) federatedBundleList(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 	data := buf.String()
 
@@ -363,18 +357,18 @@ func (s *Server) federatedBundleList(w http.ResponseWriter, r *http.Request) {
 		input = ListFederatedBundlesRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		if isErr {return}
 	}
 
 	ret, err := s.ListFederatedBundles(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "InternalError")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusInternalServerError)
 	if isErr {return}
 
 	cors(w, r)
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 }
 
@@ -383,7 +377,7 @@ func (s *Server) federatedBundleCreate(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 	data := buf.String()
 
@@ -391,18 +385,18 @@ func (s *Server) federatedBundleCreate(w http.ResponseWriter, r *http.Request) {
 		input = CreateFederatedBundleRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		if isErr {return}
 	}
 
 	ret, err := s.CreateFederatedBundle(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "InternalError")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusInternalServerError)
 	if isErr {return}
 
 	cors(w, r)
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 }
 
@@ -411,7 +405,7 @@ func (s *Server) federatedBundleUpdate(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 	data := buf.String()
 
@@ -419,18 +413,18 @@ func (s *Server) federatedBundleUpdate(w http.ResponseWriter, r *http.Request) {
 		input = UpdateFederatedBundleRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		if isErr {return}
 	}
 
 	ret, err := s.UpdateFederatedBundle(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "InternalError")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusInternalServerError)
 	if isErr {return}
 
 	cors(w, r)
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 }
 
@@ -439,7 +433,7 @@ func (s *Server) federatedBundleDelete(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 	data := buf.String()
 
@@ -447,18 +441,18 @@ func (s *Server) federatedBundleDelete(w http.ResponseWriter, r *http.Request) {
 		input = DeleteFederatedBundleRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		if isErr {return}
 	}
 
 	ret, err := s.DeleteFederatedBundle(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "InternalError")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusInternalServerError)
 	if isErr {return}
 
 	cors(w, r)
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 }
 
@@ -470,7 +464,7 @@ func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 	je := json.NewEncoder(w)
 
 	var err = je.Encode(ret)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 }
 
@@ -481,7 +475,7 @@ func (s *Server) health(w http.ResponseWriter, r *http.Request) {
 	je := json.NewEncoder(w)
 
 	var err = je.Encode(ret)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 }
 
@@ -489,7 +483,7 @@ func (s *Server) tornjakSelectorsList(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 
 	data := buf.String()
@@ -499,19 +493,19 @@ func (s *Server) tornjakSelectorsList(w http.ResponseWriter, r *http.Request) {
 		input = ListSelectorsRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		if isErr {return}
 	}
 
 	ret, err := s.ListSelectors(input)
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 
 	cors(w, r)
 
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 }
 
@@ -519,7 +513,7 @@ func (s *Server) tornjakPluginDefine(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 
 	data := buf.String()
@@ -529,18 +523,18 @@ func (s *Server) tornjakPluginDefine(w http.ResponseWriter, r *http.Request) {
 		input = RegisterSelectorRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		if isErr {return}
 	}
 
 	err = s.DefineSelectors(input)
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 
 	cors(w, r)
 
 	_, err = w.Write([]byte("SUCCESS"))
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 }
 
@@ -548,7 +542,7 @@ func (s *Server) tornjakAgentsList(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+	isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 
 	data := buf.String()
@@ -558,18 +552,18 @@ func (s *Server) tornjakAgentsList(w http.ResponseWriter, r *http.Request) {
 		input = ListAgentMetadataRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), "BadReq")
+		isErr := isHttpError(err, w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		if isErr {return}
 	}
 
 	ret, err := s.ListAgentMetadata(input)
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 
 	cors(w, r)
 
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
-	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), "BadReq")
+	isErr = isHttpError(err, w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 	if isErr {return}
 }
