@@ -29,7 +29,7 @@ import {
   DebugServerInfo,
   TornjakServerInfo
 } from './types';
-//import HeaderToolBar from './navbar-header-toolbar';
+import HeaderToolBar from './navbar-header-toolbar';
 import { env } from '../env';
 import {
   Dashboard, 
@@ -45,6 +45,11 @@ import {
   ZosSysplex,
   IbmCloudBareMetalServer
 } from "@carbon/icons-react";
+
+import SpireHealthCheck from 'components/spire-health-check';
+
+// to enable SPIRE health check component
+const spireHealthCheck = (env.REACT_APP_SPIRE_HEALTH_CHECK_ENABLE === 'true') ?? false; // defualt value false
 
 const Auth_Server_Uri = env.REACT_APP_AUTH_SERVER_URI;
 
@@ -160,7 +165,10 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
                 <a href="/">
                   <img src={tornjak_logo} height="50" width="160" alt="Tornjak" /></a>
               </span>
-              {/* <HeaderToolBar /> */}
+              
+              <div className="toolbar_icons">
+                <HeaderToolBar /> 
+              </div>
             </div>
 
             <div className="dropdown-container">
@@ -264,6 +272,12 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
               </Tag>
             </div>
 
+            {spireHealthCheck &&
+              <div>
+                <SpireHealthCheck />
+              </div>
+            }
+
             <div className="sidepanel">
                 <OpenPanelFilledLeft onClick={this.toggleSidebar} className = "panel" size={25}/>
             </div>
@@ -275,50 +289,86 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
                       <img src={tornjak_face} height="45" width="55" alt="Tornjak" />
                   </div>
               </Link>
+              
               <div className="collapsed-icons">
-                <Link to="/clusters">
+                <div className="icon-container">
+                  <Link to="/clusters">
                     <AssemblyCluster className="icon-spacing" size={32}/>
-                </Link>
+                  </Link>
+                  <span className="icon-description">Clusters List</span>
+                </div>
+
                 {(isAdmin || !env.REACT_APP_AUTH_SERVER_URI) && (
+                  <div className="icon-container">
                     <Link to="/cluster/clustermanagement">
-                        <ZosSysplex className="icon-spacing" size={32}/>
+                      <ZosSysplex className="icon-spacing" size={32}/>
                     </Link>
+                    <span className="icon-description">Cluster Management</span>
+                  </div>
                 )}
-                <Link to="/agents">
+
+                <div className="icon-container">
+                  <Link to="/agents">
                     <UserMultiple className="icon-spacing" size={32}/>
-                </Link>
+                  </Link>
+                  <span className="icon-description">Agents List</span>
+                </div>
+
                 {(isAdmin || !env.REACT_APP_AUTH_SERVER_URI) && (
+                  <div className="icon-container">
                     <Link to="/agent/createjointoken">
-                        <IbmCloudKubernetesService className="icon-spacing" size={32}/>
+                      <IbmCloudKubernetesService className="icon-spacing" size={32}/>
                     </Link>
+                    <span className="icon-description">Create Token</span>
+                  </div>
                 )}
-                <Link to="/entries">
+
+                <div className="icon-container">
+                  <Link to="/entries">
                     <Notebook className="icon-spacing" size={32}/>
-                </Link>
+                  </Link>
+                  <span className="icon-description">Entries List</span>
+                </div>
+
                 {(isAdmin || !env.REACT_APP_AUTH_SERVER_URI) && (
+                  <div className="icon-container">
                     <Link to="/entry/create">
-                        <Add className="icon-spacing" size={32}/>
+                      <Add className="icon-spacing" size={32}/>
                     </Link>
+                    <span className="icon-description">Create Entries</span>
+                  </div>
                 )}
-                <Link to="/federations">
+
+                <div className="icon-container">
+                  <Link to="/federations">
                     <TwoPersonLift className="icon-spacing" size={32}/>
-                </Link>
-                <Link to="/tornjak/serverinfo">
+                  </Link>
+                  <span className="icon-description">Federations List</span>
+                </div>
+
+                <div className="icon-container">
+                  <Link to="/tornjak/serverinfo">
                     <BareMetalServer className="icon-spacing" size={32}/>
-                </Link>
-                <Link
+                  </Link>
+                  <span className="icon-description">Tornjak ServerInfo</span>
+                </div>
+
+                <div className="icon-container">
+                  <Link
                     to="/tornjak/dashboard"
                     onClick={() => {
-                        if (this.props.globalClickedDashboardTable !== "dashboard") {
-                            this.props.clickedDashboardTableFunc("dashboard");
-                        }
+                      if (this.props.globalClickedDashboardTable !== "dashboard") {
+                        this.props.clickedDashboardTableFunc("dashboard");
+                      }
                     }}
-                >
+                  >
                     <Dashboard className="icon-spacing" size={32}/>
-                </Link>
+                  </Link>
+                  <span className="icon-description">Tornjak Dashboard</span>
+                </div>
 
                 <div className="sidepanel">
-                    <OpenPanelFilledRight onClick={this.toggleSidebar} className="panel2" size={32} />
+                  <OpenPanelFilledRight onClick={this.toggleSidebar} className="panel2" size={32} />
                 </div>
               </div>
           </div>

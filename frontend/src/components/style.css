@@ -61,31 +61,6 @@
   background-color: #282c34;
 }
 
-.shard {
-  flex-grow: 1;     
-  width: 100px;      
-  height: 100px; 
-  position: relative;
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-  opacity: 0.9;
-  margin: -20px;
-}
-
-.shard-green {
-  background-color: #4CAF50; 
-  transform: rotate(30deg);
-}
-
-.shard-blue {
-  background-color: #00BCD4; 
-  transform: rotate(-30deg);
-}
-
-.shard-lightgreen {
-  background-color: #8BC34A;
-  transform: rotate(45deg);
-}
-
 .title {
   position: absolute;
   bottom: 10px; 
@@ -130,6 +105,9 @@
 
 .icon-container {
   position: relative;
+  display: flex;
+  align-items: center;
+  z-index: 1000;
 }
 
 .icon-description {
@@ -138,16 +116,21 @@
   left: calc(100% + 10px);
   top: 50%;
   transform: translateY(-50%);
-  background-color: black;
+  background-color: #000000cc; 
   color: white;
-  padding: 10px 10px;
+  padding: 10px 15px;
   border-radius: 5px;
   white-space: nowrap;
   z-index: 100;
+  font-size: 14px;
 }
 
 .icon-container:hover .icon-description {
   display: block;
+}
+
+.icon-container:hover {
+  transform: scale(1.2); 
 }
 
 .logo {
@@ -552,7 +535,7 @@
   position: relative;
   z-index: 3;
   float: right;
-  margin-right: 190px;
+  margin-right: 40px;
   padding-top: 3px;
   margin-left: 15px;
 }
@@ -562,6 +545,7 @@
   background-color: rgb(233, 233, 233);
   top: 0;
   margin-top: 5px;
+  width: 120px;
   min-width: 157px;
 }
 
