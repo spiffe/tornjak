@@ -22,9 +22,11 @@ TODO:
 	4. Refactor at least 3 functions before the end of the semester
 */
 
+// TODO For later: Determine if input is http.StatusBadRequest OR http.StatusInternalServerError
+// TODO: Seems like there should be a more elegant solution for this...
 func isHttpError(err error, w http.ResponseWriter, emsg string, status int) (bool){
 	if err != nil {
-		retError(w, emsg, status)
+        retError(w, emsg, status);
 		return true
 	}
 	return false
