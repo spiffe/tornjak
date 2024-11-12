@@ -17,8 +17,7 @@ func (s *Server) federationList(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 
 	n, err := io.Copy(buf, r.Body)
-    emsg := fmt.Sprintf("Error: %v", err.Error())
-    isHttpErr := isHttpError(err, w, emsg, http.StatusBadRequest);
+    isHttpErr := isHttpError(err, w, "Error: ", http.StatusBadRequest);
     
     if (isHttpErr) {
         return;
@@ -30,16 +29,14 @@ func (s *Server) federationList(w http.ResponseWriter, r *http.Request) {
 		input = ListFederationRelationshipsRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
-        emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-        isHttpErr := isHttpError(err, w, emsg, http.StatusBadRequest)
+        isHttpErr := isHttpError(err, w, "Error parsing data: ", http.StatusBadRequest)
         if (isHttpErr) {
             return
         }
 	}
 
 	ret, err := s.ListFederationRelationships(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
-    emsg = fmt.Sprintf("Error: %v", err.Error())
-    isHttpErr = isHttpError(err, w, emsg, http.StatusInternalServerError)
+    isHttpErr = isHttpError(err, w, "Error: ", http.StatusInternalServerError)
     if isHttpErr {
         return
     }
@@ -48,8 +45,7 @@ func (s *Server) federationList(w http.ResponseWriter, r *http.Request) {
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 
-    emsg = fmt.Sprintf("Error: %v", err.Error())
-    isHttpErr = isHttpError(err, w, emsg, http.StatusBadRequest)
+    isHttpErr = isHttpError(err, w, "Error: ", http.StatusBadRequest)
 	if isHttpErr {
 		return
 	}
