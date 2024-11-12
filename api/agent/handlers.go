@@ -24,9 +24,10 @@ TODO:
 
 // TODO For later: Determine if input is http.StatusBadRequest OR http.StatusInternalServerError
 // TODO: Seems like there should be a more elegant solution for this...
+// @param emsg should be "Error: " or "Error parsing data: "
 func isHttpError(err error, w http.ResponseWriter, emsg string, status int) (bool){
 	if err != nil {
-        retError(w, emsg, status);
+        retError(w, emsg + err.Error(), status);
 		return true
 	}
 	return false
