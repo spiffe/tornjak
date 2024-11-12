@@ -177,11 +177,10 @@
 .user-dropdown {
   position: relative;
   display: inline-block;
-  z-index: 4;
+  z-index: 1000;
 }
 
 .user-dropdown-content {
-  padding-top: 25px;
   margin-top: 10px;
   position: absolute;
   background-color: #f1f1f1;
@@ -489,6 +488,7 @@
   display: inline;
   float: right;
   display:flex;
+  margin-left: -10px;
 }
 
 .user-name {
@@ -505,25 +505,27 @@
 
 .admin-toolbar-header {
   position: relative;
-  display: inline;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 15px;
   color: white;
   border: 0.1px solid white;
   padding: 4px;
-  float: right;
-  margin-right: 70px;
+  margin-right: 10px;
   margin-top: 7px;
   margin-left: 11px;
 }
 
 .manager-toolbar-header {
   position: relative;
-  display: inline;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 15px;
   color: white;
   border: 0.1px solid white;
   padding: 4px;
-  float: right;
   margin-right: 10px;
   margin-top: 7px;
   margin-left: 11px;
@@ -538,21 +540,36 @@
   margin-right: 40px;
   padding-top: 3px;
   margin-left: 15px;
+  margin-top: 6px;
+  margin-bottom: 10px;
 }
 
 .health-status-check-container {
   padding: 3.5px 10px 3.5px 10px;
   background-color: rgb(233, 233, 233);
   top: 0;
-  margin-top: 5px;
-  width: 120px;
-  min-width: 157px;
+  margin-top: 25px;
+  width: 140px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .health-status-check-title {
-  display: inline-block;
   margin-right: 10px;
   color: black;
+}
+
+.health-status-check-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.refresh_status{
+  display: flex;
+  gap: 10px;
 }
 
 .spire-health-check-refresh-dropdown {

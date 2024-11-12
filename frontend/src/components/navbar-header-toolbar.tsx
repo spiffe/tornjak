@@ -38,6 +38,7 @@ class HeaderToolBar extends Component<HeaderToolBarProp, HeaderToolBarState> {
                         </div>
                     </div>
                 }
+                
                 <HeaderGlobalAction
                     aria-label="Notifications"
                     onClick={() => { alert("This is a place holder, functionality to be implemented on future work!") }}>

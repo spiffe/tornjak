@@ -126,35 +126,33 @@ class SpireHealthCheck extends Component<SpireHealthCheckProp, SpireHealthCheckS
       </div>
     return (
       <div className="health-check">
-        <div className='spire-health-refresh-tooltip'>
-          <Tooltip>
-            <p className="spire-health-helper">SPIRE Health Refresh Frequency</p>
-          </Tooltip>
-        </div>
-        <div className="spire-health-check-refresh-dropdown">
-          <Dropdown
-            ariaLabel="spire-refresh-rate-drop-down"
-            id="spire-refresh-rate-drop-down"
-            items={spireHealthCheckTimeOptions}
-            defaultValue={this.props.globalSpireHealthTime.SpireHealthCheckFreqDisplay}
-            label={this.props.globalSpireHealthTime.SpireHealthCheckFreqDisplay}
-            titleText="Refresh Rate"
-            onChange={this.onChangeSpireRefreshRate}
-          />
-        </div>
-        <div className='health-status-check-container'>
-          <div className='health-status-check-title'>
-            <h6>SPIRE: </h6>
+
+          <div className="refresh_status">
+            <div className="spire-health-check-refresh-dropdown">
+              <Dropdown
+                ariaLabel="spire-refresh-rate-drop-down"
+                id="spire-refresh-rate-drop-down"
+                items={spireHealthCheckTimeOptions}
+                defaultValue={this.props.globalSpireHealthTime.SpireHealthCheckFreqDisplay}
+                label={this.props.globalSpireHealthTime.SpireHealthCheckFreqDisplay}
+                titleText="Refresh Rate"
+                onChange={this.onChangeSpireRefreshRate}
+              />
+            </div>
+            <div className='health-status-check-container'>
+              <div className='health-status-check-title'>
+                <h6>SPIRE: </h6>
+              </div>
+              <div className='health-status-check-icon'>
+                {!checking &&
+                  <InlineLoading
+                    status="active"
+                    description="Checking" />
+                }
+                {checking && spireStatus}
+              </div>
+            </div>
           </div>
-          <div className='health-status-check-icon'>
-            {!checking &&
-              <InlineLoading
-                status="active"
-                description="Checking" />
-            }
-            {checking && spireStatus}
-          </div>
-        </div>
       </div>
     );
   }
