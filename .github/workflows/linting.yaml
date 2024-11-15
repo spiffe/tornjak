@@ -9,7 +9,7 @@ jobs:
       - name: Checkout markdown
         uses: actions/checkout@v4.2.2
       - name: Lint markdown
-        uses: DavidAnson/markdownlint-cli2-action@v17
+        uses: DavidAnson/markdownlint-cli2-action@v18
         continue-on-error: true
         with:
           config: '.markdownlint.yml'
