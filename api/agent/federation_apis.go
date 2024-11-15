@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"strings"
 
@@ -15,12 +14,8 @@ func (s *Server) federationList(w http.ResponseWriter, r *http.Request) {
 	var input ListFederationRelationshipsRequest
 	buf := new(strings.Builder)
 
-	n, err := io.Copy(buf, r.Body)
-    if isHttpError(err, w, "Error: ", http.StatusBadRequest) {
-        return;
-    }
-
-	data := buf.String()
+	n, err, data := copyIntoBuff(buf, w, r, "Error: ")
+	if n == 0 && data == "err" { return }
 
 	if n == 0 {
 		input = ListFederationRelationshipsRequest{}
@@ -50,11 +45,8 @@ func (s *Server) federationCreate(w http.ResponseWriter, r *http.Request) {
 	var rawInput trustdomain.BatchCreateFederationRelationshipRequest
 	buf := new(strings.Builder)
 
-	n, err := io.Copy(buf, r.Body)
-    if isHttpError(err, w, "Error parsing data: ", http.StatusBadRequest) {
-        return
-    }
-	data := buf.String()
+	n, err, data := copyIntoBuff(buf, w, r, "Error parsing data: ")
+	if n == 0 && data == "err" { return }
 
 	if n == 0 {
 		input = CreateFederationRelationshipRequest{}
@@ -86,11 +78,8 @@ func (s *Server) federationUpdate(w http.ResponseWriter, r *http.Request) {
 	var rawInput trustdomain.BatchUpdateFederationRelationshipRequest
 	buf := new(strings.Builder)
 
-	n, err := io.Copy(buf, r.Body)
-    if isHttpError(err, w, "Error parsing data: ", http.StatusBadRequest) {
-        return
-    }
-	data := buf.String()
+	n, err, data := copyIntoBuff(buf, w, r, "Error parsing data: ")
+	if n == 0 && data == "err" { return }
 
 	if n == 0 {
 		input = UpdateFederationRelationshipRequest{}
@@ -120,11 +109,8 @@ func (s *Server) federationDelete(w http.ResponseWriter, r *http.Request) {
 	var input DeleteFederationRelationshipRequest
 	buf := new(strings.Builder)
 
-	n, err := io.Copy(buf, r.Body)
-    if isHttpError(err, w, "Error parsing data: ", http.StatusBadRequest) {
-        return
-    }
-	data := buf.String()
+	n, err, data := copyIntoBuff(buf, w, r, "Error parsing data: ")
+	if n == 0 && data == "err" { return }
 
 	if n == 0 {
 		input = DeleteFederationRelationshipRequest{}

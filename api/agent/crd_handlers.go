@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"strings"
 
@@ -20,11 +19,8 @@ func (s *Server) CRDFederationList(w http.ResponseWriter, r *http.Request) {
 	var input crdmanager.ListFederationRelationshipsRequest
 	buf := new(strings.Builder)
 
-	n, err := io.Copy(buf, r.Body)
-	if isHttpError(err, w, "Error parsing data: ", http.StatusBadRequest) {
-		return
-	}
-	data := buf.String()
+	n, err, data := copyIntoBuff(buf, w, r, "Error parsing data: ")
+	if n == 0 && data == "err" { return }
 
 	if n == 0 {
 		input = crdmanager.ListFederationRelationshipsRequest{}
