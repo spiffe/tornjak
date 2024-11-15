@@ -47,7 +47,7 @@
   -  [Further Reading](https://github.com/spiffe/tornjak/blob/main/docs/config-tornjak-server.md#further-reading)
 
 -  [Tornjak UI-API Documentation](https://github.com/spiffe/tornjak/blob/main/docs/tornjak-ui-api-documentation.md)
-    -  [Overview](https://github.com/spiffe/tornjak/blob/main/docs/tornjak-ui-api-documentation.md#11-overview)
+  -  [Overview](https://github.com/spiffe/tornjak/blob/main/docs/tornjak-ui-api-documentation.md#11-overview)
   -  [Tornjak User Interface (UI) Architecture](https://github.com/spiffe/tornjak/blob/main/docs/tornjak-ui-api-documentation.md#2-tornjak-user-interface-ui-architecture)
     -  [UI Pages (With their paths)](https://github.com/spiffe/tornjak/blob/main/docs/tornjak-ui-api-documentation.md#21-ui-pages-with-their-paths)
   -  [Tornjak User Interface (UI) Interaction with API Endpoints](https://github.com/spiffe/tornjak/blob/main/docs/tornjak-ui-api-documentation.md#3-tornjak-user-interface-ui-interaction-with-api-endpoints)
