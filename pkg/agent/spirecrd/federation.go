@@ -32,24 +32,10 @@ func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRel
 
 	var result []*apitypes.FederationRelationship
 	for _, trustDomain := range trustDomainList.Items {
-		// parse TrustDomain into ClusterFederatedTrustDomain object
-		var clusterFederatedTrustDomain spirev1alpha1.ClusterFederatedTrustDomain
-		err := runtime.DefaultUnstructuredConverter.FromUnstructured(trustDomain.Object, &clusterFederatedTrustDomain)
+		spireAPIFederation, err := unstructuredToSpireAPIFederation(trustDomain)
 		if err != nil {
-			return ListFederationRelationshipsResponse{}, fmt.Errorf("error parsing trustdomain: %v", err)
+			return ListFederationRelationshipsResponse{}, fmt.Errorf("Error parsing trustDomain: %v", err)
 		}
-		// parse ClusterFederatedTrustDomain object into Federation object
-		federation, err := spirev1alpha1.ParseClusterFederatedTrustDomainSpec(&clusterFederatedTrustDomain.Spec)
-		if err != nil {
-			return ListFederationRelationshipsResponse{}, fmt.Errorf("error parsing crd spec: %v", err)
-		}
-
-		// parse Federation object into spire API object
-		spireAPIFederation, err := federationRelationshipToAPI(*federation)
-		if err != nil {
-			return ListFederationRelationshipsResponse{}, fmt.Errorf("error parsing into spire API object: %v", err)
-		}
-
 		// place SPIRE API object into result
 		result = append(result, spireAPIFederation)
 	}
@@ -59,47 +45,102 @@ func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRel
 	}, nil 
 }
 
+func unstructuredToSpireAPIFederation(trustDomain unstructured.Unstructured) (*apitypes.FederationRelationship, error) {
+		// parse TrustDomain into ClusterFederatedTrustDomain object
+		var clusterFederatedTrustDomain spirev1alpha1.ClusterFederatedTrustDomain
+		err := runtime.DefaultUnstructuredConverter.FromUnstructured(trustDomain.Object, &clusterFederatedTrustDomain)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing trustdomain: %v", err)
+		}
+		// parse ClusterFederatedTrustDomain object into Federation object
+		federation, err := spirev1alpha1.ParseClusterFederatedTrustDomainSpec(&clusterFederatedTrustDomain.Spec)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing crd spec: %v", err)
+		}
+
+		// parse Federation object into spire API object
+		spireAPIFederation, err := federationRelationshipToAPI(*federation)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing into spire API object: %v", err)
+		}
+
+		return spireAPIFederation, nil
+}
+
+func (s *SPIRECRDManager) spireAPIFederationToUnstructured(apiFederation *apitypes.FederationRelationship) (*unstructured.Unstructured, error) {
+		// parse into federation object
+		federation, err := federationRelationshipFromAPI(apiFederation)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing into federation object: %v", err)
+		}
+
+		// parse into ClusterFederatedTrustDomain object
+		clusterFederatedTrustDomain, err := s.parseToClusterFederatedTrustDomain(&federation)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing into clusterFederatedTrustDomain object: %v", err)
+		}
+
+		// translate to unstructured
+		unstructuredObject, err := runtime.DefaultUnstructuredConverter.ToUnstructured(clusterFederatedTrustDomain)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing trustdomain: %v", err)
+		}
+		createInput := &unstructured.Unstructured{Object: unstructuredObject}
+
+		return createInput, nil
+}
+
 type BatchCreateFederationRelationshipsRequest trustdomain.BatchCreateFederationRelationshipRequest
 type BatchCreateFederationRelationshipsResponse trustdomain.BatchCreateFederationRelationshipResponse
 
 func (s *SPIRECRDManager) BatchCreateClusterFederatedTrustDomains(inp BatchCreateFederationRelationshipsRequest) (BatchCreateFederationRelationshipsResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 
+	// TODO add check on classname - should only make for a certain classname
 	apiFederationList := inp.FederationRelationships
+	var result []*trustdomain.BatchCreateFederationRelationshipResponse_Result
 	for _, apiFederation := range apiFederationList {
-
-		fmt.Printf("apiFederation object: %+v\n", apiFederation)
-
-		// parse into federation object
-		federation, err := federationRelationshipFromAPI(apiFederation)
-		if err != nil {
-			return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error parsing into federation object: %v", err)
+		// resulting object
+		successStatus := &apitypes.Status{
+			Code: 0,
+			Message: "OK",
 		}
-		fmt.Printf("federation object: %+v\n", federation)
-
-		// parse into ClusterFederatedTrustDomain object
-		clusterFederatedTrustDomain, err := s.parseToClusterFederatedTrustDomain(&federation)
-		if err != nil {
-			return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error parsing into clusterFederatedTrustDomain object: %v", err)
+		failStatus := &apitypes.Status{
+			Code: 1, // TODO more specific codes
+			Message: "Failure",
 		}
-		fmt.Printf("crd object: %+v\n", clusterFederatedTrustDomain)
 
-		// translate to unstructured
-		unstructuredObject, err := runtime.DefaultUnstructuredConverter.ToUnstructured(clusterFederatedTrustDomain)
+		// parse to unstructured
+		createInput, err := s.spireAPIFederationToUnstructured(apiFederation)
 		if err != nil {
-			return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error parsing trustdomain: %v", err)
+			failStatus.Message = fmt.Sprintf("Error parsing input: %v", err)
+			result = append(result, &trustdomain.BatchCreateFederationRelationshipResponse_Result {Status: failStatus})
+			continue
 		}
-		createInput := &unstructured.Unstructured{Object: unstructuredObject}
 
 		// post ClusterFederatedTrustDomain object
 		createResult, err := s.kubeClient.Resource(gvrFederation).Create(context.TODO(), createInput, metav1.CreateOptions{})
-		// TODO do not return error, simply store result and continue
 		if err != nil {
-			return BatchCreateFederationRelationshipsResponse{}, fmt.Errorf("error listing trust domains: %v", err)
+			failStatus.Message = fmt.Sprintf("Error listing trust dmoains: %v", err)
+			result = append(result, &trustdomain.BatchCreateFederationRelationshipResponse_Result {Status: failStatus})
+			continue
+		}
+		resultFederationRelationship, err := unstructuredToSpireAPIFederation(*createResult)
+		if err != nil {
+			failStatus.Message = fmt.Sprintf("Error parsing returned trust domain: %v", err)
+			result = append(result, &trustdomain.BatchCreateFederationRelationshipResponse_Result {Status: failStatus})
+			continue
+		}
+		resultEntry := trustdomain.BatchCreateFederationRelationshipResponse_Result{
+			Status: successStatus,
+			FederationRelationship: resultFederationRelationship,
 		}
 
-		fmt.Printf("createResult: %+v\n\n", createResult)
+		result = append(result, &resultEntry)
 
 	}
-
-	return BatchCreateFederationRelationshipsResponse{}, nil 
+	return BatchCreateFederationRelationshipsResponse{
+		Results: result,
+	}, nil 
 }
+
+
