@@ -7,6 +7,8 @@ import (
 	"crypto"
 	"crypto/x509"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"github.com/spiffe/spire-controller-manager/pkg/spireapi"
 	apitypes "github.com/spiffe/spire-api-sdk/proto/spire/api/types"
@@ -16,6 +18,52 @@ import (
 )
 
 // TODO this file has much code duplicated from spire-controller-manager - would ideally import functions directly
+
+func unstructuredToSpireAPIFederation(trustDomain unstructured.Unstructured) (*apitypes.FederationRelationship, error) {
+		// parse TrustDomain into ClusterFederatedTrustDomain object
+		var clusterFederatedTrustDomain spirev1alpha1.ClusterFederatedTrustDomain
+		err := runtime.DefaultUnstructuredConverter.FromUnstructured(trustDomain.Object, &clusterFederatedTrustDomain)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing trustdomain: %v", err)
+		}
+		// parse ClusterFederatedTrustDomain object into Federation object
+		federation, err := spirev1alpha1.ParseClusterFederatedTrustDomainSpec(&clusterFederatedTrustDomain.Spec)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing crd spec: %v", err)
+		}
+
+		// parse Federation object into spire API object
+		spireAPIFederation, err := federationRelationshipToAPI(*federation)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing into spire API object: %v", err)
+		}
+
+		return spireAPIFederation, nil
+}
+
+func (s *SPIRECRDManager) spireAPIFederationToUnstructured(apiFederation *apitypes.FederationRelationship) (*unstructured.Unstructured, error) {
+		// parse into federation object
+		federation, err := federationRelationshipFromAPI(apiFederation)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing into federation object: %v", err)
+		}
+
+		// parse into ClusterFederatedTrustDomain object
+		clusterFederatedTrustDomain, err := s.parseToClusterFederatedTrustDomain(&federation)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing into clusterFederatedTrustDomain object: %v", err)
+		}
+
+		// translate to unstructured
+		unstructuredObject, err := runtime.DefaultUnstructuredConverter.ToUnstructured(clusterFederatedTrustDomain)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing trustdomain: %v", err)
+		}
+		createInput := &unstructured.Unstructured{Object: unstructuredObject}
+
+		return createInput, nil
+}
+
 
 // This code taken from https://github.com/spiffe/spire-controller-manager/blob/main/pkg/spireapi/types.go
 // For parsing from spire type to Federation object

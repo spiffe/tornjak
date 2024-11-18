@@ -7,11 +7,7 @@ import (
 	"context"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-
-	spirev1alpha1 "github.com/spiffe/spire-controller-manager/api/v1alpha1"
 )
 
 var gvrFederation = schema.GroupVersionResource{
@@ -43,51 +39,6 @@ func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRel
 	return ListFederationRelationshipsResponse{
 		FederationRelationships: result,
 	}, nil 
-}
-
-func unstructuredToSpireAPIFederation(trustDomain unstructured.Unstructured) (*apitypes.FederationRelationship, error) {
-		// parse TrustDomain into ClusterFederatedTrustDomain object
-		var clusterFederatedTrustDomain spirev1alpha1.ClusterFederatedTrustDomain
-		err := runtime.DefaultUnstructuredConverter.FromUnstructured(trustDomain.Object, &clusterFederatedTrustDomain)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing trustdomain: %v", err)
-		}
-		// parse ClusterFederatedTrustDomain object into Federation object
-		federation, err := spirev1alpha1.ParseClusterFederatedTrustDomainSpec(&clusterFederatedTrustDomain.Spec)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing crd spec: %v", err)
-		}
-
-		// parse Federation object into spire API object
-		spireAPIFederation, err := federationRelationshipToAPI(*federation)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing into spire API object: %v", err)
-		}
-
-		return spireAPIFederation, nil
-}
-
-func (s *SPIRECRDManager) spireAPIFederationToUnstructured(apiFederation *apitypes.FederationRelationship) (*unstructured.Unstructured, error) {
-		// parse into federation object
-		federation, err := federationRelationshipFromAPI(apiFederation)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing into federation object: %v", err)
-		}
-
-		// parse into ClusterFederatedTrustDomain object
-		clusterFederatedTrustDomain, err := s.parseToClusterFederatedTrustDomain(&federation)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing into clusterFederatedTrustDomain object: %v", err)
-		}
-
-		// translate to unstructured
-		unstructuredObject, err := runtime.DefaultUnstructuredConverter.ToUnstructured(clusterFederatedTrustDomain)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing trustdomain: %v", err)
-		}
-		createInput := &unstructured.Unstructured{Object: unstructuredObject}
-
-		return createInput, nil
 }
 
 type BatchCreateFederationRelationshipsRequest trustdomain.BatchCreateFederationRelationshipRequest
