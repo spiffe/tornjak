@@ -324,4 +324,3 @@ const mapStateToProps = (state) => ({
 
 const DashboardDetailsStyled = withStyles(DashboardDetails, styles);
 export default connect(mapStateToProps, {})(DashboardDetailsStyled);
-
