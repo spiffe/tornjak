@@ -138,3 +138,29 @@ Alternatively, one may also run these components in a container, as is described
 ### User Management
 
 User Management is an optional feature that prevents un-authorized access to Tornjak and SPIRE APIs. We have several comprehensive resources for getting started with integrating user management in this [User Management documentation](./docs/user-management.md).
+
+### Windows Line Ending Troubleshooting
+
+1. On Windows, files use CRLF (`\r\n`) line endings, but Git (Linux) uses LF (`\n`) line endings.
+
+2. We can check the status of line endings using:  
+   ```console
+   git config --global core.autocrlf
+   ```
+
+3. If there is no status, Windows will use its own line endings. We can fix this issue by setting:  
+   ```console
+   git config --global core.autocrlf true
+   ```
+
+4. Now if we run the command in step 2 again:  
+   ```console
+   git config --global core.autocrlf
+   ```  
+   Windows should now output:  
+   ```console
+   true
+   ```
+
+5. Files are now checked out with CRLF (Windows format), and files are committed with LF (Unix format).
+
