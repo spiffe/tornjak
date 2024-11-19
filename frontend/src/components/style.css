@@ -1,26 +1,156 @@
 .navigation-bar {
-  min-width: 20px;
-  z-index: 3;
-  background-color: black;
-  min-width: 1550px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #282c34;
+  color: white;
+  flex-shrink: 0;
+  overflow-y: auto;
+  padding-top: 15px;
+  width: 300px;
+}
+
+.navigation-bar-collapsed, .collapsed-icons{
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  margin-right: 10px;
+  margin-left: 10px;
+  background-color: #282c34;
+  padding: auto;
+}
+
+.navigation-bar-collapsed .collapsed-icons a {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.collapsed-icons a:hover {
+  color: green;
+}
+
+
+.sidepanel{
+  margin-left: auto;
+  margin-right: 15px;
+  margin-top: 10px;
+}
+
+.panel2{
+  color: white;
+}
+
+.face{
+  padding-top: 10px;
+}
+
+.shattered {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
   width: 100%;
-  height: 47.5px;
+  height: 100%;
+  max-width: 100vw;
+  overflow-x: hidden; 
+  overflow-y: hidden;
+  background-color: #0ea2c9;
+}
+
+.sidebar{
+  background-color: #282c34;
+}
+
+.title {
+  position: absolute;
+  bottom: 10px; 
+  left: 10px;  
+  color: black;
+  font-size: 40px;
+  z-index: 2;
+  margin: 0;
+  text-align: left;
+}
+
+.top-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow-x: hidden;
+  height: 75px;
+}
+
+.icon-spacing {
+  margin-right: 8px; 
+}
+
+.icon_spacing_drop{
+  margin-left: 10px;
+}
+
+.icon_spacing_drop:hover{
+  color: green;
+}
+
+.icon-spacing2 {
+  margin-left: 10px; 
+}
+
+.toolbar_icons {
+  display: flex;
+  margin-left: auto;
+  align-items: center;
+}
+
+.icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  z-index: 1000;
+}
+
+.icon-description {
+  display: none;
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #000000cc; 
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+  white-space: nowrap;
+  z-index: 100;
+  font-size: 14px;
+}
+
+.icon-container:hover .icon-description {
+  display: block;
+}
+
+.icon-container:hover {
+  transform: scale(1.2); 
 }
 
 .logo {
-  margin-top: -50px;
+  text-align: center;
+  display:flex;
+  width: 100%;
 }
 
 .dropdown-container {
-  margin-left: 200px;
+  display:flex;
+  flex-direction: column;
 }
 
 .dropbtn {
   color: white;
-  padding: 30px;
-  font-size: 16px;
+  font-size: 17px;
   border: none;
+  width: 100%;
   text-decoration: none;
+  text-align: left;
 }
 
 .dropdown {
@@ -28,13 +158,17 @@
   display: inline-block;
   padding: 15px;
   z-index: 4;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.dropdown:hover .dropbtn {
+  background-color: #1d1f23;
 }
 
 .dropdown-content {
   margin-top: 10px;
-  position: absolute;
-  background-color: #f1f1f1;
-  display: none;
+  display: block;
   min-width: 130px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 3;
@@ -43,17 +177,15 @@
 .user-dropdown {
   position: relative;
   display: inline-block;
-  z-index: 4;
+  z-index: 1000;
 }
 
 .user-dropdown-content {
-  padding-top: 25px;
   margin-top: 10px;
   position: absolute;
   background-color: #f1f1f1;
   display: none;
   min-width: 130px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 3;
   font-weight: bold;
 }
@@ -65,13 +197,13 @@
 }
 
 .dropdown-content a {
-  color: black;
+  color: white;
   padding: 12px 16px;
   z-index: 3;
 }
 
 .dropdown-content a:hover {
-  background-color: #ddd;
+  background-color: green;
 }
 
 .dropdown:hover .dropdown-content {
@@ -259,6 +391,11 @@
   margin-left: 200px;
 }
 
+.toast-entry-creation-notification.cds--toast-notification {
+  width: 820px; 
+  margin-bottom: 10px;
+}
+
 .toast-entry-creation-notification {
   width: 850px;
 }
@@ -350,6 +487,8 @@
   position: relative;
   display: inline;
   float: right;
+  display:flex;
+  margin-left: -10px;
 }
 
 .user-name {
@@ -366,64 +505,83 @@
 
 .admin-toolbar-header {
   position: relative;
-  display: inline;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 15px;
   color: white;
   border: 0.1px solid white;
   padding: 4px;
-  float: right;
-  margin-right: 70px;
+  margin-right: 10px;
   margin-top: 7px;
+  margin-left: 11px;
 }
 
 .manager-toolbar-header {
   position: relative;
-  display: inline;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 15px;
   color: white;
   border: 0.1px solid white;
   padding: 4px;
-  float: right;
   margin-right: 10px;
   margin-top: 7px;
+  margin-left: 11px;
 }
 
 .health-check {
+  display: flex;
+  flex-direction: column;
   position: relative;
   z-index: 3;
   float: right;
-  margin-right: 190px;
+  margin-right: 40px;
   padding-top: 3px;
+  margin-left: 15px;
+  margin-top: 6px;
+  margin-bottom: 10px;
 }
 
 .health-status-check-container {
-  border: 0.1px solid black;
   padding: 3.5px 10px 3.5px 10px;
   background-color: rgb(233, 233, 233);
-  display: inline-block;
-  margin-left: 5px;
-  position: absolute;
   top: 0;
-  margin-top: 1.9em;
-  min-width: 157px;
+  margin-top: 25px;
+  width: 140px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .health-status-check-title {
-  display: inline-block;
   margin-right: 10px;
+  color: black;
 }
 
 .health-status-check-icon {
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.refresh_status{
+  display: flex;
+  gap: 10px;
 }
 
 .spire-health-check-refresh-dropdown {
   width: 115px;
+  flex-wrap: none;
   display: inline-block;
 }
 
 .spire-health-refresh-tooltip {
-  display: inline-block;
+  margin-top: 10px;
+  display: flex;
+  white-space: nowrap;
   margin-right: 10px;
 }
 
@@ -438,13 +596,12 @@
   width: 180px;
   float: right;
 }
+
 .spire-server-unique-identifier {
   margin-top: 20px;
-  margin-right: 20px;
-  z-index: 1000; /* High z-index to ensure it's on top */
+  margin-left: 10px;
   position: relative;
   display: inline;
-  float: right; /* Float to the right */
 }
 
 .tls-mtls-enabled input {

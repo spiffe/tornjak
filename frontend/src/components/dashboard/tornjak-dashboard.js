@@ -243,4 +243,3 @@ export default connect(
     selectorInfoFunc, 
     clickedDashboardTableFunc }
 )(TornjakDashboardStyled);
-
