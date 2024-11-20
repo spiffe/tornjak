@@ -273,9 +273,7 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
             </div>
 
             {spireHealthCheck &&
-              <div>
-                <SpireHealthCheck />
-              </div>
+              <SpireHealthCheck />
             }
 
             <div className="sidepanel">
