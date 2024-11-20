@@ -154,7 +154,7 @@ class DashboardDrawer extends React.Component {
             <div>
                 <CssBaseline />
                 <div style={{ display: 'flex' }}>
-                    <h3 style={{ marginLeft: '20px', marginTop: '20px'}}>Tornjak Dashboard</h3>
+                    <h3 style={{ marginLeft: '20px', marginTop: '20px', whiteSpace: 'nowrap'}}>Tornjak Dashboard</h3>
                 </div>
                 <Drawer
                     variant="permanent"
