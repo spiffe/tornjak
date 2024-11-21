@@ -100,4 +100,3 @@ const EntriesDashBoardTableStyled = withStyles(
 );
 
 export default connect(mapStateToProps, {})(EntriesDashBoardTableStyled);
-

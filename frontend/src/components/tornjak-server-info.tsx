@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 import { Accordion, AccordionItem, Tag, TagTypeName } from "carbon-components-react";
 import IsManager from './is_manager';

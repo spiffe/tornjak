@@ -1,14 +1,17 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import jwt_decode from "jwt-decode";
 import { connect } from 'react-redux';
 import IsManager from './is_manager';
 import 'carbon-components/css/carbon-components.min.css';
 import './style.css';
 import tornjak_logo from "res/tornjak_logo.png";
+import tornjak_face from "res/tornjak_face.png";
 import TornjakHelper from 'components/tornjak-helper';
 import KeycloakService from "auth/KeycloakAuth";
 import { RootState } from 'redux/reducers';
 import TornjakApi from './tornjak-api-helpers';
+import { Link } from 'react-router-dom';
+import NavDropdown from './NavDropdown';
 import {
   clickedDashboardTableFunc,
   isAuthenticatedUpdateFunc,
@@ -28,6 +31,25 @@ import {
 } from './types';
 import HeaderToolBar from './navbar-header-toolbar';
 import { env } from '../env';
+import {
+  Dashboard, 
+  BareMetalServer, 
+  AssemblyCluster, 
+  UserMultiple, 
+  Notebook, 
+  TwoPersonLift,
+  OpenPanelFilledLeft,
+  OpenPanelFilledRight,
+  IbmCloudKubernetesService,
+  Add,
+  ZosSysplex,
+  IbmCloudBareMetalServer
+} from "@carbon/icons-react";
+
+import SpireHealthCheck from 'components/spire-health-check';
+
+// to enable SPIRE health check component
+const spireHealthCheck = (env.REACT_APP_SPIRE_HEALTH_CHECK_ENABLE === 'true') ?? false; // defualt value false
 
 const Auth_Server_Uri = env.REACT_APP_AUTH_SERVER_URI;
 
@@ -68,7 +90,10 @@ type NavigationBarProp = {
   globalErrorMessage: string,
 }
 
-type NavigationBarState = {}
+type NavigationBarState = {
+  sidebarOpen: boolean;
+  isDropdownOpen: boolean;
+}
 
 class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
   TornjakHelper: TornjakHelper;
@@ -77,8 +102,23 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
     super(props);
     this.TornjakHelper = new TornjakHelper({});
     this.TornjakApi = new TornjakApi(props);
-    this.state = {};
+    this.state = {
+      sidebarOpen: true,
+      isDropdownOpen: false
+    };
   }
+
+  toggleSidebar = () => {
+    this.setState((prevState) => ({
+      sidebarOpen: !prevState.sidebarOpen
+    }));
+  }
+
+  toggleClustersDropdown = () => {
+    this.setState((prevState) => ({
+      isDropdownOpen: !prevState.isDropdownOpen,
+    }));
+  };
 
   componentDidMount() {
     if (Auth_Server_Uri) {
@@ -108,95 +148,229 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
   }
 
   render() {
+    const { sidebarOpen } = this.state;
     const isAdmin = this.TornjakHelper.checkRolesAdminUser(this.props.globalUserRoles), withAuth = env.REACT_APP_AUTH_SERVER_URI;
     let managerNavs;
     managerNavs =
       <div className="dropdown">
+        <IbmCloudBareMetalServer className="icon-spacing"/>
         <a href="/server/manage" className="dropbtn">Manage Servers</a>
       </div>
     return (
       <div data-test="nav-bar">
-        <div className="navigation-bar">
-          <div className="dropdown-container">
-            <div className="dropdown">
-              <a href="/clusters" className="dropbtn">Clusters </a>
-              <div className="dropdown-content">
-                <a href="/clusters" className="nav-link">Clusters List</a>
-                {(isAdmin || !withAuth) &&
-                  <a href="/cluster/clustermanagement" className="nav-link">Cluster Management</a>
-                }
+        {sidebarOpen ? (
+          <div className="navigation-bar">
+            <div className="logo">
+              <span>
+                <a href="/">
+                  <img src={tornjak_logo} height="50" width="160" alt="Tornjak" /></a>
+              </span>
+              
+              <div className="toolbar_icons">
+                <HeaderToolBar /> 
               </div>
             </div>
-            <div className="dropdown">
-              <a href="/agents" className="dropbtn">Agents </a>
-              <div className="dropdown-content">
-                <a href="/agents" className="nav-link">Agents List</a>
-                {(isAdmin || !withAuth) &&
-                  <a href="/agent/createjointoken" className="nav-link">Create Token</a>
-                }
+
+            <div className="dropdown-container">
+              {Auth_Server_Uri && isAdmin &&
+                <div className="admin-toolbar-header">
+                  <h5>ADMIN PORTAL</h5>
+                </div>
+              }
+              {IsManager &&
+                <div className="manager-toolbar-header">
+                  <h5>MANAGER PORTAL</h5>
+                </div>
+              }
+              {IsManager && managerNavs}
+
+              <div className="dropdown">
+                <NavDropdown
+                  icon={<AssemblyCluster className="icon-spacing" />}
+                  title="Clusters"
+                  link="/clusters"
+                  isAdmin={Boolean(isAdmin)}
+                  withAuth={Boolean(withAuth)}
+                  subLinks={[
+                    { label: 'Clusters List', to: '/clusters' },
+                    {
+                      label: 'Cluster Management',
+                      to: '/cluster/clustermanagement',
+                      adminOnly: true,
+                    },
+                  ]}
+                />
               </div>
-            </div>
-            <div className="dropdown">
-              <a href="/entries" className="dropbtn">Entries</a>
-              <div className="dropdown-content">
-                <a href="/entries" className="nav-link">Entries List</a>
-                {(isAdmin || !withAuth) &&
-                  <a href="/entry/create" className="nav-link">Create Entries</a>
-                }
+
+              <div className="dropdown">
+                <NavDropdown
+                  icon={<UserMultiple className="icon-spacing" />}
+                  title="Agents"
+                  link="/agents"
+                  isAdmin={Boolean(isAdmin)}
+                  withAuth={Boolean(withAuth)}
+                  subLinks={[
+                    { label: 'Agents List', to: '/agents' },
+                    { label: 'Create Token', to: '/agent/createjointoken', adminOnly: true },
+                  ]}
+                />
               </div>
-            </div>
-            <div className="dropdown">
-              <a href="/federations" className="dropbtn">Federations </a>
-              <div className="dropdown-content">
-                <a href="/federations" className="nav-link">Federations List</a>
-                {/* To be added */}
-                {/*{(isAdmin || !withAuth) &&*/}
-                {/*    <a href="" className="nav-link">Create Federation</a>*/}
-                {/*}*/}
+
+              <div className="dropdown">
+                <NavDropdown
+                  icon={<Notebook className="icon-spacing" />}
+                  title="Entries"
+                  link="/entries"
+                  isAdmin={Boolean(isAdmin)}
+                  withAuth={Boolean(withAuth)}
+                  subLinks={[
+                    { label: 'Entries List', to: '/entries' },
+                    { label: 'Create Entries', to: '/entry/create', adminOnly: true },
+                  ]}
+                />
               </div>
-            </div>
-            <div className="dropdown">
-              <a href="/tornjak/serverinfo" className="dropbtn">Tornjak ServerInfo</a>
-            </div>
-            <div className="dropdown">
-              <a
-                href="/tornjak/dashboard"
-                className="dropbtn"
-                onClick={() => {
-                  if (this.props.globalClickedDashboardTable !== "dashboard") {
-                    this.props.clickedDashboardTableFunc("dashboard")
-                  }
-                }}
-              >Tornjak Dashboard</a>
-            </div>
-            <HeaderToolBar />
-            {Auth_Server_Uri && isAdmin &&
-              <div className="admin-toolbar-header">
-                <h5>ADMIN PORTAL</h5>
+
+              <div className="dropdown">
+                <NavDropdown
+                icon={<TwoPersonLift className="icon-spacing" />}
+                title="Federations"
+                link="/federations"
+                isAdmin={Boolean(isAdmin)}
+                withAuth={Boolean(withAuth)}
+                subLinks={[
+                  { label: 'Federations List', to: '/federations' },
+                ]}
+                />
               </div>
+              
+              <div className="dropdown">
+                <BareMetalServer className="icon-spacing"/>
+                <a href="/tornjak/serverinfo" className="dropbtn">Tornjak ServerInfo</a>
+              </div>
+
+              <div className="dropdown">
+                <Dashboard className="icon-spacing"/>
+                <a
+                  href="/tornjak/dashboard"
+                  className="dropbtn"
+                  onClick={() => {
+                    if (this.props.globalClickedDashboardTable !== "dashboard") {
+                      this.props.clickedDashboardTableFunc("dashboard")
+                    }
+                  }}
+                >Tornjak Dashboard</a>
+              </div>
+
+            </div>
+
+            {/* Temporarily using trust domain as server unique identifier */}
+            <div className="spire-server-unique-identifier">
+              <Tag type="cyan">
+                <span style={{ fontWeight: 'bold' }}>Server ID: </span>
+                <span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>{this.props.globalServerInfo.trustDomain}</span>
+                {this.props.globalDebugServerInfo.svid_chain[0].id.path}
+              </Tag>
+            </div>
+
+            {spireHealthCheck &&
+              <SpireHealthCheck />
             }
-            {IsManager &&
-              <div className="manager-toolbar-header">
-                <h5>MANAGER PORTAL</h5>
-              </div>
-            }
-            {IsManager && managerNavs}
+
+            <div className="sidepanel">
+                <OpenPanelFilledLeft onClick={this.toggleSidebar} className = "panel" size={25}/>
+            </div>
           </div>
-        </div>
-        <div className="logo">
-          <span>
-            <a href="/">
-              <img src={tornjak_logo} height="50" width="160" alt="Tornjak" /></a>
-          </span>
-        </div>
-        {/* Temporarily using trust domain as server unique identifier */}
-        <div className="spire-server-unique-identifier">
-          <Tag type="cyan">
-            <span style={{ fontWeight: 'bold' }}>Server ID: </span>
-            <span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>{this.props.globalServerInfo.trustDomain}</span>
-            {this.props.globalDebugServerInfo.svid_chain[0].id.path}
-          </Tag>
-        </div>
+        ) : (
+          <div className="navigation-bar-collapsed">
+              <Link to="/">
+                  <div className="face">
+                      <img src={tornjak_face} height="45" width="55" alt="Tornjak" />
+                  </div>
+              </Link>
+              
+              <div className="collapsed-icons">
+                <div className="icon-container">
+                  <Link to="/clusters">
+                    <AssemblyCluster className="icon-spacing" size={32}/>
+                  </Link>
+                  <span className="icon-description">Clusters List</span>
+                </div>
+
+                {(isAdmin || !env.REACT_APP_AUTH_SERVER_URI) && (
+                  <div className="icon-container">
+                    <Link to="/cluster/clustermanagement">
+                      <ZosSysplex className="icon-spacing" size={32}/>
+                    </Link>
+                    <span className="icon-description">Cluster Management</span>
+                  </div>
+                )}
+
+                <div className="icon-container">
+                  <Link to="/agents">
+                    <UserMultiple className="icon-spacing" size={32}/>
+                  </Link>
+                  <span className="icon-description">Agents List</span>
+                </div>
+
+                {(isAdmin || !env.REACT_APP_AUTH_SERVER_URI) && (
+                  <div className="icon-container">
+                    <Link to="/agent/createjointoken">
+                      <IbmCloudKubernetesService className="icon-spacing" size={32}/>
+                    </Link>
+                    <span className="icon-description">Create Token</span>
+                  </div>
+                )}
+
+                <div className="icon-container">
+                  <Link to="/entries">
+                    <Notebook className="icon-spacing" size={32}/>
+                  </Link>
+                  <span className="icon-description">Entries List</span>
+                </div>
+
+                {(isAdmin || !env.REACT_APP_AUTH_SERVER_URI) && (
+                  <div className="icon-container">
+                    <Link to="/entry/create">
+                      <Add className="icon-spacing" size={32}/>
+                    </Link>
+                    <span className="icon-description">Create Entries</span>
+                  </div>
+                )}
+
+                <div className="icon-container">
+                  <Link to="/federations">
+                    <TwoPersonLift className="icon-spacing" size={32}/>
+                  </Link>
+                  <span className="icon-description">Federations List</span>
+                </div>
+
+                <div className="icon-container">
+                  <Link to="/tornjak/serverinfo">
+                    <BareMetalServer className="icon-spacing" size={32}/>
+                  </Link>
+                  <span className="icon-description">Tornjak ServerInfo</span>
+                </div>
+
+                <div className="icon-container">
+                  <Link
+                    to="/tornjak/dashboard"
+                    onClick={() => {
+                      if (this.props.globalClickedDashboardTable !== "dashboard") {
+                        this.props.clickedDashboardTableFunc("dashboard");
+                      }
+                    }}
+                  >
+                    <Dashboard className="icon-spacing" size={32}/>
+                  </Link>
+                  <span className="icon-description">Tornjak Dashboard</span>
+                </div>
+
+                <div className="sidepanel">
+                  <OpenPanelFilledRight onClick={this.toggleSidebar} className="panel2" size={32} />
+                </div>
+              </div>
+          </div>
+        )}
       </div>
     );
   }
