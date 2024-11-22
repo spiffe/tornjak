@@ -3,19 +3,19 @@
 -   [Blogs](/docs/blogs.md)
 
 -   [Debugging, Hints and Tips for Solving Common Problems with Tornjak](/docs/tornjak-hints.md)
-    - [Tornjak Deployment](docs/tornjak-hints.md#tornjak-deployment)
+    - [Tornjak Deployment](/docs/tornjak-hints.md#tornjak-deployment)
     - [Tornjak Configuration](/docs/tornjak-hints.md#tornjak-configuration)
     - [User Management](/docs/tornjak-hints.md#user-management)
 
 -   [JSON Format for New Entry](/docs/newEntry-json-format.md)
 
--   [Server plugin: Authentication "Keycloak"](/docs/plugin_server_authentication_keycloak.md)
+-   [Server plugin: Authentication "Keycloak"](/docs/plugins/plugin_server_authentication_keycloak.md)
 
--   [Server plugin: Authorization "RBAC"](/docs/plugin_server_authorization_rbac.md)
+-   [Server plugin: Authorization "RBAC"](/docs/plugins/plugin_server_authorization_rbac.md)
 
--   [Server plugin: Datastore "SQL"](/docs/plugin_server_datastore_sql.md)
+-   [Server plugin: Datastore "SQL"](/docs/plugins/plugin_server_datastore_sql.md)
 
--   [Server plugin: SPIRECRDManager](/docs/plugin_server_spirecrd.md)
+-   [Server plugin: SPIRECRDManager](/docs/plugins/plugin_server_spirecrd.md)
 
 -   [Tornjak Agent](/docs/tornjak-agent.md)
     - [Tornjak SPIRE Server Agent](/docs/tornjak-agent.md#tornjak-spire-server-agent)
