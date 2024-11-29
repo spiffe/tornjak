@@ -1,7 +1,13 @@
 .app-container {
   display: flex;
-  height: 100vh;
-  overflow: hidden;
+  /*height: 100vh;*/
+  /*overflow: hidden;*/
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: flex-start; 
 }
 
 .main-content {
