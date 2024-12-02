@@ -38,7 +38,6 @@ const styles = theme => ({
     h3: {
         color: 'black',
         marginTop: 20,
-        marginLeft: 10,
         marginLeft: 20,
         marginBottom: 10,
     },
