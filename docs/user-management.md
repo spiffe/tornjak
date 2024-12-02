@@ -43,7 +43,7 @@ Once the Auth Server is set up, we can deploy the Tornjak Backend to require acc
 as detailed in
 [this followup Medium blog](https://medium.com/universal-workload-identity/guide-to-integrating-tornjak-with-keycloak-for-access-control-to-spire-40a3d5ee5f5a),
 with more details on the general configuration
-[here](/docs/config-tornjak-server.md). Most notably, populate a new plugin section for keycloak as defined [here](/docs/plugin_server_auth_keycloak.md) like so:
+[here](/docs/config-tornjak-server.md). Most notably, populate a new plugin section for keycloak as defined [here](/docs/plugins/plugin_server_auth_keycloak.md) like so:
 
 ```
 ...
