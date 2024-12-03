@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/google/uuid"
 	trustdomain "github.com/spiffe/spire-api-sdk/proto/spire/api/server/trustdomain/v1"
+	"github.com/spiffe/tornjak/pkg/agent/types"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
