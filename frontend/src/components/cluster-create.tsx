@@ -8,6 +8,7 @@ import TornjakApi from './tornjak-api-helpers';
 import { clusterType } from '../data/data';
 import { ToastContainer } from 'react-toastify';
 import './style.css';
+import { v4 as uuidv4 } from 'uuid';
 import {
   clusterTypeInfoFunc,
   serverSelectedFunc,
@@ -232,13 +233,14 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
 
     var cjtData = {
       cluster: {
-        name: this.state.clusterName,
-        platformType: this.state.clusterType,
-        domainName: this.state.clusterDomainName,
-        managedBy: this.state.clusterManagedBy,
-        agentsList: this.state.clusterAgentsList ? this.state.clusterAgentsList : []
+          uid: uniqueID,
+          name: this.state.clusterName,
+          platformType: this.state.clusterType,
+          domainName: this.state.clusterDomainName,
+          managedBy: this.state.clusterManagedBy,
+          agentsList: this.state.clusterAgentsList ? this.state.clusterAgentsList : []
       }
-    }
+  }
 
     let endpoint = this.getApiEntryCreateEndpoint()
 
@@ -247,20 +249,20 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
     }
 
     axios.post(endpoint, cjtData)
-      .then(
-        res => {
-          this.setState({
-            message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
-            statusOK: "OK",
-          })
-        }
-      )
-      .catch(err => showResponseToast(err))
+        .then(
+            res => {
+                this.setState({
+                    message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
+                    statusOK: "OK",
+                })
+            }
+        )
+        .catch(err => showResponseToast(err))
     //scroll to bottom of page after submission  
     setTimeout(() => {
-      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
     }, 100);
-  }
+}
 
   render() {
     const ClusterType = this.props.clusterTypeList;
@@ -375,14 +377,14 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
                     hideCloseButton
                     title="CLUSTER SUCCESSFULLY CREATED"
                     subtitle={
-                      <div className="toast-messege" data-test="alert-primary">
-                        <pre className="toast-messege-color">
-                          {this.state.message}
-                        </pre>
+                      <div className="toast-message" data-test="alert-primary">
+                          <pre className="toast-message-color">
+                              {this.state.message}
+                          </pre>
+                          <p>Unique ID: {cjtData.cluster.uid}</p>
                       </div>
                     }
                   />
-                }
                 {(this.state.statusOK === "ERROR") &&
                   <InlineNotification
                     kind="error"
