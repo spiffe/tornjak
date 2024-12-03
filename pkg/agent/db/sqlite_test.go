@@ -2,10 +2,11 @@ package db
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/pkg/errors"
 
 	backoff "github.com/cenkalti/backoff/v4"
 
@@ -282,7 +283,7 @@ func TestClusterCreate(t *testing.T) {
 	}
 
 	// ATTEMPT Create with no conflicting agent assignment [CreateClusterEntry, GetClusters]
-	err = db.CreateClusterEntry(cinfo3)
+	err = db.(cinfo3)
 	if err != nil {
 		t.Fatal(err)
 	}

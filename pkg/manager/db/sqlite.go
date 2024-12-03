@@ -73,63 +73,63 @@ func NewLocalSqliteDB(dbpath string) (ManagerDB, error) {
 	}, nil
 }
 
-func (db *LocalSqliteDb) CreateClusterEntry(cinfo types.ClusterInfo) error {
-	statement, err := db.database.Prepare("INSERT INTO clusters (uid, name, domain_name, platform_type, managed_by) VALUES (?, ?, ?, ?, ?)")
-	if err != nil {
-		return errors.Errorf("Unable to prepare SQL query: %v", err)
-	}
+// func (db *LocalSqliteDb) CreateClusterEntry(cinfo types.ClusterInfo) error {
+// 	statement, err := db.database.Prepare("INSERT INTO clusters (uid, name, domain_name, platform_type, managed_by) VALUES (?, ?, ?, ?, ?)")
+// 	if err != nil {
+// 		return errors.Errorf("Unable to prepare SQL query: %v", err)
+// 	}
 
-	_, err = statement.Exec(cinfo.UID, cinfo.Name, cinfo.DomainName, cinfo.PlatformType, cinfo.ManagedBy)
-	if err != nil {
-		return errors.Errorf("Unable to execute SQL query: %v", err)
-	}
-	return nil
-}
+// 	_, err = statement.Exec(cinfo.UID, cinfo.Name, cinfo.DomainName, cinfo.PlatformType, cinfo.ManagedBy)
+// 	if err != nil {
+// 		return errors.Errorf("Unable to execute SQL query: %v", err)
+// 	}
+// 	return nil
+// }
 
-func (db *LocalSqliteDb) GetClusters() ([]types.ClusterInfo, error) {
-	rows, err := db.database.Query("SELECT uid, name, domain_name, platform_type, managed_by FROM clusters")
-	if err != nil {
-		return nil, errors.New("Unable to execute SQL query")
-	}
+// func (db *LocalSqliteDb) GetClusters() ([]types.ClusterInfo, error) {
+// 	rows, err := db.database.Query("SELECT uid, name, domain_name, platform_type, managed_by FROM clusters")
+// 	if err != nil {
+// 		return nil, errors.New("Unable to execute SQL query")
+// 	}
 
-	clusters := []types.ClusterInfo{}
-	var (
-		uid          string
-		name         string
-		domainName   string
-		platformType string
-		managedBy    string
-	)
-	for rows.Next() {
-		if err = rows.Scan(&uid, &name, &domainName, &platformType, &managedBy); err != nil {
-			return nil, err
-		}
+// 	clusters := []types.ClusterInfo{}
+// 	var (
+// 		uid          string
+// 		name         string
+// 		domainName   string
+// 		platformType string
+// 		managedBy    string
+// 	)
+// 	for rows.Next() {
+// 		if err = rows.Scan(&uid, &name, &domainName, &platformType, &managedBy); err != nil {
+// 			return nil, err
+// 		}
 
-		clusters = append(clusters, types.ClusterInfo{
-			UID:          uid,
-			Name:         name,
-			DomainName:   domainName,
-			PlatformType: platformType,
-			ManagedBy:    managedBy,
-		})
-	}
+// 		clusters = append(clusters, types.ClusterInfo{
+// 			UID:          uid,
+// 			Name:         name,
+// 			DomainName:   domainName,
+// 			PlatformType: platformType,
+// 			ManagedBy:    managedBy,
+// 		})
+// 	}
 
-	return clusters, nil
-}
+// 	return clusters, nil
+// }
 
-func (db *LocalSqliteDb) GetClusterByUID(uid string) (types.ClusterInfo, error) {
-	row := db.database.QueryRow("SELECT uid, name, domain_name, platform_type, managed_by FROM clusters WHERE uid=?", uid)
+// func (db *LocalSqliteDb) GetClusterByUID(uid string) (types.ClusterInfo, error) {
+// 	row := db.database.QueryRow("SELECT uid, name, domain_name, platform_type, managed_by FROM clusters WHERE uid=?", uid)
 
-	cinfo := types.ClusterInfo{}
-	err := row.Scan(&cinfo.UID, &cinfo.Name, &cinfo.DomainName, &cinfo.PlatformType, &cinfo.ManagedBy)
-	if err == sql.ErrNoRows {
-		return types.ClusterInfo{}, errors.New("Cluster not found")
-	} else if err != nil {
-		return types.ClusterInfo{}, err
-	}
+// 	cinfo := types.ClusterInfo{}
+// 	err := row.Scan(&cinfo.UID, &cinfo.Name, &cinfo.DomainName, &cinfo.PlatformType, &cinfo.ManagedBy)
+// 	if err == sql.ErrNoRows {
+// 		return types.ClusterInfo{}, errors.New("Cluster not found")
+// 	} else if err != nil {
+// 		return types.ClusterInfo{}, err
+// 	}
 
-	return cinfo, nil
-}
+// 	return cinfo, nil
+// }
 
 func (db *LocalSqliteDb) CreateServerEntry(sinfo types.ServerInfo) error {
 	statement, err := db.database.Prepare("INSERT INTO servers (servername, address, tls, mtls, ca, cert, key) VALUES (?,?,?,?,?,?,?)")
