@@ -306,28 +306,28 @@ func (db *LocalSqliteDb) GetClusters() (types.ClusterInfoList, error) {
 
 // CreateClusterEntry takes in struct cinfo of type ClusterInfo.  If a cluster with cinfo.Name already registered, returns error.
 func (db *LocalSqliteDb) createClusterEntryOp(cinfo types.ClusterInfo) error {
-    ctx := context.Background()
-    tx, err := db.database.BeginTx(ctx, nil)
-    if err != nil {
-        return errors.Errorf("Error initializing context: %v", err)
-    }
-    txHelper := getTornjakTxHelper(ctx, tx)
+	ctx := context.Background()
+	tx, err := db.database.BeginTx(ctx, nil)
+	if err != nil {
+		return errors.Errorf("Error initializing context: %v", err)
+	}
+	txHelper := getTornjakTxHelper(ctx, tx)
 
-    // Generate UID
-    cinfo.UID = uuid.New().String()
+	// Generate UID
+	cinfo.UID = uuid.New().String()
 
-    // INSERT cluster metadata with UID
-    err = txHelper.insertClusterMetadata(cinfo)
-    if err != nil {
-        return backoff.Permanent(txHelper.rollbackHandler(err))
-    }
+	// INSERT cluster metadata with UID
+	err = txHelper.insertClusterMetadata(cinfo)
+	if err != nil {
+		return backoff.Permanent(txHelper.rollbackHandler(err))
+	}
 
-    // ADD agents to cluster
-    err = txHelper.addAgentBatchToCluster(cinfo.Name, cinfo.AgentsList)
-    if err != nil {
-        return backoff.Permanent(txHelper.rollbackHandler(err))
-    }
-    return tx.Commit()
+	// ADD agents to cluster
+	err = txHelper.addAgentBatchToCluster(cinfo.Name, cinfo.AgentsList)
+	if err != nil {
+		return backoff.Permanent(txHelper.rollbackHandler(err))
+	}
+	return tx.Commit()
 }
 
 // EditClusterEntry takes in struct cinfo of type ClusterInfo.  If cluster with cinfo.Name does not exist, throws error.
