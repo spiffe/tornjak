@@ -84,8 +84,6 @@ func (s *Server) ListClusters(inp ListClustersRequest) (*ListClustersResponse, e
 	return (*ListClustersResponse)(&retVal), nil
 }
 
-type RegisterClusterRequest tornjakTypes.ClusterInput
-
 // DefineCluster registers cluster to local DB
 // DefineCluster registers a cluster to the local DB
 func (s *Server) DefineCluster(inp RegisterClusterRequest) error {
@@ -105,8 +103,6 @@ func (s *Server) DefineCluster(inp RegisterClusterRequest) error {
 
 	return s.Db.CreateClusterEntry(cinfo)
 }
-
-type EditClusterRequest tornjakTypes.ClusterInput
 
 // EditCluster registers cluster to local DB
 // EditCluster registers updates to a cluster in the local DB
@@ -137,8 +133,6 @@ func (s *Server) EditCluster(inp EditClusterRequest) error {
 
 	return s.Db.EditClusterEntry(existingCluster)
 }
-
-type DeleteClusterRequest tornjakTypes.ClusterInput
 
 // DeleteCluster deletes cluster with name cinfo.Name and assignment to agents
 func (s *Server) DeleteCluster(inp DeleteClusterRequest) error {

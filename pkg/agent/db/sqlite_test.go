@@ -191,6 +191,8 @@ func TestSelectorDB(t *testing.T) {
 // Uses functions NewLocalSqliteDB, db.GetClusters, db.CreateClusterEntry,
 //
 //	db.GetAgentClusterName, db.GetClusterAgents
+var generatedUID string // Test-level variable
+// Test variable
 func TestClusterCreate(t *testing.T) {
 	cleanup()
 	defer cleanup()
@@ -210,6 +212,13 @@ func TestClusterCreate(t *testing.T) {
 	if len(cList) > 0 {
 		t.Fatal("Clusters list should initially be empty")
 	}
+	// CHECK that UID is generated for new cluster
+	if cList[0].UID == "" {
+		t.Fatal("UID not generated for new cluster")
+	}
+
+	// Save the generated UID for further tests
+	// generatedUID := cList[0].UID
 
 	cluster1 := "cluster1"
 	cluster2 := "cluster2"
@@ -283,7 +292,7 @@ func TestClusterCreate(t *testing.T) {
 	}
 
 	// ATTEMPT Create with no conflicting agent assignment [CreateClusterEntry, GetClusters]
-	err = db.(cinfo3)
+	err = db.CreateClusterEntry(cinfo3)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -406,6 +415,10 @@ func TestClusterEdit(t *testing.T) {
 	cList := cListObject.Clusters
 	if len(cList) > 0 {
 		t.Fatal("Clusters list should initially be empty")
+	}
+	// CHECK that the UID remains unchanged after editing
+	if cList[0].UID != generatedUID {
+		t.Fatalf("UID changed after editing: expected %v, got %v", generatedUID, cList[0].UID)
 	}
 
 	cluster1 := "cluster1"
@@ -633,6 +646,11 @@ func TestClusterDelete(t *testing.T) {
 	cList := cListObject.Clusters
 	if len(cList) > 0 {
 		t.Fatal("Clusters list should initially be empty")
+	}
+	// CHECK that clusters can be deleted using UID
+	err = db.DeleteClusterEntry(generatedUID)
+	if err != nil {
+		t.Fatalf("Failed to delete cluster by UID: %v", err)
 	}
 
 	cluster1 := "cluster1"

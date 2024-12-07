@@ -31,6 +31,23 @@ type SPIREConfig struct {
 	Plugins ast.Node           `hcl:"plugins"`
 }
 
+// RegisterClusterRequest represents the request for creating a cluster
+type RegisterClusterRequest struct {
+	// ClusterInstance ClusterInfo `json:"cluster_instance"`
+	UID string `json:"uid"`
+}
+
+// EditClusterRequest represents the request for editing a cluster
+type EditClusterRequest struct {
+	// ClusterInstance ClusterInfo `json:"cluster_instance"`
+	UID string `json:"uid"`
+}
+
+// DeleteClusterRequest represents the request for deleting a cluster
+type DeleteClusterRequest struct {
+	UID string `json:"uid"`
+}
+
 type TornjakConfig struct {
 	Server  *serverConfig `hcl:"server"`
 	Plugins *ast.Node     `hcl:"plugins"`
@@ -123,14 +140,14 @@ type AuthRole struct {
 }
 
 type APIv1RoleMapping struct {
-	Name string `hcl:",key"`
-	Method string `hcl:"-"`
-	Path string `hcl:"-"`
+	Name         string   `hcl:",key"`
+	Method       string   `hcl:"-"`
+	Path         string   `hcl:"-"`
 	AllowedRoles []string `hcl:"allowed_roles"`
 }
 
 type pluginAuthorizerRBAC struct {
-	Name            string            `hcl:"name"`
-	RoleList        []*AuthRole       `hcl:"role,block"`
+	Name              string              `hcl:"name"`
+	RoleList          []*AuthRole         `hcl:"role,block"`
 	APIv1RoleMappings []*APIv1RoleMapping `hcl:"APIv1,block"`
 }
