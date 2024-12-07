@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 
+	"github.com/google/uuid"
 	tornjakTypes "github.com/spiffe/tornjak/pkg/agent/types"
 )
 
@@ -86,8 +87,11 @@ func (s *Server) ListClusters(inp ListClustersRequest) (*ListClustersResponse, e
 type RegisterClusterRequest tornjakTypes.ClusterInput
 
 // DefineCluster registers cluster to local DB
+// DefineCluster registers a cluster to the local DB
 func (s *Server) DefineCluster(inp RegisterClusterRequest) error {
 	cinfo := tornjakTypes.ClusterInfo(inp.ClusterInstance)
+
+	// Validation for mandatory fields
 	if len(cinfo.Name) == 0 {
 		return errors.New("cluster definition missing mandatory field - Name")
 	} else if len(cinfo.PlatformType) == 0 {
@@ -95,14 +99,21 @@ func (s *Server) DefineCluster(inp RegisterClusterRequest) error {
 	} else if len(cinfo.EditedName) > 0 {
 		return errors.New("cluster definition attempts renaming on create cluster - EditedName")
 	}
+
+	// Generate UID for the cluster
+	cinfo.UID = uuid.New().String()
+
 	return s.Db.CreateClusterEntry(cinfo)
 }
 
 type EditClusterRequest tornjakTypes.ClusterInput
 
 // EditCluster registers cluster to local DB
+// EditCluster registers updates to a cluster in the local DB
 func (s *Server) EditCluster(inp EditClusterRequest) error {
 	cinfo := tornjakTypes.ClusterInfo(inp.ClusterInstance)
+
+	// Validation for mandatory fields
 	if len(cinfo.Name) == 0 {
 		return errors.New("cluster definition missing mandatory field - Name")
 	} else if len(cinfo.PlatformType) == 0 {
@@ -110,7 +121,21 @@ func (s *Server) EditCluster(inp EditClusterRequest) error {
 	} else if len(cinfo.EditedName) == 0 {
 		return errors.New("cluster definition missing mandatory field - EditedName")
 	}
-	return s.Db.EditClusterEntry(cinfo)
+
+	// Retrieve existing cluster by UID to ensure it exists
+	existingCluster, err := s.Db.GetClusterByUID(cinfo.UID)
+	if err != nil {
+		return errors.New("cluster not found in database")
+	}
+
+	// Update the cluster fields
+	existingCluster.Name = cinfo.Name
+	existingCluster.PlatformType = cinfo.PlatformType
+	existingCluster.ManagedBy = cinfo.ManagedBy
+	existingCluster.DomainName = cinfo.DomainName
+	existingCluster.AgentsList = cinfo.AgentsList
+
+	return s.Db.EditClusterEntry(existingCluster)
 }
 
 type DeleteClusterRequest tornjakTypes.ClusterInput

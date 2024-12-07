@@ -1,10 +1,10 @@
 package api
+
 import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
-	"github.com/google/uuid"
 	"log"
 	"net"
 	"net/http"
@@ -19,6 +19,7 @@ import (
 	"github.com/spiffe/tornjak/pkg/agent/authorization"
 	agentdb "github.com/spiffe/tornjak/pkg/agent/db"
 	"github.com/spiffe/tornjak/pkg/agent/spirecrd"
+	"github.com/spiffe/tornjak/pkg/agent/types"
 )
 
 type Server struct {
@@ -198,14 +199,14 @@ func (s *Server) GetRouter() http.Handler {
 	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryList).Methods(http.MethodGet, http.MethodOptions)
 	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryCreate).Methods(http.MethodPost)
 	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryDelete).Methods(http.MethodDelete)
-	
+
 	// SPIRE server bundles
 	apiRtr.HandleFunc("/api/v1/spire/bundle", s.bundleGet).Methods(http.MethodGet, http.MethodOptions)
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleList).Methods(http.MethodGet, http.MethodOptions)
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleCreate).Methods(http.MethodPost)
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleUpdate).Methods(http.MethodPatch)
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleDelete).Methods(http.MethodDelete)
-	
+
 	// SPIRE server federations
 	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationList).Methods(http.MethodGet, http.MethodOptions)
 	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationCreate).Methods(http.MethodPost)

@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/spiffe/tornjak/pkg/agent/types"
 	managerdb "github.com/spiffe/tornjak/pkg/manager/db"
 )
 
@@ -108,14 +109,13 @@ func (s *Server) apiServerProxyFunc(apiPath string, apiMethod string) func(w htt
 			return
 		}
 
-		req, err := http.NewRequest(apiMethod, strings.TrimSuffix(sinfo.Address, "/") + apiPath, r.Body)
+		req, err := http.NewRequest(apiMethod, strings.TrimSuffix(sinfo.Address, "/")+apiPath, r.Body)
 		if err != nil {
 			emsg := fmt.Sprintf("Error creating http request: %v", err.Error())
 			retError(w, emsg, http.StatusBadRequest)
 			return
 		}
 
-		
 		resp, err := client.Do(req)
 		if err != nil {
 			emsg := fmt.Sprintf("Error making api call to server: %v", err.Error())

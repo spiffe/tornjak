@@ -9,7 +9,6 @@ import (
 
 	"github.com/google/uuid"
 	trustdomain "github.com/spiffe/spire-api-sdk/proto/spire/api/server/trustdomain/v1"
-	"github.com/spiffe/tornjak/pkg/agent/types"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
@@ -915,106 +914,97 @@ func (s *Server) clusterCreate(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 	n, err := io.Copy(buf, r.Body)
 	if err != nil {
-		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
+		retError(w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		return
 	}
 	data := buf.String()
+
 	var input RegisterClusterRequest
 	if n == 0 {
 		input = RegisterClusterRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
 		if err != nil {
-			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-			retError(w, emsg, http.StatusBadRequest)
+			retError(w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 			return
 		}
 	}
+
+	input.UID = uuid.New().String()
+
 	err = s.DefineCluster(input)
 	if err != nil {
-		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
+		retError(w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 		return
 	}
 	cors(w, r)
-	_, err = w.Write([]byte("SUCCESS"))
-	if err != nil {
-		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
-		return
-	}
+	json.NewEncoder(w).Encode(map[string]string{"uid": input.UID, "message": "Cluster created successfully"})
 }
 
 func (s *Server) clusterEdit(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 	n, err := io.Copy(buf, r.Body)
 	if err != nil {
-		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
+		retError(w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		return
 	}
 	data := buf.String()
+
 	var input EditClusterRequest
 	if n == 0 {
 		input = EditClusterRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
 		if err != nil {
-			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-			retError(w, emsg, http.StatusBadRequest)
+			retError(w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 			return
 		}
 	}
+
+	// Check that the UID exists in the database
+	_, err = s.Db.GetClusterByUID(input.UID)
+	if err != nil {
+		retError(w, fmt.Sprintf("Error: Cluster not found: %v", err.Error()), http.StatusBadRequest)
+		return
+	}
+
 	err = s.EditCluster(input)
 	if err != nil {
-		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
+		retError(w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 		return
 	}
 	cors(w, r)
-	_, err = w.Write([]byte("SUCCESS"))
-	if err != nil {
-		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
-		return
-	}
+	w.Write([]byte("SUCCESS"))
 }
 
 func (s *Server) clusterDelete(w http.ResponseWriter, r *http.Request) {
 	buf := new(strings.Builder)
 	n, err := io.Copy(buf, r.Body)
 	if err != nil {
-		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
+		retError(w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 		return
 	}
 	data := buf.String()
+
 	var input DeleteClusterRequest
 	if n == 0 {
 		input = DeleteClusterRequest{}
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
 		if err != nil {
-			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-			retError(w, emsg, http.StatusBadRequest)
+			retError(w, fmt.Sprintf("Error parsing data: %v", err.Error()), http.StatusBadRequest)
 			return
 		}
 	}
-	err = s.DeleteCluster(input)
+
+	// Delete by UID
+	err = s.Db.DeleteClusterEntry(input.UID)
 	if err != nil {
-		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
+		retError(w, fmt.Sprintf("Error: %v", err.Error()), http.StatusBadRequest)
 		return
 	}
 	cors(w, r)
-	_, err = w.Write([]byte("SUCCESS"))
-	if err != nil {
-		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
-		return
-	}
-
+	w.Write([]byte("SUCCESS"))
 }
 
 /********* END CLUSTER *********/
