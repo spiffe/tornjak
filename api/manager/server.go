@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/spiffe/tornjak/pkg/agent/types"
 	managerdb "github.com/spiffe/tornjak/pkg/manager/db"
 )
 

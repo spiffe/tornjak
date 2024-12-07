@@ -170,6 +170,21 @@ func (db *LocalSqliteDb) GetClusterAgents(name string) ([]string, error) {
 
 }
 
+// GetClusterByUID takes in a UID string and outputs the cluster
+func (db *LocalSqliteDb) GetClusterByUID(uid string) (types.ClusterInfo, error) {
+	row := db.database.QueryRow("SELECT uid, name, domain_name, platform_type, managed_by FROM clusters WHERE uid=?", uid)
+
+	cinfo := types.ClusterInfo{}
+	err := row.Scan(&cinfo.UID, &cinfo.Name, &cinfo.DomainName, &cinfo.PlatformType, &cinfo.ManagedBy)
+	if err == sql.ErrNoRows {
+		return types.ClusterInfo{}, errors.New("Cluster not found")
+	} else if err != nil {
+		return types.ClusterInfo{}, err
+	}
+
+	return cinfo, nil
+}
+
 // GetAgentClusterName takes in string of spiffeid of agent and outputs the name of the cluster
 func (db *LocalSqliteDb) GetAgentClusterName(spiffeid string) (string, error) {
 	var clusterName sql.NullString

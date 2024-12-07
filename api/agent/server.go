@@ -19,7 +19,6 @@ import (
 	"github.com/spiffe/tornjak/pkg/agent/authorization"
 	agentdb "github.com/spiffe/tornjak/pkg/agent/db"
 	"github.com/spiffe/tornjak/pkg/agent/spirecrd"
-	"github.com/spiffe/tornjak/pkg/agent/types"
 )
 
 type Server struct {
