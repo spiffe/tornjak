@@ -2,6 +2,8 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
+	"log"
 
 	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
@@ -21,9 +23,10 @@ type LocalSqliteDb struct {
 }
 
 func BackfillClusterUIDs(db *sql.DB) error {
-	rows, err := db.Query("SELECT id FROM clusters WHERE uid IS NULL")
+	rows, err := db.Query("SELECT id FROM clusters WHERE uid IS NULL OR uid = ''")
 	if err != nil {
-		return err
+		log.Printf("Error querying clusters with NULL UID: %v", err)
+		return fmt.Errorf("failed to query clusters with NULL UID: %w", err)
 	}
 	defer rows.Close()
 
@@ -31,17 +34,27 @@ func BackfillClusterUIDs(db *sql.DB) error {
 	for rows.Next() {
 		var id int
 		if err := rows.Scan(&id); err != nil {
-			return err
+			log.Printf("Error scanning cluster ID: %v", err)
+			return fmt.Errorf("failed to scan cluster ID: %w", err)
 		}
+
 		uid := uuid.New().String()
 		_, err := db.Exec(updateCmd, uid, id)
 		if err != nil {
-			return err
+			log.Printf("Error updating cluster UID for ID %d: %v", id, err)
+			return fmt.Errorf("failed to update cluster UID for id %d: %w", id, err)
 		}
+		log.Printf("Successfully updated cluster ID %d with UID %s", id, uid)
 	}
+
+	if err := rows.Err(); err != nil {
+		log.Printf("Error iterating over rows: %v", err)
+		return fmt.Errorf("error iterating over rows: %w", err)
+	}
+
+	log.Printf("BackfillClusterUIDs completed successfully")
 	return nil
 }
-
 func NewLocalSqliteDB(dbpath string) (ManagerDB, error) {
 	database, err := sql.Open("sqlite3", dbpath)
 	if err != nil {

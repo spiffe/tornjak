@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"strings"
 
 	backoff "github.com/cenkalti/backoff/v4"
@@ -62,10 +63,50 @@ func NewLocalSqliteDB(driverName string, dbpath string, backOffParams backoff.Ba
 		}
 	}
 
+	// Backfill UID for existing clusters
+	err = BackfillClusterUIDs(database)
+	if err != nil {
+		return nil, errors.Errorf("Failed to backfill cluster UIDs: %v", err)
+	}
+
 	return &LocalSqliteDb{
 		database:   database,
 		expBackoff: &backOffParams,
 	}, nil
+}
+
+func BackfillClusterUIDs(db *sql.DB) error {
+	rows, err := db.Query("SELECT id FROM clusters WHERE uid IS NULL OR uid = ''")
+	if err != nil {
+		log.Printf("Error querying clusters with NULL UID: %v", err)
+		return fmt.Errorf("failed to query clusters with NULL UID: %w", err)
+	}
+	defer rows.Close()
+
+	updateCmd := `UPDATE clusters SET uid = ? WHERE id = ?`
+	for rows.Next() {
+		var id int
+		if err := rows.Scan(&id); err != nil {
+			log.Printf("Error scanning cluster ID: %v", err)
+			return fmt.Errorf("failed to scan cluster ID: %w", err)
+		}
+
+		uid := uuid.New().String()
+		_, err := db.Exec(updateCmd, uid, id)
+		if err != nil {
+			log.Printf("Error updating cluster UID for ID %d: %v", id, err)
+			return fmt.Errorf("failed to update cluster UID for id %d: %w", id, err)
+		}
+		log.Printf("Successfully updated cluster ID %d with UID %s", id, uid)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Printf("Error iterating over rows: %v", err)
+		return fmt.Errorf("error iterating over rows: %w", err)
+	}
+
+	log.Printf("BackfillClusterUIDs completed successfully")
+	return nil
 }
 
 // AGENT - SELECTOR/PLUGIN HANDLERS
@@ -328,10 +369,8 @@ func (db *LocalSqliteDb) createClusterEntryOp(cinfo types.ClusterInfo) error {
 	}
 	txHelper := getTornjakTxHelper(ctx, tx)
 
-	// Generate UID
 	cinfo.UID = uuid.New().String()
 
-	// INSERT cluster metadata with UID
 	err = txHelper.insertClusterMetadata(cinfo)
 	if err != nil {
 		return backoff.Permanent(txHelper.rollbackHandler(err))
