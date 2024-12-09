@@ -49,6 +49,7 @@ const styles = (theme) => ({
     marginTop: -25,
     marginLeft: -20,
     display: 'flex',
+    flexDirection: 'column',
   },
   appBarSpacer: theme.mixins.toolbar,
   content: {
@@ -243,4 +244,3 @@ export default connect(
     selectorInfoFunc, 
     clickedDashboardTableFunc }
 )(TornjakDashboardStyled);
-
