@@ -55,6 +55,14 @@ class Body extends React.Component<BodyProp, BodyState> {
                                     <div style={{ overflowX: 'auto', width: "400px" }}>
                                         <pre>{cell.value}</pre>
                                     </div>
+                                ) : cell.info.header === "expired" ? (
+                                    cell.value === "Expired" ? (
+                                        <div style={{ color: 'red' }}>
+                                            <pre>{cell.value}</pre>
+                                        </div>
+                                      ) : (
+                                        cell.value
+                                      )
                                 ) : (
                                     cell.value)}
                             </TableCell>
