@@ -164,9 +164,14 @@ class TornjakHelper extends Component<TornjakHelperProp, TornjakHelperState> {
     // get spire data
     var admin = this.SpiffeHelper.getEntryAdminFlag(entry)
     var expTime = "No Expiry Time"
+    var currTime = Date.now();
+    var expired = 'Active'
     if (typeof entry.expires_at !== 'undefined') {
       var d = new Date(this.SpiffeHelper.getEntryExpiryMillisecondsFromEpoch(entry))
       expTime = d.toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false })
+    }
+    if (entry.expires_at <= Math.floor(currTime / 1000)){
+      expired = 'Expired'
     }
     return {
       id: entry.id,
@@ -174,6 +179,7 @@ class TornjakHelper extends Component<TornjakHelperProp, TornjakHelperState> {
       parentId: thisParentId,
       adminFlag: admin,
       entryExpireTime: expTime,
+      expiryStatus: expired,
       platformType: plugin,
       clusterName: cluster,
       canonicalAgentId: canonicalParentId,

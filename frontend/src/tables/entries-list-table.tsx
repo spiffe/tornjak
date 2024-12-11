@@ -81,7 +81,7 @@ class EntriesListTable extends React.Component<EntriesListTableProp, EntriesList
                 listtabledata[i]["expired"] = "Expired";
             }
             else {
-                listtabledata[i]["expired"] = "Not Expired";
+                listtabledata[i]["expired"] = "Active";
             }
         }
         this.setState({
