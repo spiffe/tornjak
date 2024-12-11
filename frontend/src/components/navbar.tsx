@@ -239,10 +239,12 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
                 withAuth={Boolean(withAuth)}
                 subLinks={[
                   { label: 'Federations List', to: '/federations' },
+                  { label: 'Obtain Trust Bundle', to: '/trustbundle', adminOnly: true},
+                  { label: 'Create Federation', to: '/federation/create', adminOnly: true},
                 ]}
                 />
               </div>
-              
+                
               <div className="dropdown">
                 <BareMetalServer className="icon-spacing"/>
                 <a href="/tornjak/serverinfo" className="dropbtn">Tornjak ServerInfo</a>
