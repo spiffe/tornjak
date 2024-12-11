@@ -10,13 +10,14 @@ import { AgentsReducerState, EntriesReducerState } from 'redux/actions/types';
 import { RootState } from 'redux/reducers';
 
 const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 170, renderCell: renderCellExpand as (params: GridCellParams)=>JSX.Element },
-  { field: "spiffeid", headerName: "Name", width: 170, renderCell: renderCellExpand as (params: GridCellParams)=>JSX.Element },
-  { field: "parentId", headerName: "Parent ID", width: 170, renderCell: renderCellExpand as (params: GridCellParams)=>JSX.Element },
-  { field: "clusterName", headerName: "Cluster Name", width: 150 },
-  { field: "entryExpireTime", headerName: "Entry Expire Time", width: 150 },
-  { field: "platformType", headerName: "Platform Type", width: 150 },
-  { field: "adminFlag", headerName: "Admin Flag", width: 125, type: 'boolean'},
+  { field: "id", headerName: "ID", width: 155, renderCell: renderCellExpand as (params: GridCellParams)=>JSX.Element },
+  { field: "spiffeid", headerName: "Name", width: 155, renderCell: renderCellExpand as (params: GridCellParams)=>JSX.Element },
+  { field: "parentId", headerName: "Parent ID", width: 155, renderCell: renderCellExpand as (params: GridCellParams)=>JSX.Element },
+  { field: "clusterName", headerName: "Cluster Name", width: 135 },
+  { field: "entryExpireTime", headerName: "Entry Expire Time", width: 135 },
+  { field: "expiryStatus", headerName: "Status", width: 105 },
+  { field: "platformType", headerName: "Platform Type", width: 135 },
+  { field: "adminFlag", headerName: "Admin Flag", width: 110, type: 'boolean'},
 ];
 
 interface EntriesDashBoardTableProp {
