@@ -8,6 +8,7 @@ import SelectServer from "./components/select-server";
 import ClusterList from "./components/cluster-list";
 import ClusterManagement from "./components/cluster-management";
 import FederationList from "./components/federation-list";
+import TrustBundleCreate from "components/trustbundle-create";
 import AgentList from "./components/agent-list";
 import CreateJoinToken from "./components/agent-create-join-token";
 import EntryList from "./components/entry-list";
@@ -38,6 +39,7 @@ function App() {
                                 <Route path="/" exact component={AgentList} />
                                 <Route path="/clusters" exact component={ClusterList} />
                                 <Route path="/federations" exact component={FederationList} />
+                                <Route path="/trustbundle" exact component={TrustBundleCreate} />
                                 <Route path="/agents" exact component={AgentList} />
                                 <Route path="/entries" exact component={EntryList} />
                                 <RenderOnAdminRole>
