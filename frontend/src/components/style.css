@@ -627,3 +627,25 @@
 .server-select-dropdown {
   margin-top: 20px;
 }
+
+.bundle_t{
+  margin-top: 10px;
+  border-radius: 50px;
+}
+
+.trustbtn, .trustdownbtn {
+  border-radius: 5px !important; 
+  padding: 10px 20px; 
+}
+
+.trust-bundle-area {
+  margin-top: 20px;
+}
+
+.bundle-input-field {
+  width: 400px;
+}
+
+.bundletitle{
+  margin-right: 5px;
+}

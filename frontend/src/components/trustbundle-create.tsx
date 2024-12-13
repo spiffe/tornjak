@@ -33,7 +33,8 @@ type TrustBundleCreateProps = {
 type TrustBundleCreateState = {
   trustBundle: string,
   loading: boolean,
-  error: string
+  error: string,
+  bundleEndpointUrl: string
 }
 
 class TrustBundleCreate extends Component<TrustBundleCreateProps, TrustBundleCreateState> {
@@ -44,21 +45,45 @@ class TrustBundleCreate extends Component<TrustBundleCreateProps, TrustBundleCre
     this.state = {
       trustBundle: "",
       loading: false,
-      error: ""
+      error: "",
+      bundleEndpointUrl: "https://host.docker.internal:8440" 
     };
     this.getTrustBundle = this.getTrustBundle.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
+  }
+
+  handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+    this.setState({ bundleEndpointUrl: event.target.value });
   }
 
   getTrustBundle() {
+    const { bundleEndpointUrl } = this.state;
     this.setState({loading: true, error: "", trustBundle: ""});
     const endpoint = GetApiServerUri('/api/v1/spire/bundle');
 
-    console.log("Got:      " + endpoint);
+    console.log("Fetching trust bundle from:", endpoint);
 
     axios.get(endpoint)
       .then(res => {
+        const originalBundle = res.data;
+        console.log("Fetched trust bundle:", originalBundle);
+        const trustDomain = originalBundle.trust_domain;
+
+        const federationData = {
+          "federation_relationships": [
+            {
+              "trust_domain": trustDomain,
+              "bundle_endpoint_url": bundleEndpointUrl, 
+              "https_spiffe": {
+                "endpoint_spiffe_id": `spiffe://${trustDomain}/spire/server` 
+              },
+              "trust_domain_bundle": originalBundle
+            }
+          ]
+        };
+
         this.setState({
-          trustBundle: JSON.stringify(res.data, null, 2),
+          trustBundle: JSON.stringify(federationData, null, 2),
           loading: false
         });
       })
@@ -77,12 +102,37 @@ class TrustBundleCreate extends Component<TrustBundleCreateProps, TrustBundleCre
   }
 
   render() {
-    const { trustBundle, loading, error } = this.state;
+    const { trustBundle, loading, error, bundleEndpointUrl } = this.state;
+
+    const downloadTrustBundle = () => {
+      if (!trustBundle) return;
+      const blob = new Blob([trustBundle], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+  
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "trust-bundle.json";
+      a.click();
+  
+      URL.revokeObjectURL(url);
+    };
+
     return (
       <div className="trustbundle-create" data-test="trustbundle-create">
         <h3>Obtain Trust Bundle</h3>
-        <div>
-          <Button onClick={this.getTrustBundle} kind="primary">Get Trust Bundle</Button>
+        <div className="bundle-input">
+          <label htmlFor="bundle-endpoint-url" className="bundletitle">Enter Exposed Bundle Endpoint URL:</label>
+
+          <input
+            type="text"
+            id="bundle-endpoint-url"
+            value={bundleEndpointUrl}
+            onChange={this.handleInputChange}
+            className="bundle-input-field"
+          />
+        </div>
+        <div className="bundle_t">
+          <Button onClick={this.getTrustBundle} kind="primary" className='trustbtn'>Get Trust Bundle</Button>
         </div>
         {loading && (
           <InlineNotification
@@ -103,12 +153,17 @@ class TrustBundleCreate extends Component<TrustBundleCreateProps, TrustBundleCre
         {!loading && !error && trustBundle && (
           <div className="trust-bundle-area">
             <TextArea
-              cols={50}
+              cols={80}
               labelText="Fetched Trust Bundle"
-              rows={10}
+              rows={20}
               value={trustBundle}
-              readOnly
+              readOnly 
             />
+            <div style={{ marginTop: "10px" }}>
+              <Button onClick={downloadTrustBundle} kind="secondary" className="trustdownbtn">
+                Download Bundle
+              </Button>
+            </div>
           </div>
         )}
         <ToastContainer
