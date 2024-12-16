@@ -43,7 +43,9 @@ import {
   IbmCloudKubernetesService,
   Add,
   ZosSysplex,
-  IbmCloudBareMetalServer
+  IbmCloudBareMetalServer,
+  Partnership,
+  IbmCloudAppId
 } from "@carbon/icons-react";
 
 import SpireHealthCheck from 'components/spire-health-check';
@@ -344,6 +346,20 @@ class NavigationBar extends Component<NavigationBarProp, NavigationBarState> {
                     <TwoPersonLift className="icon-spacing" size={32}/>
                   </Link>
                   <span className="icon-description">Federations List</span>
+                </div>
+
+                <div className="icon-container">
+                  <Link to="/trustbundle">
+                    <IbmCloudAppId className="icon-spacing" size={32}/>
+                  </Link>
+                  <span className="icon-description">Obtain Trust Bundle</span>
+                </div>
+
+                <div className="icon-container">
+                  <Link to="/federation/create">
+                    <Partnership className="icon-spacing" size={32}/>
+                  </Link>
+                  <span className="icon-description">Create Federation</span>
                 </div>
 
                 <div className="icon-container">
