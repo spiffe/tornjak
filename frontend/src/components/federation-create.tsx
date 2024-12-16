@@ -1,11 +1,16 @@
 import { Component, ChangeEvent } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
-import { Dropdown, TextInput, FileUploader, Button, Accordion, AccordionItem, ToastNotification } from 'carbon-components-react';
+import {
+  FileUploader,
+  Button,
+  Accordion,
+  AccordionItem,
+  ToastNotification,
+} from 'carbon-components-react';
 import { ToastContainer } from 'react-toastify';
 import GetApiServerUri from './helpers';
 import './style.css';
-import { showResponseToast } from './error-api';
 import {
   tornjakMessageFunc,
   federationsListUpdateFunc,
@@ -24,16 +29,17 @@ type FederationCreateProps = {
 type FederationCreateState = {
   federationJson: string,
   loading: boolean,
-  success: boolean,
-  error: string,
+  statusOK: string,
+  successJsonMessage: string,
+  message: string,
 };
 
 const NewFederationJsonFormatLink = (props: { link: link }) => (
   <div>
-      <a rel="noopener noreferrer" href={props.link} target="_blank">(Click to see new entry JSON format)</a>
-      <a rel="noopener noreferrer" href={props.link} target="_blank">{<Launch />}</a>
+    <a rel="noopener noreferrer" href={props.link} target="_blank">(Click to see new entry JSON format)</a>
+    <a rel="noopener noreferrer" href={props.link} target="_blank">{<Launch />}</a>
   </div>
-)
+);
 
 class FederationCreate extends Component<FederationCreateProps, FederationCreateState> {
   constructor(props: FederationCreateProps) {
@@ -41,8 +47,9 @@ class FederationCreate extends Component<FederationCreateProps, FederationCreate
     this.state = {
       federationJson: "",
       loading: false,
-      success: false,
-      error: "",
+      statusOK: "",
+      successJsonMessage: "",
+      message: "",
     };
     this.handleFileUpload = this.handleFileUpload.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -58,20 +65,20 @@ class FederationCreate extends Component<FederationCreateProps, FederationCreate
       if (typeof result === 'string') {
         this.setState({
           federationJson: result,
-          success: false,
-          error: "",
+          message: "",
+          statusOK: "",
         });
       }
     };
     reader.onerror = () => {
-      this.setState({ error: "Error reading the selected file." });
+      this.setState({ message: "Error reading the selected file.", statusOK: "ERROR" });
     };
     reader.readAsText(file);
   }
 
   onSubmit() {
     if (!this.state.federationJson) {
-      this.setState({ error: "No federation JSON loaded." });
+      this.setState({ message: "No federation JSON loaded.", statusOK: "ERROR" });
       return;
     }
 
@@ -79,47 +86,77 @@ class FederationCreate extends Component<FederationCreateProps, FederationCreate
     try {
       jsonData = JSON.parse(this.state.federationJson);
     } catch (err) {
-      this.setState({ error: "Invalid JSON format." });
+      this.setState({ message: "Invalid JSON format.", statusOK: "ERROR" });
       return;
     }
 
     const endpoint = GetApiServerUri('/api/v1/spire/federations');
-    this.setState({ loading: true, error: "", success: false });
+    this.setState({ loading: true, statusOK: "" });
 
     axios
       .post(endpoint, jsonData)
-      .then(() => {
+      .then((res) => {
+        const responseMessage = res.data?.results?.[0]?.status?.message || "OK";
         this.setState({
           loading: false,
-          success: true,
-          error: "",
+          statusOK: responseMessage === "OK" ? "OK" : "ERROR",
+          successJsonMessage: responseMessage,
+          message: JSON.stringify(res.data, null, ' '),
         });
       })
       .catch((err) => {
-        this.setState({ loading: false, success: false });
-        showResponseToast(err, { caption: "Could not create federation." });
-        let errorMessage = "Failed to create federation.";
-        if (err.response) {
-          errorMessage = `Failed to create federation. Server returned status ${err.response.status}`;
-        } else if (err.request) {
-          errorMessage = "Failed to create federation. No response received from backend.";
-        }
-        this.setState({ error: errorMessage });
+        const errorMessage = err.response?.data?.results?.[0]?.status?.message || "Failed to create federation.";
+        this.setState({
+          loading: false,
+          statusOK: "ERROR",
+          successJsonMessage: errorMessage,
+          message: JSON.stringify(err.response?.data || err.message, null, ' '),
+        });
       });
   }
 
   render() {
-    const { federationJson, loading, success, error } = this.state;
+    const { federationJson, loading, statusOK, message, successJsonMessage } = this.state;
     const newFederationFormatLink = "https://github.com/spiffe/tornjak/blob/main/docs/newFederation-json-format.md";
 
     return (
       <div className="federation-create" data-test="federation-create">
-        <h3 style={{marginBottom: 30}}>Create Federation</h3>
+        <h3 style={{ marginBottom: 30 }}>Create Federation</h3>
+
+        {statusOK !== "" && (
+          <div>
+            <ToastNotification
+              className="toast-entry-creation-notification"
+              kind={statusOK === "OK" ? "info" : "error"}
+              iconDescription="close notification"
+              subtitle={
+                <span>
+                  <br />
+                  <div role="alert" data-test="success-message">
+                    {statusOK === "OK" && successJsonMessage === "OK" && (
+                      <p className="success-message">--FEDERATION SUCCESSFULLY CREATED--</p>
+                    )}
+                    {statusOK === "ERROR" && (
+                      <p className="failed-message">--FEDERATION CREATION FAILED--</p>
+                    )}
+                  </div>
+                  <br />
+                  <div className="toast-messege" data-test="alert-primary">
+                    <pre className="toast-messege-color">{message}</pre>
+                  </div>
+                </span>
+              }
+              timeout={0}
+              title="Federation Creation Notification"
+            />
+            {window.scrollTo({ top: 0, behavior: 'smooth' })}
+          </div>
+        )}
 
         <Accordion>
           <AccordionItem title={<h5>Upload Federation JSON</h5>} open>
             <div className="entry-form">
-              <h6 style={{marginBottom: 15}}>Choose your local file:</h6>
+              <h6 style={{ marginBottom: 15 }}>Choose your local file:</h6>
               <p style={{ fontSize: 15 }}>only .json files </p>
               <NewFederationJsonFormatLink link={newFederationFormatLink} />
               <FileUploader
@@ -130,7 +167,7 @@ class FederationCreate extends Component<FederationCreateProps, FederationCreate
                 iconDescription="Clear file"
                 onChange={this.handleFileUpload}
               />
-              
+
               <br />
               <Button
                 onClick={this.onSubmit}
@@ -152,31 +189,18 @@ class FederationCreate extends Component<FederationCreateProps, FederationCreate
                   timeout={0}
                 />
               )}
-
-              {error && (
-                <ToastNotification
-                  kind="error"
-                  title="Error"
-                  subtitle={error}
-                  timeout={0}
-                />
-              )}
-
-              {success && (
-                <ToastNotification
-                  kind="success"
-                  title="Success"
-                  subtitle="Federation created successfully! Check Federation List."
-                  timeout={0}
-                />
-              )}
             </div>
           </AccordionItem>
 
-          {/*Custom Form To Be Implemented */}
-          <AccordionItem title={<><h5>Custom Federation Form</h5><p style={{ fontSize: 16}}>(click to expand)</p></>}>
-            <div className="custom-federation-form">
-            </div>
+          <AccordionItem
+            title={
+              <>
+                <h5>Custom Federation Form</h5>
+                <p style={{ fontSize: 16 }}>(click to expand)</p>
+              </>
+            }
+          >
+            <div className="custom-federation-form"></div>
           </AccordionItem>
         </Accordion>
 
