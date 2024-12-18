@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import axios from 'axios';
-import { InlineNotification, TextArea, Button } from 'carbon-components-react';
+import { InlineNotification, TextArea, Button, TextInput } from 'carbon-components-react';
 import { ToastContainer } from 'react-toastify';
 import GetApiServerUri from './helpers';
 import TornjakApi from './tornjak-api-helpers';
@@ -46,7 +46,7 @@ class TrustBundleCreate extends Component<TrustBundleCreateProps, TrustBundleCre
       trustBundle: "",
       loading: false,
       error: "",
-      bundleEndpointUrl: "https://host.docker.internal:8440" 
+      bundleEndpointUrl: "" 
     };
     this.getTrustBundle = this.getTrustBundle.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -120,14 +120,16 @@ class TrustBundleCreate extends Component<TrustBundleCreateProps, TrustBundleCre
     return (
       <div className="trustbundle-create" data-test="trustbundle-create">
         <h3>Obtain Trust Bundle</h3>
-        <div className="bundle-input">
-          <label htmlFor="bundle-endpoint-url" className="bundletitle">Enter Exposed Bundle Endpoint URL:</label>
-
-          <input
-            type="text"
+        <div className="bundle-input" data-test="bundle-endpoint-input">
+          <TextInput
+            aria-required="true"
+            helperText="e.g. https://host.docker.internal:8440"
             id="bundle-endpoint-url"
+            invalidText="A valid URL is required"
+            labelText="Exposed Bundle Endpoint URL [*required]"
+            placeholder="Enter Exposed Bundle Endpoint URL"
             value={bundleEndpointUrl}
-            onChange={this.handleInputChange}
+            onChange={(e) => this.handleInputChange(e as React.ChangeEvent<HTMLInputElement>)}
             className="bundle-input-field"
           />
         </div>
