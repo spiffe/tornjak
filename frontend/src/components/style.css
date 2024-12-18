@@ -475,7 +475,7 @@
   border-color: rgb(180, 178, 178);
 }
 
-.view_entries_yaml_button {
+.view_entries_yaml_button, .view_federations_yaml_button {
   display: inline-block;
 }
 
@@ -644,6 +644,8 @@
 
 .bundle-input-field {
   width: 400px;
+  margin-top: 10px;
+  margin-bottom: 15px;
 }
 
 .bundletitle{
