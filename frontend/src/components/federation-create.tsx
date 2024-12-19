@@ -1,5 +1,4 @@
-import { Component, ChangeEvent } from 'react';
-import { connect } from 'react-redux';
+import React, { Component, ChangeEvent } from 'react';
 import axios from 'axios';
 import {
   FileUploader,
@@ -19,6 +18,7 @@ import {
   federationsListUpdateFunc,
 } from 'redux/actions';
 import { RootState } from 'redux/reducers';
+import { connect } from 'react-redux';
 import { link } from './types';
 import { Launch, NextOutline } from '@carbon/icons-react';
 
@@ -41,7 +41,7 @@ type Federation = {
 
 type FederationCreateState = {
   federationJson: string,
-  uploadedFederation: Federation | Federation[], 
+  uploadedFederation: Federation | Federation[],
   federationLoaded: boolean,
   loading: boolean,
   statusOK: string,
@@ -83,7 +83,12 @@ class FederationCreate extends Component<FederationCreateProps, FederationCreate
   }
 
   handleFileUpload(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+    const files = e.target.files;
+    if (!files || files.length === 0) {
+      return;
+    }
+
+    const file = files[0];
     if (!file) return;
 
     const reader = new FileReader();
@@ -107,9 +112,7 @@ class FederationCreate extends Component<FederationCreateProps, FederationCreate
             const trustDomain = (singleFed.federation_relationships && singleFed.federation_relationships.length > 0)
               ? singleFed.federation_relationships[0].trust_domain || "No Trust Domain"
               : "No Trust Domain";
-            newFederationsIds = [{
-              trustDomain: trustDomain
-            }];
+            newFederationsIds = [{ trustDomain: trustDomain }];
           }
 
           this.setState({
@@ -298,6 +301,16 @@ class FederationCreate extends Component<FederationCreateProps, FederationCreate
                 filenameStatus="edit"
                 iconDescription="Clear file"
                 onChange={this.handleFileUpload}
+                onDelete={() => {
+                  this.setState({
+                    federationJson: "",
+                    uploadedFederation: [],
+                    federationLoaded: false,
+                    message: "",
+                    statusOK: "",
+                    newFederationsIds: []
+                  });
+                }}
               />
 
               {federationLoaded && (
@@ -325,97 +338,99 @@ class FederationCreate extends Component<FederationCreateProps, FederationCreate
                     title="Federations Upload Notification"
                   />
 
-                  <div className="view_federations_yaml_button">
-                    <ModalWrapper
-                      passiveModal={true}
-                      handleSubmit={() => true}
-                      size='lg'
-                      triggerButtonKind="ghost"
-                      buttonTriggerText="View Uploaded Federation(s)"
-                      modalHeading="Federation JSON"
-                      modalLabel="View Uploaded Federation(s)"
-                    >
-                      <pre className="yaml_view_modal_json">{JSON.stringify(uploadedFederation, null, 2)}</pre>
-                    </ModalWrapper>
-                  </div>
+                  <div className="fed-edit-container">
+                    <div className="view_federations_yaml_button">
+                      <ModalWrapper
+                        passiveModal={true}
+                        handleSubmit={() => true}
+                        size='lg'
+                        triggerButtonKind="ghost"
+                        buttonTriggerText="View Uploaded Bundle/s"
+                        modalHeading="Federation JSON"
+                        modalLabel="View Uploaded Federation(s)"
+                      >
+                        <pre className="yaml_view_modal_json">{JSON.stringify(uploadedFederation, null, 2)}</pre>
+                      </ModalWrapper>
+                    </div>
 
-                  <div className="edit_federations_button">
-                    <ModalWrapper
-                      size='lg'
-                      triggerButtonKind="ghost"
-                      buttonTriggerText="Edit Uploaded Federation(s)"
-                      handleSubmit={this.applyEditToFederation}
-                      modalHeading="Federations Editor"
-                      modalLabel="Edit Uploaded Federations"
-                      primaryButtonText="Step 3. Apply"
-                      secondaryButtonText="Exit"
-                    >
-                      <div className='edit-entry-container'>
-                        <div className="entries-list-container">
-                          <fieldset>
-                            <legend className="modal_Entry_list_title">Step 1. SELECT FEDERATION</legend>
-                            {newFederationsIds.map((fedId, index) => (
-                              <div key={index}>
-                                {index === selectedFederationId &&
-                                  <div>
-                                    <Link
-                                      className='selected-entry'
-                                      id={fedId.trustDomain}
-                                      href="#"
-                                      renderIcon={NextOutline}
-                                      visited={false}
-                                      inline
-                                      onClick={(e) => {
-                                        this.setSelectedFederation(index);
-                                        e.preventDefault();
-                                      }}
-                                    >
-                                      {(index + 1).toString() + ". " + fedId.trustDomain}
-                                    </Link>
-                                  </div>
-                                }
-                                {index !== selectedFederationId &&
-                                  <div>
-                                    <Link
-                                      id={fedId.trustDomain}
-                                      href="#"
-                                      renderIcon={NextOutline}
-                                      onClick={(e) => {
-                                        this.setSelectedFederation(index);
-                                        e.preventDefault();
-                                      }}
-                                    >
-                                      {(index + 1).toString() + ". " + fedId.trustDomain}
-                                    </Link>
-                                  </div>
-                                }
-                              </div>
-                            ))}
-                          </fieldset>
-                          <br />
-                          <legend className="additional_info_entries_list">[Select Federation to Edit]</legend>
+                    <div className="edit_federations_button">
+                      <ModalWrapper
+                        size='lg'
+                        triggerButtonKind="ghost"
+                        buttonTriggerText="Edit Uploaded Bundle/s"
+                        handleSubmit={this.applyEditToFederation}
+                        modalHeading="Bundle/s Editor"
+                        modalLabel="Edit Uploaded Bundle/s"
+                        primaryButtonText="Step 3. Apply"
+                        secondaryButtonText="Exit"
+                      >
+                        <div className='edit-entry-container'>
+                          <div className="entries-list-container">
+                            <fieldset>
+                              <legend className="modal_Entry_list_title">Step 1. Select Bundle</legend>
+                              {newFederationsIds.map((fedId, index) => (
+                                <div key={index}>
+                                  {index === selectedFederationId &&
+                                    <div>
+                                      <Link
+                                        className='selected-entry'
+                                        id={fedId.trustDomain}
+                                        href="#"
+                                        renderIcon={NextOutline}
+                                        visited={false}
+                                        inline
+                                        onClick={(e) => {
+                                          this.setSelectedFederation(index);
+                                          e.preventDefault();
+                                        }}
+                                      >
+                                        {(index + 1).toString() + ". " + fedId.trustDomain}
+                                      </Link>
+                                    </div>
+                                  }
+                                  {index !== selectedFederationId &&
+                                    <div>
+                                      <Link
+                                        id={fedId.trustDomain}
+                                        href="#"
+                                        renderIcon={NextOutline}
+                                        onClick={(e) => {
+                                          this.setSelectedFederation(index);
+                                          e.preventDefault();
+                                        }}
+                                      >
+                                        {(index + 1).toString() + ". " + fedId.trustDomain}
+                                      </Link>
+                                    </div>
+                                  }
+                                </div>
+                              ))}
+                            </fieldset>
+                            <br />
+                            <legend className="additional_info_entries_list">[Select Bundle to Edit]</legend>
+                          </div>
+                          <div className="entries-edit-form">
+                            <p style={{
+                              fontSize: 15,
+                              fontWeight: "bold",
+                              textDecoration: "underline",
+                              marginBottom: 10
+                            }}>Step 2. Edit Bundle</p>
+                            <TextInput
+                              aria-required="true"
+                              helperText="e.g. https://host.docker.internal:8440"
+                              id="exposed-bundle-endpoint"
+                              invalidText="A valid value is required"
+                              labelText="Exposed Bundle Endpoint URL [*required]"
+                              placeholder="Enter endpoint URL"
+                              value={exposedBundleEndpoint}
+                              disabled={!federationSelected}
+                              onChange={(e) => this.setState({ exposedBundleEndpoint: e.target.value })}
+                            />
+                          </div>
                         </div>
-                        <div className="entries-edit-form">
-                          <p style={{
-                            fontSize: 15,
-                            fontWeight: "bold",
-                            textDecoration: "underline",
-                            marginBottom: 10
-                          }}>Step 2. EDIT FEDERATION</p>
-                          <TextInput
-                            aria-required="true"
-                            helperText="e.g. https://host.docker.internal:8440"
-                            id="exposed-bundle-endpoint"
-                            invalidText="A valid value is required"
-                            labelText="Exposed Bundle Endpoint URL [*required]"
-                            placeholder="Enter endpoint URL"
-                            value={exposedBundleEndpoint}
-                            disabled={!federationSelected}
-                            onChange={(e) => this.setState({ exposedBundleEndpoint: e.target.value })}
-                          />
-                        </div>
-                      </div>
-                    </ModalWrapper>
+                      </ModalWrapper>
+                    </div>
                   </div>
                 </div>
               )}
