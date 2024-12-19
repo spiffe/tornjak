@@ -164,6 +164,13 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
             }
             try {
                 var parsedData = JSON.parse(result);
+
+                if (!parsedData.entries || !Array.isArray(parsedData.entries)) {
+                    showToast({ caption: "Invalid JSON file. 'entries' field not found or not an array." });
+                    this.setState({ parseError: true, newFileUploaded: false });
+                    return;
+                }
+                
                 this.props.newEntriesUpdateFunc(parsedData.entries);
                 for (let i = 0; i < parsedData.entries.length; i++) {
                     localNewEntriesIds[idx] = { "spiffeId": "" };
@@ -590,17 +597,19 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
         const ParentIdList = this.props.ParentIdList;
         return (
             <div>
-                {this.state.parseError &&
+                {this.state.parseError && (
                     <div>
-                        <ToastNotification className="toast-entry-creation-notification"
+                        <ToastNotification
+                            className="toast-entry-creation-notification"
                             kind="error"
                             iconDescription="close notification"
-                            subtitle={<span>Invalid JSON Format/ JSON File Empty. <NewEntryJsonFormatLink link={newEntryFormatLink} /></span>}
+                            subtitle="Invalid JSON Format/ JSON File Empty."
                             timeout={0}
                             title="New Entry JSON Format Notification"
                         />
                     </div>
-                }
+                )}
+
                 <div>
                     <h6>Choose your local file:</h6>
                     <br></br>
@@ -618,6 +627,17 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                         filenameStatus="edit"
                         iconDescription="Clear file"
                         onChange={this.handleChange}
+                        onDelete={() => {
+                            this.setState({
+                                parseError: false,
+                                isEntriesLoaded: false,
+                                newEntriesIds: [],
+                                uploadedEntries: [],
+                                newEntriesLoaded: false,
+                                entrySelected: false,
+                                selectedEntryId: -1,
+                            });
+                        }}
                     />
                 </div>
                 {this.state.isEntriesLoaded && !this.state.parseError &&
@@ -656,239 +676,242 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                                 </div>
                             }
                         </div>
-                        <div className="view_entries_yaml_button">
-                            <ModalWrapper
-                                passiveModal={true}
-                                size='lg'
-                                triggerButtonKind="ghost"
-                                buttonTriggerText="View Uploaded Entries"
-                                modalHeading="Entries JSON"
-                                modalLabel="View Uploaded Entries"
-                                handleSubmit={this.passiveModal}
-                            >
-                                <pre className="yaml_view_modal_json">{JSON.stringify(this.state.uploadedEntries, null, ' ')}</pre>
-                            </ModalWrapper>
-                        </div>
-                        <div className="edit_entries_button">
-                            <ModalWrapper
-                                size='lg'
-                                triggerButtonKind="ghost"
-                                buttonTriggerText="Edit Uploaded Entries"
-                                handleSubmit={this.applyEditToEntry}
-                                //shouldCloseAfterSubmit={true}
-                                modalHeading="Entries Editor"
-                                modalLabel="Edit Uploaded Entries"
-                                primaryButtonText="Step 3. Apply"
-                                secondaryButtonText="Exit"
-                            >
-                                <div className='edit-entry-container'>
-                                    <div className="entries-list-container">
-                                        <fieldset>
-                                            <legend className="modal_Entry_list_title">Step 1. SELECT ENTRY</legend>
-                                            {this.state.newEntriesIds.map((entryId, index) => (
-                                                <div key={index}>
-                                                    {/* eslint-disable-next-line */}
-                                                    {index === this.state.selectedEntryId &&
-                                                        <div>
-                                                            <Link
-                                                                className='selected-entry'
-                                                                id={entryId.spiffeId}
-                                                                href="#"
-                                                                renderIcon={NextOutline}
-                                                                visited={false}
-                                                                inline
-                                                                onClick={(e) => {
-                                                                    this.setSelectedEntriesIds(index, index, undefined);
-                                                                    e.preventDefault();
-                                                                }}
-                                                            >
-                                                                {(index + 1).toString() + ". " + entryId.spiffeId}
-                                                            </Link>
-                                                        </div>
-                                                    }
-                                                    {index !== this.state.selectedEntryId &&
-                                                        <div>
-                                                            <Link
-                                                                id={entryId.spiffeId}
-                                                                href="#"
-                                                                renderIcon={NextOutline}
-                                                                onClick={(e) => {
-                                                                    this.setSelectedEntriesIds(index, index, undefined);
-                                                                    e.preventDefault();
-                                                                }}
-                                                            >
-                                                                {(index + 1).toString() + ". " + entryId.spiffeId}
-                                                            </Link>
-                                                        </div>
-                                                    }
-                                                </div>
-                                            ))}
-                                        </fieldset>
-                                        <br></br>
-                                        <legend className="additional_info_entries_list">[Select Entry to Edit]</legend>
-                                    </div>
-                                    <div className="entries-edit-form">
-                                        <p style={{
-                                            fontSize: 15,
-                                            fontWeight: "bold",
-                                            textDecoration: "underline",
-                                            marginBottom: 10
-                                        }}>Step 2. EDIT ENTRY</p>
-                                        <div className="parentId-drop-down-yaml" data-test="parentId-drop-down-yaml">
-                                            {!this.state.entrySelected &&
-                                                <div>
-                                                    <Dropdown
-                                                        disabled={true}
-                                                        aria-required="true"
-                                                        ariaLabel="parentId-drop-down"
-                                                        id="parentId-drop-down"
-                                                        items={ParentIdList}
-                                                        label="Select Entry to Enable Dropdown"
-                                                        titleText="Parent ID"
-                                                        onChange={this.onChangeParentId}
-                                                    />
-                                                </div>
-                                            }
-                                            {this.state.entrySelected &&
-                                                <div>
-                                                    <Dropdown
-                                                        aria-required="true"
-                                                        ariaLabel="parentId-drop-down"
-                                                        id="parentId-drop-down"
-                                                        items={ParentIdList}
-                                                        label="Select Parent ID"
-                                                        titleText="Parent ID - [*optional Selection]"
-                                                        onChange={this.onChangeParentId}
-                                                    />
-                                                    <p className="parentId-helper">e.g. select if no Parent ID provided</p>
-                                                </div>
-                                            }
-                                        </div>
-                                        <div className="parentId-input-field" data-test="parentId-input-field">
-                                            <TextInput
-                                                aria-required="true"
-                                                helperText="e.g. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent - spiffe://example.org/spire/server"
-                                                id="parentIdInputField"
-                                                invalidText="A valid value is required - refer to helper text below"
-                                                labelText="PARENT ID [*required]"
-                                                placeholder="Enter PARENT ID"
-                                                value={this.state.parentId}
-                                                onChange={(e) => {this.onChangeParentIdInput(e)}}
-                                            />
-                                        </div>
-                                        <div className="spiffeId-input-field" data-test="spiffeId-input-field">
-                                            <TextInput
-                                                aria-required="true"
-                                                helperText="e.g. spiffe://example.org/sample/spiffe/id"
-                                                id="spiffeIdInputField"
-                                                invalidText="A valid value is required - refer to helper text below"
-                                                labelText="SPIFFE ID [*required]"
-                                                placeholder="Enter SPIFFE ID"
-                                                value={this.state.spiffeId}
-                                                onChange={(e) => {
-                                                    const input = e.target.value
-                                                    e.target.value = this.state.spiffeIdPrefix + input.substr(this.state.spiffeIdPrefix.length);
-                                                    this.onChangeSpiffeId(e);
-                                                }}
-                                            />
-                                        </div>
-                                        <TextArea
-                                            cols={50}
-                                            helperText="e.g. k8s_sat:cluster:demo-cluster,..."
-                                            id="selectors-textArea"
-                                            invalidText="A valid value is required"
-                                            labelText="Selectors"
-                                            placeholder="Enter Selectors"
-                                            value={this.state.selectorsList}
-                                            rows={8}
-                                            onChange={this.onChangeSelectors}
-                                        />
-                                        <br></br>
-                                        <div className="advanced">
-                                            <fieldset className="bx--fieldset">
-                                                <legend className="bx--label">Advanced</legend>
-                                                <div className="ttl-input" data-test="ttl-input">
-                                                    <NumberInput
-                                                        helperText="x509 SVID Ttl for identities issued for this entry (In seconds) Overrides JWT TTL if set"
-                                                        id="ttl-input"
-                                                        invalidText="Number is not valid"
-                                                        label="x509 Time to Leave (Ttl)"
-                                                        //max={100}
-                                                        min={0}
-                                                        step={1}
-                                                        value={this.state.x509_svid_ttl}
-                                                        onChange={this.onChangex509Ttl}
-                                                    />
-                                                </div>
-                                                <div className="ttl-input" data-test="ttl-input">
-                                                    <NumberInput
-                                                        helperText="JWT SVID ttl for identities issued for this entry (In seconds) "
-                                                        id="ttl-input"
-                                                        invalidText="Number is not valid"
-                                                        label="JWT Time to Leave (Ttl)"
-                                                        //max={100}
-                                                        min={0}
-                                                        step={1}
-                                                        value={this.state.jwt_svid_ttl}
-                                                        onChange={this.onChangeJwtTtl}
-                                                    />
-                                                </div>
-                                                <div className="expiresAt-input" data-test="expiresAt-input">
-                                                    <NumberInput
-                                                        helperText="Entry expires at (seconds since Unix epoch)"
-                                                        id="expiresAt-input"
-                                                        invalidText="Number is not valid"
-                                                        label="Expires At"
-                                                        //max={100}
-                                                        min={0}
-                                                        step={1}
-                                                        value={this.state.expiresAt}
-                                                        onChange={this.onChangeExpiresAt}
-                                                    />
-                                                </div>
-                                                <div className="federates-with-input-field-yaml" data-test="federates-with-input-field">
-                                                    <TextInput
-                                                        helperText="e.g. example.org,abc.com (Separated By Commas)"
-                                                        id="federates-with-input-field"
-                                                        invalidText="A valid value is required - refer to helper text below"
-                                                        labelText="Federates With"
-                                                        placeholder="Enter Names of trust domains the identity described by this entry federates with"
-                                                        value={this.state.federatesWith}
-                                                        onChange={this.onChangeFederatesWith}
-                                                    />
-                                                </div>
-                                                <div className="dnsnames-input-field-yaml" data-test="dnsnames-input-field">
-                                                    <TextInput
-                                                        helperText="e.g. example.org,abc.com (Separated By Commas)"
-                                                        id="dnsnames-input-field"
-                                                        invalidText="A valid value is required - refer to helper text below"
-                                                        labelText="DNS Names"
-                                                        placeholder="Enter DNS Names associated with the identity described by this entry"
-                                                        value={this.state.dnsNames}
-                                                        onChange={this.onChangeDnsNames}
-                                                    />
-                                                </div>
-                                                <div className="admin-flag-checkbox" data-test="admin-flag-checkbox">
-                                                    <Checkbox
-                                                        labelText="Admin Flag"
-                                                        id="admin-flag"
-                                                        checked={this.state.adminFlag}
-                                                        onChange={this.onChangeAdminFlag}
-                                                    />
-                                                </div>
-                                                <div className="down-stream-checkbox" data-test="down-stream-checkbox">
-                                                    <Checkbox
-                                                        labelText="Down Stream"
-                                                        id="down-steam"
-                                                        checked={this.state.downstream}
-                                                        onChange={this.onChangeDownStream}
-                                                    />
-                                                </div>
+
+                        <div className="entry-edit-container"> 
+                            <div className="view_entries_yaml_button">
+                                <ModalWrapper
+                                    passiveModal={true}
+                                    size='lg'
+                                    triggerButtonKind="ghost"
+                                    buttonTriggerText="View Uploaded Entries"
+                                    modalHeading="Entries JSON"
+                                    modalLabel="View Uploaded Entries"
+                                    handleSubmit={this.passiveModal}
+                                >
+                                    <pre className="yaml_view_modal_json">{JSON.stringify(this.state.uploadedEntries, null, ' ')}</pre>
+                                </ModalWrapper>
+                            </div>
+                            <div className="edit_entries_button">
+                                <ModalWrapper
+                                    size='lg'
+                                    triggerButtonKind="ghost"
+                                    buttonTriggerText="Edit Uploaded Entries"
+                                    handleSubmit={this.applyEditToEntry}
+                                    //shouldCloseAfterSubmit={true}
+                                    modalHeading="Entries Editor"
+                                    modalLabel="Edit Uploaded Entries"
+                                    primaryButtonText="Step 3. Apply"
+                                    secondaryButtonText="Exit"
+                                >
+                                    <div className='edit-entry-container'>
+                                        <div className="entries-list-container">
+                                            <fieldset>
+                                                <legend className="modal_Entry_list_title">Step 1. SELECT ENTRY</legend>
+                                                {this.state.newEntriesIds.map((entryId, index) => (
+                                                    <div key={index}>
+                                                        {/* eslint-disable-next-line */}
+                                                        {index === this.state.selectedEntryId &&
+                                                            <div>
+                                                                <Link
+                                                                    className='selected-entry'
+                                                                    id={entryId.spiffeId}
+                                                                    href="#"
+                                                                    renderIcon={NextOutline}
+                                                                    visited={false}
+                                                                    inline
+                                                                    onClick={(e) => {
+                                                                        this.setSelectedEntriesIds(index, index, undefined);
+                                                                        e.preventDefault();
+                                                                    }}
+                                                                >
+                                                                    {(index + 1).toString() + ". " + entryId.spiffeId}
+                                                                </Link>
+                                                            </div>
+                                                        }
+                                                        {index !== this.state.selectedEntryId &&
+                                                            <div>
+                                                                <Link
+                                                                    id={entryId.spiffeId}
+                                                                    href="#"
+                                                                    renderIcon={NextOutline}
+                                                                    onClick={(e) => {
+                                                                        this.setSelectedEntriesIds(index, index, undefined);
+                                                                        e.preventDefault();
+                                                                    }}
+                                                                >
+                                                                    {(index + 1).toString() + ". " + entryId.spiffeId}
+                                                                </Link>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                ))}
                                             </fieldset>
+                                            <br></br>
+                                            <legend className="additional_info_entries_list">[Select Entry to Edit]</legend>
+                                        </div>
+                                        <div className="entries-edit-form">
+                                            <p style={{
+                                                fontSize: 15,
+                                                fontWeight: "bold",
+                                                textDecoration: "underline",
+                                                marginBottom: 10
+                                            }}>Step 2. EDIT ENTRY</p>
+                                            <div className="parentId-drop-down-yaml" data-test="parentId-drop-down-yaml">
+                                                {!this.state.entrySelected &&
+                                                    <div>
+                                                        <Dropdown
+                                                            disabled={true}
+                                                            aria-required="true"
+                                                            ariaLabel="parentId-drop-down"
+                                                            id="parentId-drop-down"
+                                                            items={ParentIdList}
+                                                            label="Select Entry to Enable Dropdown"
+                                                            titleText="Parent ID"
+                                                            onChange={this.onChangeParentId}
+                                                        />
+                                                    </div>
+                                                }
+                                                {this.state.entrySelected &&
+                                                    <div>
+                                                        <Dropdown
+                                                            aria-required="true"
+                                                            ariaLabel="parentId-drop-down"
+                                                            id="parentId-drop-down"
+                                                            items={ParentIdList}
+                                                            label="Select Parent ID"
+                                                            titleText="Parent ID - [*optional Selection]"
+                                                            onChange={this.onChangeParentId}
+                                                        />
+                                                        <p className="parentId-helper">e.g. select if no Parent ID provided</p>
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div className="parentId-input-field" data-test="parentId-input-field">
+                                                <TextInput
+                                                    aria-required="true"
+                                                    helperText="e.g. spiffe://example.org/agent/myagent1 - For node entries, specify spiffe server as parent - spiffe://example.org/spire/server"
+                                                    id="parentIdInputField"
+                                                    invalidText="A valid value is required - refer to helper text below"
+                                                    labelText="PARENT ID [*required]"
+                                                    placeholder="Enter PARENT ID"
+                                                    value={this.state.parentId}
+                                                    onChange={(e) => {this.onChangeParentIdInput(e)}}
+                                                />
+                                            </div>
+                                            <div className="spiffeId-input-field" data-test="spiffeId-input-field">
+                                                <TextInput
+                                                    aria-required="true"
+                                                    helperText="e.g. spiffe://example.org/sample/spiffe/id"
+                                                    id="spiffeIdInputField"
+                                                    invalidText="A valid value is required - refer to helper text below"
+                                                    labelText="SPIFFE ID [*required]"
+                                                    placeholder="Enter SPIFFE ID"
+                                                    value={this.state.spiffeId}
+                                                    onChange={(e) => {
+                                                        const input = e.target.value
+                                                        e.target.value = this.state.spiffeIdPrefix + input.substr(this.state.spiffeIdPrefix.length);
+                                                        this.onChangeSpiffeId(e);
+                                                    }}
+                                                />
+                                            </div>
+                                            <TextArea
+                                                cols={50}
+                                                helperText="e.g. k8s_sat:cluster:demo-cluster,..."
+                                                id="selectors-textArea"
+                                                invalidText="A valid value is required"
+                                                labelText="Selectors"
+                                                placeholder="Enter Selectors"
+                                                value={this.state.selectorsList}
+                                                rows={8}
+                                                onChange={this.onChangeSelectors}
+                                            />
+                                            <br></br>
+                                            <div className="advanced">
+                                                <fieldset className="bx--fieldset">
+                                                    <legend className="bx--label">Advanced</legend>
+                                                    <div className="ttl-input" data-test="ttl-input">
+                                                        <NumberInput
+                                                            helperText="x509 SVID Ttl for identities issued for this entry (In seconds) Overrides JWT TTL if set"
+                                                            id="ttl-input"
+                                                            invalidText="Number is not valid"
+                                                            label="x509 Time to Leave (Ttl)"
+                                                            //max={100}
+                                                            min={0}
+                                                            step={1}
+                                                            value={this.state.x509_svid_ttl}
+                                                            onChange={this.onChangex509Ttl}
+                                                        />
+                                                    </div>
+                                                    <div className="ttl-input" data-test="ttl-input">
+                                                        <NumberInput
+                                                            helperText="JWT SVID ttl for identities issued for this entry (In seconds) "
+                                                            id="ttl-input"
+                                                            invalidText="Number is not valid"
+                                                            label="JWT Time to Leave (Ttl)"
+                                                            //max={100}
+                                                            min={0}
+                                                            step={1}
+                                                            value={this.state.jwt_svid_ttl}
+                                                            onChange={this.onChangeJwtTtl}
+                                                        />
+                                                    </div>
+                                                    <div className="expiresAt-input" data-test="expiresAt-input">
+                                                        <NumberInput
+                                                            helperText="Entry expires at (seconds since Unix epoch)"
+                                                            id="expiresAt-input"
+                                                            invalidText="Number is not valid"
+                                                            label="Expires At"
+                                                            //max={100}
+                                                            min={0}
+                                                            step={1}
+                                                            value={this.state.expiresAt}
+                                                            onChange={this.onChangeExpiresAt}
+                                                        />
+                                                    </div>
+                                                    <div className="federates-with-input-field-yaml" data-test="federates-with-input-field">
+                                                        <TextInput
+                                                            helperText="e.g. example.org,abc.com (Separated By Commas)"
+                                                            id="federates-with-input-field"
+                                                            invalidText="A valid value is required - refer to helper text below"
+                                                            labelText="Federates With"
+                                                            placeholder="Enter Names of trust domains the identity described by this entry federates with"
+                                                            value={this.state.federatesWith}
+                                                            onChange={this.onChangeFederatesWith}
+                                                        />
+                                                    </div>
+                                                    <div className="dnsnames-input-field-yaml" data-test="dnsnames-input-field">
+                                                        <TextInput
+                                                            helperText="e.g. example.org,abc.com (Separated By Commas)"
+                                                            id="dnsnames-input-field"
+                                                            invalidText="A valid value is required - refer to helper text below"
+                                                            labelText="DNS Names"
+                                                            placeholder="Enter DNS Names associated with the identity described by this entry"
+                                                            value={this.state.dnsNames}
+                                                            onChange={this.onChangeDnsNames}
+                                                        />
+                                                    </div>
+                                                    <div className="admin-flag-checkbox" data-test="admin-flag-checkbox">
+                                                        <Checkbox
+                                                            labelText="Admin Flag"
+                                                            id="admin-flag"
+                                                            checked={this.state.adminFlag}
+                                                            onChange={this.onChangeAdminFlag}
+                                                        />
+                                                    </div>
+                                                    <div className="down-stream-checkbox" data-test="down-stream-checkbox">
+                                                        <Checkbox
+                                                            labelText="Down Stream"
+                                                            id="down-steam"
+                                                            checked={this.state.downstream}
+                                                            onChange={this.onChangeDownStream}
+                                                        />
+                                                    </div>
+                                                </fieldset>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </ModalWrapper>
+                                </ModalWrapper>
+                            </div>
                         </div>
                     </div>
                 }
