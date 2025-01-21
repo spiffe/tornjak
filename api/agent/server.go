@@ -214,6 +214,7 @@ func (s *Server) GetRouter() http.Handler {
 
 	// SPIRE CRD Federations
 	apiRtr.HandleFunc("/api/v1/spire-controller-manager/clusterfederatedtrustdomains", s.CRDFederationList).Methods(http.MethodGet, http.MethodOptions)
+	apiRtr.HandleFunc("/api/v1/spire-controller-manager/clusterfederatedtrustdomains", s.CRDFederationCreate).Methods(http.MethodPost)
 
 	// Tornjak specific
 	apiRtr.HandleFunc("/api/v1/tornjak/serverinfo", s.tornjakGetServerInfo).Methods(http.MethodGet, http.MethodOptions)

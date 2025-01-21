@@ -7,10 +7,7 @@ import (
 	"context"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-
-	spirev1alpha1 "github.com/spiffe/spire-controller-manager/api/v1alpha1"
 )
 
 var gvrFederation = schema.GroupVersionResource{
@@ -31,24 +28,10 @@ func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRel
 
 	var result []*apitypes.FederationRelationship
 	for _, trustDomain := range trustDomainList.Items {
-		// parse TrustDomain into ClusterFederatedTrustDomain object
-		var clusterFederatedTrustDomain spirev1alpha1.ClusterFederatedTrustDomain
-		err := runtime.DefaultUnstructuredConverter.FromUnstructured(trustDomain.Object, &clusterFederatedTrustDomain)
+		spireAPIFederation, err := unstructuredToSpireAPIFederation(trustDomain)
 		if err != nil {
-			return ListFederationRelationshipsResponse{}, fmt.Errorf("error parsing trustdomain: %v", err)
+			return ListFederationRelationshipsResponse{}, fmt.Errorf("Error parsing trustDomain: %v", err)
 		}
-		// parse ClusterFederatedTrustDomain object into Federation object
-		federation, err := spirev1alpha1.ParseClusterFederatedTrustDomainSpec(&clusterFederatedTrustDomain.Spec)
-		if err != nil {
-			return ListFederationRelationshipsResponse{}, fmt.Errorf("error parsing crd spec: %v", err)
-		}
-
-		// parse Federation object into spire API object
-		spireAPIFederation, err := federationRelationshipToAPI(*federation)
-		if err != nil {
-			return ListFederationRelationshipsResponse{}, fmt.Errorf("error parsing into spire API object: %v", err)
-		}
-
 		// place SPIRE API object into result
 		result = append(result, spireAPIFederation)
 	}
@@ -57,3 +40,58 @@ func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRel
 		FederationRelationships: result,
 	}, nil 
 }
+
+type BatchCreateFederationRelationshipsRequest trustdomain.BatchCreateFederationRelationshipRequest
+type BatchCreateFederationRelationshipsResponse trustdomain.BatchCreateFederationRelationshipResponse
+
+func (s *SPIRECRDManager) BatchCreateClusterFederatedTrustDomains(inp BatchCreateFederationRelationshipsRequest) (BatchCreateFederationRelationshipsResponse, error) { //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
+
+	// TODO add check on classname - should only make for a certain classname
+	apiFederationList := inp.FederationRelationships
+	var result []*trustdomain.BatchCreateFederationRelationshipResponse_Result
+	for _, apiFederation := range apiFederationList {
+		// resulting object
+		successStatus := &apitypes.Status{
+			Code: 0,
+			Message: "OK",
+		}
+		failStatus := &apitypes.Status{
+			Code: 1, // TODO more specific codes
+			Message: "Failure",
+		}
+
+		// parse to unstructured
+		createInput, err := s.spireAPIFederationToUnstructured(apiFederation)
+		if err != nil {
+			failStatus.Message = fmt.Sprintf("Error parsing input: %v", err)
+			result = append(result, &trustdomain.BatchCreateFederationRelationshipResponse_Result {Status: failStatus})
+			continue
+		}
+
+		// post ClusterFederatedTrustDomain object
+		createResult, err := s.kubeClient.Resource(gvrFederation).Create(context.TODO(), createInput, metav1.CreateOptions{})
+		if err != nil {
+			failStatus.Message = fmt.Sprintf("Error listing trust dmoains: %v", err)
+			result = append(result, &trustdomain.BatchCreateFederationRelationshipResponse_Result {Status: failStatus})
+			continue
+		}
+		resultFederationRelationship, err := unstructuredToSpireAPIFederation(*createResult)
+		if err != nil {
+			failStatus.Message = fmt.Sprintf("Error parsing returned trust domain: %v", err)
+			result = append(result, &trustdomain.BatchCreateFederationRelationshipResponse_Result {Status: failStatus})
+			continue
+		}
+		resultEntry := trustdomain.BatchCreateFederationRelationshipResponse_Result{
+			Status: successStatus,
+			FederationRelationship: resultFederationRelationship,
+		}
+
+		result = append(result, &resultEntry)
+
+	}
+	return BatchCreateFederationRelationshipsResponse{
+		Results: result,
+	}, nil 
+}
+
+
