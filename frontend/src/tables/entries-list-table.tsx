@@ -170,7 +170,7 @@ class EntriesListTable extends React.Component<EntriesListTableProp, EntriesList
                 key: 'info',
             },
             {
-                header: 'Expirey Status',
+                header: 'Expiry Status',
                 key: 'expired',
             },
         ];
