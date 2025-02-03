@@ -459,7 +459,7 @@ If you chose to deploy Tornjak with the UI, connecting to the UI is very simple.
 You will need to deploy the separate frontend separately to access the exposed Tornjak backend. We have prebuilt the frontend in a container, so we can simply run it via a single docker command in a separate terminal, which will take a couple minutes to run:
 
 ```console
-docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak-frontend:latest
+docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak-frontend:v2.0.0
 ```
 
 After the image is downloaded, you will eventually see the following output:
