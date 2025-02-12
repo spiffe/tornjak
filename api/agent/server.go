@@ -14,6 +14,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/hashicorp/hcl/hcl/ast"
+	"github.com/rs/cors"
 
 	"github.com/spiffe/tornjak/pkg/agent/authentication/authenticator"
 	"github.com/spiffe/tornjak/pkg/agent/authorization"
@@ -48,15 +49,6 @@ type hclPluginConfig struct {
 	Enabled        *bool    `hcl:"enabled"`
 }
 
-func cors(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PATCH")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, access-control-allow-origin, access-control-allow-headers, access-control-allow-credentials, Authorization, access-control-allow-methods")
-	w.Header().Set("Access-Control-Expose-Headers", "*, Authorization")
-	w.WriteHeader(http.StatusOK)
-}
-
 func retError(w http.ResponseWriter, emsg string, status int) {
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -68,51 +60,38 @@ func retError(w http.ResponseWriter, emsg string, status int) {
 
 // Handle preflight checks
 func (s *Server) verificationMiddleware(next http.Handler) http.Handler {
-	f := func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "OPTIONS" {
-			cors(w, r)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
 			return
 		}
 
-		userInfo := s.Authenticator.AuthenticateRequest(r)
+		userIntfo := s.Authenticator.AuthenticateRequest(r)
+		err := s.Authorizer.AuthorizeRequest(r, userIntfo)
 
-		err := s.Authorizer.AuthorizeRequest(r, userInfo)
 		if err != nil {
 			emsg := fmt.Sprintf("Error authorizing request: %v", err.Error())
-			// error should be written already
 			retError(w, emsg, http.StatusUnauthorized)
 			return
 		}
 
 		next.ServeHTTP(w, r)
-	}
-	return http.HandlerFunc(f)
+	})
 }
 
 func (s *Server) tornjakGetServerInfo(w http.ResponseWriter, r *http.Request) {
 	var input GetTornjakServerInfoRequest
-	buf := new(strings.Builder)
 
-	n, err := io.Copy(buf, r.Body)
-	if err != nil {
-		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
-		return
-	}
-	data := buf.String()
-
-	if n == 0 {
+	if r.Body == nil {
 		input = GetTornjakServerInfoRequest{}
-	} else {
-		err := json.Unmarshal([]byte(data), &input)
-		if err != nil {
-			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
-			retError(w, emsg, http.StatusBadRequest)
-			return
-		}
+	} else if err := json.NewDecoder(r.Body).Decode(&input); err != nil && err != io.EOF {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusNoContent)
+		return
 	}
 
 	ret, err := s.GetTornjakServerInfo(input)
+
 	if err != nil {
 		// The error occurs only when serverinfo is empty
 		// This indicates --spire-config not passed
@@ -122,14 +101,8 @@ func (s *Server) tornjakGetServerInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
-	je := json.NewEncoder(w)
-	err = je.Encode(ret)
-	if err != nil {
-		emsg := fmt.Sprintf("Error: %v", err.Error())
-		retError(w, emsg, http.StatusBadRequest)
-		return
-	}
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	json.NewEncoder(w).Encode(ret)
 }
 
 // spaHandler implements the http.Handler interface, so we can use it
@@ -149,6 +122,7 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	relPath := r.URL.Path
 	// get the absolute path to prevent directory traversal
 	absPath, err := filepath.Abs(filepath.Join(h.staticPath, relPath))
+
 	if err != nil || !strings.HasPrefix(absPath, h.staticPath) {
 		// if we failed to get the absolute path respond with a 400 bad request
 		// and stop
@@ -168,8 +142,10 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	// otherwise, use http.FileServer to serve the static dir
-	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
+
+	http.ServeFile(w, r, absPath)
+	// // otherwise, use http.FileServer to serve the static dir
+	// http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
 }
 
 func (s *Server) GetRouter() http.Handler {
@@ -177,6 +153,9 @@ func (s *Server) GetRouter() http.Handler {
 
 	apiRtr := rtr.PathPrefix("/").Subrouter()
 	healthRtr := rtr.PathPrefix("/healthz").Subrouter()
+
+	// Middleware
+	apiRtr.Use(s.verificationMiddleware)
 
 	// Healthcheck (never goes through authn/authz layers)
 	healthRtr.HandleFunc("", s.health)
@@ -198,14 +177,14 @@ func (s *Server) GetRouter() http.Handler {
 	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryList).Methods(http.MethodGet, http.MethodOptions)
 	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryCreate).Methods(http.MethodPost)
 	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryDelete).Methods(http.MethodDelete)
-	
+
 	// SPIRE server bundles
 	apiRtr.HandleFunc("/api/v1/spire/bundle", s.bundleGet).Methods(http.MethodGet, http.MethodOptions)
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleList).Methods(http.MethodGet, http.MethodOptions)
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleCreate).Methods(http.MethodPost)
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleUpdate).Methods(http.MethodPatch)
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleDelete).Methods(http.MethodDelete)
-	
+
 	// SPIRE server federations
 	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationList).Methods(http.MethodGet, http.MethodOptions)
 	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationCreate).Methods(http.MethodPost)
@@ -228,14 +207,21 @@ func (s *Server) GetRouter() http.Handler {
 	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterEdit).Methods(http.MethodPatch)
 	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterDelete).Methods(http.MethodDelete)
 
-	// Middleware
-	apiRtr.Use(s.verificationMiddleware)
+	// Enable CORS globally
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowCredentials: true,
+	})
+
+	handler := c.Handler(rtr)
 
 	// UI
 	spa := spaHandler{staticPath: "ui-agent", indexPath: "index.html"}
 	rtr.PathPrefix("/").Handler(spa)
 
-	return rtr
+	return handler
 }
 
 func (s *Server) redirectHTTP(w http.ResponseWriter, r *http.Request) {
