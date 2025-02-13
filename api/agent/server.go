@@ -51,10 +51,6 @@ type hclPluginConfig struct {
 
 func retError(w http.ResponseWriter, emsg string, status int) {
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PATCH")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, access-control-allow-origin, access-control-allow-headers, access-control-allow-credentials, Authorization, access-control-allow-methods")
-	w.Header().Set("Access-Control-Expose-Headers", "*, Authorization")
 	http.Error(w, emsg, status)
 }
 
@@ -207,7 +203,7 @@ func (s *Server) GetRouter() http.Handler {
 	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterEdit).Methods(http.MethodPatch)
 	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterDelete).Methods(http.MethodDelete)
 
-	// Enable CORS globally
+	// Warp the router with CORS middleware
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
