@@ -1,33 +1,38 @@
-# Tornjak Bug Report Template
-
-## Summary
-*A brief description of the issue.*
-
-## Environment
-- **Tornjak Version:** 
-- **SPIRE Version:** 
-- **Operating System:** 
-- **Browser (if applicable):** 
-- **Kubernetes Version (if applicable):** 
-- **Deployment Method (e.g., Helm, Manual, Docker):** 
-
-## Steps to Reproduce
-1. *List the exact steps to reproduce the issue.*
-2. *Provide any relevant configurations or commands used.*
-
-## Expected Behavior
-*A brief description of expected behavior*
-
-## Actual Behavior
-*A concise description of what actually happened, including error messages if applicable.*
-
-## Logs & Screenshots
-*Attach any relevant logs, error messages, or screenshots to help diagnose the problem.*
-
-## Additional Context
-*Add any other relevant information here*
+---
+name: Bug report
+about: Create a report to help us improve
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
-**Thank you for reporting!**
+**Describe the bug**
+A clear and concise description of what the bug is.
 
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
+
+**Expected behavior**
+A clear and concise description of what you expected to happen.
+
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
+
+**Desktop (please complete the following information):**
+ - OS: [e.g. iOS]
+ - Browser [e.g. chrome, safari]
+ - Version [e.g. 22]
+
+**Smartphone (please complete the following information):**
+ - Device: [e.g. iPhone6]
+ - OS: [e.g. iOS8.1]
+ - Browser [e.g. stock browser, safari]
+ - Version [e.g. 22]
+
+**Additional context**
+Add any other context about the problem here.

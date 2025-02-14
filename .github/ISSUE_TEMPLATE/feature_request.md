@@ -1,21 +1,20 @@
-# Tornjak Feature Request Template
-
-## Summary
-*A brief description of the requested feature.*
-
-## Problem Statement
-*Explain the problem this feature would solve or the improvement it would bring.*
-
-## Proposed Solution
-*Describe how the feature should work, including any relevant details.*
-
-## Use Cases
-*List specific scenarios where this feature would be useful.*
-
-## Additional Context
-*Include any other relevant information, such as related issues, links, or design considerations.*
+---
+name: Feature request
+about: Suggest an idea for this project
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
-**Thank you for your suggestion!**
+**Is your feature request related to a problem? Please describe.**
+A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
+**Describe the solution you'd like**
+A clear and concise description of what you want to happen.
+
+**Describe alternatives you've considered**
+A clear and concise description of any alternative solutions or features you've considered.
+
+**Additional context**
+Add any other context or screenshots about the feature request here.
