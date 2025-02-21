@@ -451,6 +451,7 @@ This output represents the backend response. Now you should be able to make Torn
 ### Step 3b: Connecting to the Tornjak frontend to access the Tornjak UI
 
 Make sure that the backend is accessible from your browser at `http://localhost:10000`, as above, or the frontend will not work.
+- Tip: run kubectl -n spire port-forward spire-server-0 10000:10000 as a background process that way you can access the frontend.
 
 If you chose to deploy Tornjak with the UI, connecting to the UI is very simple. Otherwise, you can always run the UI locally and connect. See the two choices below:
 
