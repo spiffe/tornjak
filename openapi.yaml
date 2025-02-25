@@ -680,7 +680,7 @@ paths:
                     type: array
                     items:
                       type: string
-                      examples: ["k8s_sat"]
+                      examples: ["k8s_psat"]
                   NodeResolver:
                     type: array
                     items:
@@ -921,7 +921,7 @@ components:
       properties:
         type:
           type: string
-          examples: ["k8s_sat"]
+          examples: ["k8s_psat"]
         value:
           type: string
           examples: ["agent_ns:spire", "agent_sa:spire-agent"]
@@ -975,7 +975,7 @@ components:
           $ref: '#/components/schemas/spiffe_id'
         attestation_type:
           type: string
-          examples: ["k8s_sat"]
+          examples: ["k8s_psat"]
         x509svid_serial_number:
           type: integer
         x509svid_expires_at:

@@ -350,9 +350,9 @@ NOTE: In a windows environment, you will need to replace the backslashes ( \\ ) 
 kubectl exec -n spire -c spire-server spire-server-0 -- \
     /opt/spire/bin/spire-server entry create \
     -spiffeID spiffe://example.org/ns/spire/sa/spire-agent \
-    -selector k8s_sat:cluster:demo-cluster \
-    -selector k8s_sat:agent_ns:spire \
-    -selector k8s_sat:agent_sa:spire-agent \
+    -selector k8s_psat:cluster:demo-cluster \
+    -selector k8s_psat:agent_ns:spire \
+    -selector k8s_psat:agent_sa:spire-agent \
     -node
 ```
 
@@ -361,11 +361,10 @@ Entry ID         : 644d374c-97c9-4072-a173-aca01fbfd400
 SPIFFE ID        : spiffe://example.org/ns/spire/sa/spire-agent
 Parent ID        : spiffe://example.org/spire/server
 Revision         : 0
-X509-SVID TTL    : default
-JWT-SVID TTL     : default
-Selector         : k8s_sat:agent_ns:spire
-Selector         : k8s_sat:agent_sa:spire-agent
-Selector         : k8s_sat:cluster:demo-cluster
+TTL              : default
+Selector         : k8s_psat:agent_ns:spire
+Selector         : k8s_psat:agent_sa:spire-agent
+Selector         : k8s_psat:cluster:demo-cluster
 ```
 
 And we create a registration entry for the workload registrar, specifying the workload registrar's SPIFFE ID:

@@ -125,16 +125,16 @@ Content-Type: application/json; charset=utf-8
       "trust_domain": "example.org",
       "path": "/spire/agent"
     },
-    "attestation_type": "k8s_sat",
+    "attestation_type": "k8s_psat",
     "x509svid_serial_number": "111",
     "x509svid_expires_at": 222,
     "selectors": [
     {
-      "type": "k8s_sat",
+      "type": "k8s_psat",
       "value": "agent_ns:spire"
     },
     {
-      "type": "k8s_sat",
+      "type": "k8s_psat",
       "value": "agent_sa:spire-agent"
     },
   ]
@@ -232,11 +232,11 @@ Content-Type: application/json; charset=utf-8
       },
       "selectors": [
         {
-           "type": "k8s_sat",
+           "type": "k8s_psat",
            "value": "agent_ns:spire"
        },
        {
-            "type": "k8s_sat",
+            "type": "k8s_psat",
             "value": "agent_sa:spire-agent"
        },
     ]
@@ -265,11 +265,11 @@ Content-Type: application/json; charset=utf-8
   },
   "selectors": [
      {
-       "type": "k8s_sat",
+       "type": "k8s_psat",
        "value": "agent_ns:spire"
      },
      {
-       "type": "k8s_sat",
+       "type": "k8s_psat",
        "value": "agent_sa:spire-agent"
      },
 ]
@@ -297,11 +297,11 @@ Example response:
       },
       "selectors": [
       {
-        "type": "k8s_sat",
+        "type": "k8s_psat",
         "value": "agent_ns:spire"
       },
       {
-        "type": "k8s_sat",
+        "type": "k8s_psat",
         "value": "agent_sa:spire-agent"
       },
     ]
@@ -353,7 +353,7 @@ Content-Type: application/json; charset=utf-8
   {
     "DataStore": ["sql"],
     "KeyManager": ["disk"],
-    "NodeAttestor": ["k8s_sat"],
+    "NodeAttestor": ["k8s_psat"],
     "NodeResolver": ["k8sbundle"],
     "trust_domain": "example.org",
     "verboseConfig": "Plugin Info..."
