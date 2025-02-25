@@ -1,3 +1,7 @@
+import { Component } from 'react';
+import { connect } from 'react-redux';
+import IsManager from '../is_manager';
+import DashboardDetailsStyled from './dashboard-details';
 import TornjakHelper from '../tornjak-helper';
 import TornjakApi from '../tornjak-api-helpers';
 import {
