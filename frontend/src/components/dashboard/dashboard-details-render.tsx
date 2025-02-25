@@ -1,9 +1,10 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import IsManager from '../is_manager';
 import DashboardDetailsStyled from './dashboard-details';
 import TornjakHelper from '../tornjak-helper';
 import TornjakApi from '../tornjak-api-helpers';
+
 import {
     serverSelectedFunc,
     clustersListUpdateFunc,
@@ -19,13 +20,18 @@ import {
     clickedDashboardTableFunc,
 } from 'redux/actions';
 
+type DashboardDetailsRenderProps ={
+    globalClustersList: Array<{ [key: string]: any }>;
+}
 // DashboardDetailsRender takes in details url parameters
 // returns details page for dashboard for a specific entity
-class DashboardDetailsRender extends Component {
+class DashboardDetailsRender extends React.Component<DashboardDetailsRenderProps, {}> {
+    TornjakApi:TornjakApi;
+    TornjakHelper: TornjakHelper;
     constructor(props) {
         super(props);
-        this.TornjakApi = new TornjakApi();
-        this.TornjakHelper = new TornjakHelper();
+        this.TornjakApi = new TornjakApi({});
+        this.TornjakHelper = new TornjakHelper({});
         this.state = {};
     }
 
