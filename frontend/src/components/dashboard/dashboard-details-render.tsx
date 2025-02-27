@@ -5,6 +5,7 @@ import DashboardDetailsStyled from './dashboard-details';
 import TornjakHelper from '../tornjak-helper';
 import TornjakApi from '../tornjak-api-helpers';
 
+
 import {
     serverSelectedFunc,
     clustersListUpdateFunc,
@@ -18,17 +19,27 @@ import {
     agentworkloadSelectorInfoFunc,
     clusterTypeInfoFunc,
     clickedDashboardTableFunc,
+    
 } from 'redux/actions';
+
+import{
+    DebugServerInfo,
+
+
+} from "components/types";
 
 type DashboardDetailsRenderProps ={
     globalClustersList: Array<{ [key: string]: any }>;
+    globalDebugServerInfo:DebugServerInfo ;
+    globalServerSelected:string;
+    clickedDashboardTableFunc: (globalClickedDashboardTable: string) => void;
 }
 // DashboardDetailsRender takes in details url parameters
 // returns details page for dashboard for a specific entity
 class DashboardDetailsRender extends React.Component<DashboardDetailsRenderProps, {}> {
     TornjakApi:TornjakApi;
     TornjakHelper: TornjakHelper;
-    constructor(props) {
+    constructor(props:DashboardDetailsRenderProps) {
         super(props);
         this.TornjakApi = new TornjakApi({});
         this.TornjakHelper = new TornjakHelper({});
