@@ -12,3 +12,10 @@
 - Explored existing GitHub issues and pull requests to understand project workflows.
 
 
+## Current work on Git Issue 585
+
+Link: https://github.com/spiffe/tornjak/issues/585
+
+- Created a documentation file for issue
+- 
+
