@@ -1,5 +1,7 @@
 # Index
 
+-   [Deployment Using Helm-Charts](/docs/tornjak-helm-chart.md)
+
 -   [Blogs](/docs/blogs.md)
 
 -   [Debugging, Hints and Tips for Solving Common Problems with Tornjak](/docs/tornjak-hints.md)
