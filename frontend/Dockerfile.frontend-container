@@ -1,18 +1,18 @@
 ## Build stage
-FROM node:18-alpine3.14 AS build
+FROM node:20-alpine AS build
 WORKDIR /usr/src/app
 COPY frontend .
 RUN npm install && \
     npm run build
 
 ## Runtime stage
-FROM node:18-alpine3.14 AS runtime
+FROM node:20-alpine AS runtime
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/build ./build
 COPY --from=build /usr/src/app/.env.prod .
 
 # Install serve package and react-inject-env
-RUN npm install -g npm@9.7.1 && \
+RUN npm install -g npm@10.7.0 && \
     npm install --location=global serve && \
     npm install react-inject-env
 RUN mkdir build/tmp
