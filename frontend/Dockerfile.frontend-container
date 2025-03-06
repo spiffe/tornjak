@@ -1,12 +1,12 @@
 ## Build stage
-FROM node:18-alpine3.14 AS build
+FROM node:20-alpine AS build
 WORKDIR /usr/src/app
 COPY frontend .
 RUN npm install && \
     npm run build
 
 ## Runtime stage
-FROM node:18-alpine3.14 AS runtime
+FROM node:20-alpine AS runtime
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/build ./build
 COPY --from=build /usr/src/app/.env.prod .
