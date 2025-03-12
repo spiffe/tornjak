@@ -567,7 +567,7 @@ class ClusterEdit extends Component<ClusterEditProp, ClusterEditState> {
 //   // })),
 // };
 
-const  = (state: RootState) => ({
+const mapStateToProps = (state: RootState) => ({
   globalClusterTypeInfo: state.clusters.globalClusterTypeInfo,
   globalClustersList: state.clusters.globalClustersList,
   globalServerSelected: state.servers.globalServerSelected,
