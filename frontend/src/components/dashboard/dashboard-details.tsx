@@ -9,8 +9,8 @@ import AgentDashboardTableStyled from "./agents-dashboard-table";
 import EntriesDashBoardTableStyled from "./entries-dashboard-table";
 import DashboardDrawerStyled from "./dashboard-drawer";
 
-const styles = (theme) => ({
-  root: {
+const styles = (theme: { spacing: (arg0: number) => any})  => ({
+  root: { 
     marginTop: -25,
     marginLeft: -20,
     display: "flex",
@@ -54,15 +54,25 @@ const styles = (theme) => ({
 
 // DashboardDetails takes in the selected data and props from dashboard table for a specific entity
 // returns details page for dashboard
+
+type DashboardDetailsProps = {
+  // the clicked dashboard table
+  globalClickedDashboardTable: string,
+  selectedData:string,
+
+
+}
+
+
 class DashboardDetails extends React.Component {
-  constructor(props) {
+  constructor(props:DashboardDetailsProps) {
     super(props);
     this.state = {
       selectedDataKey: this.selectedDataKey(),
     };
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps:DashboardDetailsProps) {
     if (prevProps.selectedData !== this.props.selectedData) {
       this.setState({
         selectedDataKey: this.selectedDataKey(),
