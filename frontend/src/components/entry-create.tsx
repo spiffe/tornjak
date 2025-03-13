@@ -850,7 +850,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                     aria-required="true"
                     //required
                     titleText="Selectors Recommendation [*required]"
-                    helperText="e.g. k8s_sat:cluster,..."
+                    helperText="e.g. k8s_psat:cluster,..."
                     placeholder={this.state.selectorsListDisplay}
                     //ariaLabel="selectors-multiselect"
                     id="selectors-multiselect"
@@ -862,7 +862,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                 <div className="selectors-textArea" data-test="selectors-textArea">
                   <TextArea
                     cols={50}
-                    helperText="e.g. k8s_sat:cluster:demo-cluster,..."
+                    helperText="e.g. k8s_psat:cluster:demo-cluster,..."
                     id="selectors-textArea"
                     invalidText="A valid value is required"
                     labelText="Selectors"
