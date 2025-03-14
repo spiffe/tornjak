@@ -24,14 +24,12 @@ import {
     AgentsList,
     AgentsWorkLoadAttestorInfo,
     ClustersList,
-    ServersList,
     EntriesList,
     SelectorInfoLabels,
     ServerInfo,
     TornjakServerInfo,
     WorkloadSelectorInfoLabels,
-    SpireHealthCheckFreq,
-    DebugServerInfo, FederationsList
+    DebugServerInfo
 } from "components/types";
 
 
@@ -67,11 +65,6 @@ type DashboardDetailsRenderProps ={
     globalDebugServerInfo: DebugServerInfo,
     // tornjak server info of the selected server
     globalTornjakServerInfo: TornjakServerInfo, 
-
-  
-    
-    
-
 
 }
 // DashboardDetailsRender takes in details url parameters

@@ -76,6 +76,7 @@ class DashboardDetails extends React.Component {
     if (prevProps.selectedData !== this.props.selectedData) {
       this.setState({
         selectedDataKey: this.selectedDataKey(),
+        
       });
     }
   }
