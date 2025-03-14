@@ -135,7 +135,7 @@ Currently, we support the following deployment scheme:
 
 Using the option below, easily copy in the right server-statefulset file.
 
-<details open><summary><b> 🔴 [Click] For the deployment of only the Tornjak backend (API)</b></summary>
+<details open><summary><b> 🔴 [Click] For the deployment of only the Tornjak backend (API) (Necessary for this quickstart)</b></summary>
 
 There is an additional requirement to mount the SPIRE server socket and make it accessible to the Tornjak backend container.
 
