@@ -1,20 +1,44 @@
+# Stage 1: Build the Go binary
+FROM golang:alpine AS builder
+
+# Set working directory for the build
+WORKDIR /app
+
+# Copy Go module files and download dependencies
+COPY go.mod go.sum ./
+RUN apk add --no-cache git && \
+    go mod download
+
+# Copy the rest of the source code
+COPY . .
+
+# Build the tornjak-manager binary
+# Replace "cmd/manager" with the actual path to your main.go if different
+RUN CGO_ENABLED=0 GOOS=linux go build -o /tornjak-manager ./cmd/manager
+
+# Stage 2: Create the runtime image
 FROM alpine:latest
 
 WORKDIR /
-#COPY ui-manager ui-manager
 
-# Add init
+# Install curl if required by tornjak-manager at runtime
+RUN apk add --no-cache curl
+
+# Copy the built binary from the builder stage
+COPY --from=builder /tornjak-manager /tornjak-manager
+
+# Set the entrypoint to run the binary
 ENTRYPOINT ["/tornjak-manager"]
 
-RUN apk add curl
-COPY bin/tornjak-manager tornjak-manager
-
-# add a version link to the image description
+# Add version and build metadata as build arguments
 ARG version
 ARG github_sha
+
+# Add labels for image description and metadata
 LABEL org.opencontainers.image.description="Tornjak manager ($version): https://github.com/spiffe/tornjak/releases/tag/$version" \
       org.opencontainers.image.source="https://github.com/spiffe/tornjak" \
-      org.opencontainers.image.documentation="https://github.com/spiffe/tornjak/tree/main/docs" 
-# create env. variables with the build details
+      org.opencontainers.image.documentation="https://github.com/spiffe/tornjak/tree/main/docs"
+
+# Create environment variables with build details
 ENV VERSION=$version
 ENV GITHUB_SHA=$github_sha
