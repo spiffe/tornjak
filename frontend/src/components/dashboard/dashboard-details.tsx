@@ -58,13 +58,20 @@ const styles = (theme: { spacing: (arg0: number) => any})  => ({
 type DashboardDetailsProps = {
   // the clicked dashboard table
   globalClickedDashboardTable: string,
-  selectedData:string,
+  selectedData: {
+    name: string;
+    parentId: string;
+    clusterName: string;
+    spiffeid: string;
+  },
+  selectedDataKey:string[],
+
 
 
 }
 
 
-class DashboardDetails extends React.Component {
+class DashboardDetails extends React.Component<DashboardDetailsProps> {
   constructor(props:DashboardDetailsProps) {
     super(props);
     this.state = {
