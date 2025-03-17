@@ -10,7 +10,7 @@
     },
     "parent_id": { //required - must be a valid parent_id
       "trust_domain": "example.org",
-      "path": "/spire/agent/k8s_sat/demo-cluster/21b781e7-4c92-4fe9-8bb2-108756fa9de2"
+      "path": "/spire/agent/k8s_psat/demo-cluster/21b781e7-4c92-4fe9-8bb2-108756fa9de2"
     },
     "selectors": [ //required - must be a valid type:value format
       {
