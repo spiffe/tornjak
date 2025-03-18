@@ -35,6 +35,7 @@ import {
 
 
 type DashboardDetailsRenderProps ={
+    params: { entity: string };
     // dispatches a payload for the server selected and has a return type of void
     serverSelectedFunc: (globalServerSelected: string) => void,
     // dispatches a payload for list of clusters with their metadata info as an array of ClustersList Type and has a return type of void
