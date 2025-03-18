@@ -8,6 +8,7 @@ import ClusterDashboardTableStyled from "./clusters-dashboard-table";
 import AgentDashboardTableStyled from "./agents-dashboard-table";
 import EntriesDashBoardTableStyled from "./entries-dashboard-table";
 import DashboardDrawerStyled from "./dashboard-drawer";
+import { RootState } from 'redux/reducers';
 
 const styles = (theme: { spacing: (arg0: number) => any})  => ({
   root: { 
@@ -63,6 +64,7 @@ type DashboardDetailsProps = {
     parentId: string;
     clusterName: string;
     spiffeid: string;
+    length: number;
   },
   selectedDataKey:string[],
 
@@ -336,7 +338,7 @@ class DashboardDetails extends React.Component<DashboardDetailsProps> {
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: RootState) => ({
   globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 });
 
