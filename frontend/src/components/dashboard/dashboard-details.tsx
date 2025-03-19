@@ -65,6 +65,7 @@ type DashboardDetailsProps = {
     clusterName: string;
     spiffeid: string;
     length: number;
+    numNodes: entry.agentsList.length;
   },
   selectedDataKey:string[],
 
