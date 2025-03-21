@@ -41,6 +41,12 @@ For this tutorial, we will use minikube. If you have an existing kubernetes clus
 minikube start
 ```
 
+- By default, Minikube automatically selects the best available driver. If you want to explicitly run Minikube on Docker, use the following command:
+- ```console
+    minikube start --driver=docker
+    ```
+
+
 ```
 😄  minikube v1.12.0 on Darwin 11.2
 🎉  minikube 1.18.1 is available! Download it: https://github.com/kubernetes/minikube/releases/tag/v1.18.1
@@ -328,6 +334,7 @@ NAME          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR
 spire-agent   1         1         1       1            1           <none>          19s
 
 ```
+- Similar as above, if you see any of the field that is showing 0 instead of 1, try to re-run the command after a minute or so.
 
 Then, we can create a registration entry for the node.
 
@@ -445,7 +452,7 @@ While this runs, open a browser to
 http://localhost:10000/api/v1/tornjak/serverinfo
 ```
 
-This output represents the backend response. Now you should be able to make Tornjak API calls!
+This output represents the backend response. Now you should be able to make Tornjak API calls! (you may want to open in Firefox to load the following style correctly)
 
 ![tornjak-agent-browser](../rsrc/tornjak-agent-browser.png)
 
@@ -563,3 +570,47 @@ minikube delete
 minikube start
 ```
 </details>
+
+<details><summary><b>Troubleshoot 2: Minikube fails to start Parallels VM due to missing DHCP lease for MAC address.</b></summary>
+
+When running the `minikube start` command, you might encounter an error like the one below:
+```console
+minikube start
+```
+```
+🤦  StartHost failed, but will try again: driver start: Too many retries waiting for SSH to be available.  Last error: Maximum number of retries (60) exceeded
+🏃  Updating the running parallels "minikube" VM ...
+😿  Failed to start parallels VM. Running "minikube delete" may fix it: provision: IP lease not found for MAC address XXXXXXXXXX in: /Library/Preferences/Parallels/parallels_dhcp_leases
+
+
+❌  Exiting due to GUEST_PROVISION: error provisioning guest: Failed to start host: provision: IP lease not found for MAC address 001C42B0DEF6 in: /Library/Preferences/Parallels/parallels_dhcp_leases
+```
+This typically means the Minikube and Parallels virtual machine is failing to start due to an IP lease problem. Here some steps you can take to troubleshoot and resolve this issue:
+
+1. Sometimes, the Minikube VM can get into a bad state. Deleting and recreating it can often resolve issues.
+- Run the following command:
+```
+minikube delete
+minikube start --vm-driver=parallels
+```
+
+2. If the above solution is not applicable, you should check Parallels DHCP leases on your machine
+
+For Mac user, you can manually check the DHCP leases file to see if the MAC address is listed
+```console
+cat /Library/Preferences/Parallels/parallels_dhcp_leases
+```
+If the MAC address is not listed, it might be worth renew your DHCP lease manually.
+
+Open your System Settings, then click Network in the sidebar.
+
+![mac-network](../rsrc/mac-system-network.png)
+
+Renew every connected network's DHCP lease by clicking each of them, followed by click Details.
+
+![mac-wifi](../rsrc/mac-system-wifi.png)
+
+Click TCP/IP, then click Renew DHCP Lease, followed by Apply. Finally, click the OK button on the right. You may be prompted to enter your Mac administrator password to complete these changes.
+
+![mac-renewDHCP](../rsrc/mac-system-renewDHCP.png)
+

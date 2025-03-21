@@ -23,7 +23,7 @@ A list of releases can be found at [https://github.com/spiffe/tornjak/releases](
 Here are a few additional resources:
 - [Tornjak basic functions demo](https://www.youtube.com/watch?v=dOdRu4psKJ8)
 
-In case of deployment or configuration troubles, check out our [hints documenation](./docs/tornjak-hints.md)
+In case of deployment or configuration troubles, check out our [hints documentation](./docs/tornjak-hints.md)
 
 ## Architecture and roadmap
 
