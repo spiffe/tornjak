@@ -1,80 +1,107 @@
-# Tornjak Deployment via SPIFFE Helm Charts Hardened
+# Deploying Tornjak via SPIFFE Helm Charts Hardened
 
 ## Overview
 
-In order to deply Tornjak via Helm Charts is through the [SPIFFE Helm Charts Hardened](https://github.com/spiffe/helm-charts-hardened) repository. Here the repository includes an example for deploying both the frontend and backend for **Tornjak**. 
+You can deploy **Tornjak** using the [SPIFFE Helm Charts Hardened](https://github.com/spiffe/helm-charts-hardened)
+repository. 
 
-## Deployment Details
+This guide walks you through deploying both the frontend and backend of Tornjak with Direct Access, 
+using Helm charts in a local Kubernetes environment via Minikube. By the end, you’ll have a working instance 
+of SPIRE integrated with Tornjak for easier visibility and management of your SPIFFE identities. 
 
-Before we begin make sure you have [minikube](https://minikube.sigs.k8s.io/docs/start/?arch=%2Fmacos%2Fx86-64%2Fstable%2Fbinary+download) and [helm](https://helm.sh/docs/intro/install/) installed on your system. 
+## Prerequisites
 
-To start we want to start our minikube environment using:
-```
+Make sure you have the following installed on your system:
+
+- [Minikube](https://minikube.sigs.k8s.io/docs/start/?arch=%2Fmacos%2Fx86-64%2Fstable%2Fbinary+download)
+- [Helm](https://helm.sh/docs/intro/install/)
+
+---
+
+## Step-by-Step Deployment
+
+### 1. Start Minikube
+
+```bash
 minikube start
+``` 
+
+Once minikube is up you can continue to the next step.
+
+---
+
+### 2. Clone the Helm Charts Repository 
+
+Clone the `helm-charts-hardened` repository if you haven't already, then navigate 
+into it and create a new branch. 
+
+```bash
+git clone https://github.com/spiffe/helm-charts-hardened.git
+cd helm-charts-hardened 
+git checkout -b your-branch
 ```
 
-After you see the completion message we can now move on to the next to the next step. 
+You can name the branch whatever you like.
 
-We want for cd into the `helm-charts-hardened` directory that we just cloned and create a new branch. Name this branch whatever you want. 
+---
 
-Next in the root directory we want to create a yaml file called `your-values.yaml` (you can name this something else if you want). This file will contain all the parameters that helm will use to deploy your SPIRE instance. [This is probably wrong]
+### 3. Create a Custom Values File
 
-From where we want to copy these values onto the file:
+In the root of your `helm-charts-hardened` directory, create a YAML file (e.g `your-values.yaml`).
+This file will define the Helm configurations Helm uses when deploying SPIRE. 
 
+Here's a template you can start with: 
 ```yaml
 global:
-  openshift: false # If running on openshift, set to true
+  openshift: false  # Set to true if deploying on OpenShift
   spire:
     recommendations:
       enabled: true
     namespaces:
       create: true
-    ingressControllerType: "" # If not openshift, and want to expose services, set to a supported option [ingress-nginx]
-    # Update these
-    clusterName: example-cluster
-    trustDomain: example.org
+    ingressControllerType: ""  # Use "ingress-nginx" if exposing services outside Minikube
+    clusterName: server.example
+    trustDomain: server.example
     caSubject:
-      country: ARPA
-      organization: Example
-      commonName: example.org
-# If rancher/kubectl doesn't have a version that matches your cluster, uncomment and update:
-#    tools:
-#       kubectl:
-#         tag: "v1.23.3"
-```
-
-We want to take a look at under the `# Update these` tag and change the values to look like this:
-
-```yaml
-# Update these
-clusterName: server.example 
-trustDomain: server.example 
-caSubject:
-  country: US 
-  organization: Server 
-  commonName: server.example 
-```
-
-Great now we can excute the following to deploy our SPIRE instance: 
+      country: US
+      organization: Server
+      commonName: server.example
+# Uncomment and set the correct version if you face issues with kubectl/rancher versions:
+# tools:
+#   kubectl:
+#     tag: "v1.23.3"
 
 ```
+
+⚠️ Note: If you name your file something other than your-values.yaml, remember to use that 
+name in the following commands.
+
+--- 
+
+### 4. Deploy SPIRE
+
+Now we can excute the following to deploy our SPIRE instance: 
+
+```bash
 helm upgrade --install -n spire-mgmt spire-crds spire-crds --repo https://spiffe.github.io/helm-charts-hardened/ --create-namespace
 
 helm upgrade --install -n spire-mgmt spire spire --repo https://spiffe.github.io/helm-charts-hardened/ -f your-values.yaml
 ```
 
-Note: Make sure to update `your-values.yaml` if you decided to use a different name. 
+---
 
-Now that we have SPIRE running we can focus on doplying SPIRE with Tornjak enabled. 
+### 5. Deploy Tornjak 
 
-First we want to export the Tornjak API like so: 
+Now we can deploy Tornjak with SPIRE. 
 
-```console
+First, we need to export the Tornjak backend API URL: 
+
+```bash 
 export TORNJAK_API=http://localhost:10000
 ```
 
-Next we can execute the following using help to launch Tornjak: 
-```console
+Then, run the following Helm command to deploy Tornjak with the frontend and backend enabled:
+```bash
 helm upgrade --install -n spire-mgmt spire spire \
 --repo https://spiffe.github.io/helm-charts-hardened/ \
 --set tornjak-frontend.apiServerURL=$TORNJAK_API \
@@ -83,17 +110,30 @@ helm upgrade --install -n spire-mgmt spire spire \
 --render-subchart-notes
 ```
 
-To test the deployment run: 
-```console 
+---
+
+### 6. Test Deployment 
+You can verify the deployment with:  
+
+```bash  
 helm test spire -n spire-server
 ```
 
-Now that we have both the frontend and backend services running we want to forward the ports so that we can access them. Make sure that you run each command in a **seperate** terminal:
-```console
+--- 
+
+### 7. Access Tornjak UI
+
+To access the Tornjak frontend you'll need to forward the necessary ports. Make sure that you 
+run each of the following commands in a **seperate** terminal:
+
+```bash
 kubectl -n spire-server port-forward service/spire-tornjak-backend 10000:10000
 ```
-```console
+```bash 
 kubectl -n spire-server port-forward service/spire-tornjak-frontend 3000:3000
 ```
 
-Now if you open your browser and type `http://localhost:3000` you should be able to access the Tornjak frontend. 
+Open your browser and enter: 'http://localhost:3000`
+You should now see the Tornjak UI! 
+
+--- 
