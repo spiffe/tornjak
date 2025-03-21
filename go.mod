@@ -5,7 +5,7 @@ go 1.22.2
 require (
 	github.com/MicahParks/keyfunc/v2 v2.1.0
 	github.com/cenkalti/backoff/v4 v4.3.0
-	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/hcl v1.0.1-0.20190430135223-99e2f22d1c94
 	github.com/mattn/go-sqlite3 v1.14.19
