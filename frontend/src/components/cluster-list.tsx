@@ -135,7 +135,7 @@ class ClusterList extends Component<ClusterListProp, ClusterListState> {
 //   clustersListUpdateFunc: PropTypes.func
 // };
 
-const mapStateToProps = (state: RootState) => ({
+const  = (state: RootState) => ({
   globalServerSelected: state.servers.globalServerSelected,
   globalClustersList: state.clusters.globalClustersList,
   globalTornjakServerInfo: state.servers.globalTornjakServerInfo,
@@ -143,7 +143,7 @@ const mapStateToProps = (state: RootState) => ({
 })
 
 export default connect(
-  mapStateToProps,
+  ,
   { serverSelectedFunc, agentsListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessageFunc, workloadSelectorInfoFunc, agentworkloadSelectorInfoFunc, clustersListUpdateFunc }
 )(ClusterList)
 
