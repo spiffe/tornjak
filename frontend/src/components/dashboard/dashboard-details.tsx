@@ -65,14 +65,26 @@ type DashboardDetailsProps = {
     clusterName: string;
     spiffeid: string;
     length: number;
-    numNodes: entry.agentsList.length
+    numNodes: number;
+    numEntries:number;
+    
   },
-  selectedDataKey:string[],
+  selectedDataKey:any[],
+  
 
 
 
 }
 
+  // getClusterMetadata(entry: ClustersList, globalEntries: EntriesList[], globalAgents: AgentsList[]) {
+  //   return {
+  //     id: entry.name,
+  //     name: entry.name,
+  //     created: entry.creationTime,
+  //     numNodes: entry.agentsList.length,
+  //     numEntries: this.numberEntriesOfCluster(entry, globalEntries, globalAgents),
+  //   }
+  // }
 
 class DashboardDetails extends React.Component<DashboardDetailsProps> {
   constructor(props:DashboardDetailsProps) {
@@ -93,8 +105,8 @@ class DashboardDetails extends React.Component<DashboardDetailsProps> {
 
   selectedDataKey() {
     var { selectedData } = this.props;
-    var clickedDashboardTable = this.props.globalClickedDashboardTable,
-      selectedDataKey = [];
+    var clickedDashboardTable = this.props.globalClickedDashboardTable;
+    const selectedDataKey: Record<string, string | undefined> = {}; //Fix Lateer
     if (selectedData !== undefined) {
       if (clickedDashboardTable === "clustersdetails") {
         //to filter agents in clustersdetails
@@ -118,7 +130,8 @@ class DashboardDetails extends React.Component<DashboardDetailsProps> {
 
   render() {
     const { selectedDataKey } = this.state;
-    const classes = withStyles.getClasses(this.props);
+    // const classes = withStyles.getClasses(this.props);
+    const {classes} = this.props;
     const { selectedData } = this.props;
     return (
       <div className={classes.root}>
@@ -343,5 +356,6 @@ const mapStateToProps = (state: RootState) => ({
   globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 });
 
+// const DashboardDetailsStyled = withStyles(DashboardDetails, styles);
 const DashboardDetailsStyled = withStyles(DashboardDetails, styles);
 export default connect(mapStateToProps, {})(DashboardDetailsStyled);
