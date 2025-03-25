@@ -22,7 +22,7 @@ var staticAPIV1List = map[string]map[string]struct{}{
 	"/api/v1/spire/agents/ban" :{"POST": {}},
 	"/api/v1/spire/agents/jointoken" :{"POST": {}},
 	"/api/v1/tornjak/clusters" :{"GET": {}, "POST": {}, "PATCH": {}, "DELETE": {}},
-	"/api/v1/tornjak/selectors" :{"GET": {}, "POST": {}},
+	"/api/v1/tornjak/selectors" :{"GET": {}, "POST": {}, "PATCH": {}, "DELETE"{}},
 	"/api/v1/tornjak/agents" :{"GET": {}},
 	"/api/v1/tornjak/serverinfo" :{"GET": {}},
 	"/api/v1/spire/bundle" :{"GET": {}},
