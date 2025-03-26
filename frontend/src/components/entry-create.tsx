@@ -413,31 +413,22 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     });
   }
 
-  onChangeSelectorsRecommended = (selected: { selectedItems: SelectorLabels[]; } | undefined): void => {
-    if (selected === undefined) return
-    
-    var sid = selected.selectedItems, selectors = "", selectorsDisplay = ""
-
-    for (let i = 0; i < sid.length; i++) {
-      if (i !== sid.length - 1) {
-        selectors = selectors + sid[i].label + ":\n";
-        selectorsDisplay = selectorsDisplay + sid[i].label + ",";
-      }
-      else {
-        selectors = selectors + sid[i].label + ":"
-        selectorsDisplay = selectorsDisplay + sid[i].label
-      }
-    }
-
-    if (selectorsDisplay.length === 0) {
-      selectorsDisplay = "Select Selectors"
-    }
-
+  onChangeSelectorsRecommended = (selected: { selectedItems: SelectorLabels[] } | undefined): void => {
+    if (selected === undefined) return;
+  
+    const sid = selected.selectedItems;
+    const selectors = sid.map((item) => item.label); // Store as array
+    const selectorsDisplay = selectors.length > 0 ? selectors.join(',') : "Select Selectors";
+  
+    // Update the TextArea value to show each selector on a new line
+    const selectorsForTextArea = selectors.join('\n');
+  
     this.setState({
-      selectorsRecommendationList: selectors,
+      selectorsRecommendationList: selectorsForTextArea,
       selectorsListDisplay: selectorsDisplay,
-    })
-  }
+      selectors: selectors, // Store as array
+    });
+  };
 
   onChangeSelectors(e: { target: { value: string } }): void {
     const selectorLines = e.target.value.split('\n').map((line) => line.trim()).filter((line) => line.length > 0);
@@ -861,12 +852,12 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                 <div className="selectors-textArea" data-test="selectors-textArea">
                   <TextArea
                     cols={50}
-                    helperText="e.g. k8s_sat:cluster:demo-cluster,..."
+                    helperText="e.g. k8s_sat:agent1\nk8s_sat:agent2 (one set of selectors per line for each agent)"
                     id="selectors-textArea"
                     invalidText="A valid value is required"
-                    labelText="Selectors"
-                    placeholder="Enter Selectors - Refer to Selectors Recommendation"
-                    defaultValue={this.state.selectorsRecommendationList}
+                    labelText="Selectors [*required]"
+                    placeholder="Enter Selectors (one set per line) - Refer to Selectors Recommendation"
+                    value={this.state.selectors.join('\n')} // Join array with newlines for display
                     rows={8}
                     onChange={this.onChangeSelectors}
                   />
