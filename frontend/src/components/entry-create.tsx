@@ -103,7 +103,7 @@ type CreateEntryState = {
   parentId: string,
   parentIdTrustDomain: string,
   parentIdPath: string,
-  selectors: string,
+  selectors: string[],
   selectorsRecommendationList: string,
   adminFlag: boolean,
   jwt_svid_ttl: number,
@@ -161,7 +161,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       parentIdTrustDomain: "",
       parentIdPath: "",
       // ',' delimetered selectors
-      selectors: "",
+      selectors: [],
       selectorsRecommendationList: "",
       adminFlag: false,
       x509_svid_ttl: 0,
@@ -439,10 +439,9 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     })
   }
 
-  onChangeSelectors(e: { target: { value: string; }; }): void {
-    var sid = e.target.value, selectors = "";
-    selectors = sid.replace(/\n/g, ",");
-    this.setState({selectors: selectors});
+  onChangeSelectors(e: { target: { value: string } }): void {
+    const selectorLines = e.target.value.split('\n').map((line) => line.trim()).filter((line) => line.length > 0);
+    this.setState({ selectors: selectorLines });
   }
 
   onChangeAdminFlag = (selected: boolean): void => {
