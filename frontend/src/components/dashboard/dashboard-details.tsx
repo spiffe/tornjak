@@ -10,7 +10,7 @@ import EntriesDashBoardTableStyled from "./entries-dashboard-table";
 import DashboardDrawerStyled from "./dashboard-drawer";
 import { RootState } from 'redux/reducers';
 
-const styles = (theme: { spacing: (arg0: number) => any})  => ({
+const styles = (theme)  => ({
   root: { 
     marginTop: -25,
     marginLeft: -20,
@@ -67,6 +67,12 @@ type DashboardDetailsProps = {
     length: number;
     numNodes: number;
     numEntries:number;
+    id:string;
+    created:string;
+    status:string;
+    platformType:string;
+    adminFlag:boolean;
+    entryExpireTime:string;
     
   },
   selectedDataKey:any[],
@@ -74,7 +80,7 @@ type DashboardDetailsProps = {
 
 
 
-}
+} 
 
   // getClusterMetadata(entry: ClustersList, globalEntries: EntriesList[], globalAgents: AgentsList[]) {
   //   return {
