@@ -19,8 +19,8 @@ func init() {
 
 // TODO tests for Verify - currently AUTH logic too integrated to make general unit tests
 
-// TestNewKecyloakVerifier checks correctness of functions dealing with Agent Selector table
-// Uses functions NewKeycloakVerfier
+// TestNewKeycloakAuthenticator checks correctness of functions dealing with Agent Selector table
+// Uses functions NewKeycloakAuthenticator
 func TestNewKeycloakAuthenticator(t *testing.T) {
 	// INIT failures
 	_, err := NewKeycloakAuthenticator(true, "", "")
