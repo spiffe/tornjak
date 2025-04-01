@@ -103,7 +103,7 @@ type CreateEntryState = {
   parentId: string,
   parentIdTrustDomain: string,
   parentIdPath: string,
-  selectors: string,
+  selectors: string[],
   selectorsRecommendationList: string,
   adminFlag: boolean,
   jwt_svid_ttl: number,
@@ -161,7 +161,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
       parentIdTrustDomain: "",
       parentIdPath: "",
       // ',' delimetered selectors
-      selectors: "",
+      selectors: [],
       selectorsRecommendationList: "",
       adminFlag: false,
       x509_svid_ttl: 0,
@@ -413,36 +413,26 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     });
   }
 
-  onChangeSelectorsRecommended = (selected: { selectedItems: SelectorLabels[]; } | undefined): void => {
-    if (selected === undefined) return
-    
-    var sid = selected.selectedItems, selectors = "", selectorsDisplay = ""
-
-    for (let i = 0; i < sid.length; i++) {
-      if (i !== sid.length - 1) {
-        selectors = selectors + sid[i].label + ":\n";
-        selectorsDisplay = selectorsDisplay + sid[i].label + ",";
-      }
-      else {
-        selectors = selectors + sid[i].label + ":"
-        selectorsDisplay = selectorsDisplay + sid[i].label
-      }
-    }
-
-    if (selectorsDisplay.length === 0) {
-      selectorsDisplay = "Select Selectors"
-    }
-
+  onChangeSelectorsRecommended = (selected: { selectedItems: SelectorLabels[] } | undefined): void => {
+    if (selected === undefined) return;
+  
+    const sid = selected.selectedItems;
+    const selectors = sid.map((item) => item.label); // Store as array
+    const selectorsDisplay = selectors.length > 0 ? selectors.join(',') : "Select Selectors";
+  
+    // Update the TextArea value to show each selector on a new line
+    const selectorsForTextArea = selectors.join('\n');
+  
     this.setState({
-      selectorsRecommendationList: selectors,
+      selectorsRecommendationList: selectorsForTextArea,
       selectorsListDisplay: selectorsDisplay,
-    })
-  }
+      selectors: selectors, // Store as array
+    });
+  };
 
-  onChangeSelectors(e: { target: { value: string; }; }): void {
-    var sid = e.target.value, selectors = "";
-    selectors = sid.replace(/\n/g, ",");
-    this.setState({selectors: selectors});
+  onChangeSelectors(e: { target: { value: string } }): void {
+    const selectorLines = e.target.value.split('\n').map((line) => line.trim()).filter((line) => line.length > 0);
+    this.setState({ selectors: selectorLines });
   }
 
   onChangeAdminFlag = (selected: boolean): void => {
@@ -583,63 +573,63 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
     return ""
   }
 
-  onSubmit(e: { preventDefault: () => void; }): void {
-    let selectorStrings: string[] = []
-    let federatedWithList: string[] = []
-    let dnsNamesWithList: string[] = []
-    
-    e.preventDefault()
-
+  onSubmit(e: { preventDefault: () => void }): void {
+    e.preventDefault();
+  
+    // Validation
     if (!this.state.parentId) {
-      showToast({caption: "The parent SPIFFE id cannot be empty."})
-      return
+      showToast({ caption: "The parent SPIFFE id cannot be empty." });
+      return;
     }
-
+  
     if (!this.state.spiffeId) {
-      showToast({caption: "The SPIFFE id cannot be empty."})
-      return
+      showToast({ caption: "The SPIFFE id cannot be empty." });
+      return;
     }
-
+  
     if (!this.parseSpiffeId(this.state.parentId)[0]) {
-      showToast({caption: "The parent SPIFFE id is invalid."})
-      return
+      showToast({ caption: "The parent SPIFFE id is invalid." });
+      return;
     }
-
+  
     if (!this.parseSpiffeId(this.state.spiffeId)[0]) {
-      showToast({caption: "The SPIFFE id is invalid."})
-      return
+      showToast({ caption: "The SPIFFE id is invalid." });
+      return;
     }
-
-    if (this.state.selectors.length !== 0) {
-      selectorStrings = this.state.selectors.split(',').map(x => x.trim())
+  
+    if (this.state.selectors.length === 0) {
+      showToast({ caption: "The selectors cannot be empty." });
+      return;
     }
-
-    if (selectorStrings.length === 0) {
-      showToast({caption: "The selectors cannot be empty."})
-      return
-    }
-
-    const selectorEntries = selectorStrings.map(x => x.indexOf(":") > 0 ?
-      {
-        "type": x.substr(0, x.indexOf(":")),
-        "value": x.substr(x.indexOf(":") + 1)
-      } : null)
-
-    if (selectorEntries.some(x => x == null || x["value"].length === 0)) {
-      showToast({caption: "The selectors must be formatted 'type:value'."})
-      return
-    }
-
-    if (this.state.federatesWith.length !== 0) {
-      federatedWithList = this.state.federatesWith.split(',').map((x: string) => x.trim())
-    }
-
-    if (this.state.dnsNames.length !== 0) {
-      dnsNamesWithList = this.state.dnsNames.split(',').map((x: string) => x.trim())
-    }
-
-    var cjtData = {
-      entries: [{
+  
+    // Create entries for each set of selectors in the selectors array
+    const entries = this.state.selectors.map((selectorString) => {
+      // Each selectorString (e.g., "k8s_sat:agent1") may contain multiple selectors separated by commas
+      const selectorEntries = selectorString
+        .split(',')
+        .map((x) => x.trim())
+        .filter((x) => x.length > 0)
+        .map((x) => {
+          if (x.indexOf(":") <= 0) return null;
+          return {
+            type: x.substr(0, x.indexOf(":")),
+            value: x.substr(x.indexOf(":") + 1),
+          };
+        });
+  
+      if (selectorEntries.some((x) => x == null || x["value"].length === 0)) {
+        showToast({ caption: `Invalid selector format in "${selectorString}". Must be 'type:value' (e.g., k8s_sat:agent1).` });
+        throw new Error("Invalid selector format");
+      }
+  
+      const federatedWithList = this.state.federatesWith.length !== 0
+        ? this.state.federatesWith.split(',').map((x: string) => x.trim())
+        : [];
+      const dnsNamesWithList = this.state.dnsNames.length !== 0
+        ? this.state.dnsNames.split(',').map((x: string) => x.trim())
+        : [];
+  
+      return {
         spiffe_id: {
           trust_domain: this.state.spiffeIdTrustDomain,
           path: this.state.spiffeIdPath,
@@ -656,24 +646,33 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
         downstream: this.state.downstream,
         federates_with: federatedWithList,
         dns_names: dnsNamesWithList,
-      }]
+      };
+    });
+  
+    // If there was an error in the map (e.g., invalid selector format), the throw will stop execution
+    if (entries.length === 0) {
+      return; // Prevent submission if no valid entries were created
     }
-
-    let endpoint = this.getApiEntryCreateEndpoint()
-    
+  
+    const cjtData = { entries };
+  
+    const endpoint = this.getApiEntryCreateEndpoint();
     if (endpoint === "") {
-      return
+      return;
     }
-
+  
     axios.post(endpoint, cjtData)
-      .then(
-        res => this.setState({
-          message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
-          statusOK: "OK",
-          successJsonMessege: res.data.results[0].status.message
-        })
-      )
-      .catch(err => showResponseToast(err, {caption: "Could not create entry."}))
+      .then((res) => {
+        const successCount = res.data.results.filter((result: any) => result.status.message === "OK").length;
+        const failCount = res.data.results.length - successCount;
+        this.setState({
+          message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nResponse:" + JSON.stringify(res.data, null, ' '),
+          statusOK: successCount === res.data.results.length ? "OK" : "Multiple",
+          successNumEntries: { success: successCount, fail: failCount },
+          successJsonMessege: res.data.results.length === 1 ? res.data.results[0].status.message : "",
+        });
+      })
+      .catch((err) => showResponseToast(err, { caption: "Could not create entries." }));
   }
 
   onYAMLEntryCreate(): void {
@@ -862,12 +861,12 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                 <div className="selectors-textArea" data-test="selectors-textArea">
                   <TextArea
                     cols={50}
-                    helperText="e.g. k8s_sat:cluster:demo-cluster,..."
+                    helperText="e.g. k8s_sat:agent1\nk8s_sat:agent2 (one set of selectors per line for each agent)"
                     id="selectors-textArea"
                     invalidText="A valid value is required"
-                    labelText="Selectors"
-                    placeholder="Enter Selectors - Refer to Selectors Recommendation"
-                    defaultValue={this.state.selectorsRecommendationList}
+                    labelText="Selectors [*required]"
+                    placeholder="Enter Selectors (one set per line) - Refer to Selectors Recommendation"
+                    value={this.state.selectors.join('\n')} // Join array with newlines for display
                     rows={8}
                     onChange={this.onChangeSelectors}
                   />
