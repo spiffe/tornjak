@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import clsx from 'clsx';
-import { withStyles } from 'tss-react/mui';
+import { withStyles, WithStyles } from '@mui/styles';
+import { Theme } from '@mui/material/styles'; 
 // Components
 import {
   Container,
@@ -13,6 +14,7 @@ import {
 // Pie Charts
 import AgentsPieChart from './agents-pie-chart';
 import ClustersPieChart from './clusters-pie-chart';
+
 // Tables
 import ClusterDashboardTableStyled from './clusters-dashboard-table';
 import AgentDashboardTableStyled from './agents-dashboard-table';
@@ -46,12 +48,12 @@ const theme = createTheme({
   }
 }});
 
-const styles = (theme: { spacing: (arg0: number) => any}) => ({
+const styles = (theme: Theme) => ({
   root: {
     marginTop: -25,
     marginLeft: -20,
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row' as 'row' | 'column',
   },
   appBarSpacer: theme.mixins.toolbar,
   content: {
@@ -66,7 +68,7 @@ const styles = (theme: { spacing: (arg0: number) => any}) => ({
     padding: theme.spacing(2),
     display: 'flex',
     overflow: 'auto',
-    flexDirection: 'column',
+    flexDirection: 'row' as 'row' | 'column',
     marginBottom: 20,
     marginTop: 10
   },
@@ -88,7 +90,7 @@ import {
 } from "components/types";
 
 
-type TornjakDashboardProps ={
+type TornjakDashboardProps = WithStyles<typeof styles> & {
   globalServerSelected: string,
   // dispatches a payload for list of agents with their metadata info as an array of AgentListType and has a return type of void
   agentsListUpdateFunc: (globalAgentsList: AgentsList[]) => void,  
@@ -109,16 +111,22 @@ type TornjakDashboardProps ={
   globalAgentsList: AgentsList[], 
   // the clicked dashboard table
   globalClickedDashboardTable: string,
+  globalAgents: AgentsList[],
+  
+
+  
    
 }
 
 class TornjakDashboard extends React.Component<TornjakDashboardProps> {
   TornjakApi:TornjakApi;
   TornjakHelper: TornjakHelper;
+  SpiffeHelper: SpiffeHelper;
   constructor(props:TornjakDashboardProps) {
     super(props);
     
-    const classes = withStyles.getClasses(this.props);
+    // const classes = withStyles.getClasses(this.props);
+    const { classes } = this.props;
     this.state = {};
     this.fixedHeightPaper = clsx(classes.paper, classes.fixedHeight)
     this.TornjakApi = new TornjakApi({});
@@ -148,7 +156,7 @@ class TornjakDashboard extends React.Component<TornjakDashboardProps> {
       this.TornjakApi.populateLocalEntriesUpdate(this.props.entriesListUpdateFunc, this.props.tornjakMessageFunc)
       this.TornjakApi.populateLocalClustersUpdate(this.props.clustersListUpdateFunc, this.props.tornjakMessageFunc);
       this.TornjakApi.populateLocalTornjakAgentInfo(this.props.agentworkloadSelectorInfoFunc, "");
-      if (this.props.globalTornjakServerInfo !== "") {
+      if (this.props.globalTornjakServerInfo) {
         this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
       }
     }
@@ -271,7 +279,8 @@ const mapStateToProps = (state:RootState) => ({
   globalDebugServerInfo: state.servers.globalDebugServerInfo,
 })
 
-const TornjakDashboardStyled = withStyles(TornjakDashboard, styles);
+// const TornjakDashboardStyled = withStyles(TornjakDashboard, styles);
+const TornjakDashboardStyled = withStyles(styles)(TornjakDashboard);
 
 export default connect(
   mapStateToProps,
