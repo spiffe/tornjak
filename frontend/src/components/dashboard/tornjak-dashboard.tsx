@@ -22,6 +22,7 @@ import EntriesDashBoardTableStyled from './entries-dashboard-table';
 import IsManager from '../is_manager';
 import TornjakApi from '../tornjak-api-helpers';
 import TornjakHelper from '../tornjak-helper';
+import { AgentsReducerState, EntriesReducerState } from 'redux/actions/types';
 import {
   entriesListUpdateFunc,
   serverSelectedFunc,
@@ -111,8 +112,10 @@ type TornjakDashboardProps = WithStyles<typeof styles> & {
   globalAgentsList: AgentsList[], 
   // the clicked dashboard table
   globalClickedDashboardTable: string,
-  globalAgents: AgentsList[],
+  globalAgents: AgentsReducerState,
   
+  
+
 
   
    
@@ -122,6 +125,7 @@ class TornjakDashboard extends React.Component<TornjakDashboardProps> {
   TornjakApi:TornjakApi;
   TornjakHelper: TornjakHelper;
   SpiffeHelper: SpiffeHelper;
+  fixedHeightPaper: string;
   constructor(props:TornjakDashboardProps) {
     super(props);
     
@@ -134,6 +138,7 @@ class TornjakDashboard extends React.Component<TornjakDashboardProps> {
   }
 
   agentSpiffeids() {
+    const {globalAgents} = this.props;
     if (this.props.globalAgents.globalAgentsList !== undefined) {
       return this.props.globalAgents.globalAgentsList.map(currentAgent => {
         return this.SpiffeHelper.getAgentSpiffeid(currentAgent)
@@ -182,7 +187,8 @@ class TornjakDashboard extends React.Component<TornjakDashboardProps> {
   }
 
   render() {
-    const classes = withStyles.getClasses(this.props);
+    // const classes = withStyles.getClasses(this.props);
+    const { classes } = this.props;
     return (
       <ThemeProvider theme={theme} >
         <div className={classes.root}>
