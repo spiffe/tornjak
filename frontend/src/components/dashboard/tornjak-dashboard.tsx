@@ -22,6 +22,8 @@ import EntriesDashBoardTableStyled from './entries-dashboard-table';
 import IsManager from '../is_manager';
 import TornjakApi from '../tornjak-api-helpers';
 import TornjakHelper from '../tornjak-helper';
+import SpiffeHelper from '../spiffe-helper';
+
 import { AgentsReducerState, EntriesReducerState } from 'redux/actions/types';
 import {
   entriesListUpdateFunc,
@@ -35,7 +37,7 @@ import {
   clustersListUpdateFunc,
   clickedDashboardTableFunc,
 } from 'redux/actions';
-import SpiffeHelper from '../spiffe-helper';
+
 import DashboardDrawerStyled from './dashboard-drawer';
 import { RootState } from 'redux/reducers';
 
@@ -135,6 +137,7 @@ class TornjakDashboard extends React.Component<TornjakDashboardProps> {
     this.fixedHeightPaper = clsx(classes.paper, classes.fixedHeight)
     this.TornjakApi = new TornjakApi({});
     this.TornjakHelper = new TornjakHelper({});
+    this.SpiffeHelper = new SpiffeHelper({});
   }
 
   agentSpiffeids() {

@@ -9,8 +9,8 @@ import AgentDashboardTableStyled from "./agents-dashboard-table";
 import EntriesDashBoardTableStyled from "./entries-dashboard-table";
 import DashboardDrawerStyled from "./dashboard-drawer";
 import { RootState } from 'redux/reducers';
-
-const styles = (theme)  => ({
+import { Theme } from '@mui/material/styles'; 
+const styles = (theme:Theme)  => ({
   root: { 
     marginTop: -25,
     marginLeft: -20,
