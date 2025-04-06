@@ -75,6 +75,7 @@ const mapStateToProps = (state:RootState) => ({
   globalClustersList: state.clusters.globalClustersList,
   globalAgents: state.agents,
   globalEntries: state.entries,
+  globalClickedDashboardTable: state.tornjak.globalClickedDashboardTable,
 })
 
 const ClusterDashboardTableStyled = withStyles(
