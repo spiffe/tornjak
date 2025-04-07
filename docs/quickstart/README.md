@@ -437,6 +437,7 @@ The Tornjak HTTP server is running on port 10000 on the pod. This can easily be 
 ```console
 kubectl -n spire port-forward spire-server-0 10000:10000
 ```
+💡 Tip: For the following steps to work, run the above command in a new terminal window or tab, depending on your setup.
 
 You'll see something like this:
 
