@@ -35,7 +35,7 @@ func getJWKeyFunc(httpjwks bool, jwksInfo string) (*keyfunc.JWKS, error) {
 	if httpjwks {
 		opts := keyfunc.Options{ // TODO add options to config file
 			RefreshErrorHandler: func(err error) {
-				fmt.Fprintf(os.Stdout, "error with jwt.Keyfunc: %v", err)
+				_, _ = fmt.Fprintf(os.Stdout, "error with jwt.Keyfunc: %v", err)
 			},
 			RefreshInterval:   time.Hour,
 			RefreshRateLimit:  time.Minute * 5,

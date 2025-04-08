@@ -41,7 +41,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6.5.1
         with:
-          version: v1.57.2
+          version: v2.0.2
           args: --timeout 7m
 
       - name: Build binaries

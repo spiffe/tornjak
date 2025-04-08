@@ -26,7 +26,9 @@ func (s *Server) SPIREHealthcheck(inp HealthcheckRequest) (*HealthcheckResponse,
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close() //TODO log error
+	}()
 	client := grpc_health_v1.NewHealthClient(conn)
 
 	resp, err := client.Check(context.Background(), &inpReq)
@@ -47,7 +49,10 @@ func (s *Server) DebugServer(inp DebugServerRequest) (*DebugServerResponse, erro
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close() //TODO log error
+	}()
+
 	client := debugServer.NewDebugClient(conn)
 
 	resp, err := client.GetInfo(context.Background(), &inpReq)
@@ -68,7 +73,10 @@ func (s *Server) ListAgents(inp ListAgentsRequest) (*ListAgentsResponse, error) 
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close() //TODO log error
+	}()
+
 	client := agent.NewAgentClient(conn)
 
 	resp, err := client.ListAgents(context.Background(), &inpReq)
@@ -88,7 +96,10 @@ func (s *Server) BanAgent(inp BanAgentRequest) error { //nolint:govet //Ignoring
 	if err != nil {
 		return err
 	}
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close() //TODO log error
+	}()
+
 	client := agent.NewAgentClient(conn)
 
 	_, err = client.BanAgent(context.Background(), &inpReq)
@@ -108,7 +119,9 @@ func (s *Server) DeleteAgent(inp DeleteAgentRequest) error { //nolint:govet //Ig
 	if err != nil {
 		return err
 	}
-	defer conn.Close()
+	defer func() {
+	_ = conn.Close()
+}()
 	client := agent.NewAgentClient(conn)
 
 	_, err = client.DeleteAgent(context.Background(), &inpReq)
@@ -129,7 +142,10 @@ func (s *Server) CreateJoinToken(inp CreateJoinTokenRequest) (*CreateJoinTokenRe
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close() //TODO log error
+	}()
+
 	client := agent.NewAgentClient(conn)
 
 	joinToken, err := client.CreateJoinToken(context.Background(), &inpReq)
@@ -152,7 +168,10 @@ func (s *Server) ListEntries(inp ListEntriesRequest) (*ListEntriesResponse, erro
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close() //TODO log error
+	}()
+
 	client := entry.NewEntryClient(conn)
 
 	resp, err := client.ListEntries(context.Background(), &inpReq)
@@ -173,7 +192,10 @@ func (s *Server) BatchCreateEntry(inp BatchCreateEntryRequest) (*BatchCreateEntr
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close() //TODO log error
+	}()
+
 	client := entry.NewEntryClient(conn)
 
 	resp, err := client.BatchCreateEntry(context.Background(), &inpReq)
@@ -194,7 +216,9 @@ func (s *Server) BatchDeleteEntry(inp BatchDeleteEntryRequest) (*BatchDeleteEntr
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+	_ = conn.Close()
+}()
 	client := entry.NewEntryClient(conn)
 
 	resp, err := client.BatchDeleteEntry(context.Background(), &inpReq)
@@ -210,7 +234,7 @@ type GetTornjakServerInfoResponse TornjakSpireServerInfo
 
 func (s *Server) GetTornjakServerInfo(inp GetTornjakServerInfoRequest) (*GetTornjakServerInfoResponse, error) {
 	if s.SpireServerInfo.TrustDomain == "" {
-		return nil, errors.New("No SPIRE config provided to Tornjak")
+		return nil, errors.New("no SPIRE config provided to Tornjak")
 	}
 	return (*GetTornjakServerInfoResponse)(&s.SpireServerInfo), nil
 }
@@ -226,7 +250,9 @@ func (s *Server) GetBundle(inp GetBundleRequest) (*GetBundleResponse, error) { /
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+	_ = conn.Close()
+}()
 	client := bundle.NewBundleClient(conn)
 
 	bundle, err := client.GetBundle(context.Background(), &inpReq)
@@ -247,7 +273,9 @@ func (s *Server) ListFederatedBundles(inp ListFederatedBundlesRequest) (*ListFed
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+	_ = conn.Close()
+}()
 	client := bundle.NewBundleClient(conn)
 
 	bundle, err := client.ListFederatedBundles(context.Background(), &inpReq)
@@ -268,7 +296,9 @@ func (s *Server) CreateFederatedBundle(inp CreateFederatedBundleRequest) (*Creat
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+	_ = conn.Close()
+}()
 	client := bundle.NewBundleClient(conn)
 
 	bundle, err := client.BatchCreateFederatedBundle(context.Background(), &inpReq)
@@ -289,7 +319,9 @@ func (s *Server) UpdateFederatedBundle(inp UpdateFederatedBundleRequest) (*Updat
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+	_ = conn.Close()
+}()
 	client := bundle.NewBundleClient(conn)
 
 	bundle, err := client.BatchUpdateFederatedBundle(context.Background(), &inpReq)
@@ -310,7 +342,9 @@ func (s *Server) DeleteFederatedBundle(inp DeleteFederatedBundleRequest) (*Delet
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+	_ = conn.Close()
+}()
 	client := bundle.NewBundleClient(conn)
 
 	bundle, err := client.BatchDeleteFederatedBundle(context.Background(), &inpReq)
@@ -332,7 +366,9 @@ func (s *Server) ListFederationRelationships(inp ListFederationRelationshipsRequ
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+	_ = conn.Close()
+}()
 	client := trustdomain.NewTrustDomainClient(conn)
 
 	bundle, err := client.ListFederationRelationships(context.Background(), &inpReq)
@@ -353,7 +389,9 @@ func (s *Server) CreateFederationRelationship(inp CreateFederationRelationshipRe
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+	_ = conn.Close()
+}()
 	client := trustdomain.NewTrustDomainClient(conn)
 
 	bundle, err := client.BatchCreateFederationRelationship(context.Background(), &inpReq)
@@ -374,7 +412,9 @@ func (s *Server) UpdateFederationRelationship(inp UpdateFederationRelationshipRe
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+	_ = conn.Close()
+}()
 	client := trustdomain.NewTrustDomainClient(conn)
 
 	bundle, err := client.BatchUpdateFederationRelationship(context.Background(), &inpReq)
@@ -395,7 +435,9 @@ func (s *Server) DeleteFederationRelationship(inp DeleteFederationRelationshipRe
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+	_ = conn.Close()
+}()
 	client := trustdomain.NewTrustDomainClient(conn)
 
 	bundle, err := client.BatchDeleteFederationRelationship(context.Background(), &inpReq)

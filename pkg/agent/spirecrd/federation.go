@@ -30,7 +30,7 @@ func (s *SPIRECRDManager) ListClusterFederatedTrustDomains(inp ListFederationRel
 	for _, trustDomain := range trustDomainList.Items {
 		spireAPIFederation, err := unstructuredToSpireAPIFederation(trustDomain)
 		if err != nil {
-			return ListFederationRelationshipsResponse{}, fmt.Errorf("Error parsing trustDomain: %v", err)
+			return ListFederationRelationshipsResponse{}, fmt.Errorf("error parsing trustDomain: %v", err)
 		}
 		// place SPIRE API object into result
 		result = append(result, spireAPIFederation)

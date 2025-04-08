@@ -12,7 +12,7 @@ import (
 )
 
 func cleanup() {
-	os.Remove("./local-agentstest-db")
+	_ = os.Remove("./local-agentstest-db")
 }
 
 // TestSelectorDB checks correctness of functions dealing with Agent Selector table

@@ -424,7 +424,7 @@ func parseTrustDomainBundle(inp *spireapi.FederationRelationship)(string, error)
 
 	bundleByte, err := spireAPIBundle.Marshal()
 	if err != nil {
-		return "", fmt.Errorf("Error marshalling bundle: %w", err)
+		return "", fmt.Errorf("error marshalling bundle: %w", err)
 	}
 
 	return string(bundleByte), nil
