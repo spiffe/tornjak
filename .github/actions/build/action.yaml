@@ -57,7 +57,7 @@ runs:
       run: go mod download
 
     - name: golangci-lint
-      uses: golangci/golangci-lint-action@v4.0.0
+      uses: golangci/golangci-lint-action@7.0.0
       with:
         version: v2.0.2
         args: --timeout 7m
