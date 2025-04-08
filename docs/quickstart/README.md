@@ -41,6 +41,12 @@ For this tutorial, we will use minikube. If you have an existing kubernetes clus
 minikube start
 ```
 
+- By default, Minikube automatically selects the best available driver. If you want to explicitly run Minikube on Docker, use the following command:
+- ```console
+    minikube start --driver=docker
+    ```
+
+
 ```
 😄  minikube v1.12.0 on Darwin 11.2
 🎉  minikube 1.18.1 is available! Download it: https://github.com/kubernetes/minikube/releases/tag/v1.18.1
@@ -129,7 +135,7 @@ Currently, we support the following deployment scheme:
 
 Using the option below, easily copy in the right server-statefulset file.
 
-<details open><summary><b> 🔴 [Click] For the deployment of only the Tornjak backend (API)</b></summary>
+<details open><summary><b> 🔴 [Click] For the deployment of only the Tornjak backend (API) (Necessary for this quickstart)</b></summary>
 
 There is an additional requirement to mount the SPIRE server socket and make it accessible to the Tornjak backend container.
 
@@ -328,6 +334,7 @@ NAME          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR
 spire-agent   1         1         1       1            1           <none>          19s
 
 ```
+- Similar as above, if you see any of the field that is showing 0 instead of 1, try to re-run the command after a minute or so.
 
 Then, we can create a registration entry for the node.
 
@@ -430,6 +437,7 @@ The Tornjak HTTP server is running on port 10000 on the pod. This can easily be 
 ```console
 kubectl -n spire port-forward spire-server-0 10000:10000
 ```
+💡 Tip: For the following steps to work, run the above command in a new terminal window or tab, depending on your setup.
 
 You'll see something like this:
 
@@ -444,7 +452,7 @@ While this runs, open a browser to
 http://localhost:10000/api/v1/tornjak/serverinfo
 ```
 
-This output represents the backend response. Now you should be able to make Tornjak API calls!
+This output represents the backend response. Now you should be able to make Tornjak API calls! (you may want to open in Firefox to load the following style correctly)
 
 ![tornjak-agent-browser](../rsrc/tornjak-agent-browser.png)
 
@@ -554,6 +562,104 @@ docker context ls
 docker context use default
 ```
 - To reset Minikube:
+```console
+minikube delete
+```
+- followed by:
+```console
+minikube start
+```
+</details>
+
+<details><summary><b>Troubleshoot 2: Minikube fails to start Parallels VM due to missing DHCP lease for MAC address.</b></summary>
+
+When running the `minikube start` command, you might encounter an error like the one below:
+```console
+minikube start
+```
+```
+🤦  StartHost failed, but will try again: driver start: Too many retries waiting for SSH to be available.  Last error: Maximum number of retries (60) exceeded
+🏃  Updating the running parallels "minikube" VM ...
+😿  Failed to start parallels VM. Running "minikube delete" may fix it: provision: IP lease not found for MAC address XXXXXXXXXX in: /Library/Preferences/Parallels/parallels_dhcp_leases
+
+
+❌  Exiting due to GUEST_PROVISION: error provisioning guest: Failed to start host: provision: IP lease not found for MAC address 001C42B0DEF6 in: /Library/Preferences/Parallels/parallels_dhcp_leases
+```
+This typically means the Minikube and Parallels virtual machine is failing to start due to an IP lease problem. Here some steps you can take to troubleshoot and resolve this issue:
+
+1. Sometimes, the Minikube VM can get into a bad state. Deleting and recreating it can often resolve issues.
+- Run the following command:
+```
+minikube delete
+minikube start --vm-driver=parallels
+```
+
+2. If the above solution is not applicable, you should check Parallels DHCP leases on your machine
+
+For Mac user, you can manually check the DHCP leases file to see if the MAC address is listed
+```console
+cat /Library/Preferences/Parallels/parallels_dhcp_leases
+```
+If the MAC address is not listed, it might be worth renew your DHCP lease manually.
+
+Open your System Settings, then click Network in the sidebar.
+
+![mac-network](../rsrc/mac-system-network.png)
+
+Renew every connected network's DHCP lease by clicking each of them, followed by click Details.
+
+![mac-wifi](../rsrc/mac-system-wifi.png)
+
+Click TCP/IP, then click Renew DHCP Lease, followed by Apply. Finally, click the OK button on the right. You may be prompted to enter your Mac administrator password to complete these changes.
+
+![mac-renewDHCP](../rsrc/mac-system-renewDHCP.png)
+
+<details><summary><b>Troubleshoot 3: Minikube fails to start with a data validation error</b></summary>
+
+When running the `minikube start` command, you might encounter an error like the one below:
+
+
+```console
+minikube start
+```
+```
+😄  minikube v1.35.0 on Microsoft Windows 11 Home 10.0.26100.3476 Build 26100.3476
+✨  Using the docker driver based on existing profile
+👍  Starting "minikube" primary control-plane node in "minikube" cluster
+🚜  Pulling base image v0.0.46 ...
+🤷  docker "minikube" container is missing, will recreate.
+🔥  Creating docker container (CPUs=2, Memory=3900MB) ...
+❗  Failing to connect to https://registry.k8s.io/ from inside the minikube container
+💡  To pull new external images, you may need to configure a proxy: https://minikube.sigs.k8s.io/docs/reference/networking/proxy/
+🐳  Preparing Kubernetes v1.32.0 on Docker 27.4.1 ...
+🔎  Verifying Kubernetes components...
+    ▪ Using image gcr.io/k8s-minikube/storage-provisioner:v5
+❗  Enabling 'default-storageclass' returned an error: running callbacks: [sudo KUBECONFIG=/var/lib/minikube/kubeconfig /var/lib/minikube/binaries/v1.32.0/kubectl apply --force -f /etc/kubernetes/addons/storageclass.yaml: Process exited with status 1
+stdout:
+
+stderr:
+error: error validating "/etc/kubernetes/addons/storageclass.yaml": error validating data: failed to download openapi: Get "https://localhost:8443/openapi/v2?timeout=32s": dial tcp [::1]:8443: connect: connection refused; if you choose to ignore these errors, turn validation off with --validate=false
+]
+❗  Enabling 'storage-provisioner' returned an error: running callbacks: [sudo KUBECONFIG=/var/lib/minikube/kubeconfig /var/lib/minikube/binaries/v1.32.0/kubectl apply --force -f /etc/kubernetes/addons/storage-provisioner.yaml: Process exited with status 1
+stdout:
+
+stderr:
+error: error validating "/etc/kubernetes/addons/storage-provisioner.yaml": error validating data: failed to download openapi: Get "https://localhost:8443/openapi/v2?timeout=32s": dial tcp [::1]:8443: connect: connection refused; if you choose to ignore these errors, turn validation off with --validate=false
+]
+```
+
+This means that the Docker interface was used to delete the Minikube instance instead of the terminal.
+
+Solution:
+
+1. Check Docker Installation:
+-  Make sure Docker is installed on your system. If it's not installed, you can install Docker by following the instructions on the official Docker [installation guide.](https://docs.docker.com/get-docker/)
+
+2. Start Docker:
+- On macOS and Windows: Docker Desktop has a graphical interface to manage the Docker service. Open Docker Desktop to start Docker. Alternatively, run the command '''open -a Docker''''
+
+3. Reset Minikube through the terminal to reconfigure the right files
+- To do this:
 ```console
 minikube delete
 ```
