@@ -122,7 +122,9 @@ func (s *Server) apiServerProxyFunc(apiPath string, apiMethod string) func(w htt
 			retError(w, emsg, http.StatusBadRequest)
 			return
 		}
-		defer resp.Body.Close()
+		defer func() {
+			_ = resp.Body.Close()
+		}()
 		copyHeader(w.Header(), resp.Header)
 		w.WriteHeader(resp.StatusCode)
 		_, err = io.Copy(w, resp.Body)

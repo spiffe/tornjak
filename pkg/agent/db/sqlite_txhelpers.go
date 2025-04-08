@@ -53,7 +53,7 @@ func (t *tornjakTxHelper) insertClusterMetadata(cinfo types.ClusterInfo) error {
 	if err != nil {
 		return SQLError{cmdInsert, err}
 	}
-	defer statement.Close()
+	defer func() { _ = statement.Close() }()
 	_, err = statement.ExecContext(t.ctx, cinfo.Name, time.Now().Format("Jan 02 2006 15:04:05"), cinfo.DomainName, cinfo.ManagedBy, cinfo.PlatformType)
 	if err != nil {
 		if serr, ok := err.(sqlite3.Error); ok && serr.Code == sqlite3.ErrConstraint {
@@ -72,7 +72,7 @@ func (t *tornjakTxHelper) updateClusterMetadata(cinfo types.ClusterInfo) error {
 	if err != nil {
 		return SQLError{cmdUpdate, err}
 	}
-	defer statement.Close()
+	defer func() { _ = statement.Close() }()
 	res, err := statement.ExecContext(t.ctx, cinfo.EditedName, cinfo.DomainName, cinfo.ManagedBy, cinfo.PlatformType, cinfo.Name)
 	if err != nil {
 		if serr, ok := err.(sqlite3.Error); ok && serr.Code == sqlite3.ErrConstraint {
