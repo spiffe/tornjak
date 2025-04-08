@@ -98,7 +98,11 @@ func (s *Server) tornjakGetServerInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
-	json.NewEncoder(w).Encode(ret)
+	if err := json.NewEncoder(w).Encode(ret); err != nil {
+		emsg := fmt.Sprintf("Error encoding response: %v", err.Error())
+		retError(w, emsg, http.StatusInternalServerError)
+		return
+	}
 }
 
 // spaHandler implements the http.Handler interface, so we can use it
