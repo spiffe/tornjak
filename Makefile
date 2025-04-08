@@ -34,8 +34,20 @@ help: ## Display this help.
 PHONY: clean
 clean: ## Cleanup local build outputs
 	rm -rf bin/
-	rm -rf tornjak-frontend/build
+	rm -rf frontend/build
 	rm -rf frontend-local-build/
+
+PHONY: markdown-lint
+markdown-lint: ## automatically lint fix markdown files
+	npm install --prefix frontend
+	npm run lint:fix --prefix frontend
+
+PHONY: golang-lint
+golang-lint: vendor ## lint test golang files
+	golangci-lint run --timeout 7m
+
+PHONY: lint
+lint: markdown-lint golang-lint## lint markdown and golang files
 
 ##@ Dependencies:
 
@@ -70,9 +82,9 @@ bin/tornjak-manager: cmd/manager $(GO_FILES) | vendor ## Build bin/tornjak-manag
 		/bin/sh -c "go build --tags 'sqlite_json' -o tornjak-manager ./$</main.go; go build --tags 'sqlite_json' -mod=vendor -ldflags '-s -w -linkmode external -extldflags "-static"' -o $@ ./$</main.go"
 
 frontend-local-build: ## Build tornjak-frontend
-	npm install --prefix tornjak-frontend
+	npm install --prefix frontend
 	rm -rf frontend/build
-	npm run build --prefix tornjak-frontend
+	npm run build --prefix frontend
 	rm -rf frontend-local-build
 	cp -r frontend/build frontend-local-build
 

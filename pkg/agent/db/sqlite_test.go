@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"github.com/pkg/errors"
 	"os"
 	"testing"
@@ -99,13 +98,13 @@ func TestSelectorDB(t *testing.T) {
 		t.Fatal("There should only be one agent")
 	}
 	if !agentInfoCmp(sList.Agents[0], sinfoNew) {
-		t.Fatalf(fmt.Sprintf("Wrong agent info stored after edit: wanted %v, got %v", sinfoNew, sList.Agents[0]))
+		t.Fatalf("Wrong agent info stored after edit: wanted %v, got %v", sinfoNew, sList.Agents[0])
 	}
 
 	// ATTEMPT adding new agent with no plugin [CreateAgentEntry]
 	err = db.CreateAgentEntry(sinfoANull)
 	if err != nil {
-		t.Fatalf(fmt.Sprintf("Cannot add agent with no plugin, got error: %v", err))
+		t.Fatalf("Cannot add agent with no plugin, got error: %v", err)
 	}
 
 	// CHECK all agents with plugins; should only have 1 [GetAgentSelectors]
@@ -114,7 +113,7 @@ func TestSelectorDB(t *testing.T) {
 		t.Fatal(err)
 	}
 	if len(sList.Agents) != 1 {
-		t.Fatalf(fmt.Sprintf("There should only be one agent %v", sList.Agents))
+		t.Fatalf("There should only be one agent %v", sList.Agents)
 	}
 	if !agentInfoCmp(sList.Agents[0], sinfoNew) {
 		t.Fatal("Wrong agent info stored after edit")
@@ -168,21 +167,21 @@ func TestSelectorDB(t *testing.T) {
 		t.Fatal(err)
 	}
 	if len(sList.Agents) != 1 {
-		t.Fatalf(fmt.Sprintf("We requested one agent, got: %v", sList))
+		t.Fatalf("We requested one agent, got: %v", sList)
 	}
 	sList, err = db.GetAgentsMetadata(req2)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if len(sList.Agents) != 2 {
-		t.Fatalf(fmt.Sprintf("We requested all agents, got: %v", sList))
+		t.Fatalf("We requested all agents, got: %v", sList)
 	}
 	sList, err = db.GetAgentsMetadata(req3)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if len(sList.Agents) != 0 {
-		t.Fatalf(fmt.Sprintf("We requested nonexistent agent, got: %v", sList))
+		t.Fatalf("We requested nonexistent agent, got: %v", sList)
 	}
 }
 
@@ -278,7 +277,7 @@ func TestClusterCreate(t *testing.T) {
 	}
 	_, ok = err.(PostFailure)
 	if !ok {
-		t.Fatalf(fmt.Sprintf("Wrong error on cluster create of existing cluster: %v", err.Error()))
+		t.Fatalf("Wrong error on cluster create of existing cluster: %v", err.Error())
 	}
 
 	// ATTEMPT Create with no conflicting agent assignment [CreateClusterEntry, GetClusters]
@@ -301,7 +300,7 @@ func TestClusterCreate(t *testing.T) {
 	}
 	_, ok = err.(PostFailure)
 	if !ok {
-		t.Fatalf(fmt.Sprintf("Wrong error on agent assignment: %v", err.Error()))
+		t.Fatalf("Wrong error on agent assignment: %v", err.Error())
 	}
 	cListObject, err = db.GetClusters()
 	if err != nil {
@@ -327,11 +326,11 @@ func TestClusterCreate(t *testing.T) {
 	}
 	err = agentListComp(agents1, []string{agent1, agent2})
 	if err != nil {
-		t.Fatalf(fmt.Sprintf("Error on basic registration of agents to cluster: %v", err))
+		t.Fatalf("Error on basic registration of agents to cluster: %v", err)
 	}
 	err = agentListComp(agents3, []string{agent3})
 	if err != nil {
-		t.Fatalf(fmt.Sprintf("Error on basic registration of agents to cluster: %v", err))
+		t.Fatalf("Error on basic registration of agents to cluster: %v", err)
 	}
 
 	// ATTEMPT editing registration of agent plugin [CreateAgentEntry]
@@ -349,7 +348,7 @@ func TestClusterCreate(t *testing.T) {
 		t.Fatal("There should only be one agent")
 	}
 	if !agentInfoCmp(sList.Agents[0], sinfo) {
-		t.Fatalf(fmt.Sprintf("Wrong agent info stored after edit: wanted %v, got %v", sinfo, sList.Agents[0]))
+		t.Fatalf("Wrong agent info stored after edit: wanted %v, got %v", sinfo, sList.Agents[0])
 	}
 
 	// FINAL CHECK agent memberships [GetAgentClusterName]
@@ -484,7 +483,7 @@ func TestClusterEdit(t *testing.T) {
 	}
 	err = agentListComp(agents, []string{agent1, agent2})
 	if err != nil {
-		t.Fatalf(fmt.Sprintf("Error on basic registration of agents to cluster: %v", err))
+		t.Fatalf("Error on basic registration of agents to cluster: %v", err)
 	}
 
 	// ATTEMPT normal EditClusterEntry [EditClusterEntry, GetClusters, GetClusterAgents]
@@ -507,7 +506,7 @@ func TestClusterEdit(t *testing.T) {
 	}
 	_, ok := err.(PostFailure)
 	if !ok {
-		t.Fatalf(fmt.Sprintf("Wrong error returned on editing nonexisting cluster: %v", err.Error()))
+		t.Fatalf("Wrong error returned on editing nonexisting cluster: %v", err.Error())
 	}
 
 	// ATTEMPT EditClusterEntry with already assigned agent; should fail [CreateClusterEntry, EditClusterEntry]
@@ -521,7 +520,7 @@ func TestClusterEdit(t *testing.T) {
 	}
 	_, ok = err.(PostFailure)
 	if !ok {
-		t.Fatalf(fmt.Sprintf("Wrong error on assignment of already assigned agent: %v", err.Error()))
+		t.Fatalf("Wrong error on assignment of already assigned agent: %v", err.Error())
 	}
 	cListObject, err = db.GetClusters()
 	if err != nil {
@@ -582,7 +581,7 @@ func TestClusterEdit(t *testing.T) {
 	}
 	_, ok = err.(PostFailure)
 	if !ok {
-		t.Fatalf(fmt.Sprintf("Wrong error on assignment of already assigned agent: %v", err.Error()))
+		t.Fatalf("Wrong error on assignment of already assigned agent: %v", err.Error())
 	}
 	cListObject, err = db.GetClusters()
 	if err != nil {
@@ -599,7 +598,7 @@ func TestClusterEdit(t *testing.T) {
 	}
 	_, ok = err.(PostFailure)
 	if !ok {
-		t.Fatalf(fmt.Sprintf("Wrong error on renaming to existing cluster: %v", err.Error()))
+		t.Fatalf("Wrong error on renaming to existing cluster: %v", err.Error())
 	}
 	cListObject, err = db.GetClusters()
 	if err != nil {
@@ -684,7 +683,7 @@ func TestClusterDelete(t *testing.T) {
 	}
 	err = agentListComp(agents, []string{agent1, agent2})
 	if err != nil {
-		t.Fatalf(fmt.Sprintf("Error on basic registration of agents to cluster: %v", err))
+		t.Fatalf("Error on basic registration of agents to cluster: %v", err)
 	}
 
 	// TEST Edit with Removing Entries [EditClusterEntry, GetClusterAgents]
