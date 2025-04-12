@@ -8,7 +8,7 @@ import (
 )
 
 func cleanup() {
-	os.Remove("./local-test-db")
+	_ = os.Remove("./local-test-db")
 }
 
 func TestServerCreate(t *testing.T) {

@@ -62,6 +62,9 @@ We welcome all development attempts and contributions from the community. The ea
 > [!IMPORTANT] 
 > For any new feature design, or feature level changes, please create an issue first, then submit a PR with design details before code implementation.
 
+> [!IMPORTANT]
+> Be sure to lint your code with the `make lint` command. This will lint Golang and markdown files, and will run in the CI. 
+
 ## After your pull request is submitted
 
 At least one maintainer must approve the pull request.

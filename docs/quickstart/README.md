@@ -135,7 +135,7 @@ Currently, we support the following deployment scheme:
 
 Using the option below, easily copy in the right server-statefulset file.
 
-<details open><summary><b> 🔴 [Click] For the deployment of only the Tornjak backend (API)</b></summary>
+<details open><summary><b> 🔴 [Click] For the deployment of only the Tornjak backend (API) (Necessary for this quickstart)</b></summary>
 
 There is an additional requirement to mount the SPIRE server socket and make it accessible to the Tornjak backend container.
 
@@ -437,6 +437,7 @@ The Tornjak HTTP server is running on port 10000 on the pod. This can easily be 
 ```console
 kubectl -n spire port-forward spire-server-0 10000:10000
 ```
+💡 Tip: For the following steps to work, run the above command in a new terminal window or tab, depending on your setup.
 
 You'll see something like this:
 
@@ -613,3 +614,57 @@ Click TCP/IP, then click Renew DHCP Lease, followed by Apply. Finally, click the
 
 ![mac-renewDHCP](../rsrc/mac-system-renewDHCP.png)
 
+<details><summary><b>Troubleshoot 3: Minikube fails to start with a data validation error</b></summary>
+
+When running the `minikube start` command, you might encounter an error like the one below:
+
+
+```console
+minikube start
+```
+```
+😄  minikube v1.35.0 on Microsoft Windows 11 Home 10.0.26100.3476 Build 26100.3476
+✨  Using the docker driver based on existing profile
+👍  Starting "minikube" primary control-plane node in "minikube" cluster
+🚜  Pulling base image v0.0.46 ...
+🤷  docker "minikube" container is missing, will recreate.
+🔥  Creating docker container (CPUs=2, Memory=3900MB) ...
+❗  Failing to connect to https://registry.k8s.io/ from inside the minikube container
+💡  To pull new external images, you may need to configure a proxy: https://minikube.sigs.k8s.io/docs/reference/networking/proxy/
+🐳  Preparing Kubernetes v1.32.0 on Docker 27.4.1 ...
+🔎  Verifying Kubernetes components...
+    ▪ Using image gcr.io/k8s-minikube/storage-provisioner:v5
+❗  Enabling 'default-storageclass' returned an error: running callbacks: [sudo KUBECONFIG=/var/lib/minikube/kubeconfig /var/lib/minikube/binaries/v1.32.0/kubectl apply --force -f /etc/kubernetes/addons/storageclass.yaml: Process exited with status 1
+stdout:
+
+stderr:
+error: error validating "/etc/kubernetes/addons/storageclass.yaml": error validating data: failed to download openapi: Get "https://localhost:8443/openapi/v2?timeout=32s": dial tcp [::1]:8443: connect: connection refused; if you choose to ignore these errors, turn validation off with --validate=false
+]
+❗  Enabling 'storage-provisioner' returned an error: running callbacks: [sudo KUBECONFIG=/var/lib/minikube/kubeconfig /var/lib/minikube/binaries/v1.32.0/kubectl apply --force -f /etc/kubernetes/addons/storage-provisioner.yaml: Process exited with status 1
+stdout:
+
+stderr:
+error: error validating "/etc/kubernetes/addons/storage-provisioner.yaml": error validating data: failed to download openapi: Get "https://localhost:8443/openapi/v2?timeout=32s": dial tcp [::1]:8443: connect: connection refused; if you choose to ignore these errors, turn validation off with --validate=false
+]
+```
+
+This means that the Docker interface was used to delete the Minikube instance instead of the terminal.
+
+Solution:
+
+1. Check Docker Installation:
+-  Make sure Docker is installed on your system. If it's not installed, you can install Docker by following the instructions on the official Docker [installation guide.](https://docs.docker.com/get-docker/)
+
+2. Start Docker:
+- On macOS and Windows: Docker Desktop has a graphical interface to manage the Docker service. Open Docker Desktop to start Docker. Alternatively, run the command '''open -a Docker''''
+
+3. Reset Minikube through the terminal to reconfigure the right files
+- To do this:
+```console
+minikube delete
+```
+- followed by:
+```console
+minikube start
+```
+</details>
