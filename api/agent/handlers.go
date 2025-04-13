@@ -11,10 +11,55 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
+// Checks for httpError; meant to replace the (about) 4 chunks of error checking code run per function
+/* @param status can be: 
+	1 -> http.StatusBadRequest
+	2 -> http.StatusInternalServerError
+
+   @param emsg can be one of three:
+	1 -> "Error parsing data: %v", err.Error()
+	2 -> "Error: %v", err.Error()
+	3 -> "Error listing agents: %v", err.Error()
+	NOTE: Error message 1 ONLY returns with http.StatusBadRequest. Messages 2 and 3 can return with either
+*/
+func isHttpError(err error, w http.ResponseWriter, emsg string, status int) (bool){
+	if err != nil {
+        retError(w, emsg + fmt.Sprintf("%v",err.Error()), status);
+		return true
+	}
+	return false
+}
+
+// meant to replace the 4 lines of code repeated throughout most functions
+	// that copies the body of http.Request into buf and returns results in n and err
+/* @param emsg can be one of three:
+	1 -> "Error parsing data: %v", err.Error()
+	2 -> "Error: %v", err.Error()
+	3 -> "Error listing agents: %v", err.Error()
+*/
+func copyIntoBuff(buf *strings.Builder, w http.ResponseWriter, r *http.Request, emsg string) (int64, error, string){
+	fmt.Print("made it 2")
+	n, err := io.Copy(buf, r.Body)
+	isErr := isHttpError(err, w, emsg + fmt.Sprintf("%v", err.Error()), http.StatusBadRequest)
+	if isErr {return 0, err, "err"}
+	data := buf.String()
+
+	return n, err, data
+}
+
+// Gets called from GetRouter func in server.go
+// http is a type of command that the server can take that starts the server
+// Gives an explicit return only if an error is countered
+// otherwise, since no return is outlined, no return is necessary
 func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
+
+	//To store the HealthcheckRequest we get from grpc
 	var input HealthcheckRequest
 	buf := new(strings.Builder)
 
+	//copies body of http.Request into buf
+	//and then puts the # of bytes of type int64 into n and an error into err
+	//err is nil if there was no error
 	n, err := io.Copy(buf, r.Body)
 	if err != nil {
 		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
@@ -23,8 +68,12 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 	}
 	data := buf.String()
 
+	//if the body of the request was empty
 	if n == 0 {
 		input = HealthcheckRequest{}
+
+	//else if the body was NOT empty
+	//unmarshal the JSON and check for errors
 	} else {
 		err := json.Unmarshal([]byte(data), &input)
 		if err != nil {
@@ -34,6 +83,8 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	//ret gets the address to the HealthcheckReponse response
+		//the HealthcheckResponse is actually the response of the server "input" as returned by grpc's HealthClient.Check()
 	ret, err := s.SPIREHealthcheck(input) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
@@ -41,15 +92,32 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//Sets the headers associated with the request to specific values
+	/*
+		"Content-Type" --> "application/json;charset=UTF-8"
+		"Access-Control-Allow-Origin" --> "*"
+		"Access-Control-Allow-Methods" --> "POST, GET, OPTIONS, DELETE, PATCH"
+		"Access-Control-Allow-Headers" --> "Content-Type, access-control-allow-origin, access-control-allow-headers, access-control-allow-credentials, Authorization, access-control-allow-methods"
+		"Access-Control-Expose-Headers" --> "*, Authorization"
+	*/
 	cors(w, r)
+
+	//Creates an Encoder object pointer that will be writing to http.ResponseWriter w
 	je := json.NewEncoder(w)
 
+	//writing the JSON encoing of ret 
+		//(address to the HealtheckResponse of whatever server we're checking) 
+		//to http.ResponseWriter w
 	err = je.Encode(ret)
+	
+	//if the Encode failed
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
 		retError(w, emsg, http.StatusBadRequest)
 		return
 	}
+
+	//if we never return an error, then all is well!
 }
 
 func (s *Server) debugServer(w http.ResponseWriter, r *http.Request) {
