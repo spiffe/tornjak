@@ -62,8 +62,8 @@ func (s *Server) verificationMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		userIntfo := s.Authenticator.AuthenticateRequest(r)
-		err := s.Authorizer.AuthorizeRequest(r, userIntfo)
+		userInfo := s.Authenticator.AuthenticateRequest(r)
+		err := s.Authorizer.AuthorizeRequest(r, userInfo)
 
 		if err != nil {
 			emsg := fmt.Sprintf("Error authorizing request: %v", err.Error())
@@ -207,7 +207,7 @@ func (s *Server) GetRouter() http.Handler {
 	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterEdit).Methods(http.MethodPatch)
 	apiRtr.HandleFunc("/api/v1/tornjak/clusters", s.clusterDelete).Methods(http.MethodDelete)
 
-	// Warp the router with CORS middleware
+	// Wrap the router with CORS middleware
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},

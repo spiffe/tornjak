@@ -30,7 +30,7 @@ jobs:
 
       - name: Get branch name
         id: branch_name
-        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
       
       - name: Compute Tornjak version
         uses: ./.github/compute-version
@@ -70,7 +70,7 @@ jobs:
 
       - name: Get branch name
         id: branch_name
-        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
 
       - name: Compute Tornjak version
         uses: ./.github/compute-version

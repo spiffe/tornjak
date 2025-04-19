@@ -199,7 +199,7 @@ func (s *Server) HandleRequests() {
 	rtr.PathPrefix("/").Handler(spa)
 
 	fmt.Println("Starting to listen...")
-	// Warp the router with CORS middleware
+	// Wrap the router with CORS middleware
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
