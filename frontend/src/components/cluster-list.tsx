@@ -143,7 +143,7 @@ const mapStateToProps = (state: RootState) => ({
 })
 
 export default connect(
-  ,
+  mapStateToProps,
   { serverSelectedFunc, agentsListUpdateFunc, tornjakServerInfoUpdateFunc, serverInfoUpdateFunc, selectorInfoFunc, tornjakMessageFunc, workloadSelectorInfoFunc, agentworkloadSelectorInfoFunc, clustersListUpdateFunc }
 )(ClusterList)
 
