@@ -92,7 +92,6 @@ import {
     DebugServerInfo
 } from "components/types";
 
-
 type TornjakDashboardProps = WithStyles<typeof styles> & {
   globalServerSelected: string,
   // dispatches a payload for list of agents with their metadata info as an array of AgentListType and has a return type of void
@@ -115,12 +114,6 @@ type TornjakDashboardProps = WithStyles<typeof styles> & {
   // the clicked dashboard table
   globalClickedDashboardTable: string,
   globalAgents: AgentsReducerState,
-  
-  
-
-
-  
-   
 }
 
 class TornjakDashboard extends React.Component<TornjakDashboardProps> {

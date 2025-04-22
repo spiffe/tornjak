@@ -82,16 +82,6 @@ type DashboardDetailsProps = {
 
 } 
 
-  // getClusterMetadata(entry: ClustersList, globalEntries: EntriesList[], globalAgents: AgentsList[]) {
-  //   return {
-  //     id: entry.name,
-  //     name: entry.name,
-  //     created: entry.creationTime,
-  //     numNodes: entry.agentsList.length,
-  //     numEntries: this.numberEntriesOfCluster(entry, globalEntries, globalAgents),
-  //   }
-  // }
-
 class DashboardDetails extends React.Component<DashboardDetailsProps> {
   constructor(props:DashboardDetailsProps) {
     super(props);
