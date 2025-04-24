@@ -31,6 +31,8 @@ Note: While we have tested this tutorial with the versions below, newer versions
  - Minikube Version 1.12.0, Version 1.31.2
  - Docker Version 20.10.23, Version 24.0.6
 
+[Troubleshoot 5: Docker detected as malware](#troubleshooting)
+
 ## Step 1: Setup deployment files
 
 ### Setting up k8s
@@ -689,4 +691,10 @@ Solution:
 1. Open Rancher Destop
 2. Click on the Preferences icon and uncheck Enable Kubernetes, then apply changes
 3. Let Rancher Desktop restart and reopen a terminal and rerun the `kubectl get nodes` command, which should work properly now
+</details>
+
+<details><summary><b>Troubleshoot 5: Docker detected as malware</b></summary>
+When Docker is run on a Mac, it may be detected as malware, and cannot start.
+Solution:
+See the discussion and fix in docker/for-mac #7520 → [docker/for-mac#7520](https://github.com/docker/for-mac/issues/7520)
 </details>
