@@ -70,6 +70,7 @@ minikube   Ready    master   79s   v1.18.3
 ```
 
 [Troubleshoot 1: Minikube fails to start with a Docker CLI context error](#troubleshooting)
+[Troubleshoot 4: Right kubectl missing...](#troubleshooting)
 ### Obtaining the Deployment Files
 
 To obtain the relevant files, clone our git repository and cd into the correct directory:
@@ -670,4 +671,22 @@ minikube delete
 ```console
 minikube start
 ```
+</details>
+
+<details><summary><b>Troubleshoot 4: Right kubectl missing...</b></summary>
+
+When running the `kubectl get nodes` command, you might get an error like:
+
+```console
+kubectl get nodes
+```
+```
+I0423 18:35:22.635999    3136 versioner.go:88] Right kubectl missing, downloading version 1.32.0
+F0423 18:35:22.857702    3136 main.go:70] error while trying to get contents of https://storage.googleapis.com/kubernetes-release/release/v1.32.0/bin/darwin/amd64/kubectl.sha256: GET https://storage.googleapis.com/kubernetes-release/release/v1.32.0/bin/darwin/amd64/kubectl.sha256 returned http status 404 Not Found
+```
+This typically means that Rancher Desktop adds its own kubernetes version on your PATH, which conflicts with the one you installed. 
+Solution:
+1. Open Rancher Destop
+2. Click on the Preferences icon and uncheck Enable Kubernetes, then apply changes
+3. Let Rancher Desktop restart and reopen a terminal and rerun the `kubectl get nodes` command, which should work properly now
 </details>
