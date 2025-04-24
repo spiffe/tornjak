@@ -64,6 +64,7 @@ minikube   Ready    master   79s   v1.18.3
 ```
 
 [Troubleshoot 1: Minikube fails to start with a Docker CLI context error](#troubleshooting)
+[Troubleshoot 4: Right kubectl missing...](#troubleshooting)
 ### Obtaining the Deployment Files
 
 To obtain the relevant files, clone our git repository and cd into the correct directory:
@@ -492,6 +493,7 @@ Note, it will likely take a few minutes for the applicaiton to compile successfu
 Either of the above steps exposes the frontend at http://localhost:3000.  If you visit in your browser, you should see this page:
 
 ![tornjak-ui](../rsrc/tornjak-ui.png)
+[Troubleshoot 5: Network Error on localhost 3000](#troubleshooting)
 
 ## Cleanup
 
@@ -561,4 +563,144 @@ minikube delete
 ```console
 minikube start
 ```
+</details>
+
+<details><summary><b>Troubleshoot 2: Minikube fails to start Parallels VM due to missing DHCP lease for MAC address.</b></summary>
+
+When running the `minikube start` command, you might encounter an error like the one below:
+```console
+minikube start
+```
+```
+🤦  StartHost failed, but will try again: driver start: Too many retries waiting for SSH to be available.  Last error: Maximum number of retries (60) exceeded
+🏃  Updating the running parallels "minikube" VM ...
+😿  Failed to start parallels VM. Running "minikube delete" may fix it: provision: IP lease not found for MAC address XXXXXXXXXX in: /Library/Preferences/Parallels/parallels_dhcp_leases
+
+
+❌  Exiting due to GUEST_PROVISION: error provisioning guest: Failed to start host: provision: IP lease not found for MAC address 001C42B0DEF6 in: /Library/Preferences/Parallels/parallels_dhcp_leases
+```
+This typically means the Minikube and Parallels virtual machine is failing to start due to an IP lease problem. Here some steps you can take to troubleshoot and resolve this issue:
+
+1. Sometimes, the Minikube VM can get into a bad state. Deleting and recreating it can often resolve issues.
+- Run the following command:
+```
+minikube delete
+minikube start --vm-driver=parallels
+```
+
+2. If the above solution is not applicable, you should check Parallels DHCP leases on your machine
+
+For Mac user, you can manually check the DHCP leases file to see if the MAC address is listed
+```console
+cat /Library/Preferences/Parallels/parallels_dhcp_leases
+```
+If the MAC address is not listed, it might be worth renew your DHCP lease manually.
+
+Open your System Settings, then click Network in the sidebar.
+
+![mac-network](../rsrc/mac-system-network.png)
+
+Renew every connected network's DHCP lease by clicking each of them, followed by click Details.
+
+![mac-wifi](../rsrc/mac-system-wifi.png)
+
+Click TCP/IP, then click Renew DHCP Lease, followed by Apply. Finally, click the OK button on the right. You may be prompted to enter your Mac administrator password to complete these changes.
+
+![mac-renewDHCP](../rsrc/mac-system-renewDHCP.png)
+</details>
+
+<details><summary><b>Troubleshoot 3: Minikube fails to start with a data validation error</b></summary>
+
+When running the `minikube start` command, you might encounter an error like the one below:
+
+
+```console
+minikube start
+```
+```
+😄  minikube v1.35.0 on Microsoft Windows 11 Home 10.0.26100.3476 Build 26100.3476
+✨  Using the docker driver based on existing profile
+👍  Starting "minikube" primary control-plane node in "minikube" cluster
+🚜  Pulling base image v0.0.46 ...
+🤷  docker "minikube" container is missing, will recreate.
+🔥  Creating docker container (CPUs=2, Memory=3900MB) ...
+❗  Failing to connect to https://registry.k8s.io/ from inside the minikube container
+💡  To pull new external images, you may need to configure a proxy: https://minikube.sigs.k8s.io/docs/reference/networking/proxy/
+🐳  Preparing Kubernetes v1.32.0 on Docker 27.4.1 ...
+🔎  Verifying Kubernetes components...
+    ▪ Using image gcr.io/k8s-minikube/storage-provisioner:v5
+❗  Enabling 'default-storageclass' returned an error: running callbacks: [sudo KUBECONFIG=/var/lib/minikube/kubeconfig /var/lib/minikube/binaries/v1.32.0/kubectl apply --force -f /etc/kubernetes/addons/storageclass.yaml: Process exited with status 1
+stdout:
+
+stderr:
+error: error validating "/etc/kubernetes/addons/storageclass.yaml": error validating data: failed to download openapi: Get "https://localhost:8443/openapi/v2?timeout=32s": dial tcp [::1]:8443: connect: connection refused; if you choose to ignore these errors, turn validation off with --validate=false
+]
+❗  Enabling 'storage-provisioner' returned an error: running callbacks: [sudo KUBECONFIG=/var/lib/minikube/kubeconfig /var/lib/minikube/binaries/v1.32.0/kubectl apply --force -f /etc/kubernetes/addons/storage-provisioner.yaml: Process exited with status 1
+stdout:
+
+stderr:
+error: error validating "/etc/kubernetes/addons/storage-provisioner.yaml": error validating data: failed to download openapi: Get "https://localhost:8443/openapi/v2?timeout=32s": dial tcp [::1]:8443: connect: connection refused; if you choose to ignore these errors, turn validation off with --validate=false
+]
+```
+
+This means that the Docker interface was used to delete the Minikube instance instead of the terminal.
+
+Solution:
+
+1. Check Docker Installation:
+-  Make sure Docker is installed on your system. If it's not installed, you can install Docker by following the instructions on the official Docker [installation guide.](https://docs.docker.com/get-docker/)
+
+2. Start Docker:
+- On macOS and Windows: Docker Desktop has a graphical interface to manage the Docker service. Open Docker Desktop to start Docker. Alternatively, run the command '''open -a Docker''''
+
+3. Reset Minikube through the terminal to reconfigure the right files
+- To do this:
+```console
+minikube delete
+```
+- followed by:
+```console
+minikube start
+```
+</details>
+
+<details><summary><b>Troubleshoot 4: Right kubectl missing...</b></summary>
+
+When running the `kubectl get nodes` command, you might get an error like:
+
+```console
+kubectl get nodes
+```
+```
+I0423 18:35:22.635999    3136 versioner.go:88] Right kubectl missing, downloading version 1.32.0
+F0423 18:35:22.857702    3136 main.go:70] error while trying to get contents of https://storage.googleapis.com/kubernetes-release/release/v1.32.0/bin/darwin/amd64/kubectl.sha256: GET https://storage.googleapis.com/kubernetes-release/release/v1.32.0/bin/darwin/amd64/kubectl.sha256 returned http status 404 Not Found
+```
+This typically means that Rancher Desktop adds its own kubernetes version on your PATH, which conflicts with the one you installed. 
+Solution:
+1. Open Rancher Destop
+2. Click on the Preferences icon and uncheck Enable Kubernetes, then apply changes
+3. Let Rancher Desktop restart and reopen a terminal and rerun the `kubectl get nodes` command, which should work properly now
+</details>
+
+<details><summary><b>Troubleshoot 5: Network Error on localhost 3000</b></summary>
+
+When running the frontend locally, you might get an error such that both the frontend and backend seem to be running in the terminal, but http://localhost:3000/ shows Network Error. This happens because the unversioned latest image ia hardcoded to call the legacy endpoints (/api/tornjak/..., /api/agent/...) rather than the current /api/v1/... paths the backend actually serves. Every time the UI tried to fetch /api/tornjak/serverinfo it got an empty response. To fix this, we must use the newer ghcr.io/spiffe/tornjak-frontend:v2.0.0 image.
+Solution:
+1. Ctrl +C in the terminal if the frontend is currently running this: 
+```console
+docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak-frontend:latest
+```
+2. Tear down any old ui by running: 
+```console
+docker rm -f tornjak-ui
+```
+3. Run the v2.0.0 frontend with: 
+```console
+docker run -d \
+  --name tornjak-ui \
+  -p 3000:3000 \
+  -e REACT_APP_API_SERVER_URI='http://localhost:10000' \
+  ghcr.io/spiffe/tornjak-frontend:v2.0.0
+```
+4. close the current http://localhost:3000/ page and open it again, where the error should be fixed
 </details>
