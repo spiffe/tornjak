@@ -70,6 +70,7 @@ minikube   Ready    master   79s   v1.18.3
 ```
 
 [Troubleshoot 1: Minikube fails to start with a Docker CLI context error](#troubleshooting)
+[Troubleshoot 4: Right kubectl missing...](#troubleshooting)
 ### Obtaining the Deployment Files
 
 To obtain the relevant files, clone our git repository and cd into the correct directory:
@@ -500,6 +501,7 @@ Note, it will likely take a few minutes for the applicaiton to compile successfu
 Either of the above steps exposes the frontend at http://localhost:3000.  If you visit in your browser, you should see this page:
 
 ![tornjak-ui](../rsrc/tornjak-ui.png)
+[Troubleshoot 5: Network Error on localhost 3000](#troubleshooting)
 
 ## Cleanup
 
@@ -613,6 +615,7 @@ Renew every connected network's DHCP lease by clicking each of them, followed by
 Click TCP/IP, then click Renew DHCP Lease, followed by Apply. Finally, click the OK button on the right. You may be prompted to enter your Mac administrator password to complete these changes.
 
 ![mac-renewDHCP](../rsrc/mac-system-renewDHCP.png)
+</details>
 
 <details><summary><b>Troubleshoot 3: Minikube fails to start with a data validation error</b></summary>
 
@@ -667,4 +670,45 @@ minikube delete
 ```console
 minikube start
 ```
+</details>
+
+<details><summary><b>Troubleshoot 4: Right kubectl missing...</b></summary>
+
+When running the `kubectl get nodes` command, you might get an error like:
+
+```console
+kubectl get nodes
+```
+```
+I0423 18:35:22.635999    3136 versioner.go:88] Right kubectl missing, downloading version 1.32.0
+F0423 18:35:22.857702    3136 main.go:70] error while trying to get contents of https://storage.googleapis.com/kubernetes-release/release/v1.32.0/bin/darwin/amd64/kubectl.sha256: GET https://storage.googleapis.com/kubernetes-release/release/v1.32.0/bin/darwin/amd64/kubectl.sha256 returned http status 404 Not Found
+```
+This typically means that Rancher Desktop adds its own kubernetes version on your PATH, which conflicts with the one you installed. 
+Solution:
+1. Open Rancher Destop
+2. Click on the Preferences icon and uncheck Enable Kubernetes, then apply changes
+3. Let Rancher Desktop restart and reopen a terminal and rerun the `kubectl get nodes` command, which should work properly now
+</details>
+
+<details><summary><b>Troubleshoot 5: Network Error on localhost 3000</b></summary>
+
+When running the frontend locally, you might get an error such that both the frontend and backend seem to be running in the terminal, but http://localhost:3000/ shows Network Error. This happens because the unversioned latest image ia hardcoded to call the legacy endpoints (/api/tornjak/..., /api/agent/...) rather than the current /api/v1/... paths the backend actually serves. Every time the UI tried to fetch /api/tornjak/serverinfo it got an empty response. To fix this, we must use the newer ghcr.io/spiffe/tornjak-frontend:v2.0.0 image.
+Solution:
+1. Ctrl +C in the terminal if the frontend is currently running this: 
+```console
+docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak-frontend:latest
+```
+2. Tear down any old ui by running: 
+```console
+docker rm -f tornjak-ui
+```
+3. Run the v2.0.0 frontend with: 
+```console
+docker run -d \
+  --name tornjak-ui \
+  -p 3000:3000 \
+  -e REACT_APP_API_SERVER_URI='http://localhost:10000' \
+  ghcr.io/spiffe/tornjak-frontend:v2.0.0
+```
+4. close the current http://localhost:3000/ page and open it again, where the error should be fixed
 </details>
