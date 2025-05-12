@@ -18,7 +18,7 @@ DOCKERFILE_FRONTEND ?= frontend/Dockerfile.frontend-container
 BINARIES=tornjak-backend tornjak-manager
 IMAGES=$(BINARIES) tornjak-frontend 
 
-GO_VERSION ?= 1.22
+GO_VERSION ?= 1.24
 
 GO_FILES := $(shell find . -type f -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
 
