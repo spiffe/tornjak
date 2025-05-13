@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	managerdb "github.com/spiffe/tornjak/pkg/manager/db"
 )
 
@@ -24,29 +25,8 @@ type Server struct {
 	db         managerdb.ManagerDB
 }
 
-// Handle preflight checks
-func corsHandler(f func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "OPTIONS" {
-			cors(w, r)
-			return
-		} else {
-			f(w, r)
-		}
-	}
-}
-
-func cors(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=ascii")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
-	w.WriteHeader(http.StatusOK)
-}
-
 func retError(w http.ResponseWriter, emsg string, status int) {
 	w.Header().Set("Content-Type", "text/html; charset=ascii")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 	http.Error(w, emsg, status)
 }
 
@@ -108,14 +88,13 @@ func (s *Server) apiServerProxyFunc(apiPath string, apiMethod string) func(w htt
 			return
 		}
 
-		req, err := http.NewRequest(apiMethod, strings.TrimSuffix(sinfo.Address, "/") + apiPath, r.Body)
+		req, err := http.NewRequest(apiMethod, strings.TrimSuffix(sinfo.Address, "/")+apiPath, r.Body)
 		if err != nil {
 			emsg := fmt.Sprintf("Error creating http request: %v", err.Error())
 			retError(w, emsg, http.StatusBadRequest)
 			return
 		}
 
-		
 		resp, err := client.Do(req)
 		if err != nil {
 			emsg := fmt.Sprintf("Error making api call to server: %v", err.Error())
@@ -183,35 +162,35 @@ func (s *Server) HandleRequests() {
 	rtr := mux.NewRouter()
 
 	// Manger-specific
-	rtr.HandleFunc("/manager-api/server/list", corsHandler(s.serverList))
-	rtr.HandleFunc("/manager-api/server/register", corsHandler(s.serverRegister))
+	rtr.HandleFunc("/manager-api/server/list", s.serverList)
+	rtr.HandleFunc("/manager-api/server/register", s.serverRegister)
 
 	// SPIRE server info calls
-	rtr.HandleFunc("/manager-api/healthcheck/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/spire/healthcheck", http.MethodGet)))
-	rtr.HandleFunc("/manager-api/serverinfo/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/spire/serverinfo", http.MethodGet)))
+	rtr.HandleFunc("/manager-api/healthcheck/{server:.*}", s.apiServerProxyFunc("/api/v1/spire/healthcheck", http.MethodGet))
+	rtr.HandleFunc("/manager-api/serverinfo/{server:.*}", s.apiServerProxyFunc("/api/v1/spire/serverinfo", http.MethodGet))
 
 	// Entries
-	rtr.HandleFunc("/manager-api/entry/list/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/spire/entries", http.MethodGet)))
-	rtr.HandleFunc("/manager-api/entry/delete/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/spire/entries", http.MethodDelete)))
-	rtr.HandleFunc("/manager-api/entry/create/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/spire/entries", http.MethodPost)))
+	rtr.HandleFunc("/manager-api/entry/list/{server:.*}", s.apiServerProxyFunc("/api/v1/spire/entries", http.MethodGet))
+	rtr.HandleFunc("/manager-api/entry/delete/{server:.*}", s.apiServerProxyFunc("/api/v1/spire/entries", http.MethodDelete))
+	rtr.HandleFunc("/manager-api/entry/create/{server:.*}", s.apiServerProxyFunc("/api/v1/spire/entries", http.MethodPost))
 
 	// Agents
-	rtr.HandleFunc("/manager-api/agent/list/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/spire/agents", http.MethodGet)))
-	rtr.HandleFunc("/manager-api/agent/delete/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/spire/agents", http.MethodDelete)))
-	rtr.HandleFunc("/manager-api/agent/ban/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/spire/agents/ban", http.MethodPost)))
-	rtr.HandleFunc("/manager-api/agent/createjointoken/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/spire/agents/jointoken", http.MethodPost)))
+	rtr.HandleFunc("/manager-api/agent/list/{server:.*}", s.apiServerProxyFunc("/api/v1/spire/agents", http.MethodGet))
+	rtr.HandleFunc("/manager-api/agent/delete/{server:.*}", s.apiServerProxyFunc("/api/v1/spire/agents", http.MethodDelete))
+	rtr.HandleFunc("/manager-api/agent/ban/{server:.*}", s.apiServerProxyFunc("/api/v1/spire/agents/ban", http.MethodPost))
+	rtr.HandleFunc("/manager-api/agent/createjointoken/{server:.*}", s.apiServerProxyFunc("/api/v1/spire/agents/jointoken", http.MethodPost))
 
 	// Tornjak-specific
-	rtr.HandleFunc("/manager-api/tornjak/serverinfo/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/tornjak/serverinfo", http.MethodGet)))
+	rtr.HandleFunc("/manager-api/tornjak/serverinfo/{server:.*}", s.apiServerProxyFunc("/api/v1/tornjak/serverinfo", http.MethodGet))
 	// Agents Selectors
-	rtr.HandleFunc("/manager-api/tornjak/selectors/register/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/tornjak/selectors", http.MethodPost)))
-	rtr.HandleFunc("/manager-api/tornjak/selectors/list/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/tornjak/selectors", http.MethodGet)))
-	rtr.HandleFunc("/manager-api/tornjak/agents/list/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/tornjak/agents", http.MethodGet)))
+	rtr.HandleFunc("/manager-api/tornjak/selectors/register/{server:.*}", s.apiServerProxyFunc("/api/v1/tornjak/selectors", http.MethodPost))
+	rtr.HandleFunc("/manager-api/tornjak/selectors/list/{server:.*}", s.apiServerProxyFunc("/api/v1/tornjak/selectors", http.MethodGet))
+	rtr.HandleFunc("/manager-api/tornjak/agents/list/{server:.*}", s.apiServerProxyFunc("/api/v1/tornjak/agents", http.MethodGet))
 	// Agents Clusters
-	rtr.HandleFunc("/manager-api/tornjak/clusters/create/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/tornjak/clusters", http.MethodPost)))
-	rtr.HandleFunc("/manager-api/tornjak/clusters/edit/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/tornjak/clusters", http.MethodPatch)))
-	rtr.HandleFunc("/manager-api/tornjak/clusters/list/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/tornjak/clusters", http.MethodGet)))
-	rtr.HandleFunc("/manager-api/tornjak/clusters/delete/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/tornjak/clusters", http.MethodDelete)))
+	rtr.HandleFunc("/manager-api/tornjak/clusters/create/{server:.*}", s.apiServerProxyFunc("/api/v1/tornjak/clusters", http.MethodPost))
+	rtr.HandleFunc("/manager-api/tornjak/clusters/edit/{server:.*}", s.apiServerProxyFunc("/api/v1/tornjak/clusters", http.MethodPatch))
+	rtr.HandleFunc("/manager-api/tornjak/clusters/list/{server:.*}", s.apiServerProxyFunc("/api/v1/tornjak/clusters", http.MethodGet))
+	rtr.HandleFunc("/manager-api/tornjak/clusters/delete/{server:.*}", s.apiServerProxyFunc("/api/v1/tornjak/clusters", http.MethodDelete))
 
 	//http.HandleFunc("/manager-api/get-server-info", s.agentList)
 	//http.HandleFunc("/manager-api/agent/list/:id", s.agentList)
@@ -220,7 +199,17 @@ func (s *Server) HandleRequests() {
 	rtr.PathPrefix("/").Handler(spa)
 
 	fmt.Println("Starting to listen...")
-	log.Fatal(http.ListenAndServe(s.listenAddr, rtr))
+	// Wrap the router with CORS middleware
+
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowCredentials: true,
+	})
+
+	handler := c.Handler(rtr)
+	log.Fatal(http.ListenAndServe(s.listenAddr, handler))
 }
 
 /*
@@ -277,7 +266,8 @@ func (s *Server) serverList(w http.ResponseWriter, r *http.Request) {
 		retError(w, emsg, http.StatusBadRequest)
 		return
 	}
-	cors(w, r)
+
+	w.Header().Set("Content-Type", "text/html; charset=ascii")
 
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
@@ -321,7 +311,7 @@ func (s *Server) serverRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "text/html; charset=ascii")
 	_, err = w.Write([]byte("SUCCESS"))
 
 	if err != nil {
