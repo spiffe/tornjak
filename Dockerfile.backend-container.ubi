@@ -1,7 +1,7 @@
 # xx is helper for cross-compilation
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.3.0 AS xx
 
-FROM --platform=$BUILDPLATFORM golang:1.22-alpine3.19 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.24-alpine3.21 AS builder
 RUN apk add build-base
 COPY . /usr/src/myapp
 WORKDIR /usr/src/myapp

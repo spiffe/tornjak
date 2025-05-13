@@ -105,9 +105,9 @@ data:
 
       # configure HTTP connection to Tornjak server
       http {
-        enabled = true
         port = 10000 # opens at port 10000
       }
+
     }
 
     plugins {
@@ -174,7 +174,7 @@ spec:
       serviceAccountName: spire-server
       containers:
         - name: spire-server
-          image: ghcr.io/spiffe/spire-server:1.4.4
+          image: ghcr.io/spiffe/spire-server:1.10.4
           args:
             - -config
             - /run/spire/config/server.conf
@@ -350,11 +350,12 @@ kubectl exec -n spire -c spire-server spire-server-0 -- \
 ```
 
 ```
-Entry ID         : 03d0ec2b-54b7-4340-a0b9-d3b2cf1b041a
+Entry ID         : 644d374c-97c9-4072-a173-aca01fbfd400
 SPIFFE ID        : spiffe://example.org/ns/spire/sa/spire-agent
 Parent ID        : spiffe://example.org/spire/server
 Revision         : 0
-TTL              : default
+X509-SVID TTL    : default
+JWT-SVID TTL     : default
 Selector         : k8s_sat:agent_ns:spire
 Selector         : k8s_sat:agent_sa:spire-agent
 Selector         : k8s_sat:cluster:demo-cluster
@@ -373,11 +374,12 @@ kubectl exec -n spire -c spire-server spire-server-0 -- \
 ```
 
 ```
-Entry ID         : 11a367ab-7095-4390-ab89-34dea5fddd61
+Entry ID         : e9e46b6f-2ffd-4a31-8995-964e979b9929
 SPIFFE ID        : spiffe://example.org/ns/default/sa/default
 Parent ID        : spiffe://example.org/ns/spire/sa/spire-agent
 Revision         : 0
-TTL              : default
+X509-SVID TTL    : default
+JWT-SVID TTL     : default
 Selector         : k8s:ns:default
 Selector         : k8s:sa:default
 ```
@@ -387,6 +389,7 @@ Finally, here we deploy a workload container:
 ```console
 kubectl apply -f client-deployment.yaml
 ```
+
 ```
 deployment.apps/client created
 ```
@@ -399,13 +402,13 @@ kubectl exec -it $(kubectl get pods -o=jsonpath='{.items[0].metadata.name}' \
 ```
 
 ```
-Received 1 svid after 8.8537ms
+Received 1 svid after 3.224079ms
 
-SPIFFE ID:		spiffe://example.org/ns/default/sa/default
-SVID Valid After:	2021-04-06 20:13:02 +0000 UTC
-SVID Valid Until:	2021-04-06 21:13:12 +0000 UTC
-CA #1 Valid After:	2021-04-06 20:12:20 +0000 UTC
-CA #1 Valid Until:	2021-04-07 20:12:30 +0000 UTC
+SPIFFE ID:              spiffe://example.org/ns/default/sa/default
+SVID Valid After:       2025-05-13 02:14:17 +0000 UTC
+SVID Valid Until:       2025-05-13 03:14:27 +0000 UTC
+CA #1 Valid After:      2025-05-13 02:12:35 +0000 UTC
+CA #1 Valid Until:      2025-05-14 02:12:45 +0000 UTC
 ```
 
 Let's verify that the `spire-server-0` pod is now started with the new image:
@@ -422,7 +425,7 @@ kubectl -n spire describe pod spire-server-0 | select-string "Image:"
 Should yield two lines depending on which deployment you used:
 
 ```
-    Image:         ghcr.io/spiffe/spire-server:1.4.4
+    Image:         ghcr.io/spiffe/spire-server:1.10.4
     Image:         <TORNJAK-IMAGE>
 ```
 
