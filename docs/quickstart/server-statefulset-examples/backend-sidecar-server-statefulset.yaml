@@ -20,7 +20,7 @@ spec:
       serviceAccountName: spire-server
       containers:
         - name: spire-server
-          image: ghcr.io/spiffe/spire-server:1.9.4
+          image: ghcr.io/spiffe/spire-server:1.10.4
           args:
             - -config
             - /run/spire/config/server.conf
@@ -57,8 +57,6 @@ spec:
             - /run/spire/config/server.conf
             - --tornjak-config
             - /run/spire/tornjak-config/server.conf
-          ports:
-            - containerPort: 8081
           volumeMounts:
             - name: spire-config
               mountPath: /run/spire/config
