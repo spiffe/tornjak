@@ -593,7 +593,7 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
     }
 
     render() {
-        const newEntryFormatLink = "https://github.com/mamy-CS/tornjak-public/blob/create-entries-yaml/docs/newEntry-json-format.md";
+        const newEntryFormatLink = "https://github.com/spiffe/tornjak/blob/main/docs/newEntry-json-format.md";
         const ParentIdList = this.props.ParentIdList;
         return (
             <div>
