@@ -73,6 +73,7 @@ minikube   Ready    master   79s   v1.18.3
 [Troubleshoot 1: Minikube fails to start with a Docker CLI context error](#troubleshooting)
 
 [Troubleshoot 4: Right kubectl missing...](#troubleshooting)
+
 ### Obtaining the Deployment Files
 
 To obtain the relevant files, clone our git repository and cd into the correct directory:
