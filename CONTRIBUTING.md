@@ -9,18 +9,18 @@
 
 ## Contributor Guidelines and Governance
 
-Please see [CONTRIBUTING](https://github.com/spiffe/spiffe/blob/main/CONTRIBUTING.md) and [GOVERNANCE](https://github.com/spiffe/spiffe/blob/main/GOVERNANCE.md) from the SPIFFE project for community guidelines. 
+Please see [CONTRIBUTING](https://github.com/spiffe/spiffe/blob/main/CONTRIBUTING.md) and [GOVERNANCE](https://github.com/spiffe/spiffe/blob/main/GOVERNANCE.md) from the SPIFFE project for community guidelines.
 
-> [!IMPORTANT] 
+> [!IMPORTANT]
 > Before opening a new issue, search for any existing issues [here](https://github.com/spiffe/tornjak/issues) to avoid duplication.
 
-If you're new to this project, we recommend you join us on [Slack](https://spiffe.slack.com/archives/C024JTTK58T) for discussion of potential new features. 
+If you're new to this project, we recommend you join us on [Slack](https://spiffe.slack.com/archives/C024JTTK58T) for discussion of potential new features.
 
 ## Pre-built images
 
 You can use pre-built images for various versions and Tornjak components. For a list of supported public images of Tornjak along with usage instructions please see our [USAGE document](./USAGE.md).
 
-Otherwise, you can follow instructions below to build Tornjak images. 
+Otherwise, you can follow instructions below to build Tornjak images.
 
 ## Build Requirements
 
@@ -31,12 +31,12 @@ In order to build, we require the following installations:
 
 ## Building Executables and Images
 
-Building Tornjak manually can be done with the Makefile. Below is a list of local executable builds: 
+Building Tornjak manually can be done with the Makefile. Below is a list of local executable builds:
 - `make bin/tornjak-backend`: makes the Go executable of the Tornjak backend
 - `make bin/tornjak-manager`: makes the Go executable of the Tornjak manager
 - `make frontend-local-build`: makes the optimized ReactJS app locally for the Tornjak frontend. Uses environment variable configuration as in tornjak-frontend/.env
 
-And below is a list of container image builds: 
+And below is a list of container image builds:
 - `make image-tornjak-backend`: containerizes Go executable of the Tornjak backend
 - `make image-tornjak-manager`:containerizes Go executable of the Tornjak manager
 - `make image-tornjak-frontend`: containerizes React JS app for the Tornjak frontend
@@ -56,14 +56,14 @@ We welcome all development attempts and contributions from the community. The ea
 5. Open a [pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)
   against the upstream `main` branch
 
-> [!IMPORTANT] 
+> [!IMPORTANT]
 > Please make sure you open all PRs against the `main` branch
 
-> [!IMPORTANT] 
+> [!IMPORTANT]
 > For any new feature design, or feature level changes, please create an issue first, then submit a PR with design details before code implementation.
 
 > [!IMPORTANT]
-> Be sure to lint your code with the `make lint` command. This will lint Golang and markdown files, and will run in the CI. 
+> Be sure to lint your code with the `make lint` command. This will lint Golang and markdown files, and will run in the CI.
 
 ## After your pull request is submitted
 
@@ -85,7 +85,7 @@ Thank you for contributing to Tornjak!
 
 ## Local testing
 
-We highly recommend starting with our [quickstart tutorial](docs/quickstart/README.md), using official images and preset configs before development. This tutorial creates a local instance of SPIRE on Minikube, adds Tornjak server, and runs a UI. 
+We highly recommend starting with our [quickstart tutorial](docs/quickstart/README.md), using official images and preset configs before development. This tutorial creates a local instance of SPIRE on Minikube, adds Tornjak server, and runs a UI.
 
 Additionally, one may test out several other features including the following:
 - [Running the Frontend Locally](#running-the-frontend-locally)
@@ -109,13 +109,13 @@ This will start a server on `http://localhost:3000`. Please be patient, as it mi
 
 ### Running the Backend Locally
 
-The backend may also be run locally as well. 
+The backend may also be run locally as well.
 
 ```sh
 go run tornjak-backend/cmd/agent/agent.go
 ```
 
-Note, the above command will print out usage documentation for the server. Please see our documentation for the backend [here](./docs/config-tornjak-agent.md) for more information.  Additionally, full functionality of the server requires a SPIRE server to be running. 
+Note, the above command will print out usage documentation for the server. Please see our documentation for the backend [here](./docs/config-tornjak-agent.md) for more information.  Additionally, full functionality of the server requires a SPIRE server to be running.
 
 ### Running the Tornjak Manager
 
@@ -134,7 +134,7 @@ REACT_APP_API_SERVER_URI=http://localhost:50000/
 REACT_APP_TORNJAK_MANAGER=true npm start
 ```
 
-In this view, there is an additional navigation bar tab titled "Manage Servers" where you may register Tornjak agents. 
+In this view, there is an additional navigation bar tab titled "Manage Servers" where you may register Tornjak agents.
 
 Alternatively, one may also run these components in a container, as is described in our [USAGE doc](./USAGE.md).
 

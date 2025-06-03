@@ -37,7 +37,7 @@ Note: While we have tested this tutorial with the versions below, newer versions
 
 ### Setting up k8s
 
-For this tutorial, we will use minikube. If you have an existing kubernetes cluster, feel free to use that.
+For this tutorial, we will use Minikube. If you have an existing kubernetes cluster, feel free to use that.
 
 ```sh
 minikube start
@@ -47,7 +47,6 @@ minikube start
   ```sh
   minikube start --driver=docker
   ```
-
 
 ```
 😄  minikube v1.12.0 on Darwin 11.2
@@ -134,7 +133,7 @@ Depending on your use case, you can deploy Tornjak in different configurations. 
 
 Currently, we support the following deployment scheme:
 
-1. Only the Tornjak backend (to make Tornjak API calls)  is run as a separate container on the same pod that exposes only one port (to communicate with the Tornjak backend). This deployment type is fully-supported, has a smaller sidecar image without the frontend components, and ensures that the frontend and backend share no memory.
+1. Only the Tornjak backend (to make Tornjak API calls) is run as a separate container on the same pod that exposes only one port (to communicate with the Tornjak backend). This deployment type is fully-supported, has a smaller sidecar image without the frontend components, and ensures that the frontend and backend share no memory.
 
 Using the option below, easily copy in the right server-statefulset file.
 
@@ -142,7 +141,7 @@ Using the option below, easily copy in the right server-statefulset file.
 
 There is an additional requirement to mount the SPIRE server socket and make it accessible to the Tornjak backend container.
 
-The relevant file is called `backend-sidecar-server-statefulset.yaml` within the examples directory.  Please copy to the relevant file as follows:
+The relevant file is called `backend-sidecar-server-statefulset.yaml` within the examples directory. Please copy to the relevant file as follows:
 
 ```sh
 cp server-statefulset-examples/backend-sidecar-server-statefulset.yaml server-statefulset.yaml
@@ -338,8 +337,8 @@ kubectl get daemonset --namespace spire
 ```
 NAME          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
 spire-agent   1         1         1       1            1           <none>          19s
-
 ```
+
 - Similar as above, if you see any of the field that is showing 0 instead of 1, try to re-run the command after a minute or so.
 
 Then, we can create a registration entry for the node.
@@ -350,9 +349,9 @@ NOTE: In a windows environment, you will need to replace the backslashes ( \\ ) 
 kubectl exec -n spire -c spire-server spire-server-0 -- \
     /opt/spire/bin/spire-server entry create \
     -spiffeID spiffe://example.org/ns/spire/sa/spire-agent \
-    -selector k8s_sat:cluster:demo-cluster \
-    -selector k8s_sat:agent_ns:spire \
-    -selector k8s_sat:agent_sa:spire-agent \
+    -selector k8s_psat:cluster:demo-cluster \
+    -selector k8s_psat:agent_ns:spire \
+    -selector k8s_psat:agent_sa:spire-agent \
     -node
 ```
 
@@ -363,14 +362,15 @@ Parent ID        : spiffe://example.org/spire/server
 Revision         : 0
 X509-SVID TTL    : default
 JWT-SVID TTL     : default
-Selector         : k8s_sat:agent_ns:spire
-Selector         : k8s_sat:agent_sa:spire-agent
-Selector         : k8s_sat:cluster:demo-cluster
+Selector         : k8s_psat:agent_ns:spire
+Selector         : k8s_psat:agent_sa:spire-agent
+Selector         : k8s_psat:cluster:demo-cluster
 ```
 
 And we create a registration entry for the workload registrar, specifying the workload registrar's SPIFFE ID:
 
 NOTE: In a windows environment, you will need to replace the backslashes ( \\ ) below with backticks ( \` ) to copy and paste into a windows terminal
+
 ```sh
 kubectl exec -n spire -c spire-server spire-server-0 -- \
     /opt/spire/bin/spire-server entry create \
@@ -425,6 +425,7 @@ kubectl -n spire describe pod spire-server-0 | grep "Image:"
 ```
 
 **or**, on Windows:
+
 ```sh
 kubectl -n spire describe pod spire-server-0 | select-string "Image:"
 ```
@@ -447,6 +448,7 @@ The Tornjak HTTP server is running on port 10000 on the pod. This can easily be 
 ```sh
 kubectl -n spire port-forward spire-server-0 10000:10000
 ```
+
 💡 Tip: For the following steps to work, run the above command in a new terminal window or tab, depending on your setup.
 
 You'll see something like this:
@@ -507,7 +509,7 @@ Note, it will likely take a few minutes for the applicaiton to compile successfu
 
 </details>
 
-Either of the above steps exposes the frontend at http://localhost:3000.  If you visit in your browser, you should see this page:
+Either of the above steps exposes the frontend at http://localhost:3000. If you visit in your browser, you should see this page:
 
 ![tornjak-ui](../rsrc/tornjak-ui.png)
 
@@ -540,7 +542,6 @@ kubectl delete clusterrolebinding spire-server-trust-role-binding spire-agent-cl
 
 When running the `minikube start` command, you might encounter an error like the one below:
 
-
 ```sh
 minikube start
 ```
@@ -554,11 +555,13 @@ W1105 15:48:51.730095   42754 main.go:291] Unable to resolve the current Docker 
 💡  Suggestion: Start the Docker service
 📘  Documentation: https://minikube.sigs.k8s.io/docs/drivers/docker/
 ```
+
 This typically means that Docker is not running on your machine, and since Minikube is attempting to use Docker as a driver, it's required to have Docker active.
+
 Solution:
 
 1. Check Docker Installation:
--  Make sure Docker is installed on your system. If it's not installed, you can install Docker by following the instructions on the official Docker [installation guide.](https://docs.docker.com/get-docker/)
+- Make sure Docker is installed on your system. If it's not installed, you can install Docker by following the instructions on the official Docker [installation guide.](https://docs.docker.com/get-docker/)
 
 2. Start Docker:
 - On macOS and Windows: Docker Desktop has a graphical interface to manage the Docker service. Open Docker Desktop to start Docker. Alternatively, run:
@@ -683,7 +686,7 @@ This means that the Docker interface was used to delete the Minikube instance in
 Solution:
 
 1. Check Docker Installation:
--  Make sure Docker is installed on your system. If it's not installed, you can install Docker by following the instructions on the official Docker [installation guide.](https://docs.docker.com/get-docker/)
+- Make sure Docker is installed on your system. If it's not installed, you can install Docker by following the instructions on the official Docker [installation guide.](https://docs.docker.com/get-docker/)
 
 2. Start Docker:
 - On macOS and Windows: Docker Desktop has a graphical interface to manage the Docker service. Open Docker Desktop to start Docker. Alternatively, run: ```open -a Docker```

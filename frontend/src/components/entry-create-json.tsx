@@ -816,7 +816,7 @@ class CreateEntryJson extends Component<CreateEntryJsonProp, CreateEntryJsonStat
                                             </div>
                                             <TextArea
                                                 cols={50}
-                                                helperText="e.g. k8s_sat:cluster:demo-cluster,..."
+                                                helperText="e.g. k8s_psat:cluster:demo-cluster,..."
                                                 id="selectors-textArea"
                                                 invalidText="A valid value is required"
                                                 labelText="Selectors"

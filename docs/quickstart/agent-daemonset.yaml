@@ -28,8 +28,13 @@ spec:
           args: ["-t", "30", "spire-server:8081"]
       containers:
         - name: spire-agent
-          image: ghcr.io/spiffe/spire-agent:1.10.0
+          image: ghcr.io/spiffe/spire-agent:1.11.1
           args: ["-config", "/run/spire/config/agent.conf"]
+          env:
+          - name: MY_NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
           volumeMounts:
             - name: spire-config
               mountPath: /run/spire/config
@@ -39,6 +44,8 @@ spec:
             - name: spire-agent-socket
               mountPath: /run/spire/sockets
               readOnly: false
+            - name: spire-token
+              mountPath: /var/run/secrets/tokens
           livenessProbe:
             httpGet:
               path: /live
@@ -64,3 +71,10 @@ spec:
           hostPath:
             path: /run/spire/sockets
             type: DirectoryOrCreate
+        - name: spire-token
+          projected:
+            sources:
+            - serviceAccountToken:
+                path: spire-agent
+                expirationSeconds: 7200
+                audience: spire-server
