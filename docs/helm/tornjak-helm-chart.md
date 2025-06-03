@@ -17,13 +17,21 @@ Make sure you have the following installed on your system:
 
 ## Step-by-Step Deployment
 
-### 1. Start Minikube
+### 1. Clone Repo
+
+```sh
+git clone https://github.com/spiffe/tornjak.git
+cd tornjak
+cd docs/helm
+```
+
+### 2. Start Minikube
 
 ```sh
 minikube start
 ```
 
-### 2. Deploy SPIRE
+### 3. Deploy SPIRE
 
 Now we can excute the following to deploy our SPIRE instance:
 
@@ -31,7 +39,7 @@ Now we can excute the following to deploy our SPIRE instance:
 helm upgrade --install -n spire-server spire-crds spire-crds --repo https://spiffe.github.io/helm-charts-hardened/ --create-namespace
 ```
 
-### 3. Deploy Tornjak
+### 4. Deploy Tornjak
 
 Now we can deploy Tornjak with SPIRE.
 
@@ -51,7 +59,7 @@ helm upgrade --install -n spire-server spire spire \
 --render-subchart-notes
 ```
 
-### 4. Test Deployment
+### 5. Test Deployment
 
 You can verify the deployment with:
 
@@ -59,7 +67,7 @@ You can verify the deployment with:
 helm test spire -n spire-server
 ```
 
-### 5. Access Tornjak UI
+### 6. Access Tornjak UI
 
 Run the backend.
 
