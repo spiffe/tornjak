@@ -62,15 +62,16 @@ helm test spire -n spire-server
 ### 5. Access Tornjak UI
 
 Run the backend.
-```bash
+
+```sh
 kubectl -n spire-server port-forward service/spire-tornjak-backend 10000:10000
 ```
 
 In a separate terminal, run the frontend.
 
-```bash 
+```sh
 kubectl -n spire-server port-forward service/spire-tornjak-frontend 3000:3000
 ```
 
-Open your browser and go to http://localhost:3000
+Open your browser and go to [http://localhost:3000](http://localhost:3000)
 You should now see the Tornjak UI!
