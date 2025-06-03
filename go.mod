@@ -11,6 +11,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.19
 	github.com/pardot/oidc v1.0.1
 	github.com/pkg/errors v0.9.1
+	github.com/rs/cors v1.11.1
 	github.com/spiffe/go-spiffe/v2 v2.3.0
 	github.com/spiffe/spire v1.6.4
 	github.com/spiffe/spire-api-sdk v1.10.4
