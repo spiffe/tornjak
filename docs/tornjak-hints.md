@@ -50,7 +50,7 @@ so DB can be recreated with a correct version.
 
 When *pvc* is used to persist SPIRE data, delete it:
 
-```console
+```sh
 kubectl -n spire-server get pvc
 kubectl -n spire-server delete pvc spire-data-spire-server-0
 ```
@@ -64,7 +64,7 @@ and remove the files manually:
 Use the handy utility:
 [https://github.com/IBM/trusted-service-identity/blob/main/utils/spire.db.clean.yaml](https://github.com/IBM/trusted-service-identity/blob/main/utils/spire.db.clean.yaml):
 
-```console
+```sh
 kubectl -n spire-server create -f https://github.com/IBM/trusted-service-identity/blob/main/utils/spire.db.clean.yaml
 kubectl -n spire-server exec -it spire-server-0 -- sh
 
@@ -85,13 +85,13 @@ kubectl -n spire-server delete -f https://github.com/IBM/trusted-service-identit
 Pod with Tornjak front-end fails to start.
 Kubectl "Events" page shows the following:
 
-```console
+```sh
 Startup probe failed: Get "http://172.17.0.3:3000/": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
 ```
 
 Above message is accessible by (assuming `spire` namespace, `[POD]` is a placeholder for the front-end Pod name):
 
-```console
+```sh
 kubectl -n spire-server describe po [POD]
 ```
 
@@ -115,7 +115,7 @@ failureThreshold: 15
 
 Agent log file shows an error:
 
-```console
+```sh
 time="2021-10-01T15:26:14Z" level=info msg="SVID is not found. Starting node attestation" subsystem_name=attestor trust_domain_id="spiffe://openshift.com"
 time="2021-10-01T15:26:44Z" level=error msg="Agent crashed" error="create attestation client: failed to dial dns:///spire-server-tornjak.9d995c4a8c7c5f281ce13d5467ff6a94-0000.us-east.containers.appdomain.cloud:443: context deadline exceeded: connection error: desc = \"transport: authentication handshake failed: x509svid: could not verify leaf certificate: x509: certificate signed by unknown authority (possibly because of \\\"crypto/rsa: verification error\\\" while trying to verify candidate authority certificate \\\"SPIFFE\\\")\""
 ```
@@ -132,13 +132,13 @@ get the `spire-bundle` configmap from the SPIRE server, update the namespace to 
 
 On the SPIRE server (assuming `spire-server` namespace):
 
-```console
+```sh
 kubectl -n spire-server get configmap spire-bundle -oyaml | kubectl patch --type json --patch '[{"op": "replace", "path": "/metadata/namespace", "value":"spire"}]' -f - --dry-run=client -oyaml > spire-bundle.yaml
 ```
 
 On the SPIRE agent cluster (assuming `spire` namespace):
 
-```console
+```sh
 kubectl -n spire create -f spire-bundle.yaml
 ```
 

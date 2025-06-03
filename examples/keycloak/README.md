@@ -4,7 +4,7 @@
 
 Deploy the Keycloak instance to support Identity and Access Management (IAM) for Tornjak.
 
-```console
+```sh
 kubectl create -f config.yaml
 kubectl create -f statefulset.yaml
 kubectl create -f service.yaml
@@ -12,7 +12,7 @@ kubectl create -f service.yaml
 
 Once the service is deployed, provide a local access to Keycloak service port:
 
-```console
+```sh
 kubectl port-forward service/keycloak-service 8080:8080
 ```
 

@@ -99,7 +99,7 @@ Usage documentation for each of the Tornjak components can be found in our [Usag
 
 An excellent feature for frontend development is the ability to make changes to the frontend code without needing to restart the application.  To start a local version of the Tornjak frontend, one must have it point at the running Tornjak APIs:
 
-```console
+```sh
 cd tornjak-frontend
 npm install
 REACT_APP_API_SERVER_URI=http://localhost:3000  npm start
@@ -111,7 +111,7 @@ This will start a server on `http://localhost:3000`. Please be patient, as it mi
 
 The backend may also be run locally as well. 
 
-```console
+```sh
 go run tornjak-backend/cmd/agent/agent.go
 ```
 
@@ -147,21 +147,21 @@ User Management is an optional feature that prevents un-authorized access to Tor
 1. On Windows, files use CRLF (`\r\n`) line endings, but Git (Linux) uses LF (`\n`) line endings.
 
 2. We can check the status of line endings using:  
-   ```console
+   ```sh
    git config --global core.autocrlf
    ```
 
 3. If there is no status, Windows will use its own line endings. We can fix this issue by setting:  
-   ```console
+   ```sh
    git config --global core.autocrlf true
    ```
 
 4. Now if we run the command in step 2 again:  
-   ```console
+   ```sh
    git config --global core.autocrlf
    ```  
    Windows should now output:  
-   ```console
+   ```sh
    true
    ```
 

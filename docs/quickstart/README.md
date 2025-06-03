@@ -31,20 +31,22 @@ Note: While we have tested this tutorial with the versions below, newer versions
  - Minikube Version 1.12.0, Version 1.31.2
  - Docker Version 20.10.23, Version 24.0.6
 
+[Troubleshoot 5: Docker detected as malware](#troubleshooting)
+
 ## Step 1: Setup deployment files
 
 ### Setting up k8s
 
 For this tutorial, we will use minikube. If you have an existing kubernetes cluster, feel free to use that.
 
-```console
+```sh
 minikube start
 ```
 
 - By default, Minikube automatically selects the best available driver. If you want to explicitly run Minikube on Docker, use the following command:
-- ```console
-    minikube start --driver=docker
-    ```
+  ```sh
+  minikube start --driver=docker
+  ```
 
 
 ```
@@ -60,7 +62,7 @@ minikube start
 🏄  Done! kubectl is now configured to use "minikube"
 ```
 
-```console
+```sh
 kubectl get nodes
 ```
 
@@ -70,11 +72,13 @@ minikube   Ready    master   79s   v1.18.3
 ```
 
 [Troubleshoot 1: Minikube fails to start with a Docker CLI context error](#troubleshooting)
+
+[Troubleshoot 4: Right kubectl missing...](#troubleshooting)
 ### Obtaining the Deployment Files
 
 To obtain the relevant files, clone our git repository and cd into the correct directory:
 
-```console
+```sh
 git clone https://github.com/spiffe/tornjak.git
 cd tornjak
 cd docs/quickstart
@@ -83,7 +87,7 @@ cd docs/quickstart
 Notice, the files in this directory are largely the same files as provided by the [SPIRE quickstart for Kubernetes](https://spiffe.io/docs/latest/try/getting-started-k8s/). However, there are some minor key differences. Take note of the tornjak-configmap.yaml file, which includes configuration details for the Tornjak backend.
 To view the configuration you can issue the following:
 
-```console
+```sh
 cat tornjak-configmap.yaml
 ```
 
@@ -126,7 +130,6 @@ Additionally, we have sample server-statefulset files in the directory `server-s
 
 ### Choosing the Statefulset Deployment
 
-
 Depending on your use case, you can deploy Tornjak in different configurations. Note we have deprecated support of the use case where parts of Tornjak run on the same container as SPIRE.
 
 Currently, we support the following deployment scheme:
@@ -141,13 +144,13 @@ There is an additional requirement to mount the SPIRE server socket and make it 
 
 The relevant file is called `backend-sidecar-server-statefulset.yaml` within the examples directory.  Please copy to the relevant file as follows:
 
-```console
+```sh
 cp server-statefulset-examples/backend-sidecar-server-statefulset.yaml server-statefulset.yaml
 ```
 
 The statefulset will look something like this, where we have commented leading with a 👈 on the changed or new lines:
 
-```console
+```sh
 cat server-statefulset.yaml
 ```
 
@@ -261,8 +264,9 @@ This is all done specifically to pass the Tornjak config file as an argument to 
 
 Now that we have the correct deployment files, please follow the below steps to deploy Tornjak and SPIRE!
 
-NOTE: In a Windows OS environment, you will need to replace the backslashes ( \\ ) below with backticks ( \` ) to copy and paste into a Windows terminal. This doesnt apply for Mac.
-```console
+NOTE: In a Windows OS environment, you will need to replace the backslashes ( \\ ) below with backticks ( \` ) to copy and paste into a Windows terminal. This doesnt apply for MacOS.
+
+```sh
 kubectl apply -f spire-namespace.yaml \
     -f server-account.yaml \
     -f spire-bundle-configmap.yaml \
@@ -272,6 +276,7 @@ kubectl apply -f spire-namespace.yaml \
     -f server-statefulset.yaml \
     -f server-service.yaml
 ```
+
 The above command should deploy the SPIRE server with Tornjak:
 
 ```
@@ -294,7 +299,7 @@ service/tornjak-frontend created
 
 Before continuing, check that the spire-server is ready:
 
-```console
+```sh
 kubectl get statefulset --namespace spire
 ```
 
@@ -309,7 +314,8 @@ NOTE: You may initially see a `0/1` for READY status. Just wait a few minutes an
 
 The following steps will configure and deploy the SPIRE agent.
 NOTE: In a windows environment, you will need to replace the backslashes ( \\ ) below with backticks ( \` ) to copy and paste into a windows terminal
-```console
+
+```sh
 kubectl apply \
     -f agent-account.yaml \
     -f agent-cluster-role.yaml \
@@ -325,7 +331,7 @@ configmap/spire-agent created
 daemonset.apps/spire-agent created
 ```
 
-```console
+```sh
 kubectl get daemonset --namespace spire
 ```
 
@@ -339,7 +345,8 @@ spire-agent   1         1         1       1            1           <none>       
 Then, we can create a registration entry for the node.
 
 NOTE: In a windows environment, you will need to replace the backslashes ( \\ ) below with backticks ( \` ) to copy and paste into a windows terminal
-```console
+
+```sh
 kubectl exec -n spire -c spire-server spire-server-0 -- \
     /opt/spire/bin/spire-server entry create \
     -spiffeID spiffe://example.org/ns/spire/sa/spire-agent \
@@ -364,7 +371,7 @@ Selector         : k8s_sat:cluster:demo-cluster
 And we create a registration entry for the workload registrar, specifying the workload registrar's SPIFFE ID:
 
 NOTE: In a windows environment, you will need to replace the backslashes ( \\ ) below with backticks ( \` ) to copy and paste into a windows terminal
-```console
+```sh
 kubectl exec -n spire -c spire-server spire-server-0 -- \
     /opt/spire/bin/spire-server entry create \
     -spiffeID spiffe://example.org/ns/default/sa/default \
@@ -386,7 +393,7 @@ Selector         : k8s:sa:default
 
 Finally, here we deploy a workload container:
 
-```console
+```sh
 kubectl apply -f client-deployment.yaml
 ```
 
@@ -396,7 +403,7 @@ deployment.apps/client created
 
 And also verify that the container can access the workload API UNIX domain socket:
 
-```console
+```sh
 kubectl exec -it $(kubectl get pods -o=jsonpath='{.items[0].metadata.name}' \
    -l app=client)  -- /opt/spire/bin/spire-agent api fetch -socketPath /run/spire/sockets/agent.sock
 ```
@@ -413,12 +420,12 @@ CA #1 Valid Until:      2025-05-14 02:12:45 +0000 UTC
 
 Let's verify that the `spire-server-0` pod is now started with the new image:
 
-```console
+```sh
 kubectl -n spire describe pod spire-server-0 | grep "Image:"
 ```
 
 **or**, on Windows:
-```console
+```sh
 kubectl -n spire describe pod spire-server-0 | select-string "Image:"
 ```
 
@@ -437,7 +444,7 @@ where `<TORNJAK-IMAGE>` is `ghcr.io/spiffe/tornjak:latest` if you deployed the T
 
 The Tornjak HTTP server is running on port 10000 on the pod. This can easily be accessed by performing a local port forward using `kubectl`. This will cause the local port 10000 to proxy to the Tornjak HTTP server.
 
-```console
+```sh
 kubectl -n spire port-forward spire-server-0 10000:10000
 ```
 💡 Tip: For the following steps to work, run the above command in a new terminal window or tab, depending on your setup.
@@ -469,7 +476,7 @@ If you chose to deploy Tornjak with the UI, connecting to the UI is very simple.
 
 You will need to deploy the separate frontend separately to access the exposed Tornjak backend. We have prebuilt the frontend in a container, so we can simply run it via a single docker command in a separate terminal, which will take a couple minutes to run:
 
-```console
+```sh
 docker run -p 3000:3000 -e REACT_APP_API_SERVER_URI='http://localhost:10000' ghcr.io/spiffe/tornjak-frontend:v2.0.0
 ```
 
@@ -508,13 +515,13 @@ Either of the above steps exposes the frontend at http://localhost:3000.  If you
 
 Here are the steps to clean the deployed entities. First, we delete the workload container:
 
-```terminal
+```sh
 kubectl delete deployment client
 ```
 
 Then, delete the spire agent and server, along with the namespace we created:
 
-```terminal
+```sh
 kubectl delete namespace spire
 ```
 
@@ -522,20 +529,22 @@ NOTE: You may need to wait a few minutes for the action to complete and the prom
 
 Finally, we can delete the ClusterRole and ClusterRoleBinding:
 
-```terminal
+```sh
 kubectl delete clusterrole spire-server-trust-role spire-agent-cluster-role
 kubectl delete clusterrolebinding spire-server-trust-role-binding spire-agent-cluster-role-binding
 ```
 
 ## Troubleshooting
+
 <details><summary><b>Troubleshoot 1: Minikube fails to start with a Docker CLI context error</b></summary>
 
 When running the `minikube start` command, you might encounter an error like the one below:
 
 
-```console
+```sh
 minikube start
 ```
+
 ```
 W1105 15:48:51.730095   42754 main.go:291] Unable to resolve the current Docker CLI context "default": context "default": context not found: open /Users/kidus/.docker/contexts/meta/37a8eec1ce19687d132fe29051dca629d164e2c4958ba141d5f4133a33f0688f/meta.json: no such file or directory
 😄  minikube v1.31.2 on Darwin 14.0 (arm64)
@@ -552,34 +561,46 @@ Solution:
 -  Make sure Docker is installed on your system. If it's not installed, you can install Docker by following the instructions on the official Docker [installation guide.](https://docs.docker.com/get-docker/)
 
 2. Start Docker:
-- On macOS and Windows: Docker Desktop has a graphical interface to manage the Docker service. Open Docker Desktop to start Docker. Alternativly, run the command '''open -a Docker''''
+- On macOS and Windows: Docker Desktop has a graphical interface to manage the Docker service. Open Docker Desktop to start Docker. Alternatively, run:
+```open -a Docker```
+
 3. Retry Starting Minikube:
 - After ensuring that Docker is running, you can start Minikube again using:
-```console
+
+```sh
 minikube start
 ```
+
 4. Reset Configurations if Needed:
 - For Docker context issues:
-```console
+
+```sh
 docker context ls
 docker context use default
 ```
+
 - To reset Minikube:
-```console
+
+```sh
 minikube delete
 ```
+
 - followed by:
-```console
+
+```sh
 minikube start
 ```
+
 </details>
 
 <details><summary><b>Troubleshoot 2: Minikube fails to start Parallels VM due to missing DHCP lease for MAC address.</b></summary>
 
 When running the `minikube start` command, you might encounter an error like the one below:
-```console
+
+```sh
 minikube start
 ```
+
 ```
 🤦  StartHost failed, but will try again: driver start: Too many retries waiting for SSH to be available.  Last error: Maximum number of retries (60) exceeded
 🏃  Updating the running parallels "minikube" VM ...
@@ -588,11 +609,13 @@ minikube start
 
 ❌  Exiting due to GUEST_PROVISION: error provisioning guest: Failed to start host: provision: IP lease not found for MAC address 001C42B0DEF6 in: /Library/Preferences/Parallels/parallels_dhcp_leases
 ```
+
 This typically means the Minikube and Parallels virtual machine is failing to start due to an IP lease problem. Here some steps you can take to troubleshoot and resolve this issue:
 
 1. Sometimes, the Minikube VM can get into a bad state. Deleting and recreating it can often resolve issues.
 - Run the following command:
-```
+
+```sh
 minikube delete
 minikube start --vm-driver=parallels
 ```
@@ -600,9 +623,11 @@ minikube start --vm-driver=parallels
 2. If the above solution is not applicable, you should check Parallels DHCP leases on your machine
 
 For Mac user, you can manually check the DHCP leases file to see if the MAC address is listed
-```console
+
+```sh
 cat /Library/Preferences/Parallels/parallels_dhcp_leases
 ```
+
 If the MAC address is not listed, it might be worth renew your DHCP lease manually.
 
 Open your System Settings, then click Network in the sidebar.
@@ -617,14 +642,16 @@ Click TCP/IP, then click Renew DHCP Lease, followed by Apply. Finally, click the
 
 ![mac-renewDHCP](../rsrc/mac-system-renewDHCP.png)
 
+</details>
+
 <details><summary><b>Troubleshoot 3: Minikube fails to start with a data validation error</b></summary>
 
 When running the `minikube start` command, you might encounter an error like the one below:
 
-
-```console
+```sh
 minikube start
 ```
+
 ```
 😄  minikube v1.35.0 on Microsoft Windows 11 Home 10.0.26100.3476 Build 26100.3476
 ✨  Using the docker driver based on existing profile
@@ -659,15 +686,47 @@ Solution:
 -  Make sure Docker is installed on your system. If it's not installed, you can install Docker by following the instructions on the official Docker [installation guide.](https://docs.docker.com/get-docker/)
 
 2. Start Docker:
-- On macOS and Windows: Docker Desktop has a graphical interface to manage the Docker service. Open Docker Desktop to start Docker. Alternatively, run the command '''open -a Docker''''
+- On macOS and Windows: Docker Desktop has a graphical interface to manage the Docker service. Open Docker Desktop to start Docker. Alternatively, run: ```open -a Docker```
 
 3. Reset Minikube through the terminal to reconfigure the right files
 - To do this:
-```console
+
+```sh
 minikube delete
 ```
+
 - followed by:
-```console
+
+```sh
 minikube start
 ```
+
+</details>
+
+<details><summary><b>Troubleshoot 4: Right kubectl missing...</b></summary>
+
+When running the `kubectl get nodes` command, you might get an error like:
+
+```sh
+kubectl get nodes
+```
+
+```
+I0423 18:35:22.635999    3136 versioner.go:88] Right kubectl missing, downloading version 1.32.0
+F0423 18:35:22.857702    3136 main.go:70] error while trying to get contents of https://storage.googleapis.com/kubernetes-release/release/v1.32.0/bin/darwin/amd64/kubectl.sha256: GET https://storage.googleapis.com/kubernetes-release/release/v1.32.0/bin/darwin/amd64/kubectl.sha256 returned http status 404 Not Found
+```
+
+This typically occurs when Rancher Desktop adds its own Kubernetes version to your PATH and it conflicts with the version you installed.
+Solution:
+1. Open Rancher Desktop.
+2. Click on the Preferences icon and uncheck Enable Kubernetes, then apply changes.
+3. Restart Rancher Desktop and reopen a terminal.
+
+</details>
+
+<details><summary><b>Troubleshoot 5: Docker detected as malware</b></summary>
+
+When Docker is run on a Mac, it may be detected as malware and cannot start.
+[Solution](https://github.com/docker/for-mac/issues/7520)
+
 </details>
