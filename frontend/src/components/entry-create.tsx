@@ -313,11 +313,6 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
             selectorsList: this.props.globalSelectorInfo["gcp_iit"]
           });
         }
-        else if (serverNodeAtt === "k8s_sat") {
-          this.setState({
-            selectorsList: this.props.globalSelectorInfo["k8s_sat"]
-          });
-        }
         else if (serverNodeAtt === "k8s_psat") {
           this.setState({
             selectorsList: this.props.globalSelectorInfo["k8s_psat"]
