@@ -17,7 +17,7 @@
 
 -   [Server plugin: Datastore "SQL"](/docs/plugins/plugin_server_datastore_sql.md)
 
--   [Server plugin: SPIRECRDManager](/docs/plugins/plugin_server_spirecrd.md
+-   [Server plugin: SPIRECRDManager](/docs/plugins/plugin_server_spirecrd.md)
 -   [Tornjak Agent](/docs/tornjak-agent.md)
     - [Tornjak SPIRE Server Agent](/docs/tornjak-agent.md#tornjak-spire-server-agent)
     - [APIs](/docs/tornjak-agent.md#apis)
