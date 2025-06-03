@@ -1,6 +1,6 @@
 # Index
 
--   [Tornjak Deployment Using Helm-Charts](/docs/tornjak-helm-chart.md)
+-   [Tornjak Deployment Using Helm-Charts](/docs/helm/tornjak-helm-chart.md)
 
 -   [Blogs](/docs/blogs.md)
 
