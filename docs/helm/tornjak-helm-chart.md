@@ -47,7 +47,7 @@ Then, run the following Helm command to deploy Tornjak with the frontend and bac
 helm upgrade --install -n spire-server spire spire \
 --repo https://spiffe.github.io/helm-charts-hardened/ \
 --set tornjak-frontend.apiServerURL=$TORNJAK_API \
---values helm/values.yaml \
+--values values.yaml \
 --render-subchart-notes
 ```
 
