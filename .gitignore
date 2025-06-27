@@ -47,3 +47,5 @@ package.json
 package-lock.json
 
 /agent
+resources/start_tornjak_server.sh
+.gitignore

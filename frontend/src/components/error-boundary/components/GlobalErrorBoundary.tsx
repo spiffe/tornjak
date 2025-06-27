@@ -1,11 +1,9 @@
-// features/error-boundary/components/GlobalErrorBoundary.tsx
-import React, { Component, ReactNode, useCallback, useEffect, useRef } from 'react';
+import React, { Component, ReactNode, useEffect, useRef } from 'react';
 import {
   GlobalErrorBoundaryProps,
   GlobalErrorState,
   AppError,
 } from '../error.types';
-import { useErrorHandler } from '../useErrorHandler';
 import { classifyError, isServerError } from '../utils';
 import { ServerDownError } from './ServerDownError';
 import { setServerDownHandler } from '../../../Utils/axiosSetup';
@@ -18,7 +16,6 @@ export class GlobalErrorBoundary extends Component<GlobalErrorBoundaryProps, Glo
     this.state = {
       hasError: false,
       isServerDown: false,
-      isConnecting: false,
       error: undefined,
     };
   }
@@ -48,8 +45,7 @@ export class GlobalErrorBoundary extends Component<GlobalErrorBoundaryProps, Glo
     this.setState({
       hasError: false,
       error: undefined,
-      isServerDown: false,
-      isConnecting: false,
+      isServerDown: false
     });
   };
 
@@ -58,7 +54,7 @@ export class GlobalErrorBoundary extends Component<GlobalErrorBoundaryProps, Glo
   };
 
   render(): ReactNode {
-    const { hasError, isServerDown, error, isConnecting } = this.state;
+    const { hasError, isServerDown } = this.state;
     const { customServerDownMessage, children } = this.props;
 
     if (!hasError) {
@@ -68,7 +64,6 @@ export class GlobalErrorBoundary extends Component<GlobalErrorBoundaryProps, Glo
     if (isServerDown) {
       return (
         <ServerDownError
-          isConnecting={isConnecting}
           customMessage={customServerDownMessage}
           onReloadPage={this.handleReloadPage}
         />
@@ -79,33 +74,6 @@ export class GlobalErrorBoundary extends Component<GlobalErrorBoundaryProps, Glo
 
 const GlobalErrorBoundaryWrapper: React.FC<GlobalErrorBoundaryProps> = (props) => {
   const errorBoundaryRef = useRef<GlobalErrorBoundary>(null);
-
-  const handleServerError = useCallback(() => {
-    errorBoundaryRef.current?.updateState({
-      hasError: true,
-      isServerDown: true,
-      error: {
-        message: props.customServerDownMessage || 'Unable to connect to server',
-        type: 'server',
-        timestamp: new Date(),
-      } as AppError,
-    });
-  }, [props.customServerDownMessage]);
-
-  const handleAppError = useCallback((error: any) => {
-    const appError = classifyError(error);
-    errorBoundaryRef.current?.updateState({
-      hasError: true,
-      error: appError,
-      isServerDown: isServerError(appError),
-    });
-  }, []);
-
-  useErrorHandler({
-    onServerError: handleServerError,
-    enabled: true,
-  });
-
   useEffect(() => {
     setServerDownHandler(() => {
       errorBoundaryRef.current?.updateState({

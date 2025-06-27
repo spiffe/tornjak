@@ -22,31 +22,11 @@ import RenderOnAdminRole from 'components/RenderOnAdminRole'
 import { GlobalErrorBoundaryWithHooks } from 'components/error-boundary'
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
 
 function App() {
     return (
         <div>
-            <ToastContainer />
-            <GlobalErrorBoundaryWithHooks
-                // Server configuration
-                serverHealthEndpoint="/api/health"
-                healthCheckInterval={30000}
-                maxRetryAttempts={5}
-
-                // Features
-                enableAutoRetry={true}
-                showHealthStatus={true}
-
-                // Custom messages
-                customServerDownMessage="The server is currently unavailable. Please try again later."
-
-                onServerReconnect={() => {
-                    console.log('Server connection restored');
-                    // Optional: Show success notification
-                    // toast.success('Connection restored!');
-                }}
-            >
+            <GlobalErrorBoundaryWithHooks>
                 <Provider store={store}>                     
                     <Router>
                         <div className="app-container">
