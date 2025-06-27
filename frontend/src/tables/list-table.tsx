@@ -76,7 +76,7 @@ class DataTableRender extends React.Component<DataTableRenderProp, DataTableRend
                             downloadEntity={this.props.downloadEntity}
                             selectedRows={selectedRows}
                         />
-                        <Table size="sm" useZebraStyles>
+                        <Table size="short" useZebraStyles>
                             <Head
                                 getHeaderProps={getHeaderProps}
                                 getSelectionProps={getSelectionProps}
