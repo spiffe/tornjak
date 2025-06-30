@@ -133,7 +133,10 @@ class AgentList extends Component<AgentListProp, AgentListState> {
         {this.props.globalErrorMessage !== "OK" &&
           <div className="alert-primary" role="alert">
             <pre>
-              {this.props.globalErrorMessage}
+              {typeof this.props.globalErrorMessage === 'string'
+                ? this.props.globalErrorMessage
+                : JSON.stringify(this.props.globalErrorMessage, null, 2)
+              }
             </pre>
           </div>
           
