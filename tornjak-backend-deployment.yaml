@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tornjak-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tornjak-backend
+  template:
+    metadata:
+      labels:
+        app: tornjak-backend
+    spec:
+      containers:
+      - name: tornjak-backend
+        image: tsidentity/tornjak-backend:dev
+        command: ["/agent"]
+        args: ["--tornjak-config", "/etc/tornjak/tornjak.conf", "http"]
+        ports:
+        - containerPort: 10000
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/tornjak
+      volumes:
+      - name: config-volume
+        configMap:
+          name: tornjak-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tornjak-backend-service
+spec:
+  type: NodePort
+  selector:
+    app: tornjak-backend
+  ports:
+  - port: 10000
+    targetPort: 10000
+    nodePort: 30080  # You can choose another free port

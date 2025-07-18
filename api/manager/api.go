@@ -1,9 +1,10 @@
 package managerapi
 
 import (
-	managertypes "github.com/spiffe/tornjak/pkg/manager/types"
+	"log"
 
 	"github.com/pkg/errors"
+	managertypes "github.com/spiffe/tornjak/pkg/manager/types"
 	//types "github.com/spiffe/spire/proto/spire/types"
 	//agent "github.com/spiffe/spire/proto/spire/api/server/agent/v1"
 	//entry "github.com/spiffe/spire/proto/spire/api/server/entry/v1"
@@ -13,6 +14,7 @@ type ListServersRequest struct{}
 type ListServersResponse managertypes.ServerInfoList
 
 func (s *Server) ListServers(inp ListServersRequest) (*ListServersResponse, error) {
+	log.Printf("LOG is working")
 
 	resp, err := s.db.GetServers()
 	if err != nil {
