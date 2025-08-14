@@ -26,7 +26,7 @@ The backend is designed to be deployed where it can access a SPIRE server. To ru
 | Flag                   | Description                                                 | Default | Arguments | Required |
 |:-----------------------|:------------------------------------------------------------|:--------|:----------|:---------|
 | `--spire-config`       | Config file path for SPIRE server                           |         | `<path>`  | false    |
-| `--tornjak-config`     | Config file path for Tornjak (see our [configuration reference](./docs/config-tornjak-agent.md)) | | `<path>` | true |
+| `--tornjak-config`     | Config file path for Tornjak (see our [configuration reference](./docs/config-tornjak-server.md)) | | `<path>` | true |
 | `--expandEnv`          | If included, expand environment variables in Tornjak config | False   |           | false    |
 
 ```
@@ -35,7 +35,7 @@ docker run -p 10000:10000 ghcr.io/spiffe/tornjak-backend:latest --spire-config <
 
 The above command creates a container listening at http://localhost:10000 for Tornjak API calls. Note that the config files must be accessible from INSIDE the container. Also note, this expands the container's environment variables in the Tornjak config map. 
 
-For more instructions on Tornjak config formatting, please see our [configuration reference](./docs/config-tornjak-agent.md).
+For more instructions on Tornjak config formatting, please see our [configuration reference](./docs/config-tornjak-server.md).
 
 ## Tornjak Manager
 
