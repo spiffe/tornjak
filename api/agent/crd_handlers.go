@@ -6,10 +6,11 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
 	"google.golang.org/protobuf/encoding/protojson"
 
-	crdmanager "github.com/spiffe/tornjak/pkg/agent/spirecrd"
 	trustdomain "github.com/spiffe/spire-api-sdk/proto/spire/api/server/trustdomain/v1"
+	crdmanager "github.com/spiffe/tornjak/pkg/agent/spirecrd"
 )
 
 func (s *Server) CRDFederationList(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +50,8 @@ func (s *Server) CRDFederationList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
+
 	je := json.NewEncoder(w)
 	err = je.Encode(ret) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 	if err != nil {
@@ -98,7 +100,8 @@ func (s *Server) CRDFederationCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
+
 	je := json.NewEncoder(w)
 	err = je.Encode(ret) //nolint:govet //Ignoring mutex (not being used) - sync.Mutex by value is unused for linter govet
 
