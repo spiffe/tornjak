@@ -150,6 +150,7 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// get the absolute path to prevent directory traversal
 	absPath, err := filepath.Abs(filepath.Join(h.staticPath, relPath))
 	if err != nil || !strings.HasPrefix(absPath, h.staticPath) {
+		log.Printf("Bad request or path traversal attempt: rel=%s, abs=%s, err=%v", relPath, absPath, err)
 		// if we failed to get the absolute path respond with a 400 bad request
 		// and stop
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -159,15 +160,18 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// check whether a file exists at the given path
 	_, err = os.Stat(absPath)
 	if os.IsNotExist(err) {
+		log.Printf("File not found: %s. Serving index.html instead.", absPath)
 		// file does not exist, serve index.html
 		http.ServeFile(w, r, filepath.Join(h.staticPath, h.indexPath))
 		return
 	} else if err != nil {
+		log.Printf("Error stating file: %s. err=%v", absPath, err)
 		// if we got an error (that wasn't that the file doesn't exist) stating the
 		// file, return a 500 internal server error and stop
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	log.Printf("Serving static file: %s", absPath)
 	// otherwise, use http.FileServer to serve the static dir
 	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
 }
@@ -198,14 +202,14 @@ func (s *Server) GetRouter() http.Handler {
 	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryList).Methods(http.MethodGet, http.MethodOptions)
 	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryCreate).Methods(http.MethodPost)
 	apiRtr.HandleFunc("/api/v1/spire/entries", s.entryDelete).Methods(http.MethodDelete)
-	
+
 	// SPIRE server bundles
 	apiRtr.HandleFunc("/api/v1/spire/bundle", s.bundleGet).Methods(http.MethodGet, http.MethodOptions)
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleList).Methods(http.MethodGet, http.MethodOptions)
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleCreate).Methods(http.MethodPost)
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleUpdate).Methods(http.MethodPatch)
 	apiRtr.HandleFunc("/api/v1/spire/federations/bundles", s.federatedBundleDelete).Methods(http.MethodDelete)
-	
+
 	// SPIRE server federations
 	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationList).Methods(http.MethodGet, http.MethodOptions)
 	apiRtr.HandleFunc("/api/v1/spire/federations", s.federationCreate).Methods(http.MethodPost)
@@ -270,6 +274,7 @@ func (s *Server) HandleRequests() {
 	serverConfig := s.TornjakConfig.Server
 	if serverConfig.HTTPConfig == nil {
 		err = fmt.Errorf("HTTP Config error: no port configured")
+		log.Println("Error:", err) // <-- New log
 		errChannel <- err
 		return
 	}
@@ -291,6 +296,7 @@ func (s *Server) HandleRequests() {
 		if serverConfig.HTTPSConfig.ListenPort == 0 {
 			// Fail because this is required field in this section
 			err = fmt.Errorf("HTTPS Config error: no port configured. Starting insecure HTTP connection at %d", serverConfig.HTTPConfig.ListenPort)
+			log.Println("Error:", err) // <-- New log
 			errChannel <- err
 			httpHandler = s.GetRouter()
 			canStartHTTPS = false
@@ -298,6 +304,7 @@ func (s *Server) HandleRequests() {
 			tlsConfig, err = httpsConfig.Parse()
 			if err != nil {
 				err = fmt.Errorf("failed parsing HTTPS config: %w. Starting insecure HTTP connection at %d", err, serverConfig.HTTPConfig.ListenPort)
+				log.Println("Error:", err) // <-- New log
 				errChannel <- err
 				httpHandler = s.GetRouter()
 				canStartHTTPS = false
@@ -307,6 +314,7 @@ func (s *Server) HandleRequests() {
 		if canStartHTTPS {
 			go func() {
 				addr := fmt.Sprintf(":%d", serverConfig.HTTPSConfig.ListenPort)
+				log.Printf("Starting HTTPS server on %s...\n", addr) // <-- New log
 				// Create a Server instance to listen on port 8443 with the TLS config
 				server := &http.Server{
 					Handler:   s.GetRouter(),
@@ -318,6 +326,7 @@ func (s *Server) HandleRequests() {
 				err = server.ListenAndServeTLS(httpsConfig.Cert, httpsConfig.Key)
 				if err != nil {
 					err = fmt.Errorf("server error serving on https: %w", err)
+					log.Println("HTTPS server error:", err) // <-- New log
 					errChannel <- err
 				}
 			}()
@@ -327,8 +336,10 @@ func (s *Server) HandleRequests() {
 	go func() {
 		addr := fmt.Sprintf(":%d", serverConfig.HTTPConfig.ListenPort)
 		fmt.Printf("Starting to listen on %s...\n", addr)
+		log.Printf("Starting HTTP server on %s...\n", addr) // <-- New log
 		err := http.ListenAndServe(addr, httpHandler)
 		if err != nil {
+			log.Println("HTTP server error:", err) // <-- New log
 			errChannel <- err
 		}
 	}()
@@ -336,6 +347,6 @@ func (s *Server) HandleRequests() {
 	// as errors come in, read them, and block
 	for i := 0; i < numPorts; i++ {
 		err := <-errChannel
-		log.Printf("%v", err)
+		log.Printf("Error received: %v", err) // <-- New log
 	}
 }
