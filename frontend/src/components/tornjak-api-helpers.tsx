@@ -341,7 +341,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       .catch(function (error) {
         return error.message;
       })
-    return response.data;
+    return response;
   }
 
   // populateClustersUpdate returns the list of clusters with their info in manager mode for the selected server
