@@ -185,6 +185,7 @@ func (s *Server) HandleRequests() {
 	// Manger-specific
 	rtr.HandleFunc("/manager-api/server/list", corsHandler(s.serverList))
 	rtr.HandleFunc("/manager-api/server/register", corsHandler(s.serverRegister))
+	rtr.HandleFunc("/manager-api/server/delete/", corsHandler(s.serverDelete))
 
 	// SPIRE server info calls
 	rtr.HandleFunc("/manager-api/healthcheck/{server:.*}", corsHandler(s.apiServerProxyFunc("/api/v1/spire/healthcheck", http.MethodGet)))
@@ -327,6 +328,53 @@ func (s *Server) serverRegister(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
 		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+}
+
+func (s *Server) serverDelete(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Endpoint Hit: Server Delete")
+
+	buf := new(strings.Builder)
+
+	n, err := io.Copy(buf, r.Body)
+	if err != nil {
+		emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+		retError(w, emsg, http.StatusBadRequest)
+		return
+	}
+	data := buf.String()
+
+	var input DeleteServerRequest
+	if n == 0 {
+		input = DeleteServerRequest{}
+	} else {
+		err := json.Unmarshal([]byte(data), &input)
+		if err != nil {
+			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
+			retError(w, emsg, http.StatusBadRequest)
+			return
+		}
+	}
+
+	if input.Server.Name == "" {
+		retError(w, "Server name is missing", http.StatusBadRequest)
+		return
+	}
+
+	err = s.db.DeleteServer(input.Server.Name)
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusInternalServerError)
+		return
+	}
+
+	cors(w, r)
+	_, err = w.Write([]byte("SUCCESS"))
+
+	if err != nil {
+		emsg := fmt.Sprintf("Error: %v", err.Error())
+		retError(w, emsg, http.StatusInternalServerError)
 		return
 	}
 }

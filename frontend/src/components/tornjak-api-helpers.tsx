@@ -10,6 +10,7 @@ import {
   ServerInfo,
   EntriesList,
   ClustersList,
+  ServersList,
   DebugServerInfo,
   FederationsList
 } from './types';
@@ -343,6 +344,23 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       })
     return response.data;
   }
+
+  async serverDelete(inputData: { server: { name: string; }; }, serversListUpdateFunc: { (globalServersList: ServersList[]): void }, globalServersList: any[]) {
+    const response = await axios.post(GetApiServerUri("/manager-api/server/delete/"), inputData,
+      {
+        crossdomain: true,
+      })
+      .then(function (response) {
+        serversListUpdateFunc(globalServersList.filter(el =>
+          el.name !== inputData))
+        return response.data;
+      })
+      .catch(function (error) {
+        return error.message;
+      })
+    return response;
+  }
+
 
   // populateClustersUpdate returns the list of clusters with their info in manager mode for the selected server
   populateClustersUpdate = (serverName: string,
