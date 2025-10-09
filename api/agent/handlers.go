@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 
@@ -12,6 +13,7 @@ import (
 )
 
 func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
+	log.Printf("LOG is working")
 	var input HealthcheckRequest
 	buf := new(strings.Builder)
 
