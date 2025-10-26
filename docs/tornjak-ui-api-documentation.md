@@ -544,6 +544,24 @@ Example response:
 SUCCESS
 ```
 
+##### /manager-api/server/delete
+
+```
+Request
+manager-api/server/delete
+Example request payload:
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{
+  "server": {
+    name: "server1"
+  }
+}
+Example response:
+SUCCESS
+```
+
 ![tornjak-agent-list](rsrc/tornjak-agent-list.png)
 Figure 1. Agent List/ Home Page UI-API Interactions
 
