@@ -74,18 +74,12 @@ func TestServerDelete(t *testing.T) {
 		Address: "http://localhost:10000",
 	}
 
-	err = db.CreateServerEntry(types.ServerInfo{
-		Name:    "my-server-1",
-		Address: "http://localhost:10000",
-	})
+	err = db.CreateServerEntry(sinfo1)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = db.CreateServerEntry(types.ServerInfo{
-		Name:    "my-server-2",
-		Address: "http://localhost:10000",
-	})
+	err = db.CreateServerEntry(sinfo2)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -105,7 +99,7 @@ func TestServerDelete(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(sList.Servers) > 1 || sList.Servers[0].Name != sinfo2.Name {
+	if len(sList.Servers) != 1 || sList.Servers[0].Name != sinfo2.Name {
 		t.Fatal("Deleting server failed")
 	}
 }
