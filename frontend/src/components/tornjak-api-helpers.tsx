@@ -358,7 +358,7 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
       .catch(function (error) {
         return error.message;
       })
-    return response;
+    return response.data;
   }
 
 
