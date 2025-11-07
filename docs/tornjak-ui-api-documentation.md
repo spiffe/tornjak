@@ -555,7 +555,7 @@ Content-Type: application/json; charset=utf-8
 
 {
   "server": {
-    name: "server1"
+    "name": "server1"
   }
 }
 Example response:
