@@ -7,13 +7,19 @@ import (
 )
 
 func main() {
-	var (
-		dbString   = "./serverlocaldb"
-		listenAddr = ":50000"
-	)
-	s, err := managerapi.NewManagerServer(listenAddr, dbString)
+	// Define listening address and database path
+	dbString := "./serverlocaldb"
+	listenAddr := ":50000"
+
+	// Initialize the manager server
+	srv, err := managerapi.NewManagerServer(listenAddr, dbString)
 	if err != nil {
-		log.Fatalf("err: %v", err)
+		log.Fatalf("Failed to create manager server: %v", err)
 	}
-	s.HandleRequests()
+
+	// Start the server (blocking call)
+	log.Printf("Starting Manager API on %s...", listenAddr)
+	if err := srv.Start(); err != nil {
+		log.Fatalf("Server exited with error: %v", err)
+	}
 }

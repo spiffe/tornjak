@@ -83,7 +83,7 @@ func (s *Server) CRDFederationCreate(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// required to use protojson because of oneof field
 		err := protojson.Unmarshal([]byte(data), &rawInput)
-		if err != nil {
+		if err != nil {	
 			emsg := fmt.Sprintf("Error parsing data: %v", err.Error())
 			retError(w, emsg, http.StatusBadRequest)
 			return
