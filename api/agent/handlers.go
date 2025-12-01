@@ -41,7 +41,7 @@ func (s *Server) healthcheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 
 	err = je.Encode(ret)
@@ -62,7 +62,7 @@ func (s *Server) debugServer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 
 	err = je.Encode(ret)
@@ -103,7 +103,7 @@ func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 
 	err = je.Encode(ret)
@@ -147,7 +147,7 @@ func (s *Server) agentBan(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write([]byte("SUCCESS"))
 
 	if err != nil {
@@ -192,7 +192,7 @@ func (s *Server) agentDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write([]byte("SUCCESS"))
 
 	if err != nil {
@@ -233,7 +233,7 @@ func (s *Server) agentCreateJoinToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 	if err != nil {
@@ -274,7 +274,7 @@ func (s *Server) entryList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 	if err != nil {
@@ -315,7 +315,7 @@ func (s *Server) entryCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 	if err != nil {
@@ -356,7 +356,7 @@ func (s *Server) entryDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 	if err != nil {
@@ -397,7 +397,7 @@ func (s *Server) bundleGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 	if err != nil {
@@ -437,7 +437,7 @@ func (s *Server) federatedBundleList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 	if err != nil {
@@ -477,7 +477,7 @@ func (s *Server) federatedBundleCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 	if err != nil {
@@ -517,7 +517,7 @@ func (s *Server) federatedBundleUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 	if err != nil {
@@ -557,7 +557,7 @@ func (s *Server) federatedBundleDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 	if err != nil {
@@ -598,7 +598,7 @@ func (s *Server) federationList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 	if err != nil {
@@ -641,7 +641,7 @@ func (s *Server) federationCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 	if err != nil {
@@ -684,7 +684,7 @@ func (s *Server) federationUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 	if err != nil {
@@ -724,7 +724,7 @@ func (s *Server) federationDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 	if err != nil {
@@ -738,7 +738,7 @@ func (s *Server) federationDelete(w http.ResponseWriter, r *http.Request) {
 func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 	var ret = "Welcome to the Tornjak Backend!"
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 
 	var err = je.Encode(ret)
@@ -751,7 +751,7 @@ func (s *Server) home(w http.ResponseWriter, r *http.Request) {
 func (s *Server) health(w http.ResponseWriter, r *http.Request) {
 	var ret = "Endpoint is healthy."
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 
 	var err = je.Encode(ret)
@@ -787,7 +787,7 @@ func (s *Server) tornjakSelectorsList(w http.ResponseWriter, r *http.Request) {
 		retError(w, emsg, http.StatusBadRequest)
 		return
 	}
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 	if err != nil {
@@ -823,7 +823,7 @@ func (s *Server) tornjakPluginDefine(w http.ResponseWriter, r *http.Request) {
 		retError(w, emsg, http.StatusBadRequest)
 		return
 	}
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write([]byte("SUCCESS"))
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
@@ -858,7 +858,7 @@ func (s *Server) tornjakAgentsList(w http.ResponseWriter, r *http.Request) {
 		retError(w, emsg, http.StatusBadRequest)
 		return
 	}
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 	if err != nil {
@@ -899,7 +899,7 @@ func (s *Server) clusterList(w http.ResponseWriter, r *http.Request) {
 		retError(w, emsg, http.StatusBadRequest)
 		return
 	}
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	je := json.NewEncoder(w)
 	err = je.Encode(ret)
 	if err != nil {
@@ -935,7 +935,7 @@ func (s *Server) clusterCreate(w http.ResponseWriter, r *http.Request) {
 		retError(w, emsg, http.StatusBadRequest)
 		return
 	}
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write([]byte("SUCCESS"))
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
@@ -970,7 +970,7 @@ func (s *Server) clusterEdit(w http.ResponseWriter, r *http.Request) {
 		retError(w, emsg, http.StatusBadRequest)
 		return
 	}
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write([]byte("SUCCESS"))
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
@@ -1005,7 +1005,7 @@ func (s *Server) clusterDelete(w http.ResponseWriter, r *http.Request) {
 		retError(w, emsg, http.StatusBadRequest)
 		return
 	}
-	cors(w, r)
+	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write([]byte("SUCCESS"))
 	if err != nil {
 		emsg := fmt.Sprintf("Error: %v", err.Error())
