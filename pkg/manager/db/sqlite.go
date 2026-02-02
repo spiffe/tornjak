@@ -9,7 +9,6 @@ import (
 	"github.com/spiffe/tornjak/pkg/manager/types"
 )
 
-// TO DO: Add DELETE servers option from the data base
 const (
 	initServersTable = "CREATE TABLE IF NOT EXISTS servers (servername TEXT PRIMARY KEY, address TEXT, tls bool, mtls bool, ca varBinary, cert varBinary, key varBinary)"
 )
@@ -95,4 +94,27 @@ func (db *LocalSqliteDb) GetServer(name string) (types.ServerInfo, error) {
 	}
 
 	return sinfo, nil
+}
+
+func (db *LocalSqliteDb) DeleteServer(servername string) error {
+	statement, err := db.database.Prepare("DELETE FROM servers WHERE servername=?")
+	if err != nil {
+		return errors.Errorf("Unable to prepare SQL delete statement: %v", err)
+	}
+
+	result, err := statement.Exec(servername)
+	if err != nil {
+		return errors.Errorf("Unable to execute SQL delete statement: %v", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return errors.Errorf("Error checking affected rows: %v", err)
+	}
+
+	if rowsAffected == 0 {
+		return errors.Errorf("No server found with name: %s", servername)
+	}
+
+	return nil
 }
