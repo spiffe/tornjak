@@ -671,7 +671,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
           statusOK: "OK",
           successJsonMessege: res.data.results[0].status.message
-        })
+        }, () => window.scrollTo({ top: 0, behavior: 'smooth' }))
       )
       .catch(err => showResponseToast(err, {caption: "Could not create entry."}))
   }
@@ -701,7 +701,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
             message: "REQUEST:" + JSON.stringify(entries, null, ' ') + "\n\nRESPONSE:" + JSON.stringify(res.data, null, ' '),
             successNumEntries: { "success": sucessEntriesCount, "fail": entries.entries.length - sucessEntriesCount },
             statusOK: "Multiple",
-          })
+          }, () => window.scrollTo({ top: 0, behavior: 'smooth' }))
         }
       )
       .catch(err => showResponseToast(err, {caption: "Could not create entry from YAML."}))
@@ -751,7 +751,6 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
               timeout={0}
               title="Entry Creation Notification"
             />
-            {window.scrollTo({top: 0, behavior: 'smooth'})}
           </div>
         }
         <Accordion className="accordion-entry-form">
