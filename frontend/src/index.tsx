@@ -1,12 +1,16 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import KeycloakService from "./auth/KeycloakAuth";
 import {env} from './env';
 
-const renderApp = () => ReactDOM.render(<App />, document.getElementById('root'));
+const container = document.getElementById('root');
+if (!container) throw new Error('Root element not found');
+const root = createRoot(container);
+
+const renderApp = () => root.render(<App />);
 
 if (env.REACT_APP_AUTH_SERVER_URI) { // with Auth for testing purposes
   KeycloakService.initKeycloak(renderApp);
