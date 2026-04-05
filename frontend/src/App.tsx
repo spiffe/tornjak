@@ -19,49 +19,52 @@ import TornjakServerInfo from "./components/tornjak-server-info";
 import TornjakDashBoardStyled from "./components/dashboard/tornjak-dashboard";
 import DashboardDetailsRender from 'components/dashboard/dashboard-details-render';
 import RenderOnAdminRole from 'components/RenderOnAdminRole'
+import { GlobalErrorBoundaryWithHooks } from 'components/error-boundary'
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
     return (
         <div>
-            <Provider store={store}>
-                <Router>
-                    <div className="app-container">
-                        <div className="sidebar">
-                            <NavigationBar />
-                        </div>
+            <GlobalErrorBoundaryWithHooks>
+                <Provider store={store}>                     
+                    <Router>
+                        <div className="app-container">
+                            <div className="sidebar">
+                                <NavigationBar />
+                            </div>
 
-                        <div className="main-content">
-                            <div className="main">
-                                <SelectServer />
-                                <br />
-                                {IsManager && <br />}
-                                <Route path="/" exact component={AgentList} />
-                                <Route path="/clusters" exact component={ClusterList} />
-                                <Route path="/federations" exact component={FederationList} />
-                                <Route path="/trustbundle" exact component={TrustBundleCreate} />
-                                <Route path="/federation/create" exact component={FederationCreate} />
-                                <Route path="/agents" exact component={AgentList} />
-                                <Route path="/entries" exact component={EntryList} />
-                                <RenderOnAdminRole>
-                                    <Route path="/entry/create" exact component={EntryCreate} />
-                                    <Route path="/agent/createjointoken" exact component={CreateJoinToken} />
-                                    <Route path="/cluster/clustermanagement" exact component={ClusterManagement} />
-                                </RenderOnAdminRole>
-                                <Route path="/tornjak/serverinfo" exact component={TornjakServerInfo} />
-                                <Route path="/tornjak/dashboard" exact component={TornjakDashBoardStyled} />
-                                <Route
-                                    path="/tornjak/dashboard/details/:entity"
-                                    render={(props) => (<DashboardDetailsRender {...props} params={props.match.params} />)}
-                                />
-                                <Route path="/server/manage" exact component={ServerManagement} />
-                                <br /><br /><br />
+                            <div className="main-content">
+                                <div className="main">
+                                    <SelectServer />
+                                    <br />
+                                    {IsManager && <br />}
+                                    <Route path="/" exact component={AgentList} />
+                                    <Route path="/clusters" exact component={ClusterList} />
+                                    <Route path="/federations" exact component={FederationList} />
+                                    <Route path="/trustbundle" exact component={TrustBundleCreate} />
+                                    <Route path="/federation/create" exact component={FederationCreate} />
+                                    <Route path="/agents" exact component={AgentList} />
+                                    <Route path="/entries" exact component={EntryList} />
+                                    <RenderOnAdminRole>
+                                        <Route path="/entry/create" exact component={EntryCreate} />
+                                        <Route path="/agent/createjointoken" exact component={CreateJoinToken} />
+                                        <Route path="/cluster/clustermanagement" exact component={ClusterManagement} />
+                                    </RenderOnAdminRole>
+                                    <Route path="/tornjak/serverinfo" exact component={TornjakServerInfo} />
+                                    <Route path="/tornjak/dashboard" exact component={TornjakDashBoardStyled} />
+                                    <Route
+                                        path="/tornjak/dashboard/details/:entity"
+                                        render={(props) => (<DashboardDetailsRender {...props} params={props.match.params} />)}
+                                    />
+                                    <Route path="/server/manage" exact component={ServerManagement} />
+                                    <br /><br /><br />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </Router>
-            </Provider>
+                    </Router>
+                </Provider>
+            </GlobalErrorBoundaryWithHooks>
         </div>
     )
 }
