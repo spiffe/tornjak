@@ -77,4 +77,26 @@ func TestNewRBACAuthorizer(t *testing.T) {
     }
 
 }
+
+// Every route registered on the API router must be nameable in a policy,
+// otherwise NewRBACAuthorizer rejects the policy and the route can never
+// be granted to any role.
+func TestRBACPolicyAcceptsFederationRoutes(t *testing.T) {
+	roleList := map[string]string{"admin": "admin"}
+
+	routes := map[string][]string{
+		"/api/v1/spire/federations":                                     {"GET", "POST", "PATCH", "DELETE"},
+		"/api/v1/spire-controller-manager/clusterfederatedtrustdomains": {"GET", "POST"},
+	}
+
+	for path, methods := range routes {
+		for _, method := range methods {
+			mapping := map[string]map[string][]string{path: {method: {"admin"}}}
+			_, err := NewRBACAuthorizer("testPolicy", roleList, mapping)
+			if err != nil {
+				t.Errorf("ERROR: policy naming %s %s rejected: %s", method, path, err.Error())
+			}
+		}
+	}
+}
 // func TestAuthorizeRequest(t *testing.T) {
