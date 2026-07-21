@@ -27,6 +27,8 @@ var staticAPIV1List = map[string]map[string]struct{}{
 	"/api/v1/tornjak/serverinfo" :{"GET": {}},
 	"/api/v1/spire/bundle" :{"GET": {}},
 	"/api/v1/spire/federations/bundles" :{"GET": {}, "POST": {}, "DELETE": {}, "PATCH": {}},
+	"/api/v1/spire/federations" :{"GET": {}, "POST": {}, "DELETE": {}, "PATCH": {}},
+	"/api/v1/spire-controller-manager/clusterfederatedtrustdomains" :{"GET": {}, "POST": {}},
 }
 
 func validateInitParameters(roleList map[string]string, apiV1Mapping map[string]map[string][]string) error {
