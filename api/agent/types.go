@@ -115,6 +115,7 @@ type pluginControllerManager struct {
 type pluginAuthenticatorKeycloak struct {
 	IssuerURL string `hcl:"issuer"`
 	Audience  string `hcl:"audience"`
+	RoleClaim string `hcl:"roleclaim"`
 }
 
 type AuthRole struct {
