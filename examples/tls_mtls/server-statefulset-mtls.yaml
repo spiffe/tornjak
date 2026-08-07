@@ -20,7 +20,7 @@ spec:
       serviceAccountName: spire-server
       containers:
         - name: spire-server
-          image: ghcr.io/spiffe/spire-server:1.4.4
+          image: ghcr.io/spiffe/spire-server:1.10.4
           args:
             - -config
             - /run/spire/config/server.conf
@@ -50,7 +50,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
         - name: tornjak-backend
-          image: docker.io/maiariyer/tornjak-backend:v1.3.0
+          image: ghcr.io/spiffe/tornjak-backend:v2.0.0
           args:
             - --spire-config
             - /run/spire/config/server.conf
