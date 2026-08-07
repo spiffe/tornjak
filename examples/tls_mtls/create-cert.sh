@@ -16,5 +16,5 @@ openssl req -in ${CERTNAME}.csr -noout -text
 
 openssl x509 -req -extensions SAN \
     -extfile <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=DNS:${DOMAIN},DNS:example.com,DNS:www.example.com")) \
-    -in ${CERTNAME}.csr -CA ${CA_DIR}/rootCA.crt -CAkey ${CA_DIR}/rootCA.key -CAcreateserial -out ${CERTNAME}.crt -days 500 -sha256
+    -in ${CERTNAME}.csr -CA ${CA_DIR}/rootCA.crt -CAkey ${CA_DIR}/rootCA.key -CAcreateserial -out ${CERTNAME}.crt -days 3650 -sha256
 openssl x509 -in ${CERTNAME}.crt -text -noout
