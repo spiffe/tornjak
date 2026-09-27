@@ -141,7 +141,7 @@ func NewAuthenticator(authenticatorPlugin *ast.ObjectItem) (authenticator.Authen
 		}
 
 		// create authenticator TODO make json an option?
-		authenticator, err := authenticator.NewKeycloakAuthenticator(true, config.IssuerURL, config.Audience)
+		authenticator, err := authenticator.NewKeycloakAuthenticator(true, config.IssuerURL, config.Audience, config.RoleClaim)
 		if err != nil {
 			return nil, errors.Errorf("Couldn't configure Authenticator: %v", err)
 		}

@@ -16,19 +16,15 @@ import (
 	"github.com/spiffe/tornjak/pkg/agent/authentication/user"
 )
 
-type RealmAccessSubclaim struct {
-	Roles []string `json:"roles"`
-}
-
-type KeycloakClaim struct {
-	RealmAccess RealmAccessSubclaim `json:"realm_access"`
-	jwt.RegisteredClaims
-}
+// defaultRoleClaim is the claim path used when no roleclaim is configured,
+// preserving the pre-existing hardcoded behavior.
+const defaultRoleClaim = "realm_access.roles"
 
 type KeycloakAuthenticator struct {
-	jwks     *keyfunc.JWKS
-	jwksURL  string
-	audience string
+	jwks      *keyfunc.JWKS
+	jwksURL   string
+	audience  string
+	roleClaim string
 }
 
 func getJWKeyFunc(httpjwks bool, jwksInfo string) (*keyfunc.JWKS, error) {
@@ -59,7 +55,7 @@ func getJWKeyFunc(httpjwks bool, jwksInfo string) (*keyfunc.JWKS, error) {
 // newKeycloakAuthenticator (https bool, jwks string, redirect string)
 //
 //	get keyfunc based on https
-func NewKeycloakAuthenticator(httpjwks bool, issuerURL string, audience string) (*KeycloakAuthenticator, error) {
+func NewKeycloakAuthenticator(httpjwks bool, issuerURL string, audience string, roleClaim string) (*KeycloakAuthenticator, error) {
 	// perform OIDC discovery
 	oidcClient, err := discovery.NewClient(context.Background(), issuerURL)
 	if err != nil {
@@ -73,11 +69,57 @@ func NewKeycloakAuthenticator(httpjwks bool, issuerURL string, audience string) 
 	if err != nil {
 		return nil, err
 	}
+
 	return &KeycloakAuthenticator{
-		jwks:     jwks,
-		audience: audience,
-		jwksURL:  jwksURL,
+		jwks:      jwks,
+		audience:  audience,
+		jwksURL:   jwksURL,
+		roleClaim: resolveRoleClaim(roleClaim),
 	}, nil
+}
+
+// resolveRoleClaim falls back to defaultRoleClaim when no roleclaim is
+// configured, so existing deployments keep working unmodified.
+func resolveRoleClaim(configured string) string {
+	if configured == "" {
+		return defaultRoleClaim
+	}
+	return configured
+}
+
+// extractRoles walks a dot-separated claim path (e.g. "realm_access.roles" or
+// "resource_access.tornjak-backend.roles") through a parsed JWT claim set and
+// returns the role list found there. Returns nil if the path doesn't resolve
+// to a list of strings (missing claim, wrong shape, etc.).
+func extractRoles(claims jwt.MapClaims, path string) []string {
+	fields := strings.Split(path, ".")
+	current := map[string]interface{}(claims)
+
+	for i, field := range fields {
+		value, ok := current[field]
+		if !ok {
+			return nil
+		}
+		if i == len(fields)-1 {
+			list, ok := value.([]interface{})
+			if !ok {
+				return nil
+			}
+			roles := make([]string, 0, len(list))
+			for _, item := range list {
+				if str, ok := item.(string); ok {
+					roles = append(roles, str)
+				}
+			}
+			return roles
+		}
+		next, ok := value.(map[string]interface{})
+		if !ok {
+			return nil
+		}
+		current = next
+	}
+	return nil
 }
 
 func getToken(r *http.Request, redirectURL string) (string, error) {
@@ -110,9 +152,8 @@ func (a *KeycloakAuthenticator) AuthenticateRequest(r *http.Request) *user.UserI
 	}
 
 	// parse token
-	claims := &KeycloakClaim{}
 	parserOptions := jwt.WithAudience(a.audience)
-	jwt_token, err := jwt.ParseWithClaims(token, claims, a.jwks.Keyfunc, parserOptions)
+	jwt_token, err := jwt.Parse(token, a.jwks.Keyfunc, parserOptions)
 	if err != nil {
 		return wrapAuthenticationError(errors.Errorf("Error parsing token :%s", err.Error()))
 	}
@@ -122,7 +163,12 @@ func (a *KeycloakAuthenticator) AuthenticateRequest(r *http.Request) *user.UserI
 		return wrapAuthenticationError(errors.New("Token invalid"))
 	}
 
+	claims, ok := jwt_token.Claims.(jwt.MapClaims)
+	if !ok {
+		return wrapAuthenticationError(errors.New("Could not parse token claims"))
+	}
+
 	return &user.UserInfo{
-		Roles: claims.RealmAccess.Roles,
+		Roles: extractRoles(claims, a.roleClaim),
 	}
 }
