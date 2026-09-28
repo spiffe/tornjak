@@ -346,19 +346,20 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
   }
 
   async serverDelete(inputData: { server: { name: string; }; }, serversListUpdateFunc: { (globalServersList: ServersList[]): void }, globalServersList: any[]) {
-    const response = await axios.post(GetApiServerUri("/manager-api/server/delete/"), inputData,
-      {
+    const serverName = inputData.server.name;
+    try {
+      const response = await axios.post(GetApiServerUri("/manager-api/server/delete/"), inputData, {
         crossdomain: true,
-      })
-      .then(function (response) {
-        serversListUpdateFunc(globalServersList.filter(el =>
-          el.name !== inputData))
-        return response.data;
-      })
-      .catch(function (error) {
-        return error.message;
-      })
-    return response.data;
+      });
+      serversListUpdateFunc(globalServersList.filter((el) => el.name !== serverName));
+      return response.data;
+    } catch (error: any) {
+      const body = error.response?.data;
+      if (typeof body === "string" && body.length > 0) {
+        return body;
+      }
+      return error.message;
+    }
   }
 
 

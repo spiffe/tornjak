@@ -44,6 +44,7 @@ type ServersListTableState = {
 }
 class ServersListTable extends React.Component<ServersListTableProp, ServersListTableState> {
     TornjakApi: TornjakApi;
+    private deleteInProgress = false;
     constructor(props: ServersListTableProp) {
         super(props);
         this.TornjakApi = new TornjakApi(props);
@@ -88,22 +89,32 @@ class ServersListTable extends React.Component<ServersListTableProp, ServersList
     }
 
     deleteServer(selectedRows: readonly DenormalizedRow[]) {
-        if (!selectedRows || selectedRows.length === 0) return "";
-        if (!IsManager) return "";
-        let server: { name: string }[] = [], successMessage
+        void this.runDeleteServer(selectedRows);
+    }
 
-        for (let i = 0; i < selectedRows.length; i++) {
-            server[i] = { name: selectedRows[i].cells[1].value };
-            successMessage = this.TornjakApi.serverDelete({ server: server[i] }, this.props.serversListUpdateFunc, this.props.globalServersList);
-            successMessage.then(function (result) {
+    private async runDeleteServer(selectedRows: readonly DenormalizedRow[]) {
+        if (!selectedRows || selectedRows.length === 0) return;
+        if (!IsManager) return;
+        if (this.deleteInProgress) return;
+
+        this.deleteInProgress = true;
+        try {
+            for (let i = 0; i < selectedRows.length; i++) {
+                const server = { name: selectedRows[i].cells[1].value };
+                const result = await this.TornjakApi.serverDelete(
+                    { server },
+                    this.props.serversListUpdateFunc,
+                    this.props.globalServersList,
+                );
                 if (result === "SUCCESS") {
-                    window.alert(`SERVER "${server[i].name}" DELETED SUCCESSFULLY!`);
+                    window.alert(`SERVER "${server.name}" DELETED SUCCESSFULLY!`);
                     window.location.reload();
                 } else {
-                    window.alert(`Error deleting server "${server[i].name}": ` + result);
+                    window.alert(`Error deleting server "${server.name}": ` + result);
                 }
-                return;
-            })
+            }
+        } finally {
+            this.deleteInProgress = false;
         }
     }
 
