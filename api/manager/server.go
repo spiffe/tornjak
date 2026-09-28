@@ -162,9 +162,9 @@ func (s *Server) HandleRequests() {
 	rtr := mux.NewRouter()
 
 	// Manger-specific
-	rtr.HandleFunc("/manager-api/server/list", corsHandler(s.serverList))
-	rtr.HandleFunc("/manager-api/server/register", corsHandler(s.serverRegister))
-	rtr.HandleFunc("/manager-api/server/delete/", corsHandler(s.serverDelete))
+	rtr.HandleFunc("/manager-api/server/list", s.serverList)
+	rtr.HandleFunc("/manager-api/server/register", s.serverRegister)
+	rtr.HandleFunc("/manager-api/server/delete/", s.serverDelete)
 
 	// SPIRE server info calls
 	rtr.HandleFunc("/manager-api/healthcheck/{server:.*}", s.apiServerProxyFunc("/api/v1/spire/healthcheck", http.MethodGet))
@@ -359,7 +359,7 @@ func (s *Server) serverDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cors(w, r)
+	w.Header().Set("Content-Type", "text/html; charset=ascii")
 	_, err = w.Write([]byte("SUCCESS"))
 
 	if err != nil {
