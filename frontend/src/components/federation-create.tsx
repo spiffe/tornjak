@@ -124,12 +124,12 @@ class FederationCreate extends Component<FederationCreateProps, FederationCreate
             newFederationsIds: newFederationsIds,
           });
         } catch (err) {
-          this.setState({ message: "Invalid JSON format.", statusOK: "ERROR" });
+          this.setState({ message: "Invalid JSON format.", statusOK: "ERROR" }, () => window.scrollTo({ top: 0, behavior: 'smooth' }));
         }
       }
     };
     reader.onerror = () => {
-      this.setState({ message: "Error reading the selected file.", statusOK: "ERROR" });
+      this.setState({ message: "Error reading the selected file.", statusOK: "ERROR" }, () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     };
     reader.readAsText(file);
   }
@@ -138,7 +138,7 @@ class FederationCreate extends Component<FederationCreateProps, FederationCreate
     const { uploadedFederation } = this.state;
 
     if (!uploadedFederation || (Array.isArray(uploadedFederation) && uploadedFederation.length === 0)) {
-      this.setState({ message: "No federation JSON loaded.", statusOK: "ERROR" });
+      this.setState({ message: "No federation JSON loaded.", statusOK: "ERROR" }, () => window.scrollTo({ top: 0, behavior: 'smooth' }));
       return;
     }
 
@@ -162,7 +162,7 @@ class FederationCreate extends Component<FederationCreateProps, FederationCreate
           statusOK: responseMessage === "OK" ? "OK" : "ERROR",
           successJsonMessage: responseMessage,
           message: JSON.stringify(res.data, null, ' '),
-        });
+        }, () => window.scrollTo({ top: 0, behavior: 'smooth' }));
       })
       .catch((err) => {
         const errorMessage = err.response?.data?.results?.[0]?.status?.message || "Failed to create federation.";
@@ -171,7 +171,7 @@ class FederationCreate extends Component<FederationCreateProps, FederationCreate
           statusOK: "ERROR",
           successJsonMessage: errorMessage,
           message: JSON.stringify(err.response?.data || err.message, null, ' '),
-        });
+        }, () => window.scrollTo({ top: 0, behavior: 'smooth' }));
       });
   }
 
@@ -284,7 +284,6 @@ class FederationCreate extends Component<FederationCreateProps, FederationCreate
               timeout={0}
               title="Federation Creation Notification"
             />
-            {window.scrollTo({ top: 0, behavior: 'smooth' })}
           </div>
         )}
 

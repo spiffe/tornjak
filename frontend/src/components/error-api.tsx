@@ -1,4 +1,4 @@
-import { toast, ToastContent, ToastOptions } from "react-toastify"
+import { toast, ToastOptions } from "react-toastify"
 import { ToastNotification, ToastNotificationProps } from "carbon-components-react"
 
 interface NotificationProps extends Omit<ToastNotificationProps, "title"> {
@@ -6,7 +6,7 @@ interface NotificationProps extends Omit<ToastNotificationProps, "title"> {
 }
 
 const defualtProps: ToastNotificationProps = {title: "Notification", kind: "error"}
-const defaultOptions: ToastContent = {autoClose: false, closeButton: false, role: "alert"}
+const defaultOptions: ToastOptions = {autoClose: false, closeButton: false, role: "alert"}
 
 export const showToast = (props?: NotificationProps, options?: ToastOptions): void => {
     const newProps = {...defualtProps, ...props}

@@ -19,10 +19,10 @@ jobs:
           EOF
 
       - name: Check out repository code
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6.0.2
       
       - name: Log in to GHCR.io
-        uses: docker/login-action@v3.4.0
+        uses: docker/login-action@v3.7.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -60,9 +60,9 @@ jobs:
           EOF
 
       - name: Check out repository code
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6.0.2
       - name: Log in to GHCR.io
-        uses: docker/login-action@v3.4.0
+        uses: docker/login-action@v3.7.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}

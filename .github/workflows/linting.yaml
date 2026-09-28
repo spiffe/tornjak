@@ -7,9 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout markdown
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6.0.2
       - name: Lint markdown
-        uses: DavidAnson/markdownlint-cli2-action@v20
+        uses: DavidAnson/markdownlint-cli2-action@v22
         continue-on-error: true
         with:
           config: '.markdownlint.yml'

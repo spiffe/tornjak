@@ -671,7 +671,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
           message: "Request:" + JSON.stringify(cjtData, null, ' ') + "\n\nSuccess:" + JSON.stringify(res.data, null, ' '),
           statusOK: "OK",
           successJsonMessege: res.data.results[0].status.message
-        })
+        }, () => window.scrollTo({ top: 0, behavior: 'smooth' }))
       )
       .catch(err => showResponseToast(err, {caption: "Could not create entry."}))
   }
@@ -701,7 +701,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
             message: "REQUEST:" + JSON.stringify(entries, null, ' ') + "\n\nRESPONSE:" + JSON.stringify(res.data, null, ' '),
             successNumEntries: { "success": sucessEntriesCount, "fail": entries.entries.length - sucessEntriesCount },
             statusOK: "Multiple",
-          })
+          }, () => window.scrollTo({ top: 0, behavior: 'smooth' }))
         }
       )
       .catch(err => showResponseToast(err, {caption: "Could not create entry from YAML."}))
@@ -751,7 +751,6 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
               timeout={0}
               title="Entry Creation Notification"
             />
-            {window.scrollTo({top: 0, behavior: 'smooth'})}
           </div>
         }
         <Accordion className="accordion-entry-form">
@@ -850,7 +849,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                     aria-required="true"
                     //required
                     titleText="Selectors Recommendation [*required]"
-                    helperText="e.g. k8s_sat:cluster,..."
+                    helperText="e.g. k8s_psat:cluster,..."
                     placeholder={this.state.selectorsListDisplay}
                     //ariaLabel="selectors-multiselect"
                     id="selectors-multiselect"
@@ -862,7 +861,7 @@ class CreateEntry extends Component<CreateEntryProp, CreateEntryState> {
                 <div className="selectors-textArea" data-test="selectors-textArea">
                   <TextArea
                     cols={50}
-                    helperText="e.g. k8s_sat:cluster:demo-cluster,..."
+                    helperText="e.g. k8s_psat:cluster:demo-cluster,..."
                     id="selectors-textArea"
                     invalidText="A valid value is required"
                     labelText="Selectors"

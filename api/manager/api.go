@@ -36,3 +36,7 @@ func (s *Server) RegisterServer(inp RegisterServerRequest) error {
 
 	return s.db.CreateServerEntry(sinfo)
 }
+
+type DeleteServerRequest struct {
+	Server managertypes.ServerInfo `json:"server"`
+}
