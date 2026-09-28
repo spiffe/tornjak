@@ -43,17 +43,6 @@ const selectors =
       "label": "gcp_iit:metadata"
     }
   ],
-  "k8s_sat": [
-    {
-      "label": "k8s_sat:cluster"
-    },
-    {
-      "label": "k8s_sat:agent_ns"
-    },
-    {
-      "label": "k8s_sat:agent_sa"
-    }
-  ],
   "k8s_psat": [
     {
       "label": "k8s_psat:cluster"
