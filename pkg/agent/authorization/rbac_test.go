@@ -98,5 +98,16 @@ func TestRBACPolicyAcceptsFederationRoutes(t *testing.T) {
 			}
 		}
 	}
+
+	// clusterfederatedtrustdomains has no PATCH or DELETE handler, so naming one
+	// should still be rejected.
+	for _, method := range []string{"PATCH", "DELETE"} {
+		mapping := map[string]map[string][]string{
+			"/api/v1/spire-controller-manager/clusterfederatedtrustdomains": {method: {"admin"}},
+		}
+		if _, err := NewRBACAuthorizer("testPolicy", roleList, mapping); err == nil {
+			t.Errorf("ERROR: policy naming %s clusterfederatedtrustdomains was accepted", method)
+		}
+	}
 }
 // func TestAuthorizeRequest(t *testing.T) {
