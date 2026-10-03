@@ -6,6 +6,9 @@ import reportWebVitals from './reportWebVitals';
 import KeycloakService from "./auth/KeycloakAuth";
 import {env} from './env';
 
+if (env.REACT_APP_TITLE) document.title = env.REACT_APP_TITLE;
+if (env.REACT_APP_FAVICON) document.querySelector("link[rel='icon']")?.setAttribute("href", env.REACT_APP_FAVICON);
+
 const container = document.getElementById('root');
 if (!container) throw new Error('Root element not found');
 const root = createRoot(container);
