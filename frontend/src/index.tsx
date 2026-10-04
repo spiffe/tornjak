@@ -6,14 +6,23 @@ import reportWebVitals from './reportWebVitals';
 import KeycloakService from "./auth/KeycloakAuth";
 import {env} from './env';
 
-if (env.REACT_APP_TITLE) document.title = env.REACT_APP_TITLE;
-if (env.REACT_APP_FAVICON) document.querySelector("link[rel='icon']")?.setAttribute("href", env.REACT_APP_FAVICON);
-
 const container = document.getElementById('root');
 if (!container) throw new Error('Root element not found');
 const root = createRoot(container);
 
 const renderApp = () => root.render(<App />);
+
+const applyBranding = () => {
+  if (env.REACT_APP_TITLE) document.title = env.REACT_APP_TITLE;
+  if (env.REACT_APP_FAVICON) {
+    const url = new URL(env.REACT_APP_FAVICON, window.location.origin);
+    if (url.protocol === 'http:' || url.protocol === 'https:') {
+      document.querySelector("link[rel='icon']")?.setAttribute('href', url.href);
+    }
+  }
+};
+
+applyBranding();
 
 if (env.REACT_APP_AUTH_SERVER_URI) { // with Auth for testing purposes
   KeycloakService.initKeycloak(renderApp);

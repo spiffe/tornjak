@@ -65,7 +65,7 @@ The container requires certain environment variables be set. Below is a comprehe
 | `PORT_BE` | Port for the backend to run | `10000` | `10000` | true |
 | `REACT_APP_SPIRE_HEALTH_CHECK_ENABLE` | Enable SPIRE health check component | `false` | `true` | false |
 | `REACT_APP_TITLE` | Browser tab title | `Tornjak` | `My Tornjak` | false |
-| `REACT_APP_FAVICON` | URL of the browser tab icon | `favicon.ico` | `https://example.com/icon.png` | false |
+| `REACT_APP_FAVICON` | URL of the browser tab icon |  | `https://example.com/icon.png` | false |
 
 ```
 docker run -p 3000:8080 -e REACT_APP_API_SERVER_URI='http://localhost:50000' -e REACT_APP_TORNJAK_MANAGER=true -e PORT_FE=8080 -e REACT_APP_SPIRE_HEALTH_CHECK=true ghcr.io/spiffe/tornjak-frontend:latest
