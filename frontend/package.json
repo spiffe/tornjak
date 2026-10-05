@@ -97,7 +97,7 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "^27.2.2",
     "jest-transform-stub": "^2.0.0",
-    "markdownlint-cli2": "^0.23.2",
+    "markdownlint-cli2": "^0.23.3",
     "moxios": "^0.4.0",
     "nodemon": "^3.1.10",
     "puppeteer": "^25.10.0",
