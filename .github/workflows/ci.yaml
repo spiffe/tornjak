@@ -50,14 +50,24 @@ jobs:
       # Verifies frontend/package-lock.json is in sync with package.json.
       # The frontend image build uses `npm install`, which silently rewrites a
       # desynced lockfile instead of failing; `npm ci` errors out instead.
+      # Kept as its own step so lockfile drift fails distinctly from a test
+      # failure, even though make test-frontend also runs npm ci.
       - name: Verify frontend lockfile and install
         run: npm ci --prefix frontend
+
+      - name: Frontend unit tests
+        run: make test-frontend
 
       - name: Build binaries
         run: make binaries
 
       - name: Build images
         run: make images
+
+      # `make images` only proves the image builds. This starts the frontend
+      # container and checks it actually serves the app and its injected env.js.
+      - name: Frontend image smoke test
+        run: make smoke-test-frontend
 
       - name: Print job result
         run: |
