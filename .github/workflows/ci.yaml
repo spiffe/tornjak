@@ -44,6 +44,15 @@ jobs:
           version: v2.1.6
           args: --timeout 7m
 
+      - name: Go unit tests
+        run: make test-go
+
+      # Verifies frontend/package-lock.json is in sync with package.json.
+      # The frontend image build uses `npm install`, which silently rewrites a
+      # desynced lockfile instead of failing; `npm ci` errors out instead.
+      - name: Verify frontend lockfile and install
+        run: npm ci --prefix frontend
+
       - name: Build binaries
         run: make binaries
 
