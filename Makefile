@@ -49,6 +49,21 @@ golang-lint: vendor ## lint test golang files
 PHONY: lint
 lint: markdown-lint golang-lint## lint markdown and golang files
 
+##@ Test:
+
+## go test needs cgo: pkg/*/db use mattn/go-sqlite3
+PHONY: test
+test: test-go ## Run all tests
+
+PHONY: test-go
+test-go: ## Run go unit tests with the race detector
+	CGO_ENABLED=1 go test -race -coverprofile=coverage.out -covermode=atomic ./...
+
+PHONY: test-frontend
+test-frontend: ## Run frontend unit tests
+	npm ci --prefix frontend
+	CI=true npm test --prefix frontend -- --watchAll=false
+
 ##@ Dependencies:
 
 PHONY: download
