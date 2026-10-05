@@ -53,7 +53,7 @@ lint: markdown-lint golang-lint## lint markdown and golang files
 
 ## go test needs cgo: pkg/*/db use mattn/go-sqlite3
 PHONY: test
-test: test-go ## Run all tests
+test: test-go test-frontend ## Run all unit tests
 
 PHONY: test-go
 test-go: ## Run go unit tests with the race detector
@@ -63,6 +63,10 @@ PHONY: test-frontend
 test-frontend: ## Run frontend unit tests
 	npm ci --prefix frontend
 	CI=true npm test --prefix frontend -- --watchAll=false
+
+PHONY: smoke-test-frontend
+smoke-test-frontend: ## Start the built frontend image and check that it serves
+	./scripts/smoke-test-frontend.sh $(CONTAINER_FRONTEND_TAG):$(IMAGE_TAG_PREFIX)$(VERSION)
 
 ##@ Dependencies:
 

@@ -332,9 +332,9 @@ class ClusterCreate extends Component<ClusterCreateProp, ClusterCreateState> {
               </div>
               <div className="cluster-managed-by-input-field">
                 <TextInput
-                  data-test="cluster-domain-name-input-text-field"
+                  data-test="cluster-managed-by-input-text-field"
                   helperText="i.e. person-A"
-                  id="clusterNameInputField"
+                  id="clusterManagedByInputField"
                   invalidText="A valid value is required - refer to helper text below"
                   labelText="Cluster Managed By"
                   placeholder="Enter CLUSTER MANAGED BY"

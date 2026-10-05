@@ -1,110 +1,72 @@
-import { ClusterList } from "../../components/cluster-list"
-import { checkProps } from "../../Utils/index"
-import { shallow, configure } from "enzyme"
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17"
-import * as IsManager from "../../components/is_manager"
+import { render, screen } from "@testing-library/react"
+import { Provider } from "react-redux"
+import { ClusterList } from "../cluster-list"
+import { testReduxStore } from "../../Utils/index"
 
-configure({ adapter: new Adapter() })
-
-const props = {
-  clustersListUpdateFunc: jest.fn(), 
-  tornjakMessageFunc: jest.fn(), 
-  serverInfoUpdateFunc: jest.fn(), 
-  globalServerSelected: "Test String",
-  globalErrorMessage: "Test String", 
-  globalTornjakServerInfo: {}, 
-  globalClustersList: []
+// ClusterList renders a redux-connected table, so it needs a real store.
+const renderList = (overrides = {}) => {
+  const props = {
+    clustersListUpdateFunc: jest.fn(),
+    tornjakMessageFunc: jest.fn(),
+    serverInfoUpdateFunc: jest.fn(),
+    globalServerSelected: "Test String",
+    globalErrorMessage: "OK",
+    globalTornjakServerInfo: {},
+    globalClustersList: [],
+    ...overrides,
+  }
+  return render(
+    <Provider store={testReduxStore({})}>
+      <ClusterList {...props} />
+    </Provider>
+  )
 }
 
-const clusterParams = {
-  name: "Name", 
-  editedName: "Edited", 
-  creationTime: "Creation", 
-  domainName: "Domain", 
-  managedBy: "Managed", 
-  platformType: "Platform", 
-  agentsList: []
-}
+const cluster = (name) => ({
+  name,
+  creationTime: "Creation",
+  domainName: `${name}.example.org`,
+  managedBy: "person-A",
+  platformType: "Kubernetes",
+  agentsList: [],
+})
 
-describe("Cluster List Component", () => {
+describe("ClusterList", () => {
+  it("renders the heading and table", () => {
+    renderList()
 
-  describe("Checking PropTypes", () => {
-    // Props are allowed to be undefined/missing.
-    test("Should NOT throw Warning/ Error", () => {
-      const propsErr = checkProps(ClusterList, props)
-      expect(propsErr).toBeUndefined();
-    })
+    expect(screen.getByRole("heading", { name: "Clusters List" })).toBeInTheDocument()
+    expect(screen.getByTestId("cluster-list")).toBeInTheDocument()
   })
 
-  describe("Should Render Properly", () => {
-    // Creates a rendered copy of a ClusterList.
-    const wrapper = shallow(<ClusterList {...props} />)
-    
-    it("Should Render", () => {
-      // Generates html as a point of comparison.
-      expect(wrapper).toMatchSnapshot()
-    })
+  it("shows an error banner when the error message is not OK", () => {
+    renderList({ globalErrorMessage: "something broke" })
 
-    it("Cluster Validation/Adding", () => {
-      // Manually adds cluster
-      const list = wrapper.instance().props.globalClustersList
-      list.push(clusterParams)
+    const alert = screen.getByRole("alert")
+    expect(alert).toHaveTextContent("something broke")
+  })
 
-      // Checks whether the cluster was added.
-      const clusters = wrapper.instance().clusterList()
-      expect(clusters.length).toBe(1)
+  it("hides the error banner when the error message is OK", () => {
+    renderList({ globalErrorMessage: "OK" })
 
-      // Validates the cluster metadata
-      expect(clusters[0].props.cluster).toEqual(clusterParams)
-      expect(clusters[0].key).toBe(clusterParams.name)
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument()
+  })
 
-      console.log(wrapper.find("#table-1"))
-    })
+  it("renders a row per cluster with its metadata", () => {
+    renderList({ globalClustersList: [cluster("alpha"), cluster("beta")] })
 
-    it("Undefined Cluster List", () => {
-      // Renders with different props to ensure the project works with multiple parameters.
-      const newProps = {...props}
-      newProps.globalClustersList = undefined
-      shallow(<ClusterList {...newProps} />)
-    })
+    for (const name of ["alpha", "beta"]) {
+      expect(screen.getByText(name)).toBeInTheDocument()
+      expect(screen.getByText(`${name}.example.org`)).toBeInTheDocument()
+    }
+    expect(screen.getAllByText("Kubernetes")).toHaveLength(2)
+  })
 
-    describe("Methods", () => {
+  // globalClustersList is typed as required but arrives undefined on first
+  // render in manager mode, so the component has to tolerate it.
+  it("renders without crashing when the cluster list is undefined", () => {
+    renderList({ globalClustersList: undefined })
 
-      describe("Mounts", () => {
-        
-        test("With Manager", () => {
-          // Renders with user management enabled.
-          IsManager.default = true
-          shallow(<ClusterList {...props} />)
-        })
-  
-        test("Without Manager", () => {
-          IsManager.default = false
-          const newProps = {...props}
-          newProps.globalTornjakServerInfo = {info: "Info"}
-          shallow(<ClusterList {...newProps} />)
-        })
-      })
-
-      describe("Updates", () => {
-
-        test("With Manager", () => {
-          IsManager.default = true
-          const prevProps = {...props}
-          prevProps.globalServerSelected = "Different Test String"
-          const newWrapper = shallow(<ClusterList {...props} />)
-          // Testing the update method with different parameters.
-          newWrapper.instance().componentDidUpdate(prevProps)
-        })
-
-        test("Without Manager", () => {
-          IsManager.default = false
-          const prevProps = {...props}
-          prevProps.globalTornjakServerInfo = {info: "Info"}
-          const newWrapper = shallow(<ClusterList {...props} />)
-          newWrapper.instance().componentDidUpdate(prevProps)
-        })
-      })
-    })
+    expect(screen.getByRole("heading", { name: "Clusters List" })).toBeInTheDocument()
   })
 })
