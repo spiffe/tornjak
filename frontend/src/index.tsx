@@ -12,6 +12,23 @@ const root = createRoot(container);
 
 const renderApp = () => root.render(<App />);
 
+const applyBranding = () => {
+  if (env.REACT_APP_TITLE) document.title = env.REACT_APP_TITLE;
+  if (env.REACT_APP_FAVICON) {
+    try {
+      const url = new URL(env.REACT_APP_FAVICON, window.location.origin);
+      if (url.protocol === 'http:' || url.protocol === 'https:') {
+        document.querySelector("link[rel='icon']")?.setAttribute('href', url.href);
+      }
+    } catch {
+      // Malformed value: keep the default favicon rather than halting boot.
+      console.warn(`Ignoring invalid REACT_APP_FAVICON: ${env.REACT_APP_FAVICON}`);
+    }
+  }
+};
+
+applyBranding();
+
 if (env.REACT_APP_AUTH_SERVER_URI) { // with Auth for testing purposes
   KeycloakService.initKeycloak(renderApp);
 } else {
