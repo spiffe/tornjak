@@ -9,12 +9,20 @@ import (
 	"time"
 
 	keyfunc "github.com/MicahParks/keyfunc/v2"
+	backoff "github.com/cenkalti/backoff/v4"
 	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/pardot/oidc/discovery"
 	"github.com/pkg/errors"
 
 	"github.com/spiffe/tornjak/pkg/agent/authentication/user"
 )
+
+// oidcDiscoveryMaxElapsedTime bounds how long NewKeycloakAuthenticator will
+// keep retrying OIDC discovery before giving up. Long enough to ride out a
+// Keycloak container that's still starting (a common race in docker-compose
+// and Kubernetes, where startup order isn't guaranteed), short enough that a
+// genuinely misconfigured issuer still fails fast.
+const oidcDiscoveryMaxElapsedTime = 30 * time.Second
 
 type RealmAccessSubclaim struct {
 	Roles []string `json:"roles"`
@@ -60,8 +68,23 @@ func getJWKeyFunc(httpjwks bool, jwksInfo string) (*keyfunc.JWKS, error) {
 //
 //	get keyfunc based on https
 func NewKeycloakAuthenticator(httpjwks bool, issuerURL string, audience string) (*KeycloakAuthenticator, error) {
-	// perform OIDC discovery
-	oidcClient, err := discovery.NewClient(context.Background(), issuerURL)
+	expBackoff := backoff.NewExponentialBackOff()
+	expBackoff.MaxElapsedTime = oidcDiscoveryMaxElapsedTime
+	return newKeycloakAuthenticator(httpjwks, issuerURL, audience, expBackoff)
+}
+
+// newKeycloakAuthenticator takes an explicit backoff.BackOff so tests can
+// exercise the retry behavior without waiting out the real
+// oidcDiscoveryMaxElapsedTime window.
+func newKeycloakAuthenticator(httpjwks bool, issuerURL string, audience string, oidcBackoff backoff.BackOff) (*KeycloakAuthenticator, error) {
+	// perform OIDC discovery, retrying with backoff since the IAM server may
+	// still be starting up
+	var oidcClient *discovery.Client
+	err := backoff.Retry(func() error {
+		var discoverErr error
+		oidcClient, discoverErr = discovery.NewClient(context.Background(), issuerURL)
+		return discoverErr
+	}, oidcBackoff)
 	if err != nil {
 		return nil, errors.Errorf("Could not set up OIDC Discovery client with issuer = '%s': %v", issuerURL, err)
 	}
