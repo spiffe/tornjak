@@ -9,7 +9,7 @@ jobs:
       - name: Checkout markdown
         uses: actions/checkout@v7.0.1
       - name: Lint markdown
-        uses: DavidAnson/markdownlint-cli2-action@v22
+        uses: DavidAnson/markdownlint-cli2-action@v24
         with:
           config: '.markdownlint.yml'
           globs: |
