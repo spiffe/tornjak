@@ -75,7 +75,7 @@ class SelectServer extends Component<SelectServerProp, SelectServerState> {
             if ((this.props.globalServerSelected !== "") && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
                 this.TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
             }
-            if ((this.props.globalDebugServerInfo && Object.keys(this.props.globalDebugServerInfo).length) && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
+            if ((this.props.globalServerSelected !== "") && (this.props.globalDebugServerInfo && Object.keys(this.props.globalDebugServerInfo).length) && (this.props.globalErrorMessage === "OK" || this.props.globalErrorMessage === "")) {
                 this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
                 this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc)
             }
@@ -84,7 +84,7 @@ class SelectServer extends Component<SelectServerProp, SelectServerState> {
 
     componentDidUpdate(prevProps: SelectServerProp) {
         if (IsManager) {
-            if (prevProps.globalServerSelected !== this.props.globalServerSelected) {
+            if (prevProps.globalServerSelected !== this.props.globalServerSelected && this.props.globalServerSelected !== "") {
                 this.TornjakApi.populateTornjakServerInfo(this.props.globalServerSelected, this.props.tornjakServerInfoUpdateFunc, this.props.tornjakMessageFunc);
                 this.TornjakApi.populateServerInfo(this.props.globalTornjakServerInfo, this.props.serverInfoUpdateFunc);
                 this.TornjakApi.populateAgentsUpdate(this.props.globalServerSelected, this.props.agentsListUpdateFunc, this.props.tornjakMessageFunc);
