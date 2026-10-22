@@ -177,7 +177,7 @@ spec:
       serviceAccountName: spire-server
       containers:
         - name: spire-server
-          image: ghcr.io/spiffe/spire-server:1.10.4
+          image: ghcr.io/spiffe/spire-server:1.15.5
           args:
             - -config
             - /run/spire/config/server.conf
@@ -434,7 +434,7 @@ kubectl -n spire describe pod spire-server-0 | select-string "Image:"
 Should yield two lines depending on which deployment you used:
 
 ```
-    Image:         ghcr.io/spiffe/spire-server:1.10.4
+    Image:         ghcr.io/spiffe/spire-server:1.15.5
     Image:         <TORNJAK-IMAGE>
 ```
 

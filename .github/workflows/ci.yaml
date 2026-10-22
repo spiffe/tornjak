@@ -26,7 +26,7 @@ jobs:
 
       - uses: actions/setup-node@v6.2.0
         with:
-          node-version: '18'
+          node-version: '24.22.1'
 
       # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU
@@ -41,7 +41,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v9.2.0
         with:
-          version: v2.1.6
+          version: v2.11.4
           args: --timeout 7m
 
       - name: Go unit tests
