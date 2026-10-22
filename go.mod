@@ -1,6 +1,6 @@
 module github.com/spiffe/tornjak
 
-go 1.24.3
+go 1.26.10
 
 require (
 	github.com/MicahParks/keyfunc/v2 v2.1.0
