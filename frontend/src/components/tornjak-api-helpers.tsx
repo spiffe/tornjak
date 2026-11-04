@@ -330,19 +330,16 @@ class TornjakApi extends Component<TornjakApiProp, TornjakApiState> {
 
   // clusterDelete - returns success message after successful deletion of a cluster in manager mode
   async clusterDelete(serverName: string, inputData: { cluster: { name: string; }; }, clustersListUpdateFunc: { (globalClustersList: ClustersList[]): void }, globalClustersList: any[]) {
-    const response = await axios.post(GetApiServerUri("/manager-api/tornjak/clusters/delete/") + serverName, inputData,
-      {
-        crossdomain: true,
-      })
-      .then(function (response) {
-        clustersListUpdateFunc(globalClustersList.filter(el =>
-          el.name !== inputData))
-        return response.data;
-      })
-      .catch(function (error) {
-        return error.message;
-      })
-    return response.data;
+    try {
+      const response = await axios.post(GetApiServerUri("/manager-api/tornjak/clusters/delete/") + serverName, inputData,
+        {
+          crossdomain: true,
+        });
+      clustersListUpdateFunc(globalClustersList.filter(el => el.name !== inputData.cluster.name));
+      return response.data;
+    } catch (error: any) {
+      return error.message;
+    }
   }
 
   async serverDelete(inputData: { server: { name: string; }; }, serversListUpdateFunc: { (globalServersList: ServersList[]): void }, globalServersList: any[]) {
